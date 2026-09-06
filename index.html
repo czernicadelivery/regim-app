@@ -1029,27 +1029,32 @@ async function mockMentorAI(dayData) {
 }
 
 /* ============================================================================
-   REAL AI — wywołanie prawdziwego modelu przez Twoją Cloud Function.
-   Function `mentorAI` (patrz functions/index.js) trzyma klucz API po stronie
-   serwera (Firebase secret ANTHROPIC_API_KEY) i woła Anthropic /v1/messages.
-   Podmień MENTOR_AI_ENDPOINT na URL wdrożonej funkcji.
+   REAL AI — bezpośrednie wywołanie modelu Google Gemini z przeglądarki.
    ============================================================================ */
 const USE_REAL_AI = true;
-const MENTOR_AI_ENDPOINT = "https://us-central1-regim-web.cloudfunctions.net/mentorAI";
+const GEMINI_API_KEY = "AQ.Ab8RN6IZgY_1yPYLsiemiLHE2MPUL8LmFZ72ZhaBhZhYNoA9YA"; // Wklej tutaj swój darmowy klucz z Google AI Studio
+const GEMINI_ENDPOINT = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`;
 
 async function callRealMentorAI(dayData) {
-  const response = await fetch(MENTOR_AI_ENDPOINT, {
+  const fullPrompt = `${MENTOR_SYSTEM_PROMPT}\n\nDane użytkownika:\n${buildMentorUserPrompt(dayData)}`;
+
+  const response = await fetch(GEMINI_ENDPOINT, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
-      system: MENTOR_SYSTEM_PROMPT,
-      user: buildMentorUserPrompt(dayData),
+      contents: [{
+        parts: [{ text: fullPrompt }]
+      }]
     }),
   });
+
   if (!response.ok) throw new Error(`Błąd API mentora (${response.status})`);
+  
   const data = await response.json();
-  if (!data.reply) throw new Error("Pusta odpowiedź mentora");
-  return data.reply;
+  const reply = data.candidates?.[0]?.content?.parts?.[0]?.text;
+  
+  if (!reply) throw new Error("Pusta odpowiedź mentora");
+  return reply;
 }
 
 async function runMentorAI(dayData) {
