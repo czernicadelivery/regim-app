@@ -940,89 +940,117 @@ async function mockMentorAI(dayData) {
   const m = dayData.morning || {};
   const e = dayData.evening || {};
   const pct = dayData.completedPct ?? 0;
+  const tdee = getTDEE();
+  const diff = e.caloriesEaten != null ? e.caloriesEaten - tdee : null;
   const lines = [];
 
+  // 1. ZADANIA (ogólny klimat dnia)
+  if (pct === 100) {
+    lines.push(`Rozwaliłeś system, 100% zadań odhaczone. Taka konsekwencja robi największą robotę.`);
+  } else if (pct >= 70) {
+    lines.push(`Zrobiłeś ${pct}% planu. Większość siedzi, solidny dzień, ale dało się wyciągnąć maksa.`);
+  } else if (pct >= 40) {
+    lines.push(`Tylko ${pct}% zrobione. Trochę leniwie dzisiaj, odpuściłeś za dużo rzeczy.`);
+  } else if (pct > 0) {
+    lines.push(`Zrobiłeś ledwie ${pct}%. Dobrze, że cokolwiek ruszyłeś, ale umówmy się – to był dzień na przeczekanie.`);
+  } else {
+    lines.push(`Totalne zero dzisiaj. Każdy ma słabszy dzień, ale jutro od rana wracasz do ciśnięcia.`);
+  }
+
+  // 2. SEN (szczegóły: głęboki, płytki, REM, pobudki, tętno)
   if (m.sleepTotal != null) {
-    if (m.sleepTotal < 6.5) {
-      lines.push(`${m.sleepTotal}h snu to zdecydowanie za mało — układ nerwowy nie zdążył się zregenerować, a hormon wzrostu wydziela się głównie w głębokich fazach nocnego snu. Dziś priorytet to nie intensywność, tylko odbudowa.`);
-    } else if (m.sleepTotal < 7.5) {
-      lines.push(`${m.sleepTotal}h snu to wynik graniczny — działasz, ale bez zapasu. Regeneracja układu nerwowego idzie na styk, więc dziś pilnuj tempa, nie przeciążaj się bez potrzeby.`);
+    if (m.sleepTotal < 5) {
+      lines.push(`Spałeś ledwie ${m.sleepTotal}h. Twój organizm jest teraz na oparach, więc dzisiaj trening traktuj luźniej, żeby się nie zajechać.`);
+    } else if (m.sleepTotal < 7) {
+      lines.push(`${m.sleepTotal}h snu to trochę mało. Przeżyjesz, ale brakuje tego zapasu do pełnej regeneracji.`);
+    } else if (m.sleepTotal <= 9) {
+      lines.push(`Zaliczyłeś ${m.sleepTotal}h snu. Bateria naładowana w opór, masz z czego czerpać siłę.`);
     } else {
-      lines.push(`${m.sleepTotal}h snu to solidna baza pod regenerację — masz z czego czerpać energię na dziś.`);
+      lines.push(`Spałeś aż ${m.sleepTotal}h. Dobry reset, obyś tylko nie był po tym zaspany i przymulony.`);
+    }
+
+    if (m.sleepDeep != null) {
+      const deepRatio = m.sleepDeep / m.sleepTotal;
+      if (deepRatio < 0.15) {
+        lines.push(`Snu głębokiego było za mało. To wtedy mięśnie rosną po treningu, więc fizycznie możesz czuć się niedorobiony.`);
+      } else if (deepRatio > 0.22) {
+        lines.push(`Głęboki sen wszedł świetnie. Idealne warunki do budowy masy.`);
+      }
+    }
+
+    // Jeśli masz dane o REM i płytkim – tu można je wpiąć
+    if (m.sleepRem != null && (m.sleepRem / m.sleepTotal) < 0.15) {
+      lines.push(`Faza REM leży, przez to mózg słabiej trawi stres z całego dnia.`);
+    }
+    if (m.sleepLight != null && (m.sleepLight / m.sleepTotal) > 0.60) {
+      lines.push(`Miałeś bardzo dużo płytkiego snu, więc mogłeś się kręcić i nie wejść w ten właściwy odpoczynek.`);
+    }
+
+    if (m.sleepWakes != null) {
+      if (m.sleepWakes >= 4) {
+        lines.push(`Wybudzałeś się w nocy ${m.sleepWakes} razy. Taka szarpana noc totalnie psuje proces odpoczynku.`);
+      } else if (m.sleepWakes === 0) {
+        lines.push(`Zero pobudek, spałeś jak kamień. Tak trzeba.`);
+      }
+    }
+
+    if (m.sleepHr != null) {
+      if (m.sleepHr > 65) {
+        lines.push(`Puls w nocy wynosił ${m.sleepHr} bpm. Organizmy z czymś walczył – może za późno jadłeś albo stresowałeś się przed spaniem.`);
+      } else if (m.sleepHr < 50) {
+        lines.push(`Serce spokojne w nocy (${m.sleepHr} bpm), głęboki luz.`);
+      }
     }
   }
 
-  if (m.sleepDeep != null && m.sleepTotal) {
-    const deepRatio = m.sleepDeep / m.sleepTotal;
-    if (deepRatio < 0.12) {
-      lines.push(`Głębokiego snu było niewiele względem całości — to właśnie ta faza odpowiada za regenerację fizyczną i wydzielanie hormonu wzrostu, więc odbudowa mięśni po treningu może iść wolniej.`);
+  // 3. KALORIE, RUCH I MASA (kombinacje)
+  if (diff != null && e.steps != null) {
+    if (diff < -300) {
+      lines.push(`Jesz o ${Math.abs(Math.round(diff))} kcal za mało. Jesteś na minusie, więc zapomnij o budowaniu masy, dopóki nie dorzucisz żarcia.`);
+    } else if (diff > 300) {
+      if (e.steps < 4000) {
+        lines.push(`Dobra nadwyżka (${Math.round(diff)} kcal na plusie), ale przesiedziałeś dzień na tyłku (${e.steps} kroków). Bez ruchu to pójdzie prosto w brzuch, a nie w bica.`);
+      } else {
+        lines.push(`Masz ${Math.round(diff)} kcal na plusie i konkretny ruch (${e.steps} kroków). Takie kombo robi najlepszą robotę dla budowy mięśni.`);
+      }
+    } else {
+      lines.push(`Z kaloriami jesteś w okolicach zera. Zjedz trochę więcej, żeby mieć bezpieczną górkę na rozwój mięśni.`);
     }
+  } else if (diff != null) {
+    // Jeśli brakuje kroków, a są kalorie
+    if (diff < -300) lines.push(`Kalorie na potężnym minusie (${Math.abs(Math.round(diff))} kcal brakuje). Masa sama się nie zrobi bez jedzenia.`);
+    else if (diff > 300) lines.push(`Nadwyżka kaloryczna siadła (${Math.round(diff)} kcal). Pilnuj tylko białka.`);
   }
 
-  if (m.sleepWakes != null && m.sleepWakes >= 3) {
-    lines.push(`${m.sleepWakes} pobudek w nocy fragmentuje cykle snu — nawet przy dobrym czasie łącznym, organizm nie wchodzi głęboko w regenerację układu nerwowego.`);
+  // 4. WAGA I TRENDY
+  if (m.weeklyWeight != null) {
+    lines.push(`Dzisiejsza waga: ${m.weeklyWeight} kg. Pamiętaj, żeby nie spinać się jednym dniem, bo to skacze od wody i jedzenia w jelitach. Patrzymy na trend z całego miesiąca.`);
   }
 
-  if (m.sleepHr != null && m.sleepHr > 65) {
-    lines.push(`Tętno podczas snu na poziomie ${m.sleepHr} bpm jest podwyższone — to sygnał, że organizm mógł nie w pełni się wyciszyć (stres, późny posiłek, ekran przed snem).`);
-  }
-
+  // 5. STRES I DOTLENIENIE (wieczorne odczyty)
   if (e.stress != null) {
     if (e.stress > 65) {
-      lines.push(`Stres na poziomie ${e.stress}/100 to wysoki obciążnik dla układu nerwowego — dziś regeneracja (sen, spokojny wieczór) jest ważniejsza niż dokładanie kolejnych bodźców.`);
-    } else if (e.stress < 30) {
-      lines.push(`Niski stres (${e.stress}/100) — układ nerwowy pracuje na spokojnym, stabilnym poziomie, to dobry dzień na solidny trening.`);
+      lines.push(`Wysoki stres pod koniec dnia (${e.stress}/100). Twój układ nerwowy dostał po tyłku, musisz bezwzględnie odpocząć i zrobić reset.`);
+    } else if (e.stress < 35) {
+      lines.push(`Stres na poziomie ${e.stress}/100, pełna kontrola i luz.`);
     }
   }
 
-  if (e.spo2 != null && e.spo2 < 95) {
-    lines.push(`SpO2 na poziomie ${e.spo2}% jest niżej niż zwykle warto — jeśli to się powtarza, warto to obserwować, bo tlenowanie krwi wpływa bezpośrednio na regenerację i energię.`);
+  if (e.spo2 != null && e.spo2 < 94) {
+    lines.push(`Słabe dotlenienie krwi (${e.spo2}%). Przewietrz koniecznie pokój przed spaniem.`);
   }
 
-  if (e.steps != null) {
-    if (e.steps < 4000) {
-      lines.push(`${e.steps} kroków to mało ruchu bazowego jak na dzień budowania masy — pamiętaj, że nadwyżka kaloryczna działa najlepiej razem z aktywnością, nie zamiast niej.`);
-    } else if (e.steps > 12000) {
-      lines.push(`${e.steps} kroków to sporo wydatku energetycznego — dopilnuj, żeby dzisiejsza podaż kalorii to pokryła, inaczej zjadasz własną nadwyżkę zamiast budować masę.`);
-    }
+  // 6. PODSUMOWANIE I AKCJA NA WIECZÓR
+  if (lines.length === 0) {
+    return "Pusto tu. Uzupełnij raporty, to będę miał z czego wyciągać wnioski.";
   }
 
-  if (e.caloriesEaten != null) {
-    const tdee = getTDEE();
-    const diff = e.caloriesEaten - tdee;
-    if (diff < -200) {
-      lines.push(`Zjadłeś ${e.caloriesEaten} kcal wobec celu ${tdee} kcal — to deficyt ${Math.abs(Math.round(diff))} kcal, więc dzisiejszy dzień pracował przeciwko budowaniu masy, nie za nią.`);
-    } else if (diff > 200) {
-      lines.push(`Nadwyżka ${Math.round(diff)} kcal ponad cel (${e.caloriesEaten} vs ${tdee} kcal) — solidnie, tak buduje się masa, o ile jakość jedzenia też trzyma poziom.`);
-    } else {
-      lines.push(`${e.caloriesEaten} kcal to blisko celu ${tdee} kcal — stabilna, przewidywalna nadwyżka.`);
-    }
-  }
-
-  if (m.weeklyWeight != null) {
-    lines.push(`Waga tygodniowa zapisana: ${m.weeklyWeight} kg — patrz na trend z tygodnia na tydzień, nie na pojedynczy odczyt.`);
-  }
-
-  if (pct === 100) {
-    lines.push(`Wszystkie zadania dnia zaliczone — to właśnie powtarzalność, dzień po dniu, buduje realny postęp, nie pojedynczy dobry dzień.`);
-  } else if (pct >= 50) {
-    lines.push(`${pct}% zadań zrobione — dobra baza, dociągnij resztę, żeby dzień był kompletny.`);
-  } else if (pct > 0) {
-    lines.push(`${pct}% zadań na dziś — zacząłeś, ale zostawiłeś dużo na stole. Jutro nadrabiasz od rana.`);
+  if (m.sleepTotal != null && m.sleepTotal < 6) {
+    lines.push(`Zadanie na teraz: odetnij ekrany wcześniej i idź spać, musisz odespać dzisiejsze braki.`);
+  } else if (e.stress != null && e.stress > 60) {
+    lines.push(`Zadanie na teraz: wyluzuj, zrób krótki reset szczęki i po prostu wycisz głowę przed snem.`);
   } else {
-    lines.push(`Zero zadań dziś zaliczonych — zdarza się, ale jutro wracasz do systemu, jeden słabszy dzień niczego nie przekreśla, jeśli się nie powtórzy.`);
-  }
-
-  if (lines.length < 2) {
-    lines.push(`Uzupełnij raport poranny i wieczorny, żeby analiza była pełniejsza — im więcej danych, tym dokładniejszy obraz regeneracji i energii.`);
-  }
-
-  if (m.sleepTotal != null && m.sleepTotal < 7.5) {
-    lines.push(`Na dziś wieczór: połóż się 30-45 minut wcześniej niż zwykle.`);
-  } else if (e.stress != null && e.stress > 65) {
-    lines.push(`Na dziś wieczór: krótki reset szczęki i wcześniejsze wyciszenie ekranów.`);
-  } else {
-    lines.push(`Na jutro: utrzymaj ten sam rytm, to on buduje wynik w czasie.`);
+    lines.push(`Trzymaj ten sam rytm jutro. Dobrze ci idzie, nie psuj tego.`);
   }
 
   return lines.join(" ");
