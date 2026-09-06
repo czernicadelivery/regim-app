@@ -14,7 +14,6 @@ importScripts("https://www.gstatic.com/firebasejs/10.13.0/firebase-messaging-com
 const firebaseConfig = {
   apiKey: "AIzaSyChzU-QWJ_lyE7kLePHCvYltIayMZuXlL8",
   authDomain: "regim-web.firebaseapp.com",
-  databaseURL: "https://regim-web-default-rtdb.europe-west1.firebasedatabase.app",
   projectId: "regim-web",
   storageBucket: "regim-web.firebasestorage.app",
   messagingSenderId: "1025631760665",
