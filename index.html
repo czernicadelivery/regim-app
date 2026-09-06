@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="pl" class="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>REGIM // Dyscyplina</title>
+<meta name="description" content="System kontroli dyscypliny sportowo-życiowej. Zero wymówek.">
+<meta name="theme-color" content="#0a0a0a">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 fill=%22%230a0a0a%22/><text x=%2250%22 y=%2268%22 font-size=%2260%22 text-anchor=%22middle%22 fill=%22%23dc2626%22 font-family=%22Arial%22 font-weight=%22900%22>R</text></svg>">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+
+<!-- Tailwind (CDN build, konfiguracja inline poniżej) -->
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    darkMode: 'class',
+    theme: {
+      extend: {
+        fontFamily: {
+          display: ['"Oswald"', 'sans-serif'],
+          mono: ['"JetBrains Mono"', 'monospace'],
+        },
+        colors: {
+          void: '#0a0a0a',
+          panel: '#141414',
+          line: '#262626',
+          blood: '#dc2626',
+          bloodDim: '#7f1d1d',
+          win: '#16a34a',
+          winDim: '#14532d',
+          warn: '#d97706',
+        },
+      },
+    },
+  }
+</script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+
+<!-- Firebase SDK (modular, v10) -->
+<script type="module" src="app.js" defer></script>
+
+<style>
+  html, body { background:#0a0a0a; }
+  * { -webkit-tap-highlight-color: transparent; }
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: #0a0a0a; }
+  ::-webkit-scrollbar-thumb { background: #dc2626; }
+
+  .brutal-border { border: 2px solid #262626; }
+  .brutal-border-active { border: 2px solid #dc2626; }
+
+  @keyframes pulse-red {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(220,38,38,0.5); }
+    50% { box-shadow: 0 0 0 6px rgba(220,38,38,0); }
+  }
+  .streak-alive { animation: pulse-red 2s infinite; }
+
+  @keyframes slide-up {
+    from { transform: translateY(12px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+  }
+  .slide-up { animation: slide-up 0.25s ease-out; }
+
+  .task-done { text-decoration: line-through; opacity: 0.45; }
+
+  input[type="number"]::-webkit-outer-spin-button,
+  input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+  input[type="number"] { -moz-appearance: textfield; }
+
+  .tab-active { color: #dc2626; border-color: #dc2626; }
+
+  .day-cell { aspect-ratio: 1; }
+</style>
+</head>
+<body class="bg-void text-neutral-200 font-sans min-h-screen pb-24 select-none">
+
+<!-- ============ NAGŁÓWEK ============ -->
+<header class="sticky top-0 z-30 bg-void/95 backdrop-blur border-b-2 border-line">
+  <div class="max-w-2xl mx-auto px-4 py-3 flex items-center justify-between">
+    <div class="flex items-center gap-2">
+      <span class="font-display font-700 text-2xl tracking-tight text-neutral-100">REGIM<span class="text-blood">.</span></span>
+    </div>
+    <div class="flex items-center gap-3">
+      <div id="streak-badge" class="flex items-center gap-1.5 font-mono text-sm px-2.5 py-1 brutal-border">
+        <span class="text-blood text-lg leading-none">▲</span>
+        <span id="streak-count" class="font-bold text-neutral-100">0</span>
+      </div>
+      <button id="btn-signin" class="font-mono text-xs text-neutral-500 hover:text-neutral-200 px-2 py-1 brutal-border">LOGUJ</button>
+      <div id="user-badge" class="hidden font-mono text-xs text-neutral-500 truncate max-w-[80px]"></div>
+    </div>
+  </div>
+</header>
+
+<main class="max-w-2xl mx-auto px-4">
+
+  <!-- ============ NAWIGACJA ZAKŁADEK ============ -->
+  <nav class="flex border-b-2 border-line mt-4 mb-5 sticky top-[57px] z-20 bg-void">
+    <button data-tab="dashboard" class="tab-btn tab-active flex-1 py-3 font-display uppercase tracking-wide text-sm border-b-2 -mb-0.5 transition-colors">Dzień</button>
+    <button data-tab="mowa" class="tab-btn text-neutral-500 flex-1 py-3 font-display uppercase tracking-wide text-sm border-b-2 border-transparent -mb-0.5 transition-colors">Mowa</button>
+    <button data-tab="watch" class="tab-btn text-neutral-500 flex-1 py-3 font-display uppercase tracking-wide text-sm border-b-2 border-transparent -mb-0.5 transition-colors">Zegarek</button>
+  </nav>
+
+  <!-- ============ ZAKŁADKA: DASHBOARD ============ -->
+  <section id="tab-dashboard" class="tab-panel">
+
+    <!-- Kalendarz -->
+    <div class="brutal-border p-3 mb-5 bg-panel">
+      <div class="flex items-center justify-between mb-3">
+        <button id="cal-prev" class="w-8 h-8 flex items-center justify-center font-mono text-lg text-neutral-500 hover:text-blood">‹</button>
+        <span id="cal-label" class="font-display uppercase tracking-widest text-sm text-neutral-300">-- ----</span>
+        <button id="cal-next" class="w-8 h-8 flex items-center justify-center font-mono text-lg text-neutral-500 hover:text-blood">›</button>
+      </div>
+      <div class="grid grid-cols-7 gap-1 mb-1">
+        <div class="text-center font-mono text-[10px] text-neutral-600">PN</div>
+        <div class="text-center font-mono text-[10px] text-neutral-600">WT</div>
+        <div class="text-center font-mono text-[10px] text-neutral-600">ŚR</div>
+        <div class="text-center font-mono text-[10px] text-neutral-600">CZ</div>
+        <div class="text-center font-mono text-[10px] text-neutral-600">PT</div>
+        <div class="text-center font-mono text-[10px] text-neutral-600">SO</div>
+        <div class="text-center font-mono text-[10px] text-neutral-600">ND</div>
+      </div>
+      <div id="cal-grid" class="grid grid-cols-7 gap-1"></div>
+    </div>
+
+    <!-- Status dzisiaj -->
+    <div class="flex items-center justify-between mb-4">
+      <h2 class="font-display uppercase text-lg tracking-wide text-neutral-100">Dzisiaj</h2>
+      <span id="today-progress" class="font-mono text-sm text-neutral-500">0/0</span>
+    </div>
+
+    <!-- To-Do lista -->
+    <div id="todo-list" class="space-y-2 mb-6"></div>
+
+    <!-- AI Coach skrót -->
+    <div id="ai-verdict-box" class="hidden brutal-border p-4 mb-6 bg-panel">
+      <div class="font-mono text-[10px] text-blood uppercase tracking-widest mb-1">Werdykt AI</div>
+      <p id="ai-verdict-text" class="text-sm text-neutral-300 leading-relaxed"></p>
+    </div>
+
+  </section>
+
+  <!-- ============ ZAKŁADKA: MOWA (STOPER) ============ -->
+  <section id="tab-mowa" class="tab-panel hidden">
+    <div class="brutal-border bg-panel p-6 text-center mb-5">
+      <div class="font-mono text-[11px] uppercase tracking-widest text-neutral-500 mb-2">Faza</div>
+      <div id="speech-phase-name" class="font-display uppercase text-2xl text-neutral-100 mb-4">Gotowy</div>
+      <div id="speech-timer" class="font-mono text-6xl font-bold text-blood mb-6 tabular-nums">00:00</div>
+
+      <div class="grid grid-cols-3 gap-1 mb-6">
+        <div id="phase-dot-1" class="h-1.5 bg-line"></div>
+        <div id="phase-dot-2" class="h-1.5 bg-line"></div>
+        <div id="phase-dot-3" class="h-1.5 bg-line"></div>
+      </div>
+
+      <button id="speech-start-btn" class="w-full py-4 bg-blood text-white font-display uppercase tracking-widest text-lg hover:bg-red-700 active:scale-[0.98] transition">Start</button>
+      <button id="speech-stop-btn" class="hidden w-full py-3 mt-2 brutal-border text-neutral-400 font-display uppercase tracking-widest text-sm hover:border-blood hover:text-blood">Przerwij</button>
+    </div>
+
+    <div class="brutal-border bg-panel p-4 space-y-3 font-mono text-xs text-neutral-500">
+      <div class="flex justify-between border-b border-line pb-2"><span>FAZA 1</span><span class="text-neutral-300">2:00 — Masaż / kląskanie</span></div>
+      <div class="flex justify-between border-b border-line pb-2"><span>FAZA 2</span><span class="text-neutral-300">3:00 — Szybkie T-D-T-D</span></div>
+      <div class="flex justify-between"><span>FAZA 3</span><span class="text-neutral-300">5:00 — TDAWA / DOWED</span></div>
+    </div>
+  </section>
+
+  <!-- ============ ZAKŁADKA: ZEGAREK & AI COACH ============ -->
+  <section id="tab-watch" class="tab-panel hidden">
+
+    <form id="watch-form" class="brutal-border bg-panel p-4 mb-5 grid grid-cols-2 gap-3">
+      <div class="col-span-2 font-display uppercase text-sm tracking-wide text-neutral-100 mb-1">Dane z zegarka — dziś</div>
+
+      <label class="block">
+        <span class="font-mono text-[10px] uppercase text-neutral-500">Sen (h)</span>
+        <input type="number" step="0.1" id="input-sleep" class="w-full mt-1 bg-void brutal-border px-2 py-2 font-mono text-neutral-100 focus:outline-none focus:border-blood" placeholder="7.5">
+      </label>
+      <label class="block">
+        <span class="font-mono text-[10px] uppercase text-neutral-500">Kroki</span>
+        <input type="number" id="input-steps" class="w-full mt-1 bg-void brutal-border px-2 py-2 font-mono text-neutral-100 focus:outline-none focus:border-blood" placeholder="8000">
+      </label>
+      <label class="block">
+        <span class="font-mono text-[10px] uppercase text-neutral-500">Śr. tętno</span>
+        <input type="number" id="input-hr" class="w-full mt-1 bg-void brutal-border px-2 py-2 font-mono text-neutral-100 focus:outline-none focus:border-blood" placeholder="68">
+      </label>
+      <label class="block">
+        <span class="font-mono text-[10px] uppercase text-neutral-500">Kalorie spal.</span>
+        <input type="number" id="input-calories" class="w-full mt-1 bg-void brutal-border px-2 py-2 font-mono text-neutral-100 focus:outline-none focus:border-blood" placeholder="2400">
+      </label>
+      <label class="block col-span-2">
+        <span class="font-mono text-[10px] uppercase text-neutral-500">Waga (kg)</span>
+        <input type="number" step="0.1" id="input-weight" class="w-full mt-1 bg-void brutal-border px-2 py-2 font-mono text-neutral-100 focus:outline-none focus:border-blood" placeholder="82.4">
+      </label>
+
+      <button type="submit" class="col-span-2 mt-2 py-3 brutal-border-active text-blood font-display uppercase tracking-widest text-sm hover:bg-blood hover:text-white transition">Zapisz dane</button>
+    </form>
+
+    <button id="btn-analyze-ai" class="w-full py-4 mb-5 bg-blood text-white font-display uppercase tracking-widest hover:bg-red-700 active:scale-[0.98] transition flex items-center justify-center gap-2">
+      <span id="ai-btn-label">Analizuj dzień z AI</span>
+      <span id="ai-btn-spinner" class="hidden animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full"></span>
+    </button>
+
+    <div id="ai-result-box" class="hidden brutal-border bg-panel p-4 mb-6">
+      <div class="font-mono text-[10px] text-blood uppercase tracking-widest mb-2">Werdykt trenera</div>
+      <p id="ai-result-text" class="text-sm text-neutral-200 leading-relaxed whitespace-pre-line"></p>
+    </div>
+
+    <div class="brutal-border bg-panel p-3 mb-5">
+      <div class="font-mono text-[10px] uppercase text-neutral-500 mb-2 tracking-widest">Waga — 7 dni</div>
+      <canvas id="chart-weight" height="140"></canvas>
+    </div>
+
+    <div class="brutal-border bg-panel p-3 mb-6">
+      <div class="font-mono text-[10px] uppercase text-neutral-500 mb-2 tracking-widest">Sen — 7 dni</div>
+      <canvas id="chart-sleep" height="140"></canvas>
+    </div>
+  </section>
+
+</main>
+
+<!-- ============ MODAL: ARCHIWUM DNIA ============ -->
+<div id="modal-backdrop" class="hidden fixed inset-0 bg-black/80 z-40 flex items-end sm:items-center justify-center p-0 sm:p-4">
+  <div id="modal-box" class="slide-up bg-panel brutal-border-active w-full sm:max-w-md max-h-[85vh] overflow-y-auto p-5">
+    <div class="flex items-center justify-between mb-4">
+      <span id="modal-date" class="font-display uppercase text-lg text-neutral-100">--</span>
+      <button id="modal-close" class="font-mono text-neutral-500 hover:text-blood text-xl leading-none">✕</button>
+    </div>
+    <div id="modal-content" class="space-y-4 font-mono text-sm"></div>
+  </div>
+</div>
+
+<!-- ============ TOAST ============ -->
+<div id="toast" class="hidden fixed bottom-5 left-1/2 -translate-x-1/2 z-50 brutal-border-active bg-panel px-4 py-2 font-mono text-xs text-neutral-100"></div>
+
+</body>
+</html>
