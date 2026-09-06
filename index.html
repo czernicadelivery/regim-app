@@ -1116,21 +1116,19 @@ let currentUser = { uid: "local" };
 let fcmMessaging = null;
 
 const firebaseConfig = {
-  apiKey: "TWOJ_API_KEY",
-  authDomain: "TWOJ_PROJEKT.firebaseapp.com",
-  projectId: "TWOJ_PROJEKT",
-  storageBucket: "TWOJ_PROJEKT.appspot.com",
-  messagingSenderId: "0000000000",
-  appId: "1:0000000000:web:xxxxxxxxxxxxxxxx",
+  apiKey: "AIzaSyChzU-QWJ_lyE7kLePHCvYltIayMZuXlL8",
+  authDomain: "regim-web.firebaseapp.com",
+  databaseURL: "https://regim-web-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "regim-web",
+  storageBucket: "regim-web.firebasestorage.app",
+  messagingSenderId: "1025631760665",
+  appId: "1:1025631760665:web:93c5b62295bd8b0b675588",
 };
-// Cloud Messaging → Web Push certificates → wygeneruj i wklej klucz "pair" (Key pair) poniżej.
+
+// Ponieważ rezygnujemy z płatnego Clouda i VAPID, zostawiamy pusty string lub null:
 const VAPID_KEY = "TWOJ_VAPID_KEY";
 
 async function initFirebase() {
-  if (firebaseConfig.apiKey === "TWOJ_API_KEY") {
-    console.info("Firebase nieskonfigurowany — tryb lokalny (localStorage) aktywny.");
-    return;
-  }
   try {
     const { initializeApp } = await import("https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js");
     const authMod = await import("https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js");
@@ -1156,67 +1154,11 @@ async function initFirebase() {
         await authMod.signInAnonymously(auth);
       }
     });
-
-    // Prawdziwy push dostępny tylko gdy Firebase skonfigurowany
-    if (VAPID_KEY !== "TWOJ_VAPID_KEY" && !localStorage.getItem("regim:push-dismissed") && Notification?.permission !== "granted") {
-      document.getElementById("push-banner").classList.remove("hidden");
-    }
   } catch (e) {
     console.warn("Błąd inicjalizacji Firebase — tryb lokalny.", e);
   }
 }
 
-function localKey(key) { return `regim:${currentUser.uid}:${key}`; }
-
-async function saveDayDoc(dayData) {
-  if (firebaseReady && window.__fb) {
-    const { fsMod, db } = window.__fb;
-    const ref = fsMod.doc(db, "users", currentUser.uid, "days", dayData.date);
-    await fsMod.setDoc(ref, dayData, { merge: true });
-  } else {
-    localStorage.setItem(localKey(dayData.date), JSON.stringify(dayData));
-  }
-}
-
-async function loadDayDoc(dateStr) {
-  if (firebaseReady && window.__fb) {
-    const { fsMod, db } = window.__fb;
-    const ref = fsMod.doc(db, "users", currentUser.uid, "days", dateStr);
-    const snap = await fsMod.getDoc(ref);
-    return snap.exists() ? snap.data() : null;
-  } else {
-    const raw = localStorage.getItem(localKey(dateStr));
-    return raw ? JSON.parse(raw) : null;
-  }
-}
-
-async function loadLastNDays(n) {
-  const docs = [];
-  const today = new Date();
-
-  if (firebaseReady && window.__fb) {
-    const { fsMod, db } = window.__fb;
-    const start = new Date(today);
-    start.setDate(start.getDate() - (n - 1));
-    const colRef = fsMod.collection(db, "users", currentUser.uid, "days");
-    const q = fsMod.query(
-      colRef,
-      fsMod.where("date", ">=", dateKey(start)),
-      fsMod.orderBy("date", "asc"),
-      fsMod.limit(n)
-    );
-    const snaps = await fsMod.getDocs(q);
-    snaps.forEach((s) => docs.push(s.data()));
-  } else {
-    for (let i = n - 1; i >= 0; i--) {
-      const d = new Date(today);
-      d.setDate(d.getDate() - i);
-      const raw = localStorage.getItem(localKey(dateKey(d)));
-      if (raw) docs.push(JSON.parse(raw));
-    }
-  }
-  return docs;
-}
 
 // Dni przesunięte wstecz o offsetDays, zakres n dni (do porównań tydzień-do-tygodnia)
 async function loadDaysRange(n, offsetDays) {
