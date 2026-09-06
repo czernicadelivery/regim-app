@@ -1,7 +1,7 @@
 // ============================================================================
 // REGIM — functions/index.js
-// 1) mentorAI — bezpieczny proxy do prawdziwego modelu AI (Anthropic Claude).
-//    Klucz API trzymany jest jako Firebase Secret (nigdy w kodzie front-endu).
+// 1) mentorAI — bezpieczny proxy do Google Gemini.
+//    Klucz API trzymany jest jako Firebase Secret (GEMINI_API_KEY).
 // 2) morningPush / afternoonPush / eveningPush — zaplanowany push (Firebase
 //    Cloud Messaging) o 8:00 / 15:30 / 20:00 czasu Warszawy.
 // ============================================================================
@@ -12,15 +12,15 @@ const { logger } = require("firebase-functions");
 const admin = require("firebase-admin");
 admin.initializeApp();
 
-const ANTHROPIC_API_KEY = defineSecret("ANTHROPIC_API_KEY");
+const GEMINI_API_KEY = defineSecret("GEMINI_API_KEY");
 
 // ----------------------------------------------------------------------------
-// MENTOR AI — proxy do Anthropic /v1/messages
+// MENTOR AI — proxy do Google Gemini API
 // Deploy: firebase deploy --only functions:mentorAI
-// Ustaw sekret raz: firebase functions:secrets:set ANTHROPIC_API_KEY
+// Ustaw sekret raz: firebase functions:secrets:set GEMINI_API_KEY
 // ----------------------------------------------------------------------------
 exports.mentorAI = onRequest(
-  { secrets: [ANTHROPIC_API_KEY], cors: true, region: "us-central1" },
+  { secrets: [GEMINI_API_KEY], cors: true, region: "us-central1" },
   async (req, res) => {
     if (req.method !== "POST") {
       res.status(405).json({ error: "Użyj POST" });
@@ -34,34 +34,31 @@ exports.mentorAI = onRequest(
     }
 
     try {
-      const response = await fetch("https://api.anthropic.com/v1/messages", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "x-api-key": ANTHROPIC_API_KEY.value(),
-          "anthropic-version": "2023-06-01",
-        },
-        body: JSON.stringify({
-          model: "claude-sonnet-4-6",
-          max_tokens: 400,
-          system,
-          messages: [{ role: "user", content: user }],
-        }),
-      });
+      const fullPrompt = `${system}\n\nDane użytkownika:\n${user}`;
+      const apiKey = GEMINI_API_KEY.value();
+
+      const response = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            contents: [{
+              parts: [{ text: fullPrompt }]
+            }]
+          }),
+        }
+      );
 
       if (!response.ok) {
         const errText = await response.text();
-        logger.error("Błąd Anthropic API", response.status, errText);
+        logger.error("Błąd Gemini API", response.status, errText);
         res.status(502).json({ error: "Błąd modelu AI" });
         return;
       }
 
       const data = await response.json();
-      const reply = (data.content || [])
-        .filter((block) => block.type === "text")
-        .map((block) => block.text)
-        .join("\n")
-        .trim();
+      const reply = data.candidates?.[0]?.content?.parts?.[0]?.text;
 
       if (!reply) {
         res.status(502).json({ error: "Pusta odpowiedź modelu" });
