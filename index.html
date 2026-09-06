@@ -117,9 +117,65 @@
   }
 
   .segmented { transition: all 0.3s cubic-bezier(0.16,1,0.3,1); }
+
+  /* ===== MOTYW JASNY ===== */
+  html.light-theme, html.light-theme body {
+    background: radial-gradient(ellipse 120% 80% at 50% -10%, #eef2ff 0%, #f7f5fb 55%), #f7f5fb;
+    color: #1e1a35;
+  }
+  html.light-theme .glass {
+    background: rgba(30, 26, 53, 0.045);
+    border: 1px solid rgba(30, 26, 53, 0.08);
+  }
+  html.light-theme .text-neutral-100 { color: #1e1a35; }
+  html.light-theme .text-neutral-200 { color: #2d2740; }
+  html.light-theme .text-neutral-300 { color: #433c5c; }
+  html.light-theme .text-neutral-400 { color: #6b6480; }
+  html.light-theme .text-neutral-500 { color: #837c99; }
+  html.light-theme .border-white\/5 { border-color: rgba(30,26,53,0.06); }
+  html.light-theme .border-white\/10 { border-color: rgba(30,26,53,0.1); }
+  html.light-theme .border-white\/15 { border-color: rgba(30,26,53,0.15); }
+  html.light-theme .bg-white\/5 { background-color: rgba(30,26,53,0.04); }
+  html.light-theme .bg-white\/10 { background-color: rgba(30,26,53,0.07); }
+  html.light-theme ::-webkit-scrollbar-thumb { background: #6d5fd6; }
+  html.light-theme .modal-backdrop { background: rgba(120, 113, 140, 0.35); }
+
+  /* ===== KALENDARZ MIESIĘCZNY ===== */
+  .cal-day {
+    aspect-ratio: 1;
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 700;
+    position: relative;
+  }
+  .cal-dot { width: 6px; height: 6px; border-radius: 50%; margin-top: 2px; }
+
+  /* ===== ODZNAKI ===== */
+  .badge-card { transition: all 0.25s ease; }
+  .badge-card.locked { opacity: 0.35; filter: grayscale(1); }
+  .badge-card.unlocked { animation: rise 0.4s cubic-bezier(0.16,1,0.3,1) both; }
+
+  /* ===== CONFETTI CANVAS ===== */
+  #confetti-canvas {
+    position: fixed; inset: 0; z-index: 60; pointer-events: none;
+  }
+
+  /* ===== QUOTE FADE ===== */
+  @keyframes quote-fade {
+    0% { opacity: 0; transform: translateY(4px); }
+    10% { opacity: 1; transform: translateY(0); }
+    90% { opacity: 1; }
+    100% { opacity: 0; transform: translateY(-4px); }
+  }
+  .quote-anim { animation: quote-fade 8s ease-in-out infinite; }
 </style>
 </head>
 <body class="text-neutral-100 font-sans min-h-screen pb-28">
+<canvas id="confetti-canvas"></canvas>
 
 <!-- ============ NAGŁÓWEK ============ -->
 <header class="sticky top-0 z-30 px-5 pt-5 pb-3 bg-gradient-to-b from-ink via-ink/95 to-transparent">
@@ -138,6 +194,12 @@
         <i class="fa-solid fa-fire text-peach"></i>
         <span id="streak-count">0</span>
       </div>
+      <button id="btn-theme-toggle" class="glass rounded-full w-9 h-9 flex items-center justify-center text-neutral-400 hover:text-gold transition">
+        <i class="fa-solid fa-moon" id="theme-icon"></i>
+      </button>
+      <button id="btn-export" class="glass rounded-full w-9 h-9 flex items-center justify-center text-neutral-400 hover:text-mint transition">
+        <i class="fa-solid fa-download"></i>
+      </button>
       <button id="btn-signin" class="glass rounded-full w-9 h-9 flex items-center justify-center text-neutral-400 hover:text-mint transition">
         <i class="fa-solid fa-user"></i>
       </button>
@@ -211,16 +273,25 @@
     </div>
   </section>
 
+  <!-- ============ CYTAT DNIA ============ -->
+  <div class="glass rounded-3xl px-4 py-3 mb-5 flex items-center gap-3 overflow-hidden">
+    <i class="fa-solid fa-quote-left text-mint text-sm flex-shrink-0"></i>
+    <p id="daily-quote" class="quote-anim text-xs text-neutral-300 font-semibold leading-snug"></p>
+  </div>
+
   <!-- ============ NAWIGACJA ZAKŁADEK ============ -->
   <nav class="flex glass rounded-full p-1.5 mb-5 gap-1">
-    <button data-tab="dashboard" class="tab-btn tab-underline flex-1 py-2.5 rounded-full text-sm font-bold bg-gradient-to-br from-mint to-lilac text-ink">
-      <i class="fa-solid fa-house mr-1.5"></i>Dziś
+    <button data-tab="dashboard" class="tab-btn tab-underline flex-1 py-2.5 rounded-full text-xs sm:text-sm font-bold bg-gradient-to-br from-mint to-lilac text-ink">
+      <i class="fa-solid fa-house mr-1"></i>Dziś
     </button>
-    <button data-tab="mowa" class="tab-btn tab-underline flex-1 py-2.5 rounded-full text-sm font-bold text-neutral-400">
-      <i class="fa-solid fa-comment-dots mr-1.5"></i>Mowa
+    <button data-tab="mowa" class="tab-btn tab-underline flex-1 py-2.5 rounded-full text-xs sm:text-sm font-bold text-neutral-400">
+      <i class="fa-solid fa-comment-dots mr-1"></i>Mowa
     </button>
-    <button data-tab="mentor" class="tab-btn tab-underline flex-1 py-2.5 rounded-full text-sm font-bold text-neutral-400">
-      <i class="fa-solid fa-brain mr-1.5"></i>Mentor
+    <button data-tab="postepy" class="tab-btn tab-underline flex-1 py-2.5 rounded-full text-xs sm:text-sm font-bold text-neutral-400">
+      <i class="fa-solid fa-chart-simple mr-1"></i>Postępy
+    </button>
+    <button data-tab="mentor" class="tab-btn tab-underline flex-1 py-2.5 rounded-full text-xs sm:text-sm font-bold text-neutral-400">
+      <i class="fa-solid fa-brain mr-1"></i>Mentor
     </button>
   </nav>
 
@@ -462,6 +533,58 @@
     </div>
   </section>
 
+  <!-- ============ ZAKŁADKA: POSTĘPY ============ -->
+  <section id="tab-postepy" class="tab-panel hidden space-y-5">
+
+    <!-- Cotygodniowe podsumowanie Mentora -->
+    <div class="glass rounded-4xl p-5 shadow-warm">
+      <div class="flex items-center justify-between mb-3">
+        <div class="flex items-center gap-2">
+          <i class="fa-solid fa-calendar-week text-peach"></i>
+          <span class="font-bold text-sm">Podsumowanie tygodnia</span>
+        </div>
+        <button id="btn-weekly-summary" class="text-xs font-bold text-mint glass rounded-full px-3 py-1.5 active:scale-95 transition">
+          <i class="fa-solid fa-arrows-rotate mr-1"></i>Odśwież
+        </button>
+      </div>
+      <p id="weekly-summary-text" class="text-sm text-neutral-200 leading-relaxed font-medium">Kliknij "Odśwież", żeby Mentor przeanalizował Twój ostatni tydzień.</p>
+    </div>
+
+    <!-- Kalendarz miesięczny -->
+    <div class="glass rounded-4xl p-5 shadow-soft">
+      <div class="flex items-center justify-between mb-4">
+        <button id="cal-prev" class="w-8 h-8 rounded-full glass flex items-center justify-center text-neutral-400 active:scale-90 transition"><i class="fa-solid fa-chevron-left text-xs"></i></button>
+        <div id="cal-month-label" class="font-extrabold text-base"></div>
+        <button id="cal-next" class="w-8 h-8 rounded-full glass flex items-center justify-center text-neutral-400 active:scale-90 transition"><i class="fa-solid fa-chevron-right text-xs"></i></button>
+      </div>
+      <div class="grid grid-cols-7 gap-1.5 mb-2 text-center">
+        <div class="text-[10px] font-bold text-neutral-500">Pn</div>
+        <div class="text-[10px] font-bold text-neutral-500">Wt</div>
+        <div class="text-[10px] font-bold text-neutral-500">Śr</div>
+        <div class="text-[10px] font-bold text-neutral-500">Cz</div>
+        <div class="text-[10px] font-bold text-neutral-500">Pt</div>
+        <div class="text-[10px] font-bold text-neutral-500">So</div>
+        <div class="text-[10px] font-bold text-neutral-500">Nd</div>
+      </div>
+      <div id="cal-grid" class="grid grid-cols-7 gap-1.5"></div>
+      <div class="flex items-center gap-4 mt-4 justify-center text-[10px] text-neutral-400 font-semibold">
+        <div class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-mint"></span>100%</div>
+        <div class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-gold"></span>Częściowo</div>
+        <div class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-white/15"></span>Brak</div>
+      </div>
+    </div>
+
+    <!-- Odznaki -->
+    <div class="glass rounded-4xl p-5 shadow-soft">
+      <div class="flex items-center gap-2 mb-4">
+        <i class="fa-solid fa-medal text-gold"></i>
+        <span class="font-bold text-sm">Odznaki</span>
+      </div>
+      <div id="badges-grid" class="grid grid-cols-3 gap-3"></div>
+    </div>
+
+  </section>
+
   <!-- ============ ZAKŁADKA: MENTOR AI + WYKRESY ============ -->
   <section id="tab-mentor" class="tab-panel hidden space-y-5">
 
@@ -491,6 +614,28 @@
         <i class="fa-solid fa-moon text-lilac"></i>Wykres czasu snu — głęboki / REM
       </div>
       <canvas id="chart-sleep" height="140"></canvas>
+    </div>
+
+    <div class="glass rounded-4xl p-4 shadow-soft">
+      <div class="flex items-center gap-2 mb-3 text-sm font-bold text-neutral-300">
+        <i class="fa-solid fa-shoe-prints text-peach"></i>Wykres kroków — 7 dni
+      </div>
+      <canvas id="chart-steps" height="140"></canvas>
+    </div>
+
+    <div class="glass rounded-4xl p-4 shadow-soft">
+      <div class="flex items-center gap-2 mb-3 text-sm font-bold text-neutral-300">
+        <i class="fa-solid fa-heart-pulse text-rose"></i>Wykres stresu — 7 dni
+      </div>
+      <canvas id="chart-stress" height="140"></canvas>
+    </div>
+
+    <div id="correlation-box" class="hidden glass rounded-4xl p-5 shadow-soft border border-lilac/20">
+      <div class="flex items-center gap-2 mb-2">
+        <i class="fa-solid fa-link text-lilac"></i>
+        <span class="font-bold text-sm text-lilac">Korelacja: sen a stres</span>
+      </div>
+      <p id="correlation-text" class="text-sm text-neutral-200 leading-relaxed font-medium"></p>
     </div>
   </section>
 
@@ -1187,7 +1332,13 @@ document.querySelectorAll("[data-check]").forEach((btn) => {
     renderCheckStates();
     renderProgress();
     await persistToday();
-    if (task.done) showToast("Zaliczone ✓");
+    if (task.done) {
+      vibrate(30);
+      showToast("Zaliczone ✓");
+      if (calcCompletionPct() === 100) {
+        setTimeout(() => { fireConfetti(); vibrate([40, 60, 40, 60, 80]); }, 250);
+      }
+    }
   });
 });
 
@@ -1257,6 +1408,7 @@ document.querySelectorAll(".tab-btn").forEach((btn) => {
     document.getElementById(`tab-${btn.dataset.tab}`).classList.remove("hidden");
 
     if (btn.dataset.tab === "mentor") renderCharts();
+    if (btn.dataset.tab === "postepy") { renderCalendar(); renderBadges(); }
   });
 });
 
@@ -1363,6 +1515,7 @@ async function finishSpeechTraining() {
   clearInterval(speechTimerHandle);
   beep(1046, 500);
   setTimeout(() => beep(1318, 500), 200);
+  vibrate([50, 80, 50, 80, 100]);
   document.getElementById("speech-phase-name").textContent = "Zrobione!";
   document.getElementById("speech-phase-label").textContent = "Świetna robota";
   document.getElementById("speech-icon").textContent = "🎉";
@@ -1378,6 +1531,9 @@ async function finishSpeechTraining() {
     renderProgress();
     await persistToday();
     showToast("Trening mowy zaliczony ✓");
+    if (calcCompletionPct() === 100) {
+      setTimeout(() => { fireConfetti(); vibrate([40, 60, 40, 60, 80]); }, 250);
+    }
   }
 }
 
@@ -1533,6 +1689,48 @@ async function renderCharts() {
       plugins: { legend: { display: true, labels: { color: "#c9c5d6", font: { family: "Poppins", size: 11, weight: "700" } } } },
     },
   });
+
+  const stepsValues = days.map((d) => d.evening?.steps ?? null);
+  const stepsCtx = document.getElementById("chart-steps");
+  if (window.__stepsChart) window.__stepsChart.destroy();
+  window.__stepsChart = new Chart(stepsCtx, {
+    type: "bar",
+    data: {
+      labels: sleepLabels,
+      datasets: [{
+        data: stepsValues,
+        backgroundColor: "rgba(251,191,157,0.55)",
+        borderRadius: 8,
+        maxBarThickness: 28,
+      }],
+    },
+    options: baseOptions,
+  });
+
+  const stressValues = days.map((d) => d.evening?.stress ?? null);
+  const stressCtx = document.getElementById("chart-stress");
+  if (window.__stressChart) window.__stressChart.destroy();
+  window.__stressChart = new Chart(stressCtx, {
+    type: "line",
+    data: {
+      labels: sleepLabels,
+      datasets: [{
+        data: stressValues,
+        borderColor: "#fb7185",
+        backgroundColor: "rgba(251,113,133,0.12)",
+        pointBackgroundColor: "#fb7185",
+        pointBorderColor: "#0f0c1d",
+        pointRadius: 4,
+        borderWidth: 3,
+        tension: 0.45,
+        fill: true,
+        spanGaps: true,
+      }],
+    },
+    options: { ...baseOptions, scales: { ...baseOptions.scales, y: { ...baseOptions.scales.y, min: 0, max: 100 } } },
+  });
+
+  renderCorrelation();
 }
 
 // ----------------------------------------------------------------------------
@@ -1656,15 +1854,63 @@ document.getElementById("btn-notif-dismiss").addEventListener("click", () => {
 // ----------------------------------------------------------------------------
 if ("serviceWorker" in navigator) {
   const swCode = `
-    const CACHE_NAME = "regim-cache-v1";
-    self.addEventListener("install", (e) => { self.skipWaiting(); });
-    self.addEventListener("activate", (e) => { self.clients.claim(); });
-    self.addEventListener("fetch", (e) => {
-      if (e.request.method !== "GET") return;
-      e.respondWith(
-        fetch(e.request).catch(() => caches.match(e.request))
+    const CACHE_NAME = "regim-cache-v2";
+    const PRECACHE_URLS = [
+      "./",
+      "./index.html",
+      "./manifest.json",
+      "https://cdn.tailwindcss.com",
+      "https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap",
+      "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css",
+      "https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"
+    ];
+
+    self.addEventListener("install", (e) => {
+      self.skipWaiting();
+      e.waitUntil(
+        caches.open(CACHE_NAME).then((cache) =>
+          Promise.all(
+            PRECACHE_URLS.map((url) =>
+              fetch(url, { mode: "no-cors" }).then((res) => cache.put(url, res)).catch(() => null)
+            )
+          )
+        )
       );
     });
+
+    self.addEventListener("activate", (e) => {
+      e.waitUntil(
+        caches.keys().then((keys) =>
+          Promise.all(keys.filter((k) => k !== CACHE_NAME).map((k) => caches.delete(k)))
+        )
+      );
+      self.clients.claim();
+    });
+
+    self.addEventListener("fetch", (e) => {
+      if (e.request.method !== "GET") return;
+      const isExternal = PRECACHE_URLS.some((u) => e.request.url.startsWith(u) && u.startsWith("http"));
+      if (isExternal) {
+        // Cache-first dla zewnętrznych zasobów (CDN, fonty)
+        e.respondWith(
+          caches.match(e.request).then((cached) => cached || fetch(e.request).then((res) => {
+            const clone = res.clone();
+            caches.open(CACHE_NAME).then((cache) => cache.put(e.request, clone));
+            return res;
+          }))
+        );
+      } else {
+        // Network-first z fallbackiem do cache dla własnych plików
+        e.respondWith(
+          fetch(e.request).then((res) => {
+            const clone = res.clone();
+            caches.open(CACHE_NAME).then((cache) => cache.put(e.request, clone));
+            return res;
+          }).catch(() => caches.match(e.request))
+        );
+      }
+    });
+
     self.addEventListener("notificationclick", (e) => {
       e.notification.close();
       e.waitUntil(clients.openWindow("./index.html"));
@@ -1678,10 +1924,358 @@ if ("serviceWorker" in navigator) {
 }
 
 // ----------------------------------------------------------------------------
-// 14. BOOTSTRAP
+// 15. MOTYW JASNY / CIEMNY
+// ----------------------------------------------------------------------------
+function applyTheme(theme) {
+  const icon = document.getElementById("theme-icon");
+  if (theme === "light") {
+    document.documentElement.classList.add("light-theme");
+    icon.className = "fa-solid fa-sun";
+  } else {
+    document.documentElement.classList.remove("light-theme");
+    icon.className = "fa-solid fa-moon";
+  }
+  localStorage.setItem("regim:theme", theme);
+}
+document.getElementById("btn-theme-toggle").addEventListener("click", () => {
+  const isLight = document.documentElement.classList.contains("light-theme");
+  applyTheme(isLight ? "dark" : "light");
+});
+applyTheme(localStorage.getItem("regim:theme") || "dark");
+
+// ----------------------------------------------------------------------------
+// 16. CYTAT DNIA (rotujący)
+// ----------------------------------------------------------------------------
+const DAILY_QUOTES = [
+  "Sen to nie przestój — to główna zmiana produkcyjna Twojego ciała.",
+  "Hormon wzrostu wydziela się głównie w głębokim śnie, nie na siłowni.",
+  "Regularność bije intensywność. Codziennie trochę > raz dużo.",
+  "Bruksizm rozluźniasz świadomie, nie tylko w gabinecie.",
+  "Nadwyżka kaloryczna bez ruchu to tłuszcz. Z ruchem — to masa.",
+  "Mechaniczne R buduje się powtórzeniem, nie jednym dniem ćwiczeń.",
+  "Tętno spoczynkowe to Twój najtańszy wskaźnik regeneracji.",
+  "SpO2 poniżej normy to sygnał, nie statystyka do zignorowania.",
+  "Stres kumuluje się cicho — reset szczęki to mały, tani wentyl.",
+  "Kroki liczą się nawet w dni, gdy nie masz planowanego treningu.",
+  "Woda i tłuszcz przy D3 to różnica między wchłonięciem a marnowaniem.",
+  "Jeden słabszy dzień nie niszczy postępu. Nawyk zniszczonego dnia — tak.",
+];
+function renderDailyQuote() {
+  const idx = dayIndexSinceEpoch(new Date()) % DAILY_QUOTES.length;
+  document.getElementById("daily-quote").textContent = DAILY_QUOTES[idx];
+}
+setInterval(() => {
+  const el = document.getElementById("daily-quote");
+  const pool = DAILY_QUOTES;
+  const randomIdx = Math.floor(Math.random() * pool.length);
+  el.style.animation = "none";
+  requestAnimationFrame(() => {
+    el.textContent = pool[randomIdx];
+    el.style.animation = "";
+  });
+}, 8000);
+
+// ----------------------------------------------------------------------------
+// 17. HAPTYKA
+// ----------------------------------------------------------------------------
+function vibrate(pattern) {
+  if (navigator.vibrate) {
+    try { navigator.vibrate(pattern); } catch (e) { /* noop */ }
+  }
+}
+
+// ----------------------------------------------------------------------------
+// 18. CONFETTI (canvas, bez zależności)
+// ----------------------------------------------------------------------------
+function fireConfetti() {
+  const canvas = document.getElementById("confetti-canvas");
+  const ctx = canvas.getContext("2d");
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  const colors = ["#5eead4", "#c4b5fd", "#fbbf9d", "#fbbf24", "#fb7185"];
+  const particles = Array.from({ length: 140 }, () => ({
+    x: canvas.width / 2 + (Math.random() - 0.5) * 120,
+    y: canvas.height * 0.35,
+    vx: (Math.random() - 0.5) * 12,
+    vy: Math.random() * -14 - 4,
+    size: Math.random() * 6 + 4,
+    color: colors[Math.floor(Math.random() * colors.length)],
+    rot: Math.random() * Math.PI * 2,
+    vr: (Math.random() - 0.5) * 0.3,
+    gravity: 0.35 + Math.random() * 0.15,
+  }));
+  let frame = 0;
+  const maxFrames = 130;
+  function tick() {
+    frame++;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    particles.forEach((p) => {
+      p.vy += p.gravity;
+      p.x += p.vx;
+      p.y += p.vy;
+      p.rot += p.vr;
+      ctx.save();
+      ctx.translate(p.x, p.y);
+      ctx.rotate(p.rot);
+      ctx.fillStyle = p.color;
+      ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size * 0.6);
+      ctx.restore();
+    });
+    if (frame < maxFrames) requestAnimationFrame(tick);
+    else ctx.clearRect(0, 0, canvas.width, canvas.height);
+  }
+  tick();
+}
+
+// ----------------------------------------------------------------------------
+// 19. EKSPORT DANYCH (CSV / JSON)
+// ----------------------------------------------------------------------------
+function downloadFile(filename, content, mime) {
+  const blob = new Blob([content], { type: mime });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+async function collectAllDays() {
+  // Skan lokalny do 365 dni wstecz (localStorage) lub wszystkich dokumentów Firestore
+  const results = [];
+  if (firebaseReady && window.__fb) {
+    const { fsMod, db } = window.__fb;
+    const colRef = fsMod.collection(db, "users", currentUser.uid, "days");
+    const snaps = await fsMod.getDocs(colRef);
+    snaps.forEach((s) => results.push(s.data()));
+  } else {
+    const today = new Date();
+    for (let i = 0; i < 365; i++) {
+      const d = new Date(today);
+      d.setDate(d.getDate() - i);
+      const raw = localStorage.getItem(localKey(dateKey(d)));
+      if (raw) results.push(JSON.parse(raw));
+    }
+  }
+  return results.sort((a, b) => a.date.localeCompare(b.date));
+}
+
+function exportAsJSON(days) {
+  downloadFile(`regim-export-${todayKey}.json`, JSON.stringify(days, null, 2), "application/json");
+}
+
+function exportAsCSV(days) {
+  const headers = [
+    "date", "completedPct",
+    "morning_sleepTotal", "morning_sleepDeep", "morning_sleepRem", "morning_sleepLight",
+    "morning_sleepWakes", "morning_sleepHr", "morning_weeklyWeight",
+    "evening_steps", "evening_hrDay", "evening_spo2", "evening_stress",
+  ];
+  const rows = days.map((d) => {
+    const m = d.morning || {};
+    const e = d.evening || {};
+    return [
+      d.date, d.completedPct ?? "",
+      m.sleepTotal ?? "", m.sleepDeep ?? "", m.sleepRem ?? "", m.sleepLight ?? "",
+      m.sleepWakes ?? "", m.sleepHr ?? "", m.weeklyWeight ?? "",
+      e.steps ?? "", e.hrDay ?? "", e.spo2 ?? "", e.stress ?? "",
+    ].join(",");
+  });
+  const csv = [headers.join(","), ...rows].join("\n");
+  downloadFile(`regim-export-${todayKey}.csv`, csv, "text/csv");
+}
+
+document.getElementById("btn-export").addEventListener("click", async () => {
+  const choice = confirm("OK = eksport CSV, Anuluj = eksport JSON");
+  const days = await collectAllDays();
+  if (days.length === 0) { showToast("Brak danych do eksportu"); return; }
+  if (choice) exportAsCSV(days); else exportAsJSON(days);
+  showToast("Eksport gotowy — sprawdź pobrane pliki 📁");
+});
+
+// ----------------------------------------------------------------------------
+// 20. KALENDARZ MIESIĘCZNY (zakładka Postępy)
+// ----------------------------------------------------------------------------
+let calViewDate = new Date(todayObj.getFullYear(), todayObj.getMonth(), 1);
+const MONTH_NAMES_PL = ["Styczeń","Luty","Marzec","Kwiecień","Maj","Czerwiec","Lipiec","Sierpień","Wrzesień","Październik","Listopad","Grudzień"];
+
+async function renderCalendar() {
+  const year = calViewDate.getFullYear();
+  const month = calViewDate.getMonth();
+  document.getElementById("cal-month-label").textContent = `${MONTH_NAMES_PL[month]} ${year}`;
+
+  const firstDay = new Date(year, month, 1);
+  const lastDay = new Date(year, month + 1, 0);
+  const daysInMonth = lastDay.getDate();
+  // poniedziałek = 0
+  const startOffset = (firstDay.getDay() + 6) % 7;
+
+  const grid = document.getElementById("cal-grid");
+  grid.innerHTML = "";
+
+  for (let i = 0; i < startOffset; i++) {
+    const empty = document.createElement("div");
+    grid.appendChild(empty);
+  }
+
+  for (let day = 1; day <= daysInMonth; day++) {
+    const d = new Date(year, month, day);
+    const key = dateKey(d);
+    const isToday = key === todayKey;
+    const doc = await loadDayDoc(key);
+    const pct = doc?.completedPct ?? null;
+
+    const cell = document.createElement("div");
+    let dotColor = "bg-white/10";
+    let textColor = "text-neutral-500";
+    if (pct === 100) { dotColor = "bg-mint"; textColor = "text-neutral-200"; }
+    else if (pct != null && pct > 0) { dotColor = "bg-gold"; textColor = "text-neutral-200"; }
+
+    cell.className = `cal-day glass ${textColor} ${isToday ? "ring-2 ring-mint" : ""}`;
+    cell.innerHTML = `<span>${day}</span><span class="cal-dot ${dotColor}"></span>`;
+    grid.appendChild(cell);
+  }
+}
+
+document.getElementById("cal-prev").addEventListener("click", () => {
+  calViewDate.setMonth(calViewDate.getMonth() - 1);
+  renderCalendar();
+});
+document.getElementById("cal-next").addEventListener("click", () => {
+  calViewDate.setMonth(calViewDate.getMonth() + 1);
+  renderCalendar();
+});
+
+// ----------------------------------------------------------------------------
+// 21. ODZNAKI
+// ----------------------------------------------------------------------------
+const BADGES = [
+  { id: "streak3", icon: "fa-fire", label: "3 dni z rzędu", check: (ctx) => ctx.streak >= 3 },
+  { id: "streak7", icon: "fa-fire-flame-curved", label: "Tydzień streak", check: (ctx) => ctx.streak >= 7 },
+  { id: "streak30", icon: "fa-crown", label: "30 dni streak", check: (ctx) => ctx.streak >= 30 },
+  { id: "speech7", icon: "fa-comment-dots", label: "7× mowa", check: (ctx) => ctx.speechCount >= 7 },
+  { id: "speech30", icon: "fa-microphone", label: "30× mowa", check: (ctx) => ctx.speechCount >= 30 },
+  { id: "sleep7", icon: "fa-moon", label: "7× sen ≥8h", check: (ctx) => ctx.goodSleepCount >= 7 },
+  { id: "weight4", icon: "fa-scale-balanced", label: "4 wpisy wagi", check: (ctx) => ctx.weightEntries >= 4 },
+  { id: "perfect", icon: "fa-star", label: "Idealny dzień", check: (ctx) => ctx.hadPerfectDay },
+  { id: "early", icon: "fa-sun", label: "Ranny ptaszek", check: (ctx) => ctx.morningEntries >= 5 },
+];
+
+async function renderBadges() {
+  const allDays = await collectAllDays();
+  const streakEl = document.getElementById("streak-count");
+  const streak = parseInt(streakEl.textContent) || 0;
+
+  const ctx = {
+    streak,
+    speechCount: allDays.filter((d) => d.tasks?.find((t) => t.id === "mowa" && t.done)).length,
+    goodSleepCount: allDays.filter((d) => (d.morning?.sleepTotal ?? 0) >= 8).length,
+    weightEntries: allDays.filter((d) => d.morning?.weeklyWeight != null).length,
+    hadPerfectDay: allDays.some((d) => d.completedPct === 100),
+    morningEntries: allDays.filter((d) => d.morning && Object.keys(d.morning).length > 0).length,
+  };
+
+  const grid = document.getElementById("badges-grid");
+  grid.innerHTML = "";
+  BADGES.forEach((badge) => {
+    const unlocked = badge.check(ctx);
+    const card = document.createElement("div");
+    card.className = `badge-card ${unlocked ? "unlocked" : "locked"} glass rounded-2xl p-3 flex flex-col items-center gap-1.5 text-center`;
+    card.innerHTML = `
+      <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-mint/25 to-lilac/25 flex items-center justify-center">
+        <i class="fa-solid ${badge.icon} ${unlocked ? "text-gold" : "text-neutral-500"}"></i>
+      </div>
+      <div class="text-[10px] font-bold leading-tight">${badge.label}</div>
+    `;
+    grid.appendChild(card);
+  });
+}
+
+// ----------------------------------------------------------------------------
+// 22. COTYGODNIOWE PODSUMOWANIE MENTORA
+// ----------------------------------------------------------------------------
+async function generateWeeklySummary() {
+  const days = await loadLastNDays(7);
+  const withData = days.filter((d) => d.morning || d.evening);
+  if (withData.length === 0) {
+    return "Za mało danych z tego tygodnia — uzupełniaj raporty poranne i wieczorne, żeby Mentor mógł ocenić tydzień.";
+  }
+
+  const avgSleep = average(withData.map((d) => d.morning?.sleepTotal).filter(Boolean));
+  const avgStress = average(withData.map((d) => d.evening?.stress).filter(Boolean));
+  const avgSteps = average(withData.map((d) => d.evening?.steps).filter(Boolean));
+  const perfectDays = days.filter((d) => d.completedPct === 100).length;
+  const avgPct = Math.round(average(days.map((d) => d.completedPct ?? 0)));
+
+  const lines = [];
+  lines.push(`W tym tygodniu zaliczyłeś ${perfectDays} z 7 dni na 100%, a średnie wykonanie zadań to ${avgPct}%.`);
+
+  if (avgSleep != null) {
+    if (avgSleep < 7) lines.push(`Średni sen wyniósł ${avgSleep.toFixed(1)}h — poniżej progu regeneracyjnego, warto to podciągnąć w kolejnym tygodniu.`);
+    else lines.push(`Średni sen na poziomie ${avgSleep.toFixed(1)}h to solidny wynik tygodnia.`);
+  }
+  if (avgStress != null) {
+    if (avgStress > 55) lines.push(`Średni stres (${Math.round(avgStress)}/100) był podwyższony — układ nerwowy pracował pod obciążeniem.`);
+    else lines.push(`Stres trzymał się nisko (${Math.round(avgStress)}/100) — dobra baza pod regenerację.`);
+  }
+  if (avgSteps != null) {
+    lines.push(`Średnio ${Math.round(avgSteps)} kroków dziennie.`);
+  }
+
+  lines.push(perfectDays >= 5 ? "Taki tydzień to fundament pod realny postęp — utrzymuj rytm." : "Na przyszły tydzień: jeden konkretny cel, np. dowiezienie snu każdego dnia.");
+
+  return lines.join(" ");
+}
+function average(arr) {
+  if (!arr.length) return null;
+  return arr.reduce((a, b) => a + b, 0) / arr.length;
+}
+
+document.getElementById("btn-weekly-summary").addEventListener("click", async () => {
+  const btn = document.getElementById("btn-weekly-summary");
+  btn.disabled = true;
+  btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-1"></i>...';
+  const summary = await generateWeeklySummary();
+  document.getElementById("weekly-summary-text").textContent = summary;
+  btn.disabled = false;
+  btn.innerHTML = '<i class="fa-solid fa-arrows-rotate mr-1"></i>Odśwież';
+});
+
+// ----------------------------------------------------------------------------
+// 23. KORELACJE (sen a stres)
+// ----------------------------------------------------------------------------
+async function renderCorrelation() {
+  const days = await loadLastNDays(14);
+  const lowSleepDays = days.filter((d) => (d.morning?.sleepTotal ?? 99) < 7 && d.evening?.stress != null);
+  const highSleepDays = days.filter((d) => (d.morning?.sleepTotal ?? 0) >= 7.5 && d.evening?.stress != null);
+
+  if (lowSleepDays.length < 2 || highSleepDays.length < 2) {
+    document.getElementById("correlation-box").classList.add("hidden");
+    return;
+  }
+
+  const avgStressLow = average(lowSleepDays.map((d) => d.evening.stress));
+  const avgStressHigh = average(highSleepDays.map((d) => d.evening.stress));
+  const diff = Math.round(avgStressLow - avgStressHigh);
+
+  document.getElementById("correlation-box").classList.remove("hidden");
+  if (diff > 5) {
+    document.getElementById("correlation-text").textContent =
+      `W dni gdy spałeś poniżej 7h, Twój wieczorny stres był średnio o ${diff} pkt wyższy niż w dni z co najmniej 7,5h snu (${Math.round(avgStressLow)} vs ${Math.round(avgStressHigh)}). To wyraźny sygnał, że sen bezpośrednio obniża Twój poziom stresu.`;
+  } else {
+    document.getElementById("correlation-text").textContent =
+      `Różnica w stresie między dniami z krótszym i dłuższym snem jest niewielka (${Math.round(avgStressLow)} vs ${Math.round(avgStressHigh)}) — inne czynniki mogą mieć teraz większy wpływ na Twój stres niż sama długość snu.`;
+}
+}
+
+// ----------------------------------------------------------------------------
+// 24. BOOTSTRAP
 // ----------------------------------------------------------------------------
 async function bootApp() {
   setupTreningCard();
+  renderDailyQuote();
 
   const existing = await loadDayDoc(todayKey);
   if (existing?.tasks?.length) {
