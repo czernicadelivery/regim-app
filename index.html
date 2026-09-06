@@ -1,240 +1,1188 @@
 <!DOCTYPE html>
-<html lang="pl" class="dark">
+<html lang="pl" class="scroll-smooth">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>REGIM // Dyscyplina</title>
-<meta name="description" content="System kontroli dyscypliny sportowo-życiowej. Zero wymówek.">
-<meta name="theme-color" content="#0a0a0a">
+<title>LevelUp</title>
+<meta name="description" content="Twój codzienny system wzrostu — ciało, mowa, biznes.">
+<meta name="theme-color" content="#1a1530">
 <link rel="manifest" href="manifest.json">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 fill=%22%230a0a0a%22/><text x=%2250%22 y=%2268%22 font-size=%2260%22 text-anchor=%22middle%22 fill=%22%23dc2626%22 font-family=%22Arial%22 font-weight=%22900%22>R</text></svg>">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2222%22 fill=%22%231a1530%22/><text x=%2250%22 y=%2270%22 font-size=%2258%22 text-anchor=%22middle%22 fill=%22%235eead4%22 font-family=%22Arial%22 font-weight=%22900%22>L</text></svg>">
 <link rel="apple-touch-icon" href="icons/icon-192.png">
 
-<!-- Tailwind (CDN build, konfiguracja inline poniżej) -->
+<!-- Tailwind -->
 <script src="https://cdn.tailwindcss.com"></script>
 <script>
   tailwind.config = {
-    darkMode: 'class',
     theme: {
       extend: {
-        fontFamily: {
-          display: ['"Oswald"', 'sans-serif'],
-          mono: ['"JetBrains Mono"', 'monospace'],
-        },
+        fontFamily: { sans: ['"Poppins"', 'sans-serif'] },
         colors: {
-          void: '#0a0a0a',
-          panel: '#141414',
-          line: '#262626',
-          blood: '#dc2626',
-          bloodDim: '#7f1d1d',
-          win: '#16a34a',
-          winDim: '#14532d',
-          warn: '#d97706',
+          ink: '#0f0c1d',
+          panel: '#1e1a35',
+          mint: '#5eead4',
+          peach: '#fbbf9d',
+          lilac: '#c4b5fd',
+          gold: '#fbbf24',
         },
+        boxShadow: {
+          glow: '0 8px 32px -8px rgba(94, 234, 212, 0.25)',
+          warm: '0 8px 32px -8px rgba(251, 191, 157, 0.25)',
+          soft: '0 10px 40px -12px rgba(0,0,0,0.5)',
+        },
+        borderRadius: { '4xl': '2rem' },
       },
     },
   }
 </script>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 
-<!-- Chart.js -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
 
-<!-- Firebase SDK (modular, v10) -->
-<script type="module" src="app.js" defer></script>
-
 <style>
-  html, body { background:#0a0a0a; }
+  html, body {
+    background: radial-gradient(ellipse 120% 80% at 50% -10%, #2d2456 0%, #0f0c1d 55%), #0f0c1d;
+    min-height: 100%;
+  }
   * { -webkit-tap-highlight-color: transparent; }
-  ::-webkit-scrollbar { width: 6px; height: 6px; }
-  ::-webkit-scrollbar-track { background: #0a0a0a; }
-  ::-webkit-scrollbar-thumb { background: #dc2626; }
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: #5eead4; border-radius: 10px; }
 
-  .brutal-border { border: 2px solid #262626; }
-  .brutal-border-active { border: 2px solid #dc2626; }
-
-  @keyframes pulse-red {
-    0%, 100% { box-shadow: 0 0 0 0 rgba(220,38,38,0.5); }
-    50% { box-shadow: 0 0 0 6px rgba(220,38,38,0); }
+  .glass {
+    background: rgba(255,255,255,0.045);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    border: 1px solid rgba(255,255,255,0.08);
   }
-  .streak-alive { animation: pulse-red 2s infinite; }
 
-  @keyframes slide-up {
-    from { transform: translateY(12px); opacity: 0; }
-    to { transform: translateY(0); opacity: 1; }
+  .card-tap:active { transform: scale(0.98); }
+
+  @keyframes rise {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
   }
-  .slide-up { animation: slide-up 0.25s ease-out; }
+  .rise { animation: rise 0.35s cubic-bezier(0.16,1,0.3,1) both; }
 
-  .task-done { text-decoration: line-through; opacity: 0.45; }
+  @keyframes ring-pulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(94,234,212,0.35); }
+    50% { box-shadow: 0 0 0 14px rgba(94,234,212,0); }
+  }
+  .ring-pulse { animation: ring-pulse 2.4s infinite; }
+
+  .expand-enter {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 0.35s cubic-bezier(0.16,1,0.3,1);
+  }
+  .expand-enter.open { grid-template-rows: 1fr; }
+  .expand-enter > div { overflow: hidden; }
+
+  .droplet { transition: opacity 0.25s ease, transform 0.25s ease; }
 
   input[type="number"]::-webkit-outer-spin-button,
   input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
   input[type="number"] { -moz-appearance: textfield; }
 
-  .tab-active { color: #dc2626; border-color: #dc2626; }
+  .tab-underline { transition: all 0.3s cubic-bezier(0.16,1,0.3,1); }
 
-  .day-cell { aspect-ratio: 1; }
+  .progress-fill { transition: width 0.6s cubic-bezier(0.16,1,0.3,1); }
+
+  .timer-ring { transition: stroke-dashoffset 1s linear; }
 </style>
 </head>
-<body class="bg-void text-neutral-200 font-sans min-h-screen pb-24 select-none">
+<body class="text-neutral-100 font-sans min-h-screen pb-28">
 
 <!-- ============ NAGŁÓWEK ============ -->
-<header class="sticky top-0 z-30 bg-void/95 backdrop-blur border-b-2 border-line">
-  <div class="max-w-2xl mx-auto px-4 py-3 flex items-center justify-between">
-    <div class="flex items-center gap-2">
-      <span class="font-display font-700 text-2xl tracking-tight text-neutral-100">REGIM<span class="text-blood">.</span></span>
-    </div>
-    <div class="flex items-center gap-3">
-      <div id="streak-badge" class="flex items-center gap-1.5 font-mono text-sm px-2.5 py-1 brutal-border">
-        <span class="text-blood text-lg leading-none">▲</span>
-        <span id="streak-count" class="font-bold text-neutral-100">0</span>
+<header class="sticky top-0 z-30 px-5 pt-5 pb-3 bg-gradient-to-b from-ink via-ink/95 to-transparent">
+  <div class="max-w-lg mx-auto flex items-center justify-between">
+    <div class="flex items-center gap-2.5">
+      <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-mint to-lilac flex items-center justify-center shadow-glow">
+        <i class="fa-solid fa-bolt text-ink text-lg"></i>
       </div>
-      <button id="btn-signin" class="font-mono text-xs text-neutral-500 hover:text-neutral-200 px-2 py-1 brutal-border">LOGUJ</button>
-      <div id="user-badge" class="hidden font-mono text-xs text-neutral-500 truncate max-w-[80px]"></div>
+      <div>
+        <div class="font-extrabold text-lg leading-none tracking-tight">LevelUp</div>
+        <div class="text-[11px] text-neutral-400 leading-none mt-0.5">Twój codzienny wzrost</div>
+      </div>
+    </div>
+    <div class="flex items-center gap-2">
+      <div id="streak-pill" class="flex items-center gap-1.5 glass rounded-full px-3 py-1.5 text-sm font-semibold">
+        <i class="fa-solid fa-fire text-peach"></i>
+        <span id="streak-count">0</span>
+      </div>
+      <button id="btn-signin" class="glass rounded-full w-9 h-9 flex items-center justify-center text-neutral-400 hover:text-mint transition">
+        <i class="fa-solid fa-user"></i>
+      </button>
     </div>
   </div>
 </header>
 
-<main class="max-w-2xl mx-auto px-4">
+<!-- ============ BANER INSTALACJI PWA ============ -->
+<div id="install-banner" class="hidden max-w-lg mx-auto px-5 mb-2">
+  <div class="rise glass rounded-3xl p-4 flex items-center gap-3 shadow-soft">
+    <div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-mint/30 to-lilac/30 flex items-center justify-center flex-shrink-0">
+      <i class="fa-solid fa-mobile-screen-button text-mint text-lg"></i>
+    </div>
+    <div class="flex-1 min-w-0">
+      <div class="font-semibold text-sm">Miej LevelUp zawsze pod ręką</div>
+      <div class="text-xs text-neutral-400">Dodaj do ekranu głównego — działa jak apka</div>
+    </div>
+    <button id="btn-install" class="bg-gradient-to-br from-mint to-lilac text-ink font-bold text-sm px-4 py-2 rounded-full whitespace-nowrap active:scale-95 transition">
+      Dodaj
+    </button>
+    <button id="btn-install-dismiss" class="text-neutral-500 hover:text-neutral-300 w-6 h-6 flex items-center justify-center flex-shrink-0">
+      <i class="fa-solid fa-xmark"></i>
+    </button>
+  </div>
+</div>
+
+<main class="max-w-lg mx-auto px-5">
+
+  <!-- ============ HERO: PASEK POSTĘPU DNIA ============ -->
+  <section class="rise glass rounded-4xl p-5 mb-5 shadow-soft">
+    <div class="flex items-center justify-between mb-3">
+      <div>
+        <div class="text-2xl font-extrabold" id="progress-headline">Zaczynajmy 💪</div>
+        <div class="text-xs text-neutral-400" id="progress-sub">0 z 4 zadań na dziś</div>
+      </div>
+      <div class="relative w-16 h-16 flex-shrink-0">
+        <svg class="w-16 h-16 -rotate-90" viewBox="0 0 64 64">
+          <circle cx="32" cy="32" r="27" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="7"/>
+          <circle id="hero-ring" cx="32" cy="32" r="27" fill="none" stroke="url(#heroGrad)" stroke-width="7" stroke-linecap="round" stroke-dasharray="169.6" stroke-dashoffset="169.6" class="progress-fill" style="transition: stroke-dashoffset 0.6s cubic-bezier(0.16,1,0.3,1);"/>
+          <defs>
+            <linearGradient id="heroGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#5eead4"/>
+              <stop offset="100%" stop-color="#c4b5fd"/>
+            </linearGradient>
+          </defs>
+        </svg>
+        <div class="absolute inset-0 flex items-center justify-center font-bold text-sm" id="hero-pct">0%</div>
+      </div>
+    </div>
+    <div class="h-2 bg-white/5 rounded-full overflow-hidden">
+      <div id="progress-bar" class="progress-fill h-full rounded-full bg-gradient-to-r from-mint to-lilac" style="width:0%"></div>
+    </div>
+  </section>
 
   <!-- ============ NAWIGACJA ZAKŁADEK ============ -->
-  <nav class="flex border-b-2 border-line mt-4 mb-5 sticky top-[57px] z-20 bg-void">
-    <button data-tab="dashboard" class="tab-btn tab-active flex-1 py-3 font-display uppercase tracking-wide text-sm border-b-2 -mb-0.5 transition-colors">Dzień</button>
-    <button data-tab="mowa" class="tab-btn text-neutral-500 flex-1 py-3 font-display uppercase tracking-wide text-sm border-b-2 border-transparent -mb-0.5 transition-colors">Mowa</button>
-    <button data-tab="watch" class="tab-btn text-neutral-500 flex-1 py-3 font-display uppercase tracking-wide text-sm border-b-2 border-transparent -mb-0.5 transition-colors">Zegarek</button>
+  <nav class="flex glass rounded-full p-1.5 mb-5 gap-1">
+    <button data-tab="dashboard" class="tab-btn tab-underline flex-1 py-2.5 rounded-full text-sm font-semibold bg-gradient-to-br from-mint to-lilac text-ink">
+      <i class="fa-solid fa-house mr-1.5"></i>Dziś
+    </button>
+    <button data-tab="mowa" class="tab-btn tab-underline flex-1 py-2.5 rounded-full text-sm font-semibold text-neutral-400">
+      <i class="fa-solid fa-comment-dots mr-1.5"></i>Mowa
+    </button>
+    <button data-tab="mentor" class="tab-btn tab-underline flex-1 py-2.5 rounded-full text-sm font-semibold text-neutral-400">
+      <i class="fa-solid fa-brain mr-1.5"></i>Mentor
+    </button>
   </nav>
 
   <!-- ============ ZAKŁADKA: DASHBOARD ============ -->
-  <section id="tab-dashboard" class="tab-panel">
+  <section id="tab-dashboard" class="tab-panel space-y-4">
 
-    <!-- Kalendarz -->
-    <div class="brutal-border p-3 mb-5 bg-panel">
-      <div class="flex items-center justify-between mb-3">
-        <button id="cal-prev" class="w-8 h-8 flex items-center justify-center font-mono text-lg text-neutral-500 hover:text-blood">‹</button>
-        <span id="cal-label" class="font-display uppercase tracking-widest text-sm text-neutral-300">-- ----</span>
-        <button id="cal-next" class="w-8 h-8 flex items-center justify-center font-mono text-lg text-neutral-500 hover:text-blood">›</button>
+    <!-- Karta: Budulec (D3 + Dieta) -->
+    <div class="glass rounded-4xl overflow-hidden shadow-soft card-tap transition cursor-pointer" data-card="budulec">
+      <div class="p-5 flex items-center gap-4" data-toggle="budulec">
+        <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-peach/25 to-gold/25 flex items-center justify-center flex-shrink-0">
+          <i class="fa-solid fa-shield-heart text-peach text-2xl"></i>
+        </div>
+        <div class="flex-1 min-w-0">
+          <div class="font-bold text-base">Budulec — D3 + Dieta</div>
+          <div class="text-xs text-neutral-400">Witamina i nadwyżka kaloryczna</div>
+        </div>
+        <button data-check="budulec" class="check-btn w-9 h-9 rounded-full border-2 border-white/15 flex items-center justify-center flex-shrink-0 transition">
+          <i class="fa-solid fa-check text-xs opacity-0 transition"></i>
+        </button>
       </div>
-      <div class="grid grid-cols-7 gap-1 mb-1">
-        <div class="text-center font-mono text-[10px] text-neutral-600">PN</div>
-        <div class="text-center font-mono text-[10px] text-neutral-600">WT</div>
-        <div class="text-center font-mono text-[10px] text-neutral-600">ŚR</div>
-        <div class="text-center font-mono text-[10px] text-neutral-600">CZ</div>
-        <div class="text-center font-mono text-[10px] text-neutral-600">PT</div>
-        <div class="text-center font-mono text-[10px] text-neutral-600">SO</div>
-        <div class="text-center font-mono text-[10px] text-neutral-600">ND</div>
+      <div class="expand-enter" data-panel="budulec">
+        <div>
+          <div class="px-5 pb-5 pt-0 text-sm text-neutral-300 leading-relaxed border-t border-white/5 mx-5">
+            <div class="flex items-start gap-2.5 pt-4">
+              <i class="fa-solid fa-lightbulb text-gold mt-0.5"></i>
+              <p>D3 do posiłku z tłuszczem, żeby się dobrze wchłonęła. Pamiętaj o nadwyżce kalorii — to twój pancerz i masa, bez tego nie urośniesz. Jedz regularnie, nie tylko kiedy masz ochotę.</p>
+            </div>
+          </div>
+        </div>
       </div>
-      <div id="cal-grid" class="grid grid-cols-7 gap-1"></div>
     </div>
 
-    <!-- Status dzisiaj -->
-    <div class="flex items-center justify-between mb-4">
-      <h2 class="font-display uppercase text-lg tracking-wide text-neutral-100">Dzisiaj</h2>
-      <span id="today-progress" class="font-mono text-sm text-neutral-500">0/0</span>
+    <!-- Karta: Trening (dynamiczna) -->
+    <div class="glass rounded-4xl overflow-hidden shadow-soft card-tap transition cursor-pointer" data-card="trening">
+      <div class="p-5 flex items-center gap-4" data-toggle="trening">
+        <div id="trening-icon-box" class="w-14 h-14 rounded-2xl bg-gradient-to-br from-mint/25 to-lilac/25 flex items-center justify-center flex-shrink-0">
+          <i id="trening-icon" class="fa-solid fa-dumbbell text-mint text-2xl"></i>
+        </div>
+        <div class="flex-1 min-w-0">
+          <div id="trening-title" class="font-bold text-base">Kalistenika</div>
+          <div id="trening-sub" class="text-xs text-neutral-400">Buduj siłę własnym ciałem</div>
+        </div>
+        <button data-check="trening" class="check-btn w-9 h-9 rounded-full border-2 border-white/15 flex items-center justify-center flex-shrink-0 transition">
+          <i class="fa-solid fa-check text-xs opacity-0 transition"></i>
+        </button>
+      </div>
+      <div class="expand-enter" data-panel="trening">
+        <div>
+          <div class="px-5 pb-5 pt-0 text-sm text-neutral-300 leading-relaxed border-t border-white/5 mx-5">
+            <div id="trening-desc" class="flex items-start gap-2.5 pt-4">
+              <i class="fa-solid fa-lightbulb text-gold mt-0.5"></i>
+              <p>Każdy trening to cegiełka. Siła, którą budujesz, buduje też szacunek — twój do siebie, i innych do ciebie.</p>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
 
-    <!-- To-Do lista -->
-    <div id="todo-list" class="space-y-2 mb-6"></div>
+    <!-- Karta: Nawodnienie -->
+    <div class="glass rounded-4xl p-5 shadow-soft">
+      <div class="flex items-center gap-4 mb-4">
+        <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-lilac/25 to-mint/25 flex items-center justify-center flex-shrink-0">
+          <i class="fa-solid fa-droplet text-lilac text-2xl"></i>
+        </div>
+        <div class="flex-1">
+          <div class="font-bold text-base">Nawodnienie</div>
+          <div class="text-xs text-neutral-400"><span id="water-count">0</span>/8 szklanek</div>
+        </div>
+        <button id="water-add" class="w-11 h-11 rounded-full bg-gradient-to-br from-mint to-lilac text-ink flex items-center justify-center font-bold text-lg active:scale-90 transition flex-shrink-0">
+          <i class="fa-solid fa-plus"></i>
+        </button>
+      </div>
+      <div class="flex gap-1.5 flex-wrap" id="water-drops"></div>
+    </div>
 
-    <!-- AI Coach skrót -->
-    <div id="ai-verdict-box" class="hidden brutal-border p-4 mb-6 bg-panel">
-      <div class="font-mono text-[10px] text-blood uppercase tracking-widest mb-1">Werdykt AI</div>
-      <p id="ai-verdict-text" class="text-sm text-neutral-300 leading-relaxed"></p>
+    <!-- Karta: Czernica Delivery -->
+    <div class="glass rounded-4xl overflow-hidden shadow-soft card-tap transition cursor-pointer" data-card="biznes">
+      <div class="p-5 flex items-center gap-4" data-toggle="biznes">
+        <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-gold/25 to-peach/25 flex items-center justify-center flex-shrink-0">
+          <i class="fa-solid fa-box text-gold text-2xl"></i>
+        </div>
+        <div class="flex-1 min-w-0">
+          <div class="font-bold text-base">Czernica Delivery</div>
+          <div class="text-xs text-neutral-400">Zaplanuj dzisiejsze zlecenia</div>
+        </div>
+        <button data-check="biznes" class="check-btn w-9 h-9 rounded-full border-2 border-white/15 flex items-center justify-center flex-shrink-0 transition">
+          <i class="fa-solid fa-check text-xs opacity-0 transition"></i>
+        </button>
+      </div>
+      <div class="expand-enter" data-panel="biznes">
+        <div>
+          <div class="px-5 pb-5 pt-0 text-sm text-neutral-300 leading-relaxed border-t border-white/5 mx-5">
+            <div class="flex items-start gap-2.5 pt-4">
+              <i class="fa-solid fa-lightbulb text-gold mt-0.5"></i>
+              <p>Sprawdź dzisiejsze zamówienia i zaplanuj trasy. Własny biznes w twoim wieku to coś, z czego naprawdę można być dumnym — trzymaj w tym porządek.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Werdykt Mentora (skrót) -->
+    <div id="mentor-verdict-box" class="hidden rise glass rounded-4xl p-5 shadow-warm">
+      <div class="flex items-center gap-2 mb-2">
+        <i class="fa-solid fa-comment-dots text-peach"></i>
+        <span class="font-bold text-sm text-peach">Twój starszy brat mówi</span>
+      </div>
+      <p id="mentor-verdict-text" class="text-sm text-neutral-200 leading-relaxed"></p>
     </div>
 
   </section>
 
   <!-- ============ ZAKŁADKA: MOWA (STOPER) ============ -->
-  <section id="tab-mowa" class="tab-panel hidden">
-    <div class="brutal-border bg-panel p-6 text-center mb-5">
-      <div class="font-mono text-[11px] uppercase tracking-widest text-neutral-500 mb-2">Faza</div>
-      <div id="speech-phase-name" class="font-display uppercase text-2xl text-neutral-100 mb-4">Gotowy</div>
-      <div id="speech-timer" class="font-mono text-6xl font-bold text-blood mb-6 tabular-nums">00:00</div>
+  <section id="tab-mowa" class="tab-panel hidden space-y-5">
 
-      <div class="grid grid-cols-3 gap-1 mb-6">
-        <div id="phase-dot-1" class="h-1.5 bg-line"></div>
-        <div id="phase-dot-2" class="h-1.5 bg-line"></div>
-        <div id="phase-dot-3" class="h-1.5 bg-line"></div>
+    <div class="glass rounded-4xl p-6 shadow-soft text-center">
+      <div id="speech-phase-label" class="text-sm text-neutral-400 mb-1">Gotowy, kiedy chcesz</div>
+      <div id="speech-phase-name" class="font-extrabold text-xl mb-6">Rozgrzewka mowy</div>
+
+      <div class="relative w-56 h-56 mx-auto mb-6">
+        <svg class="w-56 h-56 -rotate-90" viewBox="0 0 200 200">
+          <circle cx="100" cy="100" r="88" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="12"/>
+          <circle id="speech-ring" cx="100" cy="100" r="88" fill="none" stroke="url(#speechGrad)" stroke-width="12" stroke-linecap="round" stroke-dasharray="552.9" stroke-dashoffset="552.9" class="timer-ring"/>
+          <defs>
+            <linearGradient id="speechGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#5eead4"/>
+              <stop offset="100%" stop-color="#c4b5fd"/>
+            </linearGradient>
+          </defs>
+        </svg>
+        <div class="absolute inset-0 flex flex-col items-center justify-center">
+          <div id="speech-timer" class="font-extrabold text-5xl tabular-nums">02:00</div>
+          <div id="speech-icon" class="text-3xl mt-2">😌</div>
+        </div>
       </div>
 
-      <button id="speech-start-btn" class="w-full py-4 bg-blood text-white font-display uppercase tracking-widest text-lg hover:bg-red-700 active:scale-[0.98] transition">Start</button>
-      <button id="speech-stop-btn" class="hidden w-full py-3 mt-2 brutal-border text-neutral-400 font-display uppercase tracking-widest text-sm hover:border-blood hover:text-blood">Przerwij</button>
+      <div class="flex justify-center gap-2 mb-6">
+        <div id="phase-dot-1" class="h-2 w-10 rounded-full bg-white/10 transition"></div>
+        <div id="phase-dot-2" class="h-2 w-10 rounded-full bg-white/10 transition"></div>
+        <div id="phase-dot-3" class="h-2 w-10 rounded-full bg-white/10 transition"></div>
+      </div>
+
+      <button id="speech-start-btn" class="w-full py-4 bg-gradient-to-br from-mint to-lilac text-ink font-bold rounded-full text-lg active:scale-95 transition shadow-glow">
+        <i class="fa-solid fa-play mr-2"></i>Zaczynamy
+      </button>
+      <button id="speech-stop-btn" class="hidden w-full py-3.5 mt-2 glass rounded-full text-neutral-300 font-semibold active:scale-95 transition">
+        Przerwij
+      </button>
     </div>
 
-    <div class="brutal-border bg-panel p-4 space-y-3 font-mono text-xs text-neutral-500">
-      <div class="flex justify-between border-b border-line pb-2"><span>FAZA 1</span><span class="text-neutral-300">2:00 — Masaż / kląskanie</span></div>
-      <div class="flex justify-between border-b border-line pb-2"><span>FAZA 2</span><span class="text-neutral-300">3:00 — Szybkie T-D-T-D</span></div>
-      <div class="flex justify-between"><span>FAZA 3</span><span class="text-neutral-300">5:00 — TDAWA / DOWED</span></div>
+    <div class="glass rounded-4xl p-5 space-y-3 shadow-soft">
+      <div class="flex items-start gap-3">
+        <div class="w-9 h-9 rounded-xl bg-mint/15 flex items-center justify-center flex-shrink-0 text-mint font-bold text-sm">1</div>
+        <div>
+          <div class="font-semibold text-sm">Masaż szczęki — 2 min</div>
+          <div class="text-xs text-neutral-400">Rozluźnia napięcie od bruksizmu, żeby reszta poszła lżej</div>
+        </div>
+      </div>
+      <div class="flex items-start gap-3">
+        <div class="w-9 h-9 rounded-xl bg-lilac/15 flex items-center justify-center flex-shrink-0 text-lilac font-bold text-sm">2</div>
+        <div>
+          <div class="font-semibold text-sm">Mechaniczne T-D — 3 min</div>
+          <div class="text-xs text-neutral-400">Wyraźne, ostre uderzenia języka — buduje precyzję</div>
+        </div>
+      </div>
+      <div class="flex items-start gap-3">
+        <div class="w-9 h-9 rounded-xl bg-peach/15 flex items-center justify-center flex-shrink-0 text-peach font-bold text-sm">3</div>
+        <div>
+          <div class="font-semibold text-sm">Słowa: TDAWA, DOWED — 5 min</div>
+          <div class="text-xs text-neutral-400">Przenosisz technikę na realne dźwięki mowy</div>
+        </div>
+      </div>
     </div>
   </section>
 
-  <!-- ============ ZAKŁADKA: ZEGAREK & AI COACH ============ -->
-  <section id="tab-watch" class="tab-panel hidden">
+  <!-- ============ ZAKŁADKA: MENTOR AI + STATYSTYKI ============ -->
+  <section id="tab-mentor" class="tab-panel hidden space-y-5">
 
-    <form id="watch-form" class="brutal-border bg-panel p-4 mb-5 grid grid-cols-2 gap-3">
-      <div class="col-span-2 font-display uppercase text-sm tracking-wide text-neutral-100 mb-1">Dane z zegarka — dziś</div>
+    <form id="watch-form" class="glass rounded-4xl p-5 shadow-soft grid grid-cols-2 gap-3">
+      <div class="col-span-2 flex items-center gap-2 mb-1">
+        <i class="fa-solid fa-watch-fitness text-mint"></i>
+        <span class="font-bold text-sm">Dane z zegarka — dziś</span>
+      </div>
 
       <label class="block">
-        <span class="font-mono text-[10px] uppercase text-neutral-500">Sen (h)</span>
-        <input type="number" step="0.1" id="input-sleep" class="w-full mt-1 bg-void brutal-border px-2 py-2 font-mono text-neutral-100 focus:outline-none focus:border-blood" placeholder="7.5">
+        <span class="text-[11px] text-neutral-400 ml-1">Sen (h)</span>
+        <input type="number" step="0.1" id="input-sleep" class="w-full mt-1 bg-white/5 border border-white/10 rounded-2xl px-3 py-2.5 text-neutral-100 focus:outline-none focus:border-mint transition" placeholder="8">
       </label>
       <label class="block">
-        <span class="font-mono text-[10px] uppercase text-neutral-500">Kroki</span>
-        <input type="number" id="input-steps" class="w-full mt-1 bg-void brutal-border px-2 py-2 font-mono text-neutral-100 focus:outline-none focus:border-blood" placeholder="8000">
+        <span class="text-[11px] text-neutral-400 ml-1">Kroki</span>
+        <input type="number" id="input-steps" class="w-full mt-1 bg-white/5 border border-white/10 rounded-2xl px-3 py-2.5 text-neutral-100 focus:outline-none focus:border-mint transition" placeholder="9000">
       </label>
       <label class="block">
-        <span class="font-mono text-[10px] uppercase text-neutral-500">Śr. tętno</span>
-        <input type="number" id="input-hr" class="w-full mt-1 bg-void brutal-border px-2 py-2 font-mono text-neutral-100 focus:outline-none focus:border-blood" placeholder="68">
+        <span class="text-[11px] text-neutral-400 ml-1">Śr. tętno</span>
+        <input type="number" id="input-hr" class="w-full mt-1 bg-white/5 border border-white/10 rounded-2xl px-3 py-2.5 text-neutral-100 focus:outline-none focus:border-mint transition" placeholder="72">
       </label>
       <label class="block">
-        <span class="font-mono text-[10px] uppercase text-neutral-500">Kalorie spal.</span>
-        <input type="number" id="input-calories" class="w-full mt-1 bg-void brutal-border px-2 py-2 font-mono text-neutral-100 focus:outline-none focus:border-blood" placeholder="2400">
+        <span class="text-[11px] text-neutral-400 ml-1">Kalorie</span>
+        <input type="number" id="input-calories" class="w-full mt-1 bg-white/5 border border-white/10 rounded-2xl px-3 py-2.5 text-neutral-100 focus:outline-none focus:border-mint transition" placeholder="2600">
       </label>
       <label class="block col-span-2">
-        <span class="font-mono text-[10px] uppercase text-neutral-500">Waga (kg)</span>
-        <input type="number" step="0.1" id="input-weight" class="w-full mt-1 bg-void brutal-border px-2 py-2 font-mono text-neutral-100 focus:outline-none focus:border-blood" placeholder="82.4">
+        <span class="text-[11px] text-neutral-400 ml-1">Waga (kg)</span>
+        <input type="number" step="0.1" id="input-weight" class="w-full mt-1 bg-white/5 border border-white/10 rounded-2xl px-3 py-2.5 text-neutral-100 focus:outline-none focus:border-mint transition" placeholder="52.5">
       </label>
 
-      <button type="submit" class="col-span-2 mt-2 py-3 brutal-border-active text-blood font-display uppercase tracking-widest text-sm hover:bg-blood hover:text-white transition">Zapisz dane</button>
+      <button type="submit" class="col-span-2 mt-1 py-3 rounded-full glass font-semibold text-mint active:scale-95 transition">
+        <i class="fa-solid fa-floppy-disk mr-1.5"></i>Zapisz dane
+      </button>
     </form>
 
-    <button id="btn-analyze-ai" class="w-full py-4 mb-5 bg-blood text-white font-display uppercase tracking-widest hover:bg-red-700 active:scale-[0.98] transition flex items-center justify-center gap-2">
-      <span id="ai-btn-label">Analizuj dzień z AI</span>
-      <span id="ai-btn-spinner" class="hidden animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full"></span>
+    <button id="btn-analyze-ai" class="w-full py-4 bg-gradient-to-br from-peach to-gold text-ink font-bold rounded-full text-base active:scale-95 transition shadow-warm flex items-center justify-center gap-2">
+      <span id="ai-btn-label"><i class="fa-solid fa-brain mr-1.5"></i>Zapytaj mentora</span>
+      <span id="ai-btn-spinner" class="hidden animate-spin h-4 w-4 border-2 border-ink border-t-transparent rounded-full"></span>
     </button>
 
-    <div id="ai-result-box" class="hidden brutal-border bg-panel p-4 mb-6">
-      <div class="font-mono text-[10px] text-blood uppercase tracking-widest mb-2">Werdykt trenera</div>
+    <div id="ai-result-box" class="hidden glass rounded-4xl p-5 shadow-warm">
+      <div class="flex items-center gap-2 mb-2">
+        <i class="fa-solid fa-comment-dots text-peach"></i>
+        <span class="font-bold text-sm text-peach">Mentor mówi</span>
+      </div>
       <p id="ai-result-text" class="text-sm text-neutral-200 leading-relaxed whitespace-pre-line"></p>
     </div>
 
-    <div class="brutal-border bg-panel p-3 mb-5">
-      <div class="font-mono text-[10px] uppercase text-neutral-500 mb-2 tracking-widest">Waga — 7 dni</div>
+    <div class="glass rounded-4xl p-4 shadow-soft">
+      <div class="flex items-center gap-2 mb-3 text-sm font-semibold text-neutral-300">
+        <i class="fa-solid fa-chart-line text-mint"></i>Trend wagi — 7 dni
+      </div>
       <canvas id="chart-weight" height="140"></canvas>
     </div>
 
-    <div class="brutal-border bg-panel p-3 mb-6">
-      <div class="font-mono text-[10px] uppercase text-neutral-500 mb-2 tracking-widest">Sen — 7 dni</div>
+    <div class="glass rounded-4xl p-4 shadow-soft">
+      <div class="flex items-center gap-2 mb-3 text-sm font-semibold text-neutral-300">
+        <i class="fa-solid fa-moon text-lilac"></i>Trend snu — 7 dni
+      </div>
       <canvas id="chart-sleep" height="140"></canvas>
     </div>
   </section>
 
 </main>
 
-<!-- ============ MODAL: ARCHIWUM DNIA ============ -->
-<div id="modal-backdrop" class="hidden fixed inset-0 bg-black/80 z-40 flex items-end sm:items-center justify-center p-0 sm:p-4">
-  <div id="modal-box" class="slide-up bg-panel brutal-border-active w-full sm:max-w-md max-h-[85vh] overflow-y-auto p-5">
-    <div class="flex items-center justify-between mb-4">
-      <span id="modal-date" class="font-display uppercase text-lg text-neutral-100">--</span>
-      <button id="modal-close" class="font-mono text-neutral-500 hover:text-blood text-xl leading-none">✕</button>
-    </div>
-    <div id="modal-content" class="space-y-4 font-mono text-sm"></div>
-  </div>
-</div>
-
 <!-- ============ TOAST ============ -->
-<div id="toast" class="hidden fixed bottom-5 left-1/2 -translate-x-1/2 z-50 brutal-border-active bg-panel px-4 py-2 font-mono text-xs text-neutral-100"></div>
+<div id="toast" class="hidden fixed bottom-6 left-1/2 -translate-x-1/2 z-50 glass rounded-full px-5 py-3 text-sm font-medium shadow-soft rise"></div>
 
+<script>
+// ============================================================================
+// LEVELUP — app logic (Vanilla JS)
+// Firestore/Firebase: opcjonalny. Bez konfiguracji apka działa w localStorage.
+// ============================================================================
+
+// ----------------------------------------------------------------------------
+// 0. KONTEKST UŻYTKOWNIKA — używany w prompcie AI (Mentor)
+// ----------------------------------------------------------------------------
+const USER_CONTEXT = {
+  age: 14,
+  goals: [
+    "Urosnąć i przytyć (nabrać masy mięśniowej), żeby czuć pewność siebie i żeby rówieśnicy przestali go wyzywać.",
+    "Naprawić wadę mowy: mechaniczne R, napięcie szczęki od bruksizmu — ćwiczenia masażu, T-D, słowa TDAWA/DOWED.",
+    "Prowadzić własny, lokalny biznes dostawczy 'Czernica Delivery'.",
+    "Trenować kalistenikę (w poniedziałki basen).",
+  ],
+};
+
+// System prompt dla Mentora AI — persona "starszy brat", ciepły ale trzymający dyscyplinę.
+// WAŻNE: mentor motywuje do budowy pewności siebie i zdrowych nawyków (sen, jedzenie,
+// trening), NIGDY nie skupia się na wyglądzie/wadze w sposób obsesyjny ani nie ocenia
+// wartości chłopaka przez pryzmat masy czy wzrostu — to narzędzia do celu (siła,
+// zdrowie, pewność siebie), nie cel sam w sobie.
+const MENTOR_SYSTEM_PROMPT = `
+Jesteś starszym bratem i mentorem 14-letniego chłopaka. Znasz jego sytuację:
+
+- Chce urosnąć i nabrać masy mięśniowej, żeby czuć się pewniej — rówieśnicy go wyzywali.
+  Twoim zadaniem jest wzmacniać jego pewność siebie i pokazywać, że siła i charakter
+  budują się latami, konsekwencją — nie jednym dniem. Nigdy nie krytykuj jego wyglądu
+  ani wagi wprost, nie mów o "byciu za chudym" jako o wadzie — mów o budowaniu, nabieraniu,
+  regeneracji jako fundamentach.
+- Naprawia wadę wymowy (mechaniczne R, napięcie szczęki od bruksizmu) — ćwiczy masaż
+  szczęki, T-D, słowa TDAWA/DOWED. Chwal regularność w tym, to wymaga cierpliwości.
+- Prowadzi własny biznes "Czernica Delivery" — trzymaj do tego szacunek, to nie jest
+  "zabawka", tylko realna odpowiedzialność w jego wieku.
+- Trenuje kalistenikę wt-nd, w poniedziałki basen.
+
+TON: wyluzowany, ciepły, "gadasz jak starszy brat", nie jak nauczyciel czy lekarz.
+Krótko, konkretnie, po ludzku. Możesz użyć "stary" raz na wiadomość, nie nadużywaj.
+Pilnujesz dyscypliny, ale NIGDY nie jesteś chamski, nie wyzywasz, nie zawstydzasz.
+Krytykę podajesz przez fakty i konsekwencje, nie przez ocenianie jego jako osoby.
+
+ZASADY ANALIZY:
+- Jeśli sen < 8h: wytłumacz, że hormon wzrostu wydziela się głównie w nocy, a on chce
+  urosnąć i nabrać masy — regeneracja jest priorytetem, biznes i inne rzeczy poczekają.
+- Jeśli kalorie/dieta nie wyglądają na nadwyżkę (mało jedzenia, mały ruch a dużo kalorii
+  spalonych): przypomnij że bez nadwyżki kalorycznej nie będzie masy, niezależnie od
+  treningu.
+- Jeśli zadania dnia niewykonane w 100%: nazwij to wprost, ale skieruj do przodu ("jutro
+  nadrabiasz"), nie zawstydzaj.
+- Jeśli wszystko zrobione i dane dobre: pochwal konkretnie za co, wzmocnij że tak buduje
+  się pewność siebie — małymi, powtarzalnymi krokami, nie że "jest super" ogólnikowo.
+- Zawsze kończ jednym prostym, konkretnym punktem na jutro.
+- Długość: 3-5 zdań. Zero emotikonek w treści (styl mówiony, nie czat).
+- Nigdy nie dawaj konkretnych zaleceń medycznych, dawek suplementów ani szczegółowych
+  planów dietetycznych — trzymaj się motywacji, priorytetów i dyscypliny.
+`.trim();
+
+function buildMentorUserPrompt(dayData) {
+  const w = dayData.watch || {};
+  const tasksSummary = (dayData.tasks || [])
+    .map((t) => `${t.label}: ${t.done ? "zrobione" : "niezrobione"}`)
+    .join(", ");
+  return `
+Dane na dziś (${dayData.date}):
+Zadania — ${tasksSummary}
+Wykonanie dnia: ${dayData.completedPct ?? 0}%
+Sen: ${w.sleep ?? "brak danych"} h
+Kroki: ${w.steps ?? "brak danych"}
+Średnie tętno: ${w.hr ?? "brak danych"} bpm
+Spalone kalorie: ${w.calories ?? "brak danych"} kcal
+Waga: ${w.weight ?? "brak danych"} kg
+Szklanki wody: ${dayData.water ?? 0}/8
+
+Oceń ten dzień jako starszy brat/mentor.
+`.trim();
+}
+
+// --- MOCK AI (offline, bez klucza) ------------------------------------------
+async function mockMentorAI(dayData) {
+  await new Promise((r) => setTimeout(r, 900));
+  const w = dayData.watch || {};
+  const pct = dayData.completedPct ?? 0;
+  const lines = [];
+
+  if (w.sleep !== null && w.sleep !== undefined && w.sleep < 8) {
+    lines.push(`Stary, ${w.sleep}h snu to za mało. Hormon wzrostu wydziela się głównie w nocy — chcesz urosnąć i nabrać masy, to musisz dowozić minimum 8 godzin. Czernica Delivery poczeka, regeneracja to podstawa.`);
+  }
+
+  if (pct === 100) {
+    lines.push(`Wszystko odhaczone — to właśnie takie dni, jeden po drugim, budują pewność siebie. Nie efekt jednego treningu, tylko powtarzalność.`);
+  } else if (pct > 0) {
+    lines.push(`${pct}% dnia zrobione — nieźle, ale nie idealnie. Jutro dogrywasz resztę, bez tłumaczenia się.`);
+  } else {
+    lines.push(`Dzisiaj zero zadań zaliczonych. Zdarza się, ale jutro wracasz do gry — jeden słabszy dzień niczego nie przekreśla, jeśli nie zrobisz z tego nawyku.`);
+  }
+
+  if (dayData.water !== undefined && dayData.water < 5) {
+    lines.push(`Wody wypiłeś mało jak na dziś — nawodnienie to nie dodatek, to część budowania masy.`);
+  }
+
+  lines.push(`Na jutro: jedna rzecz — połóż się dziś wcześniej, żeby ten sen w końcu się zgadzał.`);
+
+  return lines.join(" ");
+}
+
+// --- REALNE API (opcjonalne) -------------------------------------------------
+// Podłącz własny backend-proxy (np. Cloudflare Worker) trzymający klucz API
+// po stronie serwera. NIGDY nie wklejaj klucza API bezpośrednio tutaj —
+// ten kod trafia na publiczne GitHub Pages.
+async function callRealMentorAI(dayData) {
+  const response = await fetch("https://twoj-backend-proxy.example.com/api/mentor", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      system: MENTOR_SYSTEM_PROMPT,
+      user: buildMentorUserPrompt(dayData),
+    }),
+  });
+  if (!response.ok) throw new Error("Błąd API mentora");
+  const data = await response.json();
+  return data.reply;
+}
+
+// ----------------------------------------------------------------------------
+// 1. FIREBASE (opcjonalny — fallback do localStorage jeśli nieskonfigurowany)
+// ----------------------------------------------------------------------------
+let firebaseReady = false;
+let auth = null;
+let db = null;
+let currentUser = { uid: "local" };
+
+const firebaseConfig = {
+  apiKey: "TWOJ_API_KEY",
+  authDomain: "TWOJ_PROJEKT.firebaseapp.com",
+  projectId: "TWOJ_PROJEKT",
+  storageBucket: "TWOJ_PROJEKT.appspot.com",
+  messagingSenderId: "0000000000",
+  appId: "1:0000000000:web:xxxxxxxxxxxxxxxx",
+};
+
+async function initFirebase() {
+  if (firebaseConfig.apiKey === "TWOJ_API_KEY") {
+    console.info("Firebase nieskonfigurowany — tryb lokalny (localStorage) aktywny.");
+    return;
+  }
+  try {
+    const { initializeApp } = await import("https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js");
+    const authMod = await import("https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js");
+    const fsMod = await import("https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js");
+
+    const app = initializeApp(firebaseConfig);
+    auth = authMod.getAuth(app);
+    db = fsMod.getFirestore(app);
+    firebaseReady = true;
+
+    window.__fb = { authMod, fsMod, db, auth };
+
+    authMod.onAuthStateChanged(auth, async (user) => {
+      currentUser = user || { uid: "local" };
+      await bootApp();
+    });
+
+    document.getElementById("btn-signin").addEventListener("click", async () => {
+      try {
+        const provider = new authMod.GoogleAuthProvider();
+        await authMod.signInWithPopup(auth, provider);
+      } catch (e) {
+        console.warn("Logowanie Google nieudane, próbuję anonimowo.", e);
+        await authMod.signInAnonymously(auth);
+      }
+    });
+  } catch (e) {
+    console.warn("Błąd inicjalizacji Firebase — tryb lokalny.", e);
+  }
+}
+
+function localKey(key) {
+  return `levelup:${currentUser.uid}:${key}`;
+}
+
+async function saveDayDoc(dayData) {
+  if (firebaseReady && window.__fb) {
+    const { fsMod, db } = window.__fb;
+    const ref = fsMod.doc(db, "users", currentUser.uid, "days", dayData.date);
+    await fsMod.setDoc(ref, dayData, { merge: true });
+  } else {
+    localStorage.setItem(localKey(dayData.date), JSON.stringify(dayData));
+  }
+}
+
+async function loadDayDoc(dateStr) {
+  if (firebaseReady && window.__fb) {
+    const { fsMod, db } = window.__fb;
+    const ref = fsMod.doc(db, "users", currentUser.uid, "days", dateStr);
+    const snap = await fsMod.getDoc(ref);
+    return snap.exists() ? snap.data() : null;
+  } else {
+    const raw = localStorage.getItem(localKey(dateStr));
+    return raw ? JSON.parse(raw) : null;
+  }
+}
+
+async function loadLastNDays(n) {
+  const docs = [];
+  const today = new Date();
+
+  if (firebaseReady && window.__fb) {
+    const { fsMod, db } = window.__fb;
+    const start = new Date(today);
+    start.setDate(start.getDate() - (n - 1));
+    const colRef = fsMod.collection(db, "users", currentUser.uid, "days");
+    const q = fsMod.query(
+      colRef,
+      fsMod.where("date", ">=", dateKey(start)),
+      fsMod.orderBy("date", "asc"),
+      fsMod.limit(n)
+    );
+    const snaps = await fsMod.getDocs(q);
+    snaps.forEach((s) => docs.push(s.data()));
+  } else {
+    for (let i = n - 1; i >= 0; i--) {
+      const d = new Date(today);
+      d.setDate(d.getDate() - i);
+      const raw = localStorage.getItem(localKey(dateKey(d)));
+      if (raw) docs.push(JSON.parse(raw));
+    }
+  }
+  return docs;
+}
+
+async function computeStreakUpTo(dateStr) {
+  let streak = 0;
+  let cursor = new Date(dateStr);
+  cursor.setDate(cursor.getDate() - 1);
+  for (let i = 0; i < 400; i++) {
+    const data = await loadDayDoc(dateKey(cursor));
+    if (data && data.completedPct === 100) {
+      streak++;
+      cursor.setDate(cursor.getDate() - 1);
+    } else break;
+  }
+  return streak;
+}
+
+// ----------------------------------------------------------------------------
+// 2. POMOCNICZE
+// ----------------------------------------------------------------------------
+function dateKey(date) {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, "0");
+  const d = String(date.getDate()).padStart(2, "0");
+  return `${y}-${m}-${d}`;
+}
+function isMonday(date) { return date.getDay() === 1; }
+
+function showToast(msg) {
+  const toast = document.getElementById("toast");
+  toast.textContent = msg;
+  toast.classList.remove("hidden");
+  clearTimeout(showToast._t);
+  showToast._t = setTimeout(() => toast.classList.add("hidden"), 2400);
+}
+
+// ----------------------------------------------------------------------------
+// 3. STAN + ZADANIA DNIA
+// ----------------------------------------------------------------------------
+const todayObj = new Date();
+const todayKey = dateKey(todayObj);
+const monday = isMonday(todayObj);
+
+const state = {
+  tasks: [
+    { id: "budulec", label: "Budulec — D3 + Dieta", done: false },
+    { id: "trening", label: monday ? "Basen 1,5h" : "Kalistenika", done: false },
+    { id: "biznes", label: "Czernica Delivery", done: false },
+    { id: "mowa", label: "Trening mowy", done: false },
+  ],
+  water: 0,
+};
+
+function calcCompletionPct() {
+  const done = state.tasks.filter((t) => t.done).length;
+  return Math.round((done / state.tasks.length) * 100);
+}
+
+// ----------------------------------------------------------------------------
+// 4. RENDER: TRENING dzień-zależny + karty checkbox
+// ----------------------------------------------------------------------------
+function setupTreningCard() {
+  const icon = document.getElementById("trening-icon");
+  const title = document.getElementById("trening-title");
+  const sub = document.getElementById("trening-sub");
+  const desc = document.getElementById("trening-desc").querySelector("p");
+
+  if (monday) {
+    icon.className = "fa-solid fa-person-swimming text-mint text-2xl";
+    title.textContent = "Basen — 1,5h";
+    sub.textContent = "Poniedziałek to dzień na wodę";
+    desc.textContent = "Pływanie odciąża stawy i buduje wytrzymałość całego ciała — dziś kalistenika robi sobie przerwę, basen bierze prowadzenie.";
+  } else {
+    icon.className = "fa-solid fa-dumbbell text-mint text-2xl";
+    title.textContent = "Kalistenika";
+    sub.textContent = "Buduj siłę własnym ciałem";
+    desc.textContent = "Każdy trening to cegiełka. Siła, którą budujesz, buduje też szacunek — twój do siebie, i innych do ciebie.";
+  }
+}
+
+function renderCheckStates() {
+  state.tasks.forEach((task) => {
+    const btn = document.querySelector(`[data-check="${task.id}"]`);
+    if (!btn) return;
+    const icon = btn.querySelector("i");
+    if (task.done) {
+      btn.classList.add("bg-gradient-to-br", "from-mint", "to-lilac", "border-transparent");
+      btn.classList.remove("border-white/15");
+      icon.classList.remove("opacity-0");
+      icon.classList.add("text-ink");
+    } else {
+      btn.classList.remove("bg-gradient-to-br", "from-mint", "to-lilac", "border-transparent");
+      btn.classList.add("border-white/15");
+      icon.classList.add("opacity-0");
+      icon.classList.remove("text-ink");
+    }
+  });
+}
+
+function renderProgress() {
+  const pct = calcCompletionPct();
+  const doneCount = state.tasks.filter((t) => t.done).length;
+
+  document.getElementById("progress-bar").style.width = `${pct}%`;
+  document.getElementById("hero-pct").textContent = `${pct}%`;
+  document.getElementById("progress-sub").textContent = `${doneCount} z ${state.tasks.length} zadań na dziś`;
+
+  const circumference = 169.6;
+  const offset = circumference - (pct / 100) * circumference;
+  document.getElementById("hero-ring").style.strokeDashoffset = offset;
+
+  const headline = document.getElementById("progress-headline");
+  if (pct === 100) headline.textContent = "Level up! 🚀";
+  else if (pct >= 50) headline.textContent = "Dobra robota, jedziesz dalej 🔥";
+  else if (pct > 0) headline.textContent = "Ruszyłeś, nie zwalniaj 💪";
+  else headline.textContent = "Zaczynajmy 💪";
+}
+
+function renderWaterDrops() {
+  const container = document.getElementById("water-drops");
+  container.innerHTML = "";
+  for (let i = 0; i < 8; i++) {
+    const drop = document.createElement("div");
+    const filled = i < state.water;
+    drop.className = `droplet w-7 h-7 rounded-full flex items-center justify-center text-xs ${
+      filled ? "bg-gradient-to-br from-mint to-lilac" : "bg-white/5 border border-white/10"
+    }`;
+    drop.innerHTML = filled ? '<i class="fa-solid fa-droplet text-ink"></i>' : "";
+    container.appendChild(drop);
+  }
+  document.getElementById("water-count").textContent = state.water;
+}
+
+async function persistToday() {
+  const pct = calcCompletionPct();
+  const existing = (await loadDayDoc(todayKey)) || {};
+  const dayData = {
+    ...existing,
+    date: todayKey,
+    tasks: state.tasks,
+    completedPct: pct,
+    water: state.water,
+  };
+  await saveDayDoc(dayData);
+  await refreshStreak();
+}
+
+async function refreshStreak() {
+  const today = await loadDayDoc(todayKey);
+  const pctToday = today?.completedPct ?? 0;
+  const base = await computeStreakUpTo(todayKey);
+  const streak = pctToday === 100 ? base + 1 : base;
+  document.getElementById("streak-count").textContent = streak;
+  const pill = document.getElementById("streak-pill");
+  if (streak > 0) pill.classList.add("ring-pulse");
+  else pill.classList.remove("ring-pulse");
+}
+
+// ----------------------------------------------------------------------------
+// 5. INTERAKCJE: KARTY (checkbox + expand)
+// ----------------------------------------------------------------------------
+document.querySelectorAll("[data-check]").forEach((btn) => {
+  btn.addEventListener("click", async (e) => {
+    e.stopPropagation();
+    const id = btn.dataset.check;
+    const task = state.tasks.find((t) => t.id === id);
+    if (!task) return;
+    task.done = !task.done;
+    renderCheckStates();
+    renderProgress();
+    await persistToday();
+    if (task.done) showToast("Zaliczone ✓");
+  });
+});
+
+document.querySelectorAll("[data-toggle]").forEach((trigger) => {
+  trigger.addEventListener("click", () => {
+    const id = trigger.dataset.toggle;
+    const panel = document.querySelector(`[data-panel="${id}"]`);
+    panel.classList.toggle("open");
+  });
+});
+
+document.getElementById("water-add").addEventListener("click", async () => {
+  if (state.water < 8) {
+    state.water += 1;
+    renderWaterDrops();
+    await persistToday();
+    if (state.water === 8) showToast("Nawodnienie zaliczone 💧");
+  }
+});
+
+// ----------------------------------------------------------------------------
+// 6. ZAKŁADKI
+// ----------------------------------------------------------------------------
+document.querySelectorAll(".tab-btn").forEach((btn) => {
+  btn.addEventListener("click", () => {
+    document.querySelectorAll(".tab-btn").forEach((b) => {
+      b.classList.remove("bg-gradient-to-br", "from-mint", "to-lilac", "text-ink");
+      b.classList.add("text-neutral-400");
+    });
+    btn.classList.add("bg-gradient-to-br", "from-mint", "to-lilac", "text-ink");
+    btn.classList.remove("text-neutral-400");
+
+    document.querySelectorAll(".tab-panel").forEach((p) => p.classList.add("hidden"));
+    document.getElementById(`tab-${btn.dataset.tab}`).classList.remove("hidden");
+
+    if (btn.dataset.tab === "mentor") renderCharts();
+  });
+});
+
+// ----------------------------------------------------------------------------
+// 7. MODUŁ MOWY — STOPER Z PIERŚCIENIEM
+// ----------------------------------------------------------------------------
+const SPEECH_PHASES = [
+  { name: "Masaż szczęki", seconds: 120, icon: "😌", label: "Faza 1 z 3" },
+  { name: "Mechaniczne T-D", seconds: 180, icon: "😤", label: "Faza 2 z 3" },
+  { name: "Słowa: TDAWA, DOWED", seconds: 300, icon: "🗣", label: "Faza 3 z 3" },
+];
+const RING_CIRCUMFERENCE = 552.9;
+
+let speechTimerHandle = null;
+let speechPhaseIdx = 0;
+let speechRemaining = 0;
+let speechAudioCtx = null;
+
+function beep(freq = 880, duration = 250) {
+  try {
+    speechAudioCtx = speechAudioCtx || new (window.AudioContext || window.webkitAudioContext)();
+    const osc = speechAudioCtx.createOscillator();
+    const gain = speechAudioCtx.createGain();
+    osc.frequency.value = freq;
+    osc.type = "sine";
+    gain.gain.setValueAtTime(0.16, speechAudioCtx.currentTime);
+    osc.connect(gain);
+    gain.connect(speechAudioCtx.destination);
+    osc.start();
+    osc.stop(speechAudioCtx.currentTime + duration / 1000);
+  } catch (e) { console.warn("Audio nieobsługiwane", e); }
+}
+
+function formatMMSS(totalSeconds) {
+  const m = Math.floor(totalSeconds / 60).toString().padStart(2, "0");
+  const s = Math.floor(totalSeconds % 60).toString().padStart(2, "0");
+  return `${m}:${s}`;
+}
+
+function updateSpeechUI() {
+  const phase = SPEECH_PHASES[speechPhaseIdx];
+  document.getElementById("speech-timer").textContent = formatMMSS(speechRemaining);
+  document.getElementById("speech-phase-name").textContent = phase ? phase.name : "Gotowe!";
+  document.getElementById("speech-phase-label").textContent = phase ? phase.label : "Świetna robota";
+  document.getElementById("speech-icon").textContent = phase ? phase.icon : "🎉";
+
+  const totalSeconds = phase ? phase.seconds : 1;
+  const elapsedRatio = phase ? 1 - speechRemaining / phase.seconds : 1;
+  const offset = RING_CIRCUMFERENCE - elapsedRatio * RING_CIRCUMFERENCE;
+  document.getElementById("speech-ring").style.strokeDashoffset = offset;
+
+  for (let i = 0; i < 3; i++) {
+    const dot = document.getElementById(`phase-dot-${i + 1}`);
+    if (i < speechPhaseIdx) dot.className = "h-2 w-10 rounded-full bg-mint transition";
+    else if (i === speechPhaseIdx) dot.className = "h-2 w-10 rounded-full bg-gradient-to-r from-mint to-lilac transition";
+    else dot.className = "h-2 w-10 rounded-full bg-white/10 transition";
+  }
+}
+
+function startSpeechTraining() {
+  speechPhaseIdx = 0;
+  speechRemaining = SPEECH_PHASES[0].seconds;
+  document.getElementById("speech-start-btn").classList.add("hidden");
+  document.getElementById("speech-stop-btn").classList.remove("hidden");
+  document.getElementById("speech-ring").style.strokeDashoffset = RING_CIRCUMFERENCE;
+  beep(660, 200);
+  updateSpeechUI();
+
+  clearInterval(speechTimerHandle);
+  speechTimerHandle = setInterval(() => {
+    speechRemaining -= 1;
+    if (speechRemaining < 0) {
+      beep(880, 300);
+      speechPhaseIdx += 1;
+      if (speechPhaseIdx >= SPEECH_PHASES.length) {
+        finishSpeechTraining();
+        return;
+      }
+      speechRemaining = SPEECH_PHASES[speechPhaseIdx].seconds;
+    }
+    updateSpeechUI();
+  }, 1000);
+}
+
+async function finishSpeechTraining() {
+  clearInterval(speechTimerHandle);
+  beep(1046, 500);
+  setTimeout(() => beep(1318, 500), 200);
+  document.getElementById("speech-phase-name").textContent = "Zrobione!";
+  document.getElementById("speech-phase-label").textContent = "Świetna robota";
+  document.getElementById("speech-icon").textContent = "🎉";
+  document.getElementById("speech-timer").textContent = "00:00";
+  document.getElementById("speech-ring").style.strokeDashoffset = 0;
+  document.getElementById("speech-start-btn").classList.remove("hidden");
+  document.getElementById("speech-stop-btn").classList.add("hidden");
+
+  const task = state.tasks.find((t) => t.id === "mowa");
+  if (task && !task.done) {
+    task.done = true;
+    renderCheckStates();
+    renderProgress();
+    await persistToday();
+    showToast("Trening mowy zaliczony ✓");
+  }
+}
+
+function stopSpeechTraining() {
+  clearInterval(speechTimerHandle);
+  speechPhaseIdx = 0;
+  speechRemaining = 0;
+  document.getElementById("speech-phase-name").textContent = "Rozgrzewka mowy";
+  document.getElementById("speech-phase-label").textContent = "Przerwano — wróć, kiedy będziesz gotowy";
+  document.getElementById("speech-icon").textContent = "😌";
+  document.getElementById("speech-timer").textContent = "02:00";
+  document.getElementById("speech-ring").style.strokeDashoffset = RING_CIRCUMFERENCE;
+  document.getElementById("speech-start-btn").classList.remove("hidden");
+  document.getElementById("speech-stop-btn").classList.add("hidden");
+}
+
+document.getElementById("speech-start-btn").addEventListener("click", startSpeechTraining);
+document.getElementById("speech-stop-btn").addEventListener("click", stopSpeechTraining);
+
+// ----------------------------------------------------------------------------
+// 8. FORMULARZ ZEGARKA
+// ----------------------------------------------------------------------------
+document.getElementById("watch-form").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const watch = {
+    sleep: parseFloat(document.getElementById("input-sleep").value) || null,
+    steps: parseInt(document.getElementById("input-steps").value) || null,
+    hr: parseInt(document.getElementById("input-hr").value) || null,
+    calories: parseInt(document.getElementById("input-calories").value) || null,
+    weight: parseFloat(document.getElementById("input-weight").value) || null,
+  };
+  const existing = (await loadDayDoc(todayKey)) || { date: todayKey, tasks: state.tasks, completedPct: calcCompletionPct(), water: state.water };
+  await saveDayDoc({ ...existing, watch });
+  showToast("Dane zapisane ✓");
+  renderCharts();
+});
+
+// ----------------------------------------------------------------------------
+// 9. WYKRESY
+// ----------------------------------------------------------------------------
+let weightChart = null;
+let sleepChart = null;
+
+async function renderCharts() {
+  const docs = await loadLastNDays(7);
+  const labels = docs.map((d) => {
+    const [, m, day] = d.date.split("-");
+    return `${day}.${m}`;
+  });
+  const weights = docs.map((d) => d.watch?.weight ?? null);
+  const sleeps = docs.map((d) => d.watch?.sleep ?? null);
+
+  const baseOptions = {
+    responsive: true,
+    plugins: { legend: { display: false } },
+    scales: {
+      x: { ticks: { color: "#8b8397", font: { family: "Poppins", size: 10 } }, grid: { display: false } },
+      y: { ticks: { color: "#8b8397", font: { family: "Poppins", size: 10 } }, grid: { color: "rgba(255,255,255,0.05)" } },
+    },
+  };
+
+  const weightCtx = document.getElementById("chart-weight");
+  if (weightChart) weightChart.destroy();
+  weightChart = new Chart(weightCtx, {
+    type: "line",
+    data: {
+      labels,
+      datasets: [{
+        data: weights,
+        borderColor: "#5eead4",
+        backgroundColor: "rgba(94,234,212,0.12)",
+        pointBackgroundColor: "#5eead4",
+        pointBorderColor: "#0f0c1d",
+        pointRadius: 4,
+        borderWidth: 3,
+        tension: 0.45,
+        fill: true,
+        spanGaps: true,
+      }],
+    },
+    options: baseOptions,
+  });
+
+  const sleepCtx = document.getElementById("chart-sleep");
+  if (sleepChart) sleepChart.destroy();
+  sleepChart = new Chart(sleepCtx, {
+    type: "line",
+    data: {
+      labels,
+      datasets: [{
+        data: sleeps,
+        borderColor: "#c4b5fd",
+        backgroundColor: "rgba(196,181,253,0.12)",
+        pointBackgroundColor: "#c4b5fd",
+        pointBorderColor: "#0f0c1d",
+        pointRadius: 4,
+        borderWidth: 3,
+        tension: 0.45,
+        fill: true,
+        spanGaps: true,
+      }],
+    },
+    options: baseOptions,
+  });
+}
+
+// ----------------------------------------------------------------------------
+// 10. MENTOR AI
+// ----------------------------------------------------------------------------
+document.getElementById("btn-analyze-ai").addEventListener("click", async () => {
+  const label = document.getElementById("ai-btn-label");
+  const spinner = document.getElementById("ai-btn-spinner");
+  label.classList.add("opacity-0");
+  spinner.classList.remove("hidden");
+
+  try {
+    const dayData = (await loadDayDoc(todayKey)) || {
+      date: todayKey, tasks: state.tasks, completedPct: calcCompletionPct(), water: state.water,
+    };
+
+    // Domyślnie mock. Aby użyć realnego API: await callRealMentorAI(dayData)
+    const verdict = await mockMentorAI(dayData);
+
+    await saveDayDoc({ ...dayData, aiVerdict: verdict });
+
+    document.getElementById("ai-result-box").classList.remove("hidden");
+    document.getElementById("ai-result-text").textContent = verdict;
+    document.getElementById("mentor-verdict-box").classList.remove("hidden");
+    document.getElementById("mentor-verdict-text").textContent = verdict;
+  } catch (err) {
+    showToast("Coś poszło nie tak z mentorem");
+    console.error(err);
+  } finally {
+    label.classList.remove("opacity-0");
+    spinner.classList.add("hidden");
+  }
+});
+
+// ----------------------------------------------------------------------------
+// 11. PWA INSTALL PROMPT
+// ----------------------------------------------------------------------------
+let deferredInstallPrompt = null;
+
+window.addEventListener("beforeinstallprompt", (e) => {
+  e.preventDefault();
+  deferredInstallPrompt = e;
+  if (!localStorage.getItem("levelup:install-dismissed")) {
+    document.getElementById("install-banner").classList.remove("hidden");
+  }
+});
+
+document.getElementById("btn-install").addEventListener("click", async () => {
+  if (!deferredInstallPrompt) return;
+  deferredInstallPrompt.prompt();
+  const { outcome } = await deferredInstallPrompt.userChoice;
+  if (outcome === "accepted") showToast("Dodano do ekranu głównego 🎉");
+  deferredInstallPrompt = null;
+  document.getElementById("install-banner").classList.add("hidden");
+});
+
+document.getElementById("btn-install-dismiss").addEventListener("click", () => {
+  document.getElementById("install-banner").classList.add("hidden");
+  localStorage.setItem("levelup:install-dismissed", "1");
+});
+
+// ----------------------------------------------------------------------------
+// 12. SERVICE WORKER (rejestracja inline — brak osobnego sw.js w tym pliku)
+// ----------------------------------------------------------------------------
+if ("serviceWorker" in navigator) {
+  const swCode = `
+    const CACHE_NAME = "levelup-cache-v1";
+    self.addEventListener("install", (e) => { self.skipWaiting(); });
+    self.addEventListener("activate", (e) => { self.clients.claim(); });
+    self.addEventListener("fetch", (e) => {
+      if (e.request.method !== "GET") return;
+      e.respondWith(
+        fetch(e.request).catch(() => caches.match(e.request))
+      );
+    });
+  `;
+  const blob = new Blob([swCode], { type: "application/javascript" });
+  const swUrl = URL.createObjectURL(blob);
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register(swUrl).catch((e) => console.warn("SW nieudany", e));
+  });
+}
+
+// ----------------------------------------------------------------------------
+// 13. BOOTSTRAP
+// ----------------------------------------------------------------------------
+async function bootApp() {
+  setupTreningCard();
+
+  const existing = await loadDayDoc(todayKey);
+  if (existing?.tasks?.length) {
+    state.tasks = existing.tasks;
+    state.water = existing.water || 0;
+  } else {
+    await saveDayDoc({ date: todayKey, tasks: state.tasks, completedPct: 0, water: 0 });
+  }
+
+  renderCheckStates();
+  renderProgress();
+  renderWaterDrops();
+  await refreshStreak();
+
+  if (existing?.aiVerdict) {
+    document.getElementById("mentor-verdict-box").classList.remove("hidden");
+    document.getElementById("mentor-verdict-text").textContent = existing.aiVerdict;
+  }
+  if (existing?.watch) {
+    const w = existing.watch;
+    if (w.sleep) document.getElementById("input-sleep").value = w.sleep;
+    if (w.steps) document.getElementById("input-steps").value = w.steps;
+    if (w.hr) document.getElementById("input-hr").value = w.hr;
+    if (w.calories) document.getElementById("input-calories").value = w.calories;
+    if (w.weight) document.getElementById("input-weight").value = w.weight;
+  }
+}
+
+initFirebase().then(() => {
+  if (!firebaseReady) bootApp();
+});
+</script>
 </body>
 </html>
