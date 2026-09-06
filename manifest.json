@@ -1,7 +1,7 @@
 {
-  "name": "LevelUp — Twój codzienny wzrost",
-  "short_name": "LevelUp",
-  "description": "Codzienny system: budowanie masy, trening mowy, kalistenika/basen i własny biznes Czernica Delivery.",
+  "name": "REGIM — Twój codzienny system regeneracji i wzrostu",
+  "short_name": "REGIM",
+  "description": "Codzienny system: raport ze smartwatcha (sen, kroki, tętno, SpO2, stres), trening dzień-zależny, trening mowy z timerem i Mentor AI do analizy regeneracji.",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
