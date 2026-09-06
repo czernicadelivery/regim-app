@@ -172,6 +172,13 @@
     100% { opacity: 0; transform: translateY(-4px); }
   }
   .quote-anim { animation: quote-fade 8s ease-in-out infinite; }
+
+  /* ===== KALORIE ===== */
+  .kcal-fill { transition: width 0.6s cubic-bezier(0.16,1,0.3,1); }
+
+  /* ===== HISTORIA MENTORA ===== */
+  .history-item { border-left: 2px solid rgba(255,255,255,0.1); }
+  html.light-theme .history-item { border-left-color: rgba(30,26,53,0.12); }
 </style>
 </head>
 <body class="text-neutral-100 font-sans min-h-screen pb-28">
@@ -186,7 +193,7 @@
       </div>
       <div>
         <div class="font-extrabold text-lg leading-none tracking-tight">REGIM</div>
-        <div class="text-[11px] text-neutral-400 leading-none mt-0.5">Twój codzienny wzrost</div>
+        <div class="text-[11px] text-neutral-400 leading-none mt-0.5" id="header-greeting">Twój codzienny wzrost</div>
       </div>
     </div>
     <div class="flex items-center gap-2">
@@ -226,7 +233,7 @@
   </div>
 </div>
 
-<!-- ============ BANER POWIADOMIEŃ ============ -->
+<!-- ============ BANER POWIADOMIEŃ (lokalne, offline) ============ -->
 <div id="notif-banner" class="hidden max-w-lg mx-auto px-5 mb-2">
   <div class="rise glass rounded-3xl p-4 flex items-center gap-3 shadow-soft">
     <div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-peach/30 to-gold/30 flex items-center justify-center flex-shrink-0">
@@ -245,6 +252,25 @@
   </div>
 </div>
 
+<!-- ============ BANER PRAWDZIWEGO PUSH (Firebase Cloud Messaging) ============ -->
+<div id="push-banner" class="hidden max-w-lg mx-auto px-5 mb-2">
+  <div class="rise glass rounded-3xl p-4 flex items-center gap-3 shadow-soft border border-lilac/25">
+    <div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-lilac/30 to-mint/30 flex items-center justify-center flex-shrink-0">
+      <i class="fa-solid fa-tower-broadcast text-lilac text-lg"></i>
+    </div>
+    <div class="flex-1 min-w-0">
+      <div class="font-bold text-sm">Prawdziwy push (nawet gdy telefon śpi)</div>
+      <div class="text-xs text-neutral-400">Wysyłany przez serwer Firebase, nie przez kartę przeglądarki</div>
+    </div>
+    <button id="btn-push-enable" class="bg-gradient-to-br from-lilac to-mint text-ink font-extrabold text-sm px-4 py-2 rounded-full whitespace-nowrap active:scale-95 transition">
+      Włącz
+    </button>
+    <button id="btn-push-dismiss" class="text-neutral-500 hover:text-neutral-300 w-6 h-6 flex items-center justify-center flex-shrink-0">
+      <i class="fa-solid fa-xmark"></i>
+    </button>
+  </div>
+</div>
+
 <main class="max-w-lg mx-auto px-5">
 
   <!-- ============ HERO: PASEK POSTĘPU DNIA ============ -->
@@ -252,7 +278,7 @@
     <div class="flex items-center justify-between mb-3">
       <div>
         <div class="text-2xl font-extrabold" id="progress-headline">Zaczynajmy 💪</div>
-        <div class="text-xs text-neutral-400 font-semibold" id="progress-sub">0 z 4 zadań na dziś</div>
+        <div class="text-xs text-neutral-400 font-semibold" id="progress-sub">0 z 5 zadań na dziś</div>
       </div>
       <div class="relative w-16 h-16 flex-shrink-0">
         <svg class="w-16 h-16 -rotate-90" viewBox="0 0 64 64">
@@ -372,11 +398,53 @@
           <span class="text-[11px] text-neutral-400 ml-1 font-semibold">Stres (1-100)</span>
           <input type="number" min="1" max="100" id="input-stress" placeholder="35" class="w-full mt-1 bg-white/5 border border-white/10 rounded-2xl px-3 py-2.5 text-neutral-100 font-semibold focus:outline-none focus:border-lilac transition">
         </label>
+        <label class="block col-span-2">
+          <span class="text-[11px] text-neutral-400 ml-1 font-semibold">Kalorie zjedzone dziś (kcal)</span>
+          <input type="number" id="input-calories-eaten" placeholder="3100" class="w-full mt-1 bg-white/5 border border-white/10 rounded-2xl px-3 py-2.5 text-neutral-100 font-semibold focus:outline-none focus:border-lilac transition">
+        </label>
 
         <button type="submit" class="col-span-2 mt-1 py-3 rounded-full bg-gradient-to-br from-lilac to-mint text-ink font-extrabold active:scale-95 transition">
           <i class="fa-solid fa-floppy-disk mr-1.5"></i>Zapisz podsumowanie dnia
         </button>
       </form>
+    </div>
+
+    <!-- ===== KARTA: NADWYŻKA KALORYCZNA ===== -->
+    <div class="glass rounded-4xl p-4 shadow-soft">
+      <div class="flex items-center justify-between mb-3">
+        <div class="flex items-center gap-2">
+          <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-gold/25 to-peach/25 flex items-center justify-center flex-shrink-0">
+            <i class="fa-solid fa-fire text-gold"></i>
+          </div>
+          <div class="font-bold text-base">Nadwyżka kaloryczna</div>
+        </div>
+        <button id="btn-edit-tdee" class="text-[11px] font-bold text-neutral-400 glass rounded-full px-3 py-1.5 active:scale-95 transition">
+          <i class="fa-solid fa-gear mr-1"></i>Cel: <span id="tdee-label">2800</span> kcal
+        </button>
+      </div>
+      <div id="tdee-edit-wrapper" class="hidden rise mb-3">
+        <label class="block">
+          <span class="text-[11px] text-neutral-400 ml-1 font-semibold">Cel kaloryczny na masę (kcal/dzień)</span>
+          <div class="flex gap-2 mt-1">
+            <input type="number" id="input-tdee" placeholder="2800" class="flex-1 bg-white/5 border border-white/10 rounded-2xl px-3 py-2.5 text-neutral-100 font-semibold focus:outline-none focus:border-gold transition">
+            <button id="btn-save-tdee" class="px-4 rounded-2xl bg-gradient-to-br from-gold to-peach text-ink font-extrabold active:scale-95 transition">Zapisz</button>
+          </div>
+        </label>
+      </div>
+      <div class="flex items-end justify-between mb-2">
+        <div>
+          <div class="text-3xl font-extrabold" id="kcal-eaten-display">0</div>
+          <div class="text-[11px] text-neutral-400 font-semibold">kcal zjedzone dziś</div>
+        </div>
+        <div class="text-right">
+          <div id="kcal-surplus-display" class="text-xl font-extrabold text-neutral-400">—</div>
+          <div class="text-[11px] text-neutral-400 font-semibold">nadwyżka / deficyt</div>
+        </div>
+      </div>
+      <div class="h-2 bg-white/5 rounded-full overflow-hidden">
+        <div id="kcal-bar" class="kcal-fill h-full rounded-full bg-gradient-to-r from-gold to-peach" style="width:0%"></div>
+      </div>
+      <div id="kcal-hint" class="text-[11px] text-neutral-500 font-semibold mt-2"></div>
     </div>
 
     <!-- Karta: Tabletka / Suplementy -->
@@ -536,6 +604,24 @@
   <!-- ============ ZAKŁADKA: POSTĘPY ============ -->
   <section id="tab-postepy" class="tab-panel hidden space-y-5">
 
+    <!-- ===== NAJLEPSZY WYNIK ===== -->
+    <div class="glass rounded-4xl p-5 shadow-warm">
+      <div class="flex items-center gap-2 mb-4">
+        <i class="fa-solid fa-trophy text-gold"></i>
+        <span class="font-bold text-sm">Najlepszy wynik</span>
+      </div>
+      <div class="grid grid-cols-2 gap-3">
+        <div class="glass rounded-3xl p-4 text-center">
+          <div class="text-2xl font-extrabold text-gold" id="best-streak-value">0</div>
+          <div class="text-[11px] text-neutral-400 font-semibold mt-1">Najdłuższy streak (dni)</div>
+        </div>
+        <div class="glass rounded-3xl p-4 text-center">
+          <div class="text-2xl font-extrabold text-mint" id="best-week-value">0%</div>
+          <div class="text-[11px] text-neutral-400 font-semibold mt-1">Najlepszy tydzień</div>
+        </div>
+      </div>
+    </div>
+
     <!-- Cotygodniowe podsumowanie Mentora -->
     <div class="glass rounded-4xl p-5 shadow-warm">
       <div class="flex items-center justify-between mb-3">
@@ -601,6 +687,22 @@
       <p id="ai-result-text" class="text-sm text-neutral-200 leading-relaxed whitespace-pre-line font-medium"></p>
     </div>
 
+    <!-- ===== GLOW UP — porównanie tygodni ===== -->
+    <div class="glass rounded-4xl p-5 shadow-soft border border-mint/20">
+      <div class="flex items-center justify-between mb-3">
+        <div class="flex items-center gap-2">
+          <i class="fa-solid fa-sparkles text-mint"></i>
+          <span class="font-bold text-sm text-mint">Glow Up — ten tydzień vs poprzedni</span>
+        </div>
+        <button id="btn-glowup-refresh" class="text-xs font-bold text-mint glass rounded-full px-3 py-1.5 active:scale-95 transition">
+          <i class="fa-solid fa-arrows-rotate mr-1"></i>Odśwież
+        </button>
+      </div>
+      <div id="glowup-content" class="space-y-2">
+        <p class="text-sm text-neutral-400 font-medium">Kliknij "Odśwież", żeby porównać ostatnie 7 dni z poprzednimi 7.</p>
+      </div>
+    </div>
+
     <div class="glass rounded-4xl p-4 shadow-soft">
       <div class="flex items-center gap-2 mb-3 text-sm font-bold text-neutral-300">
         <i class="fa-solid fa-scale-balanced text-gold"></i>Wykres tygodniowej wagi
@@ -630,12 +732,35 @@
       <canvas id="chart-stress" height="140"></canvas>
     </div>
 
+    <div class="glass rounded-4xl p-4 shadow-soft">
+      <div class="flex items-center gap-2 mb-3 text-sm font-bold text-neutral-300">
+        <i class="fa-solid fa-fire text-gold"></i>Wykres kalorii — 7 dni
+      </div>
+      <canvas id="chart-kcal" height="140"></canvas>
+    </div>
+
     <div id="correlation-box" class="hidden glass rounded-4xl p-5 shadow-soft border border-lilac/20">
       <div class="flex items-center gap-2 mb-2">
         <i class="fa-solid fa-link text-lilac"></i>
         <span class="font-bold text-sm text-lilac">Korelacja: sen a stres</span>
       </div>
       <p id="correlation-text" class="text-sm text-neutral-200 leading-relaxed font-medium"></p>
+    </div>
+
+    <!-- ===== HISTORIA MENTORA ===== -->
+    <div class="glass rounded-4xl p-5 shadow-soft">
+      <div class="flex items-center justify-between mb-3">
+        <div class="flex items-center gap-2">
+          <i class="fa-solid fa-clock-rotate-left text-neutral-400"></i>
+          <span class="font-bold text-sm">Historia Mentora</span>
+        </div>
+        <button id="btn-history-refresh" class="text-xs font-bold text-neutral-400 glass rounded-full px-3 py-1.5 active:scale-95 transition">
+          <i class="fa-solid fa-arrows-rotate mr-1"></i>Odśwież
+        </button>
+      </div>
+      <div id="mentor-history-list" class="space-y-3 max-h-96 overflow-y-auto pr-1">
+        <p class="text-sm text-neutral-500 font-medium">Brak jeszcze historii — zrób analizę Mentora, żeby zaczęła się budować.</p>
+      </div>
     </div>
   </section>
 
@@ -798,14 +923,20 @@
 // ============================================================================
 
 // ----------------------------------------------------------------------------
+// -1. PERSONALIZACJA
+// ----------------------------------------------------------------------------
+const USER_NAME = "Karol";
+document.getElementById("header-greeting").textContent = `Cześć, ${USER_NAME} 👋`;
+
+// ----------------------------------------------------------------------------
 // 0. MENTOR AI — SYSTEM PROMPT (dla realnego API, jeśli podłączysz backend)
 // ----------------------------------------------------------------------------
 const MENTOR_SYSTEM_PROMPT = `
-Jesteś Mentorem — analitykiem wydajności i regeneracji. Analizujesz poranny raport
+Jesteś Mentorem — analitykiem wydajności i regeneracji ${USER_NAME}a. Analizujesz poranny raport
 snu ze smartwatcha (czas snu, sen głęboki, REM, płytki, pobudki, tętno podczas snu)
-oraz wieczorne statystyki dnia (kroki, tętno dzienne, SpO2, poziom stresu, ewentualnie
-waga tygodniowa w niedzielę), pod kątem regeneracji układu nerwowego, poziomu energii
-i kaloryczności/budowania masy.
+oraz wieczorne statystyki dnia (kroki, tętno dzienne, SpO2, poziom stresu, kalorie zjedzone,
+ewentualnie waga tygodniowa w niedzielę), pod kątem regeneracji układu nerwowego, poziomu
+energii i kaloryczności/budowania masy.
 
 TON: prosty, techniczny, ale motywujący — jak trener przygotowania fizycznego, który
 tłumaczy DLACZEGO liczby mają znaczenie, a nie tylko co jest "dobre" czy "złe".
@@ -815,10 +946,10 @@ ZASADY:
   hormonu wzrostu spadają, a to wpływa na budowę masy i koncentrację następnego dnia.
 - Wysoki poziom stresu (>60) i podwyższone tętno spoczynkowe: zasygnalizuj przeciążenie
   układu nerwowego, zaproponuj priorytet regeneracji nad intensywnością.
-- Niska liczba kroków i brak nadwyżki kalorycznej: przypomnij że bez odpowiedniej podaży
+- Kalorie zjedzone poniżej celu (nadwyżki): przypomnij że bez odpowiedniej podaży
   energii nie będzie przyrostu masy, niezależnie od treningu.
-- Dobre dane (sen >=8h, REM/deep w normie, stres niski): pochwal konkretnie, wskaż który
-  parametr zadziałał najlepiej.
+- Dobre dane (sen >=8h, REM/deep w normie, stres niski, kalorie w celu): pochwal
+  konkretnie, wskaż który parametr zadziałał najlepiej.
 - Zawsze kończ jednym konkretnym punktem na jutro/dziś wieczór.
 - Długość: 3-5 zdań. Bez emotikonek w treści.
 - Nie dawaj konkretnych dawek suplementów ani szczegółowych planów dietetycznych/medycznych
@@ -850,6 +981,7 @@ Kroki: ${e.steps ?? "brak"}
 Śr. tętno dnia: ${e.hrDay ?? "brak"} bpm
 SpO2: ${e.spo2 ?? "brak"} %
 Poziom stresu: ${e.stress ?? "brak"} /100
+Kalorie zjedzone: ${e.caloriesEaten ?? "brak"} kcal (cel: ${getTDEE()} kcal)
 
 Oceń regenerację, energię i kaloryczność jako analityk wydajności.
 `.trim();
@@ -910,6 +1042,19 @@ async function mockMentorAI(dayData) {
     }
   }
 
+  // --- KALORIE ---
+  if (e.caloriesEaten != null) {
+    const tdee = getTDEE();
+    const diff = e.caloriesEaten - tdee;
+    if (diff < -200) {
+      lines.push(`Zjadłeś ${e.caloriesEaten} kcal wobec celu ${tdee} kcal — to deficyt ${Math.abs(Math.round(diff))} kcal, więc dzisiejszy dzień pracował przeciwko budowaniu masy, nie za nią.`);
+    } else if (diff > 200) {
+      lines.push(`Nadwyżka ${Math.round(diff)} kcal ponad cel (${e.caloriesEaten} vs ${tdee} kcal) — solidnie, tak buduje się masa, o ile jakość jedzenia też trzyma poziom.`);
+    } else {
+      lines.push(`${e.caloriesEaten} kcal to blisko celu ${tdee} kcal — stabilna, przewidywalna nadwyżka.`);
+    }
+  }
+
   // --- WAGA TYGODNIOWA ---
   if (m.weeklyWeight != null) {
     lines.push(`Waga tygodniowa zapisana: ${m.weeklyWeight} kg — patrz na trend z tygodnia na tydzień, nie na pojedynczy odczyt.`);
@@ -943,10 +1088,6 @@ async function mockMentorAI(dayData) {
 }
 
 // --- REALNE / TANIE API (opcjonalne) ----------------------------------------
-// Podłącz własny backend-proxy (np. Cloudflare Worker) trzymający klucz API
-// po stronie serwera. NIGDY nie wklejaj klucza API bezpośrednio tutaj —
-// ten kod może trafić na publiczne GitHub Pages. Podmień ADRES poniżej
-// i przełącz USE_REAL_AI na true, żeby używać zamiast mockMentorAI.
 const USE_REAL_AI = false;
 async function callRealMentorAI(dayData) {
   const response = await fetch("https://twoj-backend-proxy.example.com/api/mentor", {
@@ -967,9 +1108,12 @@ async function runMentorAI(dayData) {
 
 // ----------------------------------------------------------------------------
 // 1. FIREBASE (opcjonalny placeholder — fallback do localStorage)
+// Podmień poniższe dane na swój projekt (Firebase Console → Project Settings).
+// Dla realnego push (sekcja 12) potrzebujesz też VAPID_KEY z Cloud Messaging.
 // ----------------------------------------------------------------------------
 let firebaseReady = false;
 let currentUser = { uid: "local" };
+let fcmMessaging = null;
 
 const firebaseConfig = {
   apiKey: "TWOJ_API_KEY",
@@ -979,6 +1123,8 @@ const firebaseConfig = {
   messagingSenderId: "0000000000",
   appId: "1:0000000000:web:xxxxxxxxxxxxxxxx",
 };
+// Cloud Messaging → Web Push certificates → wygeneruj i wklej klucz "pair" (Key pair) poniżej.
+const VAPID_KEY = "TWOJ_VAPID_KEY";
 
 async function initFirebase() {
   if (firebaseConfig.apiKey === "TWOJ_API_KEY") {
@@ -1010,6 +1156,11 @@ async function initFirebase() {
         await authMod.signInAnonymously(auth);
       }
     });
+
+    // Prawdziwy push dostępny tylko gdy Firebase skonfigurowany
+    if (VAPID_KEY !== "TWOJ_VAPID_KEY" && !localStorage.getItem("regim:push-dismissed") && Notification?.permission !== "granted") {
+      document.getElementById("push-banner").classList.remove("hidden");
+    }
   } catch (e) {
     console.warn("Błąd inicjalizacji Firebase — tryb lokalny.", e);
   }
@@ -1067,6 +1218,19 @@ async function loadLastNDays(n) {
   return docs;
 }
 
+// Dni przesunięte wstecz o offsetDays, zakres n dni (do porównań tydzień-do-tygodnia)
+async function loadDaysRange(n, offsetDays) {
+  const docs = [];
+  const today = new Date();
+  for (let i = n - 1; i >= 0; i--) {
+    const d = new Date(today);
+    d.setDate(d.getDate() - i - offsetDays);
+    const doc = await loadDayDoc(dateKey(d));
+    if (doc) docs.push(doc);
+  }
+  return docs;
+}
+
 // Wagi tygodniowe (niedziele) — osobna seria do wykresu wagi
 async function loadWeeklyWeights(nWeeks) {
   const today = new Date();
@@ -1082,7 +1246,6 @@ async function loadWeeklyWeights(nWeeks) {
       .slice(-nWeeks)
       .forEach((d) => points.push({ date: d.date, weight: d.morning.weeklyWeight }));
   } else {
-    // Skan do 90 dni wstecz, zbieramy wpisy z wagą (niedziele)
     for (let i = 0; i < 90; i++) {
       const d = new Date(today);
       d.setDate(d.getDate() - i);
@@ -1127,6 +1290,10 @@ function isSunday(date) { return date.getDay() === 0; }
 function dayIndexSinceEpoch(date) {
   return Math.floor(date.getTime() / 86400000);
 }
+function average(arr) {
+  if (!arr.length) return null;
+  return arr.reduce((a, b) => a + b, 0) / arr.length;
+}
 
 function showToast(msg) {
   const toast = document.getElementById("toast");
@@ -1165,7 +1332,75 @@ function calcCompletionPct() {
 }
 
 // ----------------------------------------------------------------------------
-// 4. RENDER: TRENING dzień-zależny + karty checkbox
+// 4. KALORIE — cel (TDEE) + nadwyżka
+// ----------------------------------------------------------------------------
+function getTDEE() {
+  return parseInt(localStorage.getItem("regim:tdee"), 10) || 2800;
+}
+function setTDEE(value) {
+  localStorage.setItem("regim:tdee", String(value));
+}
+
+function renderCalorieWidget() {
+  const tdee = getTDEE();
+  document.getElementById("tdee-label").textContent = tdee;
+  const eaten = state.evening.caloriesEaten;
+
+  const eatenDisplay = document.getElementById("kcal-eaten-display");
+  const surplusDisplay = document.getElementById("kcal-surplus-display");
+  const bar = document.getElementById("kcal-bar");
+  const hint = document.getElementById("kcal-hint");
+
+  if (eaten == null) {
+    eatenDisplay.textContent = "0";
+    surplusDisplay.textContent = "—";
+    surplusDisplay.className = "text-xl font-extrabold text-neutral-400";
+    bar.style.width = "0%";
+    hint.textContent = "Wpisz kalorie w raporcie wieczornym, żeby zobaczyć nadwyżkę.";
+    return;
+  }
+
+  eatenDisplay.textContent = eaten;
+  const diff = eaten - tdee;
+  const pctOfGoal = Math.min(100, Math.round((eaten / tdee) * 100));
+  bar.style.width = `${pctOfGoal}%`;
+
+  if (diff > 100) {
+    surplusDisplay.textContent = `+${Math.round(diff)}`;
+    surplusDisplay.className = "text-xl font-extrabold text-mint";
+    hint.textContent = `Nadwyżka ${Math.round(diff)} kcal ponad cel — dobrze pod budowę masy.`;
+  } else if (diff < -100) {
+    surplusDisplay.textContent = `${Math.round(diff)}`;
+    surplusDisplay.className = "text-xl font-extrabold text-rose";
+    hint.textContent = `Deficyt ${Math.abs(Math.round(diff))} kcal wobec celu — brakuje energii do budowy masy.`;
+  } else {
+    surplusDisplay.textContent = `${diff >= 0 ? "+" : ""}${Math.round(diff)}`;
+    surplusDisplay.className = "text-xl font-extrabold text-gold";
+    hint.textContent = "Blisko celu — stabilna nadwyżka.";
+  }
+}
+
+document.getElementById("btn-edit-tdee").addEventListener("click", () => {
+  const wrapper = document.getElementById("tdee-edit-wrapper");
+  wrapper.classList.toggle("hidden");
+  if (!wrapper.classList.contains("hidden")) {
+    document.getElementById("input-tdee").value = getTDEE();
+  }
+});
+document.getElementById("btn-save-tdee").addEventListener("click", () => {
+  const val = parseInt(document.getElementById("input-tdee").value, 10);
+  if (val && val > 500) {
+    setTDEE(val);
+    document.getElementById("tdee-edit-wrapper").classList.add("hidden");
+    renderCalorieWidget();
+    showToast("Cel kaloryczny zapisany ✓");
+  } else {
+    showToast("Podaj sensowną wartość kcal");
+  }
+});
+
+// ----------------------------------------------------------------------------
+// 5. RENDER: TRENING dzień-zależny + karty checkbox
 // ----------------------------------------------------------------------------
 function setupTreningCard() {
   const icon = document.getElementById("trening-icon");
@@ -1183,9 +1418,21 @@ function setupTreningCard() {
   } else {
     icon.className = "fa-solid fa-dumbbell text-mint text-2xl";
     title.textContent = "Kalistenika";
-    sub.textContent = "Buduj siłę własnym ciałem";
+    sub.textContent = "3x15 pompek • plank na czas • przysiady";
   }
 }
+
+// Plan kalisteniki z konkretnymi seriami / powtórzeniami / czasem
+const CALISTHENICS_PLAN = [
+  { icon: "fa-person-walking-arrow-loop-left", color: "mint", tag: "3 min", name: "Rozgrzewka", detail: "Pajacyki + krążenia ramion i bioder, dynamiczne rozciąganie" },
+  { icon: "fa-arrow-up", color: "lilac", tag: "3×15", name: "Pompki klasyczne", detail: "Pełny zakres ruchu, klatka blisko podłogi, 60-90s przerwy między seriami" },
+  { icon: "fa-hand", color: "peach", tag: "3×10", name: "Pompki diamentowe", detail: "Dłonie razem pod klatką — mocniej angażują triceps" },
+  { icon: "fa-down-left-and-up-right-to-center", color: "gold", tag: "4×20", name: "Przysiady", detail: "Pełny zakres, pięty na ziemi, tempo kontrolowane" },
+  { icon: "fa-shoe-prints", color: "mint", tag: "3×12 / noga", name: "Wykroki chodzone", detail: "Naprzemiennie, kolano prawie do ziemi" },
+  { icon: "fa-water", color: "lilac", tag: "3×45s", name: "Deska (plank)", detail: "Biodra w linii z ciałem, napięty brzuch, licz sekundy na stoperze" },
+  { icon: "fa-arrows-up-down", color: "rose", tag: "3×20", name: "Unoszenie nóg leżąc", detail: "Dolne partie brzucha, powolne opuszczanie bez odbicia" },
+  { icon: "fa-person-running", color: "gold", tag: "3×30s", name: "Mountain climbers", detail: "Szybkie tempo, spięty core, płynny oddech" },
+];
 
 function renderTreningModalContent() {
   const iconBox = document.getElementById("modal-trening-icon");
@@ -1214,33 +1461,18 @@ function renderTreningModalContent() {
   } else {
     iconBox.className = "fa-solid fa-dumbbell text-mint text-2xl";
     title.textContent = "Kalistenika";
-    sub.textContent = "Plan na dziś — dokładne serie";
-    content.innerHTML = `
+    sub.textContent = "Plan na dziś — konkretne serie, powtórzenia i czas";
+    content.innerHTML = CALISTHENICS_PLAN.map((ex) => `
       <div class="glass rounded-3xl p-3.5 flex items-center gap-3">
-        <div class="w-8 h-8 rounded-xl bg-mint/15 flex items-center justify-center flex-shrink-0 text-mint"><i class="fa-solid fa-person-walking-arrow-loop-left text-xs"></i></div>
-        <div class="text-sm font-bold flex-1">Rozgrzewka</div>
-        <div class="text-xs text-neutral-400 font-bold">3 min pajacyki + krążenia ramion</div>
-      </div>
-      <div class="glass rounded-3xl p-3.5 flex items-center gap-3">
-        <div class="w-8 h-8 rounded-xl bg-lilac/15 flex items-center justify-center flex-shrink-0 text-lilac font-extrabold text-xs">4</div>
-        <div class="text-sm font-bold flex-1">Pompki klasyczne</div>
-        <div class="text-xs text-neutral-400 font-bold">4 serie do upadku</div>
-      </div>
-      <div class="glass rounded-3xl p-3.5 flex items-center gap-3">
-        <div class="w-8 h-8 rounded-xl bg-peach/15 flex items-center justify-center flex-shrink-0 text-peach font-extrabold text-xs">3</div>
-        <div class="text-sm font-bold flex-1">Pompki diamentowe / na podwyższeniu</div>
-        <div class="text-xs text-neutral-400 font-bold">3 serie</div>
-      </div>
-      <div class="glass rounded-3xl p-3.5 flex items-center gap-3">
-        <div class="w-8 h-8 rounded-xl bg-gold/15 flex items-center justify-center flex-shrink-0 text-gold font-extrabold text-xs">4×20</div>
-        <div class="text-sm font-bold flex-1">Przysiady</div>
-        <div class="text-xs text-neutral-400 font-bold">4 serie po 20</div>
-      </div>
-      <div class="glass rounded-3xl p-3.5 flex items-center gap-3">
-        <div class="w-8 h-8 rounded-xl bg-rose/15 flex items-center justify-center flex-shrink-0 text-rose font-extrabold text-xs">3</div>
-        <div class="text-sm font-bold flex-1">Brzuch — Plank / unoszenie nóg</div>
-        <div class="text-xs text-neutral-400 font-bold">3 serie</div>
-      </div>`;
+        <div class="w-9 h-9 rounded-xl bg-${ex.color}/15 flex items-center justify-center flex-shrink-0 text-${ex.color}">
+          <i class="fa-solid ${ex.icon} text-sm"></i>
+        </div>
+        <div class="flex-1 min-w-0">
+          <div class="text-sm font-bold">${ex.name}</div>
+          <div class="text-[11px] text-neutral-400 font-medium">${ex.detail}</div>
+        </div>
+        <div class="text-xs font-extrabold text-${ex.color} whitespace-nowrap">${ex.tag}</div>
+      </div>`).join("");
   }
 }
 
@@ -1287,7 +1519,7 @@ function renderProgress() {
   if (pct === 100) headline.textContent = "Level up! 🚀";
   else if (pct >= 50) headline.textContent = "Dobra robota, jedziesz dalej 🔥";
   else if (pct > 0) headline.textContent = "Ruszyłeś, nie zwalniaj 💪";
-  else headline.textContent = "Zaczynajmy 💪";
+  else headline.textContent = `Zaczynajmy, ${USER_NAME} 💪`;
 }
 
 async function persistToday() {
@@ -1315,7 +1547,7 @@ async function refreshStreak() {
 }
 
 // ----------------------------------------------------------------------------
-// 5. INTERAKCJE: KARTY (checkbox) + MODALE
+// 6. INTERAKCJE: KARTY (checkbox) + MODALE
 // ----------------------------------------------------------------------------
 document.querySelectorAll("[data-check]").forEach((btn) => {
   btn.addEventListener("click", async (e) => {
@@ -1323,7 +1555,6 @@ document.querySelectorAll("[data-check]").forEach((btn) => {
     const id = btn.dataset.check;
     const task = state.tasks.find((t) => t.id === id);
     if (!task) return;
-    // W modalu klik na check-btn zawsze ustawia "zrobione" (nie toggle) — spójne z UX modalu
     if (btn.classList.contains("modal-check-btn")) {
       task.done = true;
     } else {
@@ -1356,13 +1587,13 @@ function closeAllModals() {
 
 document.querySelectorAll("[data-card][data-modal]").forEach((card) => {
   card.addEventListener("click", (e) => {
-    if (e.target.closest("[data-check]")) return; // klik w checkbox nie otwiera modalu
+    if (e.target.closest("[data-check]")) return;
     openModal(card.dataset.modal);
   });
 });
 document.querySelectorAll("[data-close-modal]").forEach((el) => {
   el.addEventListener("click", (e) => {
-    if (el.tagName === "BUTTON" && el.hasAttribute("data-check")) return; // pozwól handlerowi checka zadziałać, potem zamknij
+    if (el.tagName === "BUTTON" && el.hasAttribute("data-check")) return;
     closeAllModals();
   });
 });
@@ -1374,7 +1605,6 @@ document.getElementById("btn-goto-speech-tab").addEventListener("click", () => {
   document.querySelector('.tab-btn[data-tab="mowa"]').click();
 });
 
-// Food chips w modalu jedzenia
 document.querySelectorAll(".food-chip").forEach((chip) => {
   chip.addEventListener("click", async () => {
     const food = chip.dataset.food;
@@ -1393,7 +1623,7 @@ document.getElementById("btn-booster").addEventListener("click", () => {
 });
 
 // ----------------------------------------------------------------------------
-// 6. ZAKŁADKI GŁÓWNE
+// 7. ZAKŁADKI GŁÓWNE
 // ----------------------------------------------------------------------------
 document.querySelectorAll(".tab-btn").forEach((btn) => {
   btn.addEventListener("click", () => {
@@ -1407,12 +1637,11 @@ document.querySelectorAll(".tab-btn").forEach((btn) => {
     document.querySelectorAll(".tab-panel").forEach((p) => p.classList.add("hidden"));
     document.getElementById(`tab-${btn.dataset.tab}`).classList.remove("hidden");
 
-    if (btn.dataset.tab === "mentor") renderCharts();
-    if (btn.dataset.tab === "postepy") { renderCalendar(); renderBadges(); }
+    if (btn.dataset.tab === "mentor") { renderCharts(); renderMentorHistory(); }
+    if (btn.dataset.tab === "postepy") { renderCalendar(); renderBadges(); renderBestStats(); }
   });
 });
 
-// Segmented: Rano / Wieczór
 document.querySelectorAll(".report-btn").forEach((btn) => {
   btn.addEventListener("click", () => {
     document.querySelectorAll(".report-btn").forEach((b) => {
@@ -1432,7 +1661,7 @@ document.querySelectorAll(".report-btn").forEach((btn) => {
 });
 
 // ----------------------------------------------------------------------------
-// 7. MODUŁ MOWY — STOPER Z PIERŚCIENIEM (10 min: 2+3+5)
+// 8. MODUŁ MOWY — STOPER Z PIERŚCIENIEM (10 min: 2+3+5)
 // ----------------------------------------------------------------------------
 const SPEECH_PHASES = [
   { name: "Masaż żwaczy + kląskanie", seconds: 120, icon: "😌", label: "Faza 1 z 3" },
@@ -1499,7 +1728,7 @@ function startSpeechTraining() {
   speechTimerHandle = setInterval(() => {
     speechRemaining -= 1;
     if (speechRemaining < 0) {
-      beep(880, 300); // sygnał zmiany fazy
+      beep(880, 300);
       speechPhaseIdx += 1;
       if (speechPhaseIdx >= SPEECH_PHASES.length) {
         finishSpeechTraining();
@@ -1556,7 +1785,7 @@ document.getElementById("speech-start-btn").addEventListener("click", startSpeec
 document.getElementById("speech-stop-btn").addEventListener("click", stopSpeechTraining);
 
 // ----------------------------------------------------------------------------
-// 8. FORMULARZE: PORANNY (sen) + WIECZORNY (dzień) + WAGA W NIEDZIELĘ
+// 9. FORMULARZE: PORANNY (sen) + WIECZORNY (dzień + kalorie) + WAGA W NIEDZIELĘ
 // ----------------------------------------------------------------------------
 if (sunday) {
   document.getElementById("weight-field-wrapper").classList.remove("hidden");
@@ -1587,16 +1816,18 @@ document.getElementById("form-evening").addEventListener("submit", async (e) => 
     hrDay: parseInt(document.getElementById("input-hr-day").value) || null,
     spo2: parseInt(document.getElementById("input-spo2").value) || null,
     stress: parseInt(document.getElementById("input-stress").value) || null,
+    caloriesEaten: parseInt(document.getElementById("input-calories-eaten").value) || null,
   };
   const existing = (await loadDayDoc(todayKey)) || { date: todayKey, tasks: state.tasks, completedPct: calcCompletionPct() };
   await saveDayDoc({ ...existing, evening });
   state.evening = evening;
   showToast("Podsumowanie dnia zapisane ✓");
+  renderCalorieWidget();
   renderCharts();
 });
 
 // ----------------------------------------------------------------------------
-// 9. WYKRESY
+// 10. WYKRESY
 // ----------------------------------------------------------------------------
 let weightChart = null;
 let sleepChart = null;
@@ -1730,11 +1961,29 @@ async function renderCharts() {
     options: { ...baseOptions, scales: { ...baseOptions.scales, y: { ...baseOptions.scales.y, min: 0, max: 100 } } },
   });
 
+  const kcalValues = days.map((d) => d.evening?.caloriesEaten ?? null);
+  const tdee = getTDEE();
+  const kcalCtx = document.getElementById("chart-kcal");
+  if (window.__kcalChart) window.__kcalChart.destroy();
+  window.__kcalChart = new Chart(kcalCtx, {
+    type: "bar",
+    data: {
+      labels: sleepLabels,
+      datasets: [{
+        data: kcalValues,
+        backgroundColor: kcalValues.map((v) => (v == null ? "rgba(255,255,255,0.08)" : v >= tdee ? "rgba(94,234,212,0.55)" : "rgba(251,113,133,0.55)")),
+        borderRadius: 8,
+        maxBarThickness: 28,
+      }],
+    },
+    options: baseOptions,
+  });
+
   renderCorrelation();
 }
 
 // ----------------------------------------------------------------------------
-// 10. MENTOR AI
+// 11. MENTOR AI
 // ----------------------------------------------------------------------------
 document.getElementById("btn-analyze-ai").addEventListener("click", async () => {
   const label = document.getElementById("ai-btn-label");
@@ -1756,6 +2005,7 @@ document.getElementById("btn-analyze-ai").addEventListener("click", async () => 
     document.getElementById("ai-result-text").textContent = verdict;
     document.getElementById("mentor-verdict-box").classList.remove("hidden");
     document.getElementById("mentor-verdict-text").textContent = verdict;
+    renderMentorHistory();
   } catch (err) {
     showToast("Coś poszło nie tak z mentorem");
     console.error(err);
@@ -1766,7 +2016,86 @@ document.getElementById("btn-analyze-ai").addEventListener("click", async () => 
 });
 
 // ----------------------------------------------------------------------------
-// 11. PWA INSTALL PROMPT
+// 12. HISTORIA MENTORA
+// ----------------------------------------------------------------------------
+async function renderMentorHistory() {
+  const list = document.getElementById("mentor-history-list");
+  const days = await loadLastNDays(30);
+  const withVerdict = days.filter((d) => d.aiVerdict).sort((a, b) => b.date.localeCompare(a.date));
+
+  if (withVerdict.length === 0) {
+    list.innerHTML = `<p class="text-sm text-neutral-500 font-medium">Brak jeszcze historii — zrób analizę Mentora, żeby zaczęła się budować.</p>`;
+    return;
+  }
+
+  list.innerHTML = withVerdict.map((d) => {
+    const [y, m, day] = d.date.split("-");
+    const pct = d.completedPct ?? 0;
+    const pctColor = pct === 100 ? "text-mint" : pct >= 50 ? "text-gold" : "text-rose";
+    return `
+      <div class="history-item pl-3">
+        <div class="flex items-center gap-2 mb-1">
+          <span class="text-xs font-extrabold">${day}.${m}.${y}</span>
+          <span class="text-[11px] font-bold ${pctColor}">${pct}%</span>
+        </div>
+        <p class="text-xs text-neutral-400 leading-relaxed font-medium">${escapeHtml(d.aiVerdict)}</p>
+      </div>`;
+  }).join("");
+}
+document.getElementById("btn-history-refresh").addEventListener("click", renderMentorHistory);
+
+function escapeHtml(str) {
+  const div = document.createElement("div");
+  div.textContent = str;
+  return div.innerHTML;
+}
+
+// ----------------------------------------------------------------------------
+// 13. GLOW UP — porównanie tego tygodnia z poprzednim
+// ----------------------------------------------------------------------------
+async function renderGlowUp() {
+  const content = document.getElementById("glowup-content");
+  const thisWeek = await loadDaysRange(7, 0);
+  const lastWeek = await loadDaysRange(7, 7);
+
+  if (thisWeek.length === 0 || lastWeek.length === 0) {
+    content.innerHTML = `<p class="text-sm text-neutral-400 font-medium">Za mało danych z dwóch tygodni, żeby porównać — wróć za kilka dni.</p>`;
+    return;
+  }
+
+  const metrics = [
+    { key: "completedPct", label: "Wykonanie zadań", unit: "%", get: (d) => d.completedPct, higherIsBetter: true },
+    { key: "sleepTotal", label: "Sen", unit: "h", get: (d) => d.morning?.sleepTotal, higherIsBetter: true },
+    { key: "steps", label: "Kroki", unit: "", get: (d) => d.evening?.steps, higherIsBetter: true },
+    { key: "stress", label: "Stres", unit: "/100", get: (d) => d.evening?.stress, higherIsBetter: false },
+  ];
+
+  const rows = metrics.map((metric) => {
+    const thisAvg = average(thisWeek.map(metric.get).filter((v) => v != null));
+    const lastAvg = average(lastWeek.map(metric.get).filter((v) => v != null));
+    if (thisAvg == null || lastAvg == null) return null;
+
+    const diff = thisAvg - lastAvg;
+    const improved = metric.higherIsBetter ? diff > 0 : diff < 0;
+    const arrow = diff === 0 ? "→" : (diff > 0 ? "↑" : "↓");
+    const color = diff === 0 ? "text-neutral-400" : (improved ? "text-mint" : "text-rose");
+    const fmt = (v) => (metric.key === "steps" ? Math.round(v) : v.toFixed(1));
+
+    return `
+      <div class="flex items-center justify-between glass rounded-2xl px-4 py-2.5">
+        <span class="text-xs font-bold text-neutral-300">${metric.label}</span>
+        <span class="text-xs font-extrabold ${color}">${fmt(thisAvg)}${metric.unit} ${arrow} <span class="text-neutral-500 font-semibold">(było ${fmt(lastAvg)}${metric.unit})</span></span>
+      </div>`;
+  }).filter(Boolean);
+
+  content.innerHTML = rows.length
+    ? rows.join("")
+    : `<p class="text-sm text-neutral-400 font-medium">Za mało wspólnych danych do porównania — uzupełniaj raporty codziennie.</p>`;
+}
+document.getElementById("btn-glowup-refresh").addEventListener("click", renderGlowUp);
+
+// ----------------------------------------------------------------------------
+// 14. PWA INSTALL PROMPT
 // ----------------------------------------------------------------------------
 let deferredInstallPrompt = null;
 
@@ -1793,12 +2122,9 @@ document.getElementById("btn-install-dismiss").addEventListener("click", () => {
 });
 
 // ----------------------------------------------------------------------------
-// 12. POWIADOMIENIA PUSH (lokalne przypomnienia rano/wieczór)
+// 15. POWIADOMIENIA LOKALNE (fallback offline — działa dopóki karta/SW żyje)
 // ----------------------------------------------------------------------------
 function scheduleLocalReminders() {
-  // Prosty scheduler działający, dopóki karta jest otwarta / SW aktywny w tle
-  // (prawdziwe push wymaga serwera z VAPID — tu robimy najlepszy offline substytut:
-  // sprawdzanie co minutę, czy minęła godzina 8:00 lub 20:00 i raport nie był wysłany).
   setInterval(async () => {
     const now = new Date();
     const hh = now.getHours();
@@ -1808,7 +2134,7 @@ function scheduleLocalReminders() {
       fireNotification("Dzień dobry! ☀️", "Czas na poranny raport snu ze smartwatcha.");
     }
     if (hh === 20 && mm === 0 && !(existing?.evening)) {
-      fireNotification("Podsumowanie dnia 🌙", "Wpisz kroki, tętno, SpO2 i poziom stresu.");
+      fireNotification("Podsumowanie dnia 🌙", "Wpisz kroki, tętno, SpO2, stres i kalorie.");
     }
   }, 60000);
 }
@@ -1850,81 +2176,68 @@ document.getElementById("btn-notif-dismiss").addEventListener("click", () => {
 });
 
 // ----------------------------------------------------------------------------
-// 13. SERVICE WORKER (rejestracja inline — brak osobnego sw.js w tym pliku)
+// 16. PRAWDZIWY PUSH — Firebase Cloud Messaging
+// Wymaga: Firebase skonfigurowany (sekcja 1), plan Blaze, VAPID_KEY ustawiony,
+// oraz plik firebase-messaging-sw.js w tym samym katalogu co index.html.
+// Wysyłka o 8:00 / 15:30 / 20:00 (czas Warszawy) realizowana jest po stronie
+// serwera przez Cloud Functions (patrz functions/index.js) — działa nawet gdy
+// telefon jest zablokowany lub karta zamknięta.
+// ----------------------------------------------------------------------------
+async function enableRealPush() {
+  if (!firebaseReady || !window.__fb) {
+    showToast("Najpierw skonfiguruj Firebase (sekcja 1 w kodzie).");
+    return;
+  }
+  if (VAPID_KEY === "TWOJ_VAPID_KEY") {
+    showToast("Ustaw VAPID_KEY w kodzie (Cloud Messaging → Web Push certificates).");
+    return;
+  }
+  try {
+    const perm = await Notification.requestPermission();
+    if (perm !== "granted") {
+      showToast("Powiadomienia zablokowane w przeglądarce.");
+      return;
+    }
+    const reg = await navigator.serviceWorker.register("./firebase-messaging-sw.js");
+    const messagingMod = await import("https://www.gstatic.com/firebasejs/10.13.0/firebase-messaging.js");
+    fcmMessaging = messagingMod.getMessaging(window.__fb.app || undefined);
+    const token = await messagingMod.getToken(fcmMessaging, { vapidKey: VAPID_KEY, serviceWorkerRegistration: reg });
+    if (!token) {
+      showToast("Nie udało się uzyskać tokenu push.");
+      return;
+    }
+    const { fsMod, db } = window.__fb;
+    const ref = fsMod.doc(db, "users", currentUser.uid, "pushTokens", token);
+    await fsMod.setDoc(ref, { token, createdAt: Date.now(), platform: navigator.userAgent });
+    messagingMod.onMessage(fcmMessaging, (payload) => {
+      showToast(payload.notification?.title || "Nowe powiadomienie");
+    });
+    showToast("Prawdziwy push włączony ✓");
+    document.getElementById("push-banner").classList.add("hidden");
+  } catch (e) {
+    console.error("Błąd włączania push", e);
+    showToast("Błąd włączania push — sprawdź konsolę.");
+  }
+}
+
+document.getElementById("btn-push-enable").addEventListener("click", enableRealPush);
+document.getElementById("btn-push-dismiss").addEventListener("click", () => {
+  document.getElementById("push-banner").classList.add("hidden");
+  localStorage.setItem("regim:push-dismissed", "1");
+});
+
+// ----------------------------------------------------------------------------
+// 17. SERVICE WORKER (cache offline) — plik zewnętrzny ./sw.js
+// firebase-messaging-sw.js (osobny plik) obsługuje tło dla realnego pushu.
 // ----------------------------------------------------------------------------
 if ("serviceWorker" in navigator) {
-  const swCode = `
-    const CACHE_NAME = "regim-cache-v2";
-    const PRECACHE_URLS = [
-      "./",
-      "./index.html",
-      "./manifest.json",
-      "https://cdn.tailwindcss.com",
-      "https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap",
-      "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css",
-      "https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"
-    ];
-
-    self.addEventListener("install", (e) => {
-      self.skipWaiting();
-      e.waitUntil(
-        caches.open(CACHE_NAME).then((cache) =>
-          Promise.all(
-            PRECACHE_URLS.map((url) =>
-              fetch(url, { mode: "no-cors" }).then((res) => cache.put(url, res)).catch(() => null)
-            )
-          )
-        )
-      );
-    });
-
-    self.addEventListener("activate", (e) => {
-      e.waitUntil(
-        caches.keys().then((keys) =>
-          Promise.all(keys.filter((k) => k !== CACHE_NAME).map((k) => caches.delete(k)))
-        )
-      );
-      self.clients.claim();
-    });
-
-    self.addEventListener("fetch", (e) => {
-      if (e.request.method !== "GET") return;
-      const isExternal = PRECACHE_URLS.some((u) => e.request.url.startsWith(u) && u.startsWith("http"));
-      if (isExternal) {
-        // Cache-first dla zewnętrznych zasobów (CDN, fonty)
-        e.respondWith(
-          caches.match(e.request).then((cached) => cached || fetch(e.request).then((res) => {
-            const clone = res.clone();
-            caches.open(CACHE_NAME).then((cache) => cache.put(e.request, clone));
-            return res;
-          }))
-        );
-      } else {
-        // Network-first z fallbackiem do cache dla własnych plików
-        e.respondWith(
-          fetch(e.request).then((res) => {
-            const clone = res.clone();
-            caches.open(CACHE_NAME).then((cache) => cache.put(e.request, clone));
-            return res;
-          }).catch(() => caches.match(e.request))
-        );
-      }
-    });
-
-    self.addEventListener("notificationclick", (e) => {
-      e.notification.close();
-      e.waitUntil(clients.openWindow("./index.html"));
-    });
-  `;
-  const blob = new Blob([swCode], { type: "application/javascript" });
-  const swUrl = URL.createObjectURL(blob);
   window.addEventListener("load", () => {
-    navigator.serviceWorker.register(swUrl).catch((e) => console.warn("SW nieudany", e));
+    navigator.serviceWorker.register("./sw.js").catch((e) => console.warn("SW nieudany", e));
   });
 }
 
 // ----------------------------------------------------------------------------
-// 15. MOTYW JASNY / CIEMNY
+// 18. MOTYW JASNY / CIEMNY
 // ----------------------------------------------------------------------------
 function applyTheme(theme) {
   const icon = document.getElementById("theme-icon");
@@ -1944,7 +2257,7 @@ document.getElementById("btn-theme-toggle").addEventListener("click", () => {
 applyTheme(localStorage.getItem("regim:theme") || "dark");
 
 // ----------------------------------------------------------------------------
-// 16. CYTAT DNIA (rotujący)
+// 19. CYTAT DNIA (rotujący)
 // ----------------------------------------------------------------------------
 const DAILY_QUOTES = [
   "Sen to nie przestój — to główna zmiana produkcyjna Twojego ciała.",
@@ -1959,6 +2272,7 @@ const DAILY_QUOTES = [
   "Kroki liczą się nawet w dni, gdy nie masz planowanego treningu.",
   "Woda i tłuszcz przy D3 to różnica między wchłonięciem a marnowaniem.",
   "Jeden słabszy dzień nie niszczy postępu. Nawyk zniszczonego dnia — tak.",
+  "Licz kalorie tak samo uważnie jak powtórzenia — jedno bez drugiego nie zbuduje masy.",
 ];
 function renderDailyQuote() {
   const idx = dayIndexSinceEpoch(new Date()) % DAILY_QUOTES.length;
@@ -1976,7 +2290,7 @@ setInterval(() => {
 }, 8000);
 
 // ----------------------------------------------------------------------------
-// 17. HAPTYKA
+// 20. HAPTYKA
 // ----------------------------------------------------------------------------
 function vibrate(pattern) {
   if (navigator.vibrate) {
@@ -1985,7 +2299,7 @@ function vibrate(pattern) {
 }
 
 // ----------------------------------------------------------------------------
-// 18. CONFETTI (canvas, bez zależności)
+// 21. CONFETTI (canvas, bez zależności)
 // ----------------------------------------------------------------------------
 function fireConfetti() {
   const canvas = document.getElementById("confetti-canvas");
@@ -2028,7 +2342,7 @@ function fireConfetti() {
 }
 
 // ----------------------------------------------------------------------------
-// 19. EKSPORT DANYCH (CSV / JSON)
+// 22. EKSPORT DANYCH (CSV / JSON)
 // ----------------------------------------------------------------------------
 function downloadFile(filename, content, mime) {
   const blob = new Blob([content], { type: mime });
@@ -2043,7 +2357,6 @@ function downloadFile(filename, content, mime) {
 }
 
 async function collectAllDays() {
-  // Skan lokalny do 365 dni wstecz (localStorage) lub wszystkich dokumentów Firestore
   const results = [];
   if (firebaseReady && window.__fb) {
     const { fsMod, db } = window.__fb;
@@ -2071,7 +2384,7 @@ function exportAsCSV(days) {
     "date", "completedPct",
     "morning_sleepTotal", "morning_sleepDeep", "morning_sleepRem", "morning_sleepLight",
     "morning_sleepWakes", "morning_sleepHr", "morning_weeklyWeight",
-    "evening_steps", "evening_hrDay", "evening_spo2", "evening_stress",
+    "evening_steps", "evening_hrDay", "evening_spo2", "evening_stress", "evening_caloriesEaten",
   ];
   const rows = days.map((d) => {
     const m = d.morning || {};
@@ -2080,7 +2393,7 @@ function exportAsCSV(days) {
       d.date, d.completedPct ?? "",
       m.sleepTotal ?? "", m.sleepDeep ?? "", m.sleepRem ?? "", m.sleepLight ?? "",
       m.sleepWakes ?? "", m.sleepHr ?? "", m.weeklyWeight ?? "",
-      e.steps ?? "", e.hrDay ?? "", e.spo2 ?? "", e.stress ?? "",
+      e.steps ?? "", e.hrDay ?? "", e.spo2 ?? "", e.stress ?? "", e.caloriesEaten ?? "",
     ].join(",");
   });
   const csv = [headers.join(","), ...rows].join("\n");
@@ -2096,7 +2409,7 @@ document.getElementById("btn-export").addEventListener("click", async () => {
 });
 
 // ----------------------------------------------------------------------------
-// 20. KALENDARZ MIESIĘCZNY (zakładka Postępy)
+// 23. KALENDARZ MIESIĘCZNY (zakładka Postępy)
 // ----------------------------------------------------------------------------
 let calViewDate = new Date(todayObj.getFullYear(), todayObj.getMonth(), 1);
 const MONTH_NAMES_PL = ["Styczeń","Luty","Marzec","Kwiecień","Maj","Czerwiec","Lipiec","Sierpień","Wrzesień","Październik","Listopad","Grudzień"];
@@ -2109,7 +2422,6 @@ async function renderCalendar() {
   const firstDay = new Date(year, month, 1);
   const lastDay = new Date(year, month + 1, 0);
   const daysInMonth = lastDay.getDate();
-  // poniedziałek = 0
   const startOffset = (firstDay.getDay() + 6) % 7;
 
   const grid = document.getElementById("cal-grid");
@@ -2149,7 +2461,7 @@ document.getElementById("cal-next").addEventListener("click", () => {
 });
 
 // ----------------------------------------------------------------------------
-// 21. ODZNAKI
+// 24. ODZNAKI
 // ----------------------------------------------------------------------------
 const BADGES = [
   { id: "streak3", icon: "fa-fire", label: "3 dni z rzędu", check: (ctx) => ctx.streak >= 3 },
@@ -2194,7 +2506,50 @@ async function renderBadges() {
 }
 
 // ----------------------------------------------------------------------------
-// 22. COTYGODNIOWE PODSUMOWANIE MENTORA
+// 25. NAJLEPSZY WYNIK — rekordowy streak + rekordowy tydzień
+// ----------------------------------------------------------------------------
+async function renderBestStats() {
+  const allDays = await collectAllDays();
+  if (allDays.length === 0) {
+    document.getElementById("best-streak-value").textContent = "0";
+    document.getElementById("best-week-value").textContent = "0%";
+    return;
+  }
+
+  // Najdłuższy streak 100%-owych dni z rzędu (po dacie, tolerując pojedyncze przerwy w danych jako reset)
+  let bestStreak = 0;
+  let current = 0;
+  let prevDate = null;
+  allDays.forEach((d) => {
+    const isConsecutive = prevDate ? (new Date(d.date) - new Date(prevDate)) === 86400000 : true;
+    if (d.completedPct === 100 && isConsecutive) {
+      current += 1;
+    } else if (d.completedPct === 100) {
+      current = 1;
+    } else {
+      current = 0;
+    }
+    bestStreak = Math.max(bestStreak, current);
+    prevDate = d.date;
+  });
+
+  // Najlepszy tydzień: średnie wykonanie w blokach po 7 kolejnych dni danych
+  let bestWeekPct = 0;
+  for (let i = 0; i <= allDays.length - 7; i++) {
+    const slice = allDays.slice(i, i + 7);
+    const avgPct = average(slice.map((d) => d.completedPct ?? 0));
+    if (avgPct != null) bestWeekPct = Math.max(bestWeekPct, avgPct);
+  }
+  if (allDays.length < 7) {
+    bestWeekPct = Math.round(average(allDays.map((d) => d.completedPct ?? 0)) || 0);
+  }
+
+  document.getElementById("best-streak-value").textContent = bestStreak;
+  document.getElementById("best-week-value").textContent = `${Math.round(bestWeekPct)}%`;
+}
+
+// ----------------------------------------------------------------------------
+// 26. COTYGODNIOWE PODSUMOWANIE MENTORA
 // ----------------------------------------------------------------------------
 async function generateWeeklySummary() {
   const days = await loadLastNDays(7);
@@ -2206,6 +2561,7 @@ async function generateWeeklySummary() {
   const avgSleep = average(withData.map((d) => d.morning?.sleepTotal).filter(Boolean));
   const avgStress = average(withData.map((d) => d.evening?.stress).filter(Boolean));
   const avgSteps = average(withData.map((d) => d.evening?.steps).filter(Boolean));
+  const avgKcal = average(withData.map((d) => d.evening?.caloriesEaten).filter(Boolean));
   const perfectDays = days.filter((d) => d.completedPct === 100).length;
   const avgPct = Math.round(average(days.map((d) => d.completedPct ?? 0)));
 
@@ -2223,14 +2579,14 @@ async function generateWeeklySummary() {
   if (avgSteps != null) {
     lines.push(`Średnio ${Math.round(avgSteps)} kroków dziennie.`);
   }
+  if (avgKcal != null) {
+    const tdee = getTDEE();
+    lines.push(avgKcal >= tdee ? `Średnio ${Math.round(avgKcal)} kcal dziennie — nadwyżka wobec celu ${tdee} kcal utrzymana.` : `Średnio ${Math.round(avgKcal)} kcal dziennie — poniżej celu ${tdee} kcal, budowa masy szła pod górkę.`);
+  }
 
   lines.push(perfectDays >= 5 ? "Taki tydzień to fundament pod realny postęp — utrzymuj rytm." : "Na przyszły tydzień: jeden konkretny cel, np. dowiezienie snu każdego dnia.");
 
   return lines.join(" ");
-}
-function average(arr) {
-  if (!arr.length) return null;
-  return arr.reduce((a, b) => a + b, 0) / arr.length;
 }
 
 document.getElementById("btn-weekly-summary").addEventListener("click", async () => {
@@ -2244,7 +2600,7 @@ document.getElementById("btn-weekly-summary").addEventListener("click", async ()
 });
 
 // ----------------------------------------------------------------------------
-// 23. KORELACJE (sen a stres)
+// 27. KORELACJE (sen a stres)
 // ----------------------------------------------------------------------------
 async function renderCorrelation() {
   const days = await loadLastNDays(14);
@@ -2271,7 +2627,7 @@ async function renderCorrelation() {
 }
 
 // ----------------------------------------------------------------------------
-// 24. BOOTSTRAP
+// 28. BOOTSTRAP
 // ----------------------------------------------------------------------------
 async function bootApp() {
   setupTreningCard();
@@ -2289,9 +2645,9 @@ async function bootApp() {
 
   renderCheckStates();
   renderProgress();
+  renderCalorieWidget();
   await refreshStreak();
 
-  // Przywróć zaznaczone jedzenie w modalu
   state.foodChecked.forEach((food) => {
     const chip = document.querySelector(`.food-chip[data-food="${food}"]`);
     if (chip) chip.classList.add("active");
@@ -2318,6 +2674,7 @@ async function bootApp() {
     if (e.hrDay != null) document.getElementById("input-hr-day").value = e.hrDay;
     if (e.spo2 != null) document.getElementById("input-spo2").value = e.spo2;
     if (e.stress != null) document.getElementById("input-stress").value = e.stress;
+    if (e.caloriesEaten != null) document.getElementById("input-calories-eaten").value = e.caloriesEaten;
   }
 }
 
