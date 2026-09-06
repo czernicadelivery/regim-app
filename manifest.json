@@ -1,7 +1,7 @@
 {
   "name": "REGIM — Twój codzienny system regeneracji i wzrostu",
   "short_name": "REGIM",
-  "description": "Codzienny system: raport ze smartwatcha (sen, kroki, tętno, SpO2, stres), trening dzień-zależny, trening mowy z timerem i Mentor AI do analizy regeneracji.",
+  "description": "Codzienny system: raport ze smartwatcha (sen, kroki, tętno, SpO2, stres), trening dzień-zależny, trening mowy z timerem, licznik kalorii i Mentor AI do analizy regeneracji.",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
