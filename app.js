@@ -31,12 +31,13 @@ import {
 // (Project Settings → General → Your apps → SDK setup and configuration).
 // ----------------------------------------------------------------------------
 const firebaseConfig = {
-  apiKey: "TWOJ_API_KEY",
-  authDomain: "TWOJ_PROJEKT.firebaseapp.com",
-  projectId: "TWOJ_PROJEKT",
-  storageBucket: "TWOJ_PROJEKT.appspot.com",
-  messagingSenderId: "0000000000",
-  appId: "1:0000000000:web:xxxxxxxxxxxxxxxx",
+  apiKey: "AIzaSyChzU-QWJ_lyE7kLePHCvYltIayMZuXlL8",
+  authDomain: "regim-web.firebaseapp.com",
+  databaseURL: "https://regim-web-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "regim-web",
+  storageBucket: "regim-web.firebasestorage.app",
+  messagingSenderId: "1025631760665",
+  appId: "1:1025631760665:web:93c5b62295bd8b0b675588"
 };
 
 let app, auth, db;
