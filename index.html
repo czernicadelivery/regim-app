@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>LevelUp</title>
-<meta name="description" content="Twój codzienny system wzrostu — ciało, mowa, biznes.">
+<title>REGIM / LevelUp</title>
+<meta name="description" content="Twój codzienny system regeneracji, treningu i mowy — raport ze smartwatcha, zadania dnia i Mentor AI.">
 <meta name="theme-color" content="#1a1530">
 <link rel="manifest" href="manifest.json">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2222%22 fill=%22%231a1530%22/><text x=%2250%22 y=%2270%22 font-size=%2258%22 text-anchor=%22middle%22 fill=%22%235eead4%22 font-family=%22Arial%22 font-weight=%22900%22>L</text></svg>">
@@ -16,7 +16,9 @@
   tailwind.config = {
     theme: {
       extend: {
-        fontFamily: { sans: ['"Poppins"', 'sans-serif'] },
+        fontFamily: {
+          sans: ['-apple-system', 'BlinkMacSystemFont', '"SF Pro Display"', '"SF Pro Text"', '"Poppins"', 'sans-serif'],
+        },
         colors: {
           ink: '#0f0c1d',
           panel: '#1e1a35',
@@ -24,6 +26,7 @@
           peach: '#fbbf9d',
           lilac: '#c4b5fd',
           gold: '#fbbf24',
+          rose: '#fb7185',
         },
         boxShadow: {
           glow: '0 8px 32px -8px rgba(94, 234, 212, 0.25)',
@@ -37,7 +40,7 @@
 </script>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
@@ -48,6 +51,12 @@
     min-height: 100%;
   }
   * { -webkit-tap-highlight-color: transparent; }
+  body {
+    font-weight: 500;
+    letter-spacing: -0.01em;
+    -webkit-font-smoothing: antialiased;
+  }
+  h1,h2,h3,.font-extrabold,.font-bold { letter-spacing: -0.02em; }
   ::-webkit-scrollbar { width: 6px; }
   ::-webkit-scrollbar-track { background: transparent; }
   ::-webkit-scrollbar-thumb { background: #5eead4; border-radius: 10px; }
@@ -81,17 +90,33 @@
   .expand-enter.open { grid-template-rows: 1fr; }
   .expand-enter > div { overflow: hidden; }
 
-  .droplet { transition: opacity 0.25s ease, transform 0.25s ease; }
-
   input[type="number"]::-webkit-outer-spin-button,
   input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
   input[type="number"] { -moz-appearance: textfield; }
 
   .tab-underline { transition: all 0.3s cubic-bezier(0.16,1,0.3,1); }
-
   .progress-fill { transition: width 0.6s cubic-bezier(0.16,1,0.3,1); }
-
   .timer-ring { transition: stroke-dashoffset 1s linear; }
+
+  /* Modal */
+  .modal-backdrop {
+    background: rgba(10, 8, 20, 0.72);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+  }
+  @keyframes modal-pop {
+    from { opacity: 0; transform: translateY(24px) scale(0.97); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+  }
+  .modal-pop { animation: modal-pop 0.3s cubic-bezier(0.16,1,0.3,1) both; }
+
+  .food-chip { transition: all 0.2s ease; }
+  .food-chip.active {
+    background: linear-gradient(135deg, rgba(94,234,212,0.25), rgba(196,181,253,0.25));
+    border-color: rgba(94,234,212,0.5);
+  }
+
+  .segmented { transition: all 0.3s cubic-bezier(0.16,1,0.3,1); }
 </style>
 </head>
 <body class="text-neutral-100 font-sans min-h-screen pb-28">
@@ -104,12 +129,12 @@
         <i class="fa-solid fa-bolt text-ink text-lg"></i>
       </div>
       <div>
-        <div class="font-extrabold text-lg leading-none tracking-tight">LevelUp</div>
+        <div class="font-extrabold text-lg leading-none tracking-tight">REGIM</div>
         <div class="text-[11px] text-neutral-400 leading-none mt-0.5">Twój codzienny wzrost</div>
       </div>
     </div>
     <div class="flex items-center gap-2">
-      <div id="streak-pill" class="flex items-center gap-1.5 glass rounded-full px-3 py-1.5 text-sm font-semibold">
+      <div id="streak-pill" class="flex items-center gap-1.5 glass rounded-full px-3 py-1.5 text-sm font-bold">
         <i class="fa-solid fa-fire text-peach"></i>
         <span id="streak-count">0</span>
       </div>
@@ -127,13 +152,32 @@
       <i class="fa-solid fa-mobile-screen-button text-mint text-lg"></i>
     </div>
     <div class="flex-1 min-w-0">
-      <div class="font-semibold text-sm">Miej LevelUp zawsze pod ręką</div>
+      <div class="font-bold text-sm">Miej REGIM zawsze pod ręką</div>
       <div class="text-xs text-neutral-400">Dodaj do ekranu głównego — działa jak apka</div>
     </div>
-    <button id="btn-install" class="bg-gradient-to-br from-mint to-lilac text-ink font-bold text-sm px-4 py-2 rounded-full whitespace-nowrap active:scale-95 transition">
+    <button id="btn-install" class="bg-gradient-to-br from-mint to-lilac text-ink font-extrabold text-sm px-4 py-2 rounded-full whitespace-nowrap active:scale-95 transition">
       Dodaj
     </button>
     <button id="btn-install-dismiss" class="text-neutral-500 hover:text-neutral-300 w-6 h-6 flex items-center justify-center flex-shrink-0">
+      <i class="fa-solid fa-xmark"></i>
+    </button>
+  </div>
+</div>
+
+<!-- ============ BANER POWIADOMIEŃ ============ -->
+<div id="notif-banner" class="hidden max-w-lg mx-auto px-5 mb-2">
+  <div class="rise glass rounded-3xl p-4 flex items-center gap-3 shadow-soft">
+    <div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-peach/30 to-gold/30 flex items-center justify-center flex-shrink-0">
+      <i class="fa-solid fa-bell text-peach text-lg"></i>
+    </div>
+    <div class="flex-1 min-w-0">
+      <div class="font-bold text-sm">Włącz przypomnienia</div>
+      <div class="text-xs text-neutral-400">Rano i wieczorem przypomnimy o raporcie</div>
+    </div>
+    <button id="btn-notif-enable" class="bg-gradient-to-br from-peach to-gold text-ink font-extrabold text-sm px-4 py-2 rounded-full whitespace-nowrap active:scale-95 transition">
+      Włącz
+    </button>
+    <button id="btn-notif-dismiss" class="text-neutral-500 hover:text-neutral-300 w-6 h-6 flex items-center justify-center flex-shrink-0">
       <i class="fa-solid fa-xmark"></i>
     </button>
   </div>
@@ -146,12 +190,12 @@
     <div class="flex items-center justify-between mb-3">
       <div>
         <div class="text-2xl font-extrabold" id="progress-headline">Zaczynajmy 💪</div>
-        <div class="text-xs text-neutral-400" id="progress-sub">0 z 4 zadań na dziś</div>
+        <div class="text-xs text-neutral-400 font-semibold" id="progress-sub">0 z 4 zadań na dziś</div>
       </div>
       <div class="relative w-16 h-16 flex-shrink-0">
         <svg class="w-16 h-16 -rotate-90" viewBox="0 0 64 64">
           <circle cx="32" cy="32" r="27" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="7"/>
-          <circle id="hero-ring" cx="32" cy="32" r="27" fill="none" stroke="url(#heroGrad)" stroke-width="7" stroke-linecap="round" stroke-dasharray="169.6" stroke-dashoffset="169.6" class="progress-fill" style="transition: stroke-dashoffset 0.6s cubic-bezier(0.16,1,0.3,1);"/>
+          <circle id="hero-ring" cx="32" cy="32" r="27" fill="none" stroke="url(#heroGrad)" stroke-width="7" stroke-linecap="round" stroke-dasharray="169.6" stroke-dashoffset="169.6" style="transition: stroke-dashoffset 0.6s cubic-bezier(0.16,1,0.3,1);"/>
           <defs>
             <linearGradient id="heroGrad" x1="0%" y1="0%" x2="100%" y2="100%">
               <stop offset="0%" stop-color="#5eead4"/>
@@ -159,7 +203,7 @@
             </linearGradient>
           </defs>
         </svg>
-        <div class="absolute inset-0 flex items-center justify-center font-bold text-sm" id="hero-pct">0%</div>
+        <div class="absolute inset-0 flex items-center justify-center font-extrabold text-sm" id="hero-pct">0%</div>
       </div>
     </div>
     <div class="h-2 bg-white/5 rounded-full overflow-hidden">
@@ -169,13 +213,13 @@
 
   <!-- ============ NAWIGACJA ZAKŁADEK ============ -->
   <nav class="flex glass rounded-full p-1.5 mb-5 gap-1">
-    <button data-tab="dashboard" class="tab-btn tab-underline flex-1 py-2.5 rounded-full text-sm font-semibold bg-gradient-to-br from-mint to-lilac text-ink">
+    <button data-tab="dashboard" class="tab-btn tab-underline flex-1 py-2.5 rounded-full text-sm font-bold bg-gradient-to-br from-mint to-lilac text-ink">
       <i class="fa-solid fa-house mr-1.5"></i>Dziś
     </button>
-    <button data-tab="mowa" class="tab-btn tab-underline flex-1 py-2.5 rounded-full text-sm font-semibold text-neutral-400">
+    <button data-tab="mowa" class="tab-btn tab-underline flex-1 py-2.5 rounded-full text-sm font-bold text-neutral-400">
       <i class="fa-solid fa-comment-dots mr-1.5"></i>Mowa
     </button>
-    <button data-tab="mentor" class="tab-btn tab-underline flex-1 py-2.5 rounded-full text-sm font-semibold text-neutral-400">
+    <button data-tab="mentor" class="tab-btn tab-underline flex-1 py-2.5 rounded-full text-sm font-bold text-neutral-400">
       <i class="fa-solid fa-brain mr-1.5"></i>Mentor
     </button>
   </nav>
@@ -183,98 +227,164 @@
   <!-- ============ ZAKŁADKA: DASHBOARD ============ -->
   <section id="tab-dashboard" class="tab-panel space-y-4">
 
-    <!-- Karta: Budulec (D3 + Dieta) -->
-    <div class="glass rounded-4xl overflow-hidden shadow-soft card-tap transition cursor-pointer" data-card="budulec">
-      <div class="p-5 flex items-center gap-4" data-toggle="budulec">
-        <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-peach/25 to-gold/25 flex items-center justify-center flex-shrink-0">
-          <i class="fa-solid fa-shield-heart text-peach text-2xl"></i>
+    <!-- ===== MODUŁ PORANNY / WIECZORNY (segmented) ===== -->
+    <div class="glass rounded-4xl p-4 shadow-soft">
+      <div class="flex items-center gap-2 mb-3">
+        <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-lilac/25 to-mint/25 flex items-center justify-center flex-shrink-0">
+          <i class="fa-solid fa-watch-fitness text-lilac"></i>
+        </div>
+        <div class="font-bold text-base">Raport ze smartwatcha</div>
+      </div>
+
+      <div class="flex glass rounded-full p-1 mb-4">
+        <button data-report="morning" class="report-btn segmented flex-1 py-2 rounded-full text-xs font-bold bg-gradient-to-br from-peach to-gold text-ink">
+          <i class="fa-solid fa-sun mr-1"></i>Dzień dobry
+        </button>
+        <button data-report="evening" class="report-btn segmented flex-1 py-2 rounded-full text-xs font-bold text-neutral-400">
+          <i class="fa-solid fa-moon mr-1"></i>Podsumowanie dnia
+        </button>
+      </div>
+
+      <!-- FORMULARZ PORANNY -->
+      <form id="form-morning" class="report-panel grid grid-cols-2 gap-3">
+        <label class="block col-span-2">
+          <span class="text-[11px] text-neutral-400 ml-1 font-semibold">Czas snu (h)</span>
+          <input type="number" step="0.01" id="input-sleep-total" placeholder="8.31" class="w-full mt-1 bg-white/5 border border-white/10 rounded-2xl px-3 py-2.5 text-neutral-100 font-semibold focus:outline-none focus:border-mint transition">
+        </label>
+        <label class="block">
+          <span class="text-[11px] text-neutral-400 ml-1 font-semibold">Głęboki sen (h)</span>
+          <input type="number" step="0.01" id="input-sleep-deep" placeholder="1.45" class="w-full mt-1 bg-white/5 border border-white/10 rounded-2xl px-3 py-2.5 text-neutral-100 font-semibold focus:outline-none focus:border-mint transition">
+        </label>
+        <label class="block">
+          <span class="text-[11px] text-neutral-400 ml-1 font-semibold">REM (h)</span>
+          <input type="number" step="0.01" id="input-sleep-rem" placeholder="1.52" class="w-full mt-1 bg-white/5 border border-white/10 rounded-2xl px-3 py-2.5 text-neutral-100 font-semibold focus:outline-none focus:border-mint transition">
+        </label>
+        <label class="block">
+          <span class="text-[11px] text-neutral-400 ml-1 font-semibold">Płytki sen (h)</span>
+          <input type="number" step="0.01" id="input-sleep-light" placeholder="5.34" class="w-full mt-1 bg-white/5 border border-white/10 rounded-2xl px-3 py-2.5 text-neutral-100 font-semibold focus:outline-none focus:border-mint transition">
+        </label>
+        <label class="block">
+          <span class="text-[11px] text-neutral-400 ml-1 font-semibold">Pobudki</span>
+          <input type="number" id="input-sleep-wakes" placeholder="2" class="w-full mt-1 bg-white/5 border border-white/10 rounded-2xl px-3 py-2.5 text-neutral-100 font-semibold focus:outline-none focus:border-mint transition">
+        </label>
+        <label class="block col-span-2">
+          <span class="text-[11px] text-neutral-400 ml-1 font-semibold">Śr. tętno podczas snu (bpm)</span>
+          <input type="number" id="input-sleep-hr" placeholder="58" class="w-full mt-1 bg-white/5 border border-white/10 rounded-2xl px-3 py-2.5 text-neutral-100 font-semibold focus:outline-none focus:border-mint transition">
+        </label>
+
+        <!-- Pole wagi — tylko w niedzielę -->
+        <label id="weight-field-wrapper" class="hidden block col-span-2 rise">
+          <span class="text-[11px] text-gold ml-1 font-bold"><i class="fa-solid fa-scale-balanced mr-1"></i>Niedziela — waga tygodnia (kg)</span>
+          <input type="number" step="0.1" id="input-weight-weekly" placeholder="52.5" class="w-full mt-1 bg-gold/10 border border-gold/30 rounded-2xl px-3 py-2.5 text-neutral-100 font-semibold focus:outline-none focus:border-gold transition">
+        </label>
+
+        <button type="submit" class="col-span-2 mt-1 py-3 rounded-full bg-gradient-to-br from-peach to-gold text-ink font-extrabold active:scale-95 transition">
+          <i class="fa-solid fa-floppy-disk mr-1.5"></i>Zapisz raport poranny
+        </button>
+      </form>
+
+      <!-- FORMULARZ WIECZORNY -->
+      <form id="form-evening" class="report-panel hidden grid grid-cols-2 gap-3">
+        <label class="block">
+          <span class="text-[11px] text-neutral-400 ml-1 font-semibold">Kroki</span>
+          <input type="number" id="input-steps" placeholder="9000" class="w-full mt-1 bg-white/5 border border-white/10 rounded-2xl px-3 py-2.5 text-neutral-100 font-semibold focus:outline-none focus:border-lilac transition">
+        </label>
+        <label class="block">
+          <span class="text-[11px] text-neutral-400 ml-1 font-semibold">Śr. tętno dnia (bpm)</span>
+          <input type="number" id="input-hr-day" placeholder="78" class="w-full mt-1 bg-white/5 border border-white/10 rounded-2xl px-3 py-2.5 text-neutral-100 font-semibold focus:outline-none focus:border-lilac transition">
+        </label>
+        <label class="block">
+          <span class="text-[11px] text-neutral-400 ml-1 font-semibold">SpO2 (%)</span>
+          <input type="number" id="input-spo2" placeholder="97" class="w-full mt-1 bg-white/5 border border-white/10 rounded-2xl px-3 py-2.5 text-neutral-100 font-semibold focus:outline-none focus:border-lilac transition">
+        </label>
+        <label class="block">
+          <span class="text-[11px] text-neutral-400 ml-1 font-semibold">Stres (1-100)</span>
+          <input type="number" min="1" max="100" id="input-stress" placeholder="35" class="w-full mt-1 bg-white/5 border border-white/10 rounded-2xl px-3 py-2.5 text-neutral-100 font-semibold focus:outline-none focus:border-lilac transition">
+        </label>
+
+        <button type="submit" class="col-span-2 mt-1 py-3 rounded-full bg-gradient-to-br from-lilac to-mint text-ink font-extrabold active:scale-95 transition">
+          <i class="fa-solid fa-floppy-disk mr-1.5"></i>Zapisz podsumowanie dnia
+        </button>
+      </form>
+    </div>
+
+    <!-- Karta: Tabletka / Suplementy -->
+    <div class="glass rounded-4xl overflow-hidden shadow-soft card-tap transition cursor-pointer" data-card="tabletka" data-modal="modal-tabletka">
+      <div class="p-5 flex items-center gap-4">
+        <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-gold/25 to-peach/25 flex items-center justify-center flex-shrink-0">
+          <i class="fa-solid fa-pills text-gold text-2xl"></i>
         </div>
         <div class="flex-1 min-w-0">
-          <div class="font-bold text-base">Budulec — D3 + Dieta</div>
-          <div class="text-xs text-neutral-400">Witamina i nadwyżka kaloryczna</div>
+          <div class="font-bold text-base">Wziąłem tabletkę (D3/Witaminy)</div>
+          <div class="text-xs text-neutral-400 font-semibold">Rano, z posiłkiem tłuszczowym</div>
         </div>
-        <button data-check="budulec" class="check-btn w-9 h-9 rounded-full border-2 border-white/15 flex items-center justify-center flex-shrink-0 transition">
+        <button data-check="tabletka" class="check-btn w-9 h-9 rounded-full border-2 border-white/15 flex items-center justify-center flex-shrink-0 transition">
           <i class="fa-solid fa-check text-xs opacity-0 transition"></i>
         </button>
       </div>
-      <div class="expand-enter" data-panel="budulec">
-        <div>
-          <div class="px-5 pb-5 pt-0 text-sm text-neutral-300 leading-relaxed border-t border-white/5 mx-5">
-            <div class="flex items-start gap-2.5 pt-4">
-              <i class="fa-solid fa-lightbulb text-gold mt-0.5"></i>
-              <p>D3 do posiłku z tłuszczem, żeby się dobrze wchłonęła. Pamiętaj o nadwyżce kalorii — to twój pancerz i masa, bez tego nie urośniesz. Jedz regularnie, nie tylko kiedy masz ochotę.</p>
-            </div>
-          </div>
+    </div>
+
+    <!-- Karta: Zdrowe jedzenie na masę -->
+    <div class="glass rounded-4xl overflow-hidden shadow-soft card-tap transition cursor-pointer" data-card="jedzenie" data-modal="modal-jedzenie">
+      <div class="p-5 flex items-center gap-4">
+        <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-peach/25 to-rose/25 flex items-center justify-center flex-shrink-0">
+          <i class="fa-solid fa-apple-whole text-peach text-2xl"></i>
         </div>
+        <div class="flex-1 min-w-0">
+          <div class="font-bold text-base">Zjadłem coś zdrowego</div>
+          <div class="text-xs text-neutral-400 font-semibold">Budujesz nadwyżkę na masę</div>
+        </div>
+        <button data-check="jedzenie" class="check-btn w-9 h-9 rounded-full border-2 border-white/15 flex items-center justify-center flex-shrink-0 transition">
+          <i class="fa-solid fa-check text-xs opacity-0 transition"></i>
+        </button>
       </div>
     </div>
 
     <!-- Karta: Trening (dynamiczna) -->
-    <div class="glass rounded-4xl overflow-hidden shadow-soft card-tap transition cursor-pointer" data-card="trening">
-      <div class="p-5 flex items-center gap-4" data-toggle="trening">
+    <div class="glass rounded-4xl overflow-hidden shadow-soft card-tap transition cursor-pointer" data-card="trening" data-modal="modal-trening">
+      <div class="p-5 flex items-center gap-4">
         <div id="trening-icon-box" class="w-14 h-14 rounded-2xl bg-gradient-to-br from-mint/25 to-lilac/25 flex items-center justify-center flex-shrink-0">
           <i id="trening-icon" class="fa-solid fa-dumbbell text-mint text-2xl"></i>
         </div>
         <div class="flex-1 min-w-0">
           <div id="trening-title" class="font-bold text-base">Kalistenika</div>
-          <div id="trening-sub" class="text-xs text-neutral-400">Buduj siłę własnym ciałem</div>
+          <div id="trening-sub" class="text-xs text-neutral-400 font-semibold">Buduj siłę własnym ciałem</div>
         </div>
         <button data-check="trening" class="check-btn w-9 h-9 rounded-full border-2 border-white/15 flex items-center justify-center flex-shrink-0 transition">
           <i class="fa-solid fa-check text-xs opacity-0 transition"></i>
         </button>
       </div>
-      <div class="expand-enter" data-panel="trening">
-        <div>
-          <div class="px-5 pb-5 pt-0 text-sm text-neutral-300 leading-relaxed border-t border-white/5 mx-5">
-            <div id="trening-desc" class="flex items-start gap-2.5 pt-4">
-              <i class="fa-solid fa-lightbulb text-gold mt-0.5"></i>
-              <p>Każdy trening to cegiełka. Siła, którą budujesz, buduje też szacunek — twój do siebie, i innych do ciebie.</p>
-            </div>
-          </div>
-        </div>
-      </div>
     </div>
 
-    <!-- Karta: Nawodnienie -->
-    <div class="glass rounded-4xl p-5 shadow-soft">
-      <div class="flex items-center gap-4 mb-4">
+    <!-- Karta: Trening mowy -->
+    <div class="glass rounded-4xl overflow-hidden shadow-soft card-tap transition cursor-pointer" data-card="mowa" data-modal="modal-mowa">
+      <div class="p-5 flex items-center gap-4">
         <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-lilac/25 to-mint/25 flex items-center justify-center flex-shrink-0">
-          <i class="fa-solid fa-droplet text-lilac text-2xl"></i>
-        </div>
-        <div class="flex-1">
-          <div class="font-bold text-base">Nawodnienie</div>
-          <div class="text-xs text-neutral-400"><span id="water-count">0</span>/8 szklanek</div>
-        </div>
-        <button id="water-add" class="w-11 h-11 rounded-full bg-gradient-to-br from-mint to-lilac text-ink flex items-center justify-center font-bold text-lg active:scale-90 transition flex-shrink-0">
-          <i class="fa-solid fa-plus"></i>
-        </button>
-      </div>
-      <div class="flex gap-1.5 flex-wrap" id="water-drops"></div>
-    </div>
-
-    <!-- Karta: Czernica Delivery -->
-    <div class="glass rounded-4xl overflow-hidden shadow-soft card-tap transition cursor-pointer" data-card="biznes">
-      <div class="p-5 flex items-center gap-4" data-toggle="biznes">
-        <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-gold/25 to-peach/25 flex items-center justify-center flex-shrink-0">
-          <i class="fa-solid fa-box text-gold text-2xl"></i>
+          <i class="fa-solid fa-comment-dots text-lilac text-2xl"></i>
         </div>
         <div class="flex-1 min-w-0">
-          <div class="font-bold text-base">Czernica Delivery</div>
-          <div class="text-xs text-neutral-400">Zaplanuj dzisiejsze zlecenia</div>
+          <div class="font-bold text-base">Zrobiłem mowę</div>
+          <div class="text-xs text-neutral-400 font-semibold">10 min — mechaniczne R, bruksizm</div>
         </div>
-        <button data-check="biznes" class="check-btn w-9 h-9 rounded-full border-2 border-white/15 flex items-center justify-center flex-shrink-0 transition">
+        <button data-check="mowa" class="check-btn w-9 h-9 rounded-full border-2 border-white/15 flex items-center justify-center flex-shrink-0 transition">
           <i class="fa-solid fa-check text-xs opacity-0 transition"></i>
         </button>
       </div>
-      <div class="expand-enter" data-panel="biznes">
-        <div>
-          <div class="px-5 pb-5 pt-0 text-sm text-neutral-300 leading-relaxed border-t border-white/5 mx-5">
-            <div class="flex items-start gap-2.5 pt-4">
-              <i class="fa-solid fa-lightbulb text-gold mt-0.5"></i>
-              <p>Sprawdź dzisiejsze zamówienia i zaplanuj trasy. Własny biznes w twoim wieku to coś, z czego naprawdę można być dumnym — trzymaj w tym porządek.</p>
-            </div>
-          </div>
+    </div>
+
+    <!-- Karta: Reset szczęki przed snem -->
+    <div class="glass rounded-4xl overflow-hidden shadow-soft card-tap transition cursor-pointer" data-card="reset" data-modal="modal-reset">
+      <div class="p-5 flex items-center gap-4">
+        <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-rose/25 to-lilac/25 flex items-center justify-center flex-shrink-0">
+          <i class="fa-solid fa-face-tired text-rose text-2xl"></i>
         </div>
+        <div class="flex-1 min-w-0">
+          <div class="font-bold text-base">Reset Szczęki Przed Snem</div>
+          <div class="text-xs text-neutral-400 font-semibold">2 min — mniej zgrzytania w nocy</div>
+        </div>
+        <button data-check="reset" class="check-btn w-9 h-9 rounded-full border-2 border-white/15 flex items-center justify-center flex-shrink-0 transition">
+          <i class="fa-solid fa-check text-xs opacity-0 transition"></i>
+        </button>
       </div>
     </div>
 
@@ -282,9 +392,9 @@
     <div id="mentor-verdict-box" class="hidden rise glass rounded-4xl p-5 shadow-warm">
       <div class="flex items-center gap-2 mb-2">
         <i class="fa-solid fa-comment-dots text-peach"></i>
-        <span class="font-bold text-sm text-peach">Twój starszy brat mówi</span>
+        <span class="font-bold text-sm text-peach">Mentor mówi</span>
       </div>
-      <p id="mentor-verdict-text" class="text-sm text-neutral-200 leading-relaxed"></p>
+      <p id="mentor-verdict-text" class="text-sm text-neutral-200 leading-relaxed font-medium"></p>
     </div>
 
   </section>
@@ -293,8 +403,8 @@
   <section id="tab-mowa" class="tab-panel hidden space-y-5">
 
     <div class="glass rounded-4xl p-6 shadow-soft text-center">
-      <div id="speech-phase-label" class="text-sm text-neutral-400 mb-1">Gotowy, kiedy chcesz</div>
-      <div id="speech-phase-name" class="font-extrabold text-xl mb-6">Rozgrzewka mowy</div>
+      <div id="speech-phase-label" class="text-sm text-neutral-400 font-semibold mb-1">Gotowy, kiedy chcesz</div>
+      <div id="speech-phase-name" class="font-extrabold text-xl mb-6">Trening mowy — 10 min</div>
 
       <div class="relative w-56 h-56 mx-auto mb-6">
         <svg class="w-56 h-56 -rotate-90" viewBox="0 0 200 200">
@@ -308,7 +418,7 @@
           </defs>
         </svg>
         <div class="absolute inset-0 flex flex-col items-center justify-center">
-          <div id="speech-timer" class="font-extrabold text-5xl tabular-nums">02:00</div>
+          <div id="speech-timer" class="font-extrabold text-5xl tabular-nums">10:00</div>
           <div id="speech-icon" class="text-3xl mt-2">😌</div>
         </div>
       </div>
@@ -319,76 +429,44 @@
         <div id="phase-dot-3" class="h-2 w-10 rounded-full bg-white/10 transition"></div>
       </div>
 
-      <button id="speech-start-btn" class="w-full py-4 bg-gradient-to-br from-mint to-lilac text-ink font-bold rounded-full text-lg active:scale-95 transition shadow-glow">
+      <button id="speech-start-btn" class="w-full py-4 bg-gradient-to-br from-mint to-lilac text-ink font-extrabold rounded-full text-lg active:scale-95 transition shadow-glow">
         <i class="fa-solid fa-play mr-2"></i>Zaczynamy
       </button>
-      <button id="speech-stop-btn" class="hidden w-full py-3.5 mt-2 glass rounded-full text-neutral-300 font-semibold active:scale-95 transition">
+      <button id="speech-stop-btn" class="hidden w-full py-3.5 mt-2 glass rounded-full text-neutral-300 font-bold active:scale-95 transition">
         Przerwij
       </button>
     </div>
 
-    <div class="glass rounded-4xl p-5 space-y-3 shadow-soft">
+    <div class="glass rounded-4xl p-5 space-y-4 shadow-soft">
       <div class="flex items-start gap-3">
-        <div class="w-9 h-9 rounded-xl bg-mint/15 flex items-center justify-center flex-shrink-0 text-mint font-bold text-sm">1</div>
+        <div class="w-9 h-9 rounded-xl bg-mint/15 flex items-center justify-center flex-shrink-0 text-mint font-extrabold text-sm">1</div>
         <div>
-          <div class="font-semibold text-sm">Masaż szczęki — 2 min</div>
-          <div class="text-xs text-neutral-400">Rozluźnia napięcie od bruksizmu, żeby reszta poszła lżej</div>
+          <div class="font-bold text-sm">Masaż żwaczy + kląskanie — 2 min</div>
+          <div class="text-xs text-neutral-400 font-medium">Rozluźnienie bruksizmu, mięśni szczęki</div>
         </div>
       </div>
       <div class="flex items-start gap-3">
-        <div class="w-9 h-9 rounded-xl bg-lilac/15 flex items-center justify-center flex-shrink-0 text-lilac font-bold text-sm">2</div>
+        <div class="w-9 h-9 rounded-xl bg-lilac/15 flex items-center justify-center flex-shrink-0 text-lilac font-extrabold text-sm">2</div>
         <div>
-          <div class="font-semibold text-sm">Mechaniczne T-D — 3 min</div>
-          <div class="text-xs text-neutral-400">Wyraźne, ostre uderzenia języka — buduje precyzję</div>
+          <div class="font-bold text-sm">Uderzenia języka T-D — 3 min</div>
+          <div class="text-xs text-neutral-400 font-medium">Czubek języka o wałek dziąsłowy, zero dźwięku z gardła</div>
         </div>
       </div>
       <div class="flex items-start gap-3">
-        <div class="w-9 h-9 rounded-xl bg-peach/15 flex items-center justify-center flex-shrink-0 text-peach font-bold text-sm">3</div>
+        <div class="w-9 h-9 rounded-xl bg-peach/15 flex items-center justify-center flex-shrink-0 text-peach font-extrabold text-sm">3</div>
         <div>
-          <div class="font-semibold text-sm">Słowa: TDAWA, DOWED — 5 min</div>
-          <div class="text-xs text-neutral-400">Przenosisz technikę na realne dźwięki mowy</div>
+          <div class="font-bold text-sm">Słowa: TDAWA, DOWED, DUDY, TDA — 5 min</div>
+          <div class="text-xs text-neutral-400 font-medium">Przenosisz technikę na realne dźwięki mowy</div>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- ============ ZAKŁADKA: MENTOR AI + STATYSTYKI ============ -->
+  <!-- ============ ZAKŁADKA: MENTOR AI + WYKRESY ============ -->
   <section id="tab-mentor" class="tab-panel hidden space-y-5">
 
-    <form id="watch-form" class="glass rounded-4xl p-5 shadow-soft grid grid-cols-2 gap-3">
-      <div class="col-span-2 flex items-center gap-2 mb-1">
-        <i class="fa-solid fa-watch-fitness text-mint"></i>
-        <span class="font-bold text-sm">Dane z zegarka — dziś</span>
-      </div>
-
-      <label class="block">
-        <span class="text-[11px] text-neutral-400 ml-1">Sen (h)</span>
-        <input type="number" step="0.1" id="input-sleep" class="w-full mt-1 bg-white/5 border border-white/10 rounded-2xl px-3 py-2.5 text-neutral-100 focus:outline-none focus:border-mint transition" placeholder="8">
-      </label>
-      <label class="block">
-        <span class="text-[11px] text-neutral-400 ml-1">Kroki</span>
-        <input type="number" id="input-steps" class="w-full mt-1 bg-white/5 border border-white/10 rounded-2xl px-3 py-2.5 text-neutral-100 focus:outline-none focus:border-mint transition" placeholder="9000">
-      </label>
-      <label class="block">
-        <span class="text-[11px] text-neutral-400 ml-1">Śr. tętno</span>
-        <input type="number" id="input-hr" class="w-full mt-1 bg-white/5 border border-white/10 rounded-2xl px-3 py-2.5 text-neutral-100 focus:outline-none focus:border-mint transition" placeholder="72">
-      </label>
-      <label class="block">
-        <span class="text-[11px] text-neutral-400 ml-1">Kalorie</span>
-        <input type="number" id="input-calories" class="w-full mt-1 bg-white/5 border border-white/10 rounded-2xl px-3 py-2.5 text-neutral-100 focus:outline-none focus:border-mint transition" placeholder="2600">
-      </label>
-      <label class="block col-span-2">
-        <span class="text-[11px] text-neutral-400 ml-1">Waga (kg)</span>
-        <input type="number" step="0.1" id="input-weight" class="w-full mt-1 bg-white/5 border border-white/10 rounded-2xl px-3 py-2.5 text-neutral-100 focus:outline-none focus:border-mint transition" placeholder="52.5">
-      </label>
-
-      <button type="submit" class="col-span-2 mt-1 py-3 rounded-full glass font-semibold text-mint active:scale-95 transition">
-        <i class="fa-solid fa-floppy-disk mr-1.5"></i>Zapisz dane
-      </button>
-    </form>
-
-    <button id="btn-analyze-ai" class="w-full py-4 bg-gradient-to-br from-peach to-gold text-ink font-bold rounded-full text-base active:scale-95 transition shadow-warm flex items-center justify-center gap-2">
-      <span id="ai-btn-label"><i class="fa-solid fa-brain mr-1.5"></i>Zapytaj mentora</span>
+    <button id="btn-analyze-ai" class="w-full py-4 bg-gradient-to-br from-peach to-gold text-ink font-extrabold rounded-full text-base active:scale-95 transition shadow-warm flex items-center justify-center gap-2">
+      <span id="ai-btn-label"><i class="fa-solid fa-brain mr-1.5"></i>Analiza Mentora</span>
       <span id="ai-btn-spinner" class="hidden animate-spin h-4 w-4 border-2 border-ink border-t-transparent rounded-full"></span>
     </button>
 
@@ -397,19 +475,20 @@
         <i class="fa-solid fa-comment-dots text-peach"></i>
         <span class="font-bold text-sm text-peach">Mentor mówi</span>
       </div>
-      <p id="ai-result-text" class="text-sm text-neutral-200 leading-relaxed whitespace-pre-line"></p>
+      <p id="ai-result-text" class="text-sm text-neutral-200 leading-relaxed whitespace-pre-line font-medium"></p>
     </div>
 
     <div class="glass rounded-4xl p-4 shadow-soft">
-      <div class="flex items-center gap-2 mb-3 text-sm font-semibold text-neutral-300">
-        <i class="fa-solid fa-chart-line text-mint"></i>Trend wagi — 7 dni
+      <div class="flex items-center gap-2 mb-3 text-sm font-bold text-neutral-300">
+        <i class="fa-solid fa-scale-balanced text-gold"></i>Wykres tygodniowej wagi
       </div>
       <canvas id="chart-weight" height="140"></canvas>
+      <div class="text-[11px] text-neutral-500 font-semibold mt-2 text-center">Aktualizowany co niedzielę</div>
     </div>
 
     <div class="glass rounded-4xl p-4 shadow-soft">
-      <div class="flex items-center gap-2 mb-3 text-sm font-semibold text-neutral-300">
-        <i class="fa-solid fa-moon text-lilac"></i>Trend snu — 7 dni
+      <div class="flex items-center gap-2 mb-3 text-sm font-bold text-neutral-300">
+        <i class="fa-solid fa-moon text-lilac"></i>Wykres czasu snu — głęboki / REM
       </div>
       <canvas id="chart-sleep" height="140"></canvas>
     </div>
@@ -418,69 +497,192 @@
 </main>
 
 <!-- ============ TOAST ============ -->
-<div id="toast" class="hidden fixed bottom-6 left-1/2 -translate-x-1/2 z-50 glass rounded-full px-5 py-3 text-sm font-medium shadow-soft rise"></div>
+<div id="toast" class="hidden fixed bottom-6 left-1/2 -translate-x-1/2 z-50 glass rounded-full px-5 py-3 text-sm font-bold shadow-soft rise"></div>
+
+<!-- ============ MODALE ============ -->
+
+<!-- MODAL: Tabletka / Suplementy -->
+<div id="modal-tabletka" class="modal-wrap hidden fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-5">
+  <div class="modal-backdrop absolute inset-0" data-close-modal></div>
+  <div class="modal-pop relative glass rounded-t-4xl sm:rounded-4xl w-full sm:max-w-md p-6 shadow-soft max-h-[85vh] overflow-y-auto">
+    <div class="flex items-start justify-between mb-4">
+      <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-gold/25 to-peach/25 flex items-center justify-center">
+        <i class="fa-solid fa-pills text-gold text-2xl"></i>
+      </div>
+      <button data-close-modal class="w-9 h-9 rounded-full glass flex items-center justify-center text-neutral-400"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <h3 class="font-extrabold text-xl mb-3">Tabletka / Suplementy</h3>
+    <div class="glass rounded-3xl p-4 mb-5 flex items-start gap-3">
+      <i class="fa-solid fa-lightbulb text-gold mt-0.5"></i>
+      <p class="text-sm text-neutral-200 leading-relaxed font-medium">Bierz rano do posiłku z tłuszczem (np. jaja, masło orzechowe, orzechy). Bez tłuszczu witamina D3 się nie wchłonie — to witamina rozpuszczalna w tłuszczach, więc suchy posiłek praktycznie ją marnuje.</p>
+    </div>
+    <button data-check="tabletka" data-close-modal class="modal-check-btn w-full py-3.5 rounded-full bg-gradient-to-br from-gold to-peach text-ink font-extrabold active:scale-95 transition">
+      <i class="fa-solid fa-check mr-1.5"></i>Wziąłem tabletkę
+    </button>
+  </div>
+</div>
+
+<!-- MODAL: Zdrowe jedzenie na masę -->
+<div id="modal-jedzenie" class="modal-wrap hidden fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-5">
+  <div class="modal-backdrop absolute inset-0" data-close-modal></div>
+  <div class="modal-pop relative glass rounded-t-4xl sm:rounded-4xl w-full sm:max-w-md p-6 shadow-soft max-h-[85vh] overflow-y-auto">
+    <div class="flex items-start justify-between mb-4">
+      <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-peach/25 to-rose/25 flex items-center justify-center">
+        <i class="fa-solid fa-apple-whole text-peach text-2xl"></i>
+      </div>
+      <button data-close-modal class="w-9 h-9 rounded-full glass flex items-center justify-center text-neutral-400"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <h3 class="font-extrabold text-xl mb-1">Zdrowe jedzenie na masę</h3>
+    <p class="text-xs text-neutral-400 font-semibold mb-4">Odhacz co dziś zjadłeś</p>
+
+    <div class="grid grid-cols-2 gap-2.5 mb-5" id="food-chip-list">
+      <button data-food="jablko" class="food-chip glass rounded-2xl px-3 py-3 text-sm font-bold flex items-center gap-2 border border-transparent"><i class="fa-solid fa-apple-whole text-rose"></i>Jabłko</button>
+      <button data-food="banan" class="food-chip glass rounded-2xl px-3 py-3 text-sm font-bold flex items-center gap-2 border border-transparent"><i class="fa-solid fa-lemon text-gold"></i>Banan</button>
+      <button data-food="jogurt" class="food-chip glass rounded-2xl px-3 py-3 text-sm font-bold flex items-center gap-2 border border-transparent"><i class="fa-solid fa-bowl-rice text-mint"></i>Jogurt/Skyr</button>
+      <button data-food="orzechy" class="food-chip glass rounded-2xl px-3 py-3 text-sm font-bold flex items-center gap-2 border border-transparent"><i class="fa-solid fa-seedling text-peach"></i>Orzechy</button>
+      <button data-food="serek" class="food-chip glass rounded-2xl px-3 py-3 text-sm font-bold flex items-center gap-2 border border-transparent"><i class="fa-solid fa-cheese text-gold"></i>Serek wiejski</button>
+      <button data-food="owsianka" class="food-chip glass rounded-2xl px-3 py-3 text-sm font-bold flex items-center gap-2 border border-transparent"><i class="fa-solid fa-wheat-awn text-lilac"></i>Płatki owsiane</button>
+    </div>
+
+    <button id="btn-booster" class="w-full py-3 rounded-full glass font-extrabold text-mint active:scale-95 transition mb-3 border border-mint/20">
+      <i class="fa-solid fa-bolt mr-1.5"></i>Szybki Booster Kalorii
+    </button>
+
+    <div id="booster-panel" class="hidden rise glass rounded-3xl p-4 mb-5 border border-gold/20">
+      <div class="flex items-start gap-3 mb-2">
+        <i class="fa-solid fa-fire text-gold mt-0.5"></i>
+        <p class="text-sm text-neutral-200 leading-relaxed font-medium">Ściąga na szybkie kalorie: <strong class="text-gold">masło orzechowe</strong> (łyżka do wszystkiego), <strong class="text-gold">kabanosy</strong> (białko + tłuszcz w kieszeni), <strong class="text-gold">szejk proteinowy</strong> (mleko + odżywka + banan zamiast wody).</p>
+      </div>
+    </div>
+
+    <button data-check="jedzenie" data-close-modal class="modal-check-btn w-full py-3.5 rounded-full bg-gradient-to-br from-peach to-rose text-ink font-extrabold active:scale-95 transition">
+      <i class="fa-solid fa-check mr-1.5"></i>Zjadłem coś zdrowego
+    </button>
+  </div>
+</div>
+
+<!-- MODAL: Trening -->
+<div id="modal-trening" class="modal-wrap hidden fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-5">
+  <div class="modal-backdrop absolute inset-0" data-close-modal></div>
+  <div class="modal-pop relative glass rounded-t-4xl sm:rounded-4xl w-full sm:max-w-md p-6 shadow-soft max-h-[85vh] overflow-y-auto">
+    <div class="flex items-start justify-between mb-4">
+      <div id="modal-trening-icon-box" class="w-14 h-14 rounded-2xl bg-gradient-to-br from-mint/25 to-lilac/25 flex items-center justify-center">
+        <i id="modal-trening-icon" class="fa-solid fa-dumbbell text-mint text-2xl"></i>
+      </div>
+      <button data-close-modal class="w-9 h-9 rounded-full glass flex items-center justify-center text-neutral-400"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <h3 id="modal-trening-title" class="font-extrabold text-xl mb-1">Kalistenika</h3>
+    <p id="modal-trening-sub" class="text-xs text-neutral-400 font-semibold mb-4">Plan na dziś</p>
+
+    <div id="modal-trening-content" class="space-y-3 mb-5"></div>
+
+    <button data-check="trening" data-close-modal class="modal-check-btn w-full py-3.5 rounded-full bg-gradient-to-br from-mint to-lilac text-ink font-extrabold active:scale-95 transition">
+      <i class="fa-solid fa-check mr-1.5"></i>Zrobiłem trening
+    </button>
+  </div>
+</div>
+
+<!-- MODAL: Trening mowy (info, timer jest w zakładce Mowa) -->
+<div id="modal-mowa" class="modal-wrap hidden fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-5">
+  <div class="modal-backdrop absolute inset-0" data-close-modal></div>
+  <div class="modal-pop relative glass rounded-t-4xl sm:rounded-4xl w-full sm:max-w-md p-6 shadow-soft max-h-[85vh] overflow-y-auto">
+    <div class="flex items-start justify-between mb-4">
+      <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-lilac/25 to-mint/25 flex items-center justify-center">
+        <i class="fa-solid fa-comment-dots text-lilac text-2xl"></i>
+      </div>
+      <button data-close-modal class="w-9 h-9 rounded-full glass flex items-center justify-center text-neutral-400"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <h3 class="font-extrabold text-xl mb-1">Trening mowy — 10 min</h3>
+    <p class="text-xs text-neutral-400 font-semibold mb-4">Mechaniczne R + rozluźnienie bruksizmu</p>
+
+    <div class="space-y-3 mb-5">
+      <div class="glass rounded-3xl p-4 flex items-start gap-3">
+        <div class="w-8 h-8 rounded-xl bg-mint/15 flex items-center justify-center flex-shrink-0 text-mint font-extrabold text-xs">1</div>
+        <div>
+          <div class="font-bold text-sm mb-0.5">Krok 1 (2 min) — Masaż żwaczy + kląskanie</div>
+          <p class="text-xs text-neutral-300 font-medium leading-relaxed">Rozmasuj mięśnie żwacze (szczęki) opuszkami palców okrężnymi ruchami. Dodaj kląskanie językiem — to rozluźnia napięcie od bruksizmu przed dalszą pracą.</p>
+        </div>
+      </div>
+      <div class="glass rounded-3xl p-4 flex items-start gap-3">
+        <div class="w-8 h-8 rounded-xl bg-lilac/15 flex items-center justify-center flex-shrink-0 text-lilac font-extrabold text-xs">2</div>
+        <div>
+          <div class="font-bold text-sm mb-0.5">Krok 2 (3 min) — Uderzenia T-D</div>
+          <p class="text-xs text-neutral-300 font-medium leading-relaxed">Uderzaj czubkiem języka o wałek dziąsłowy za górnymi zębami: T-T-T, D-D-D. Wyraźnie, mechanicznie. Zero dźwięku z gardła!</p>
+        </div>
+      </div>
+      <div class="glass rounded-3xl p-4 flex items-start gap-3">
+        <div class="w-8 h-8 rounded-xl bg-peach/15 flex items-center justify-center flex-shrink-0 text-peach font-extrabold text-xs">3</div>
+        <div>
+          <div class="font-bold text-sm mb-0.5">Krok 3 (5 min) — Repetycja słów</div>
+          <p class="text-xs text-neutral-300 font-medium leading-relaxed">Powtarzaj: TDAWA, DOWED, DUDY, TDA. Przenosisz precyzję uderzenia języka na realne słowa.</p>
+        </div>
+      </div>
+    </div>
+
+    <button id="btn-goto-speech-tab" data-close-modal class="w-full py-3.5 rounded-full bg-gradient-to-br from-lilac to-mint text-ink font-extrabold active:scale-95 transition">
+      <i class="fa-solid fa-stopwatch mr-1.5"></i>Otwórz timer 10 min
+    </button>
+  </div>
+</div>
+
+<!-- MODAL: Reset szczęki przed snem -->
+<div id="modal-reset" class="modal-wrap hidden fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-5">
+  <div class="modal-backdrop absolute inset-0" data-close-modal></div>
+  <div class="modal-pop relative glass rounded-t-4xl sm:rounded-4xl w-full sm:max-w-md p-6 shadow-soft max-h-[85vh] overflow-y-auto">
+    <div class="flex items-start justify-between mb-4">
+      <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-rose/25 to-lilac/25 flex items-center justify-center">
+        <i class="fa-solid fa-face-tired text-rose text-2xl"></i>
+      </div>
+      <button data-close-modal class="w-9 h-9 rounded-full glass flex items-center justify-center text-neutral-400"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <h3 class="font-extrabold text-xl mb-3">Reset Szczęki Przed Snem</h3>
+    <div class="glass rounded-3xl p-4 mb-5 flex items-start gap-3">
+      <i class="fa-solid fa-lightbulb text-rose mt-0.5"></i>
+      <p class="text-sm text-neutral-200 leading-relaxed font-medium">2-minutowy przewodnik anti-bruksizm: rozmasuj żwacze okrężnymi ruchami, oprzyj czubek języka na podniebieniu tuż za górnymi zębami, rozluźnij usta i szczękę. To zmniejszy zgrzytanie zębami w nocy.</p>
+    </div>
+    <button data-check="reset" data-close-modal class="modal-check-btn w-full py-3.5 rounded-full bg-gradient-to-br from-rose to-lilac text-ink font-extrabold active:scale-95 transition">
+      <i class="fa-solid fa-check mr-1.5"></i>Zrobiłem reset szczęki
+    </button>
+  </div>
+</div>
 
 <script>
 // ============================================================================
-// LEVELUP — app logic (Vanilla JS)
-// Firestore/Firebase: opcjonalny. Bez konfiguracji apka działa w localStorage.
+// REGIM / LEVELUP — app logic (Vanilla JS)
+// Firebase: opcjonalny placeholder. Bez konfiguracji apka działa w localStorage.
 // ============================================================================
 
 // ----------------------------------------------------------------------------
-// 0. KONTEKST UŻYTKOWNIKA — używany w prompcie AI (Mentor)
+// 0. MENTOR AI — SYSTEM PROMPT (dla realnego API, jeśli podłączysz backend)
 // ----------------------------------------------------------------------------
-const USER_CONTEXT = {
-  age: 14,
-  goals: [
-    "Urosnąć i przytyć (nabrać masy mięśniowej), żeby czuć pewność siebie i żeby rówieśnicy przestali go wyzywać.",
-    "Naprawić wadę mowy: mechaniczne R, napięcie szczęki od bruksizmu — ćwiczenia masażu, T-D, słowa TDAWA/DOWED.",
-    "Prowadzić własny, lokalny biznes dostawczy 'Czernica Delivery'.",
-    "Trenować kalistenikę (w poniedziałki basen).",
-  ],
-};
-
-// System prompt dla Mentora AI — persona "starszy brat", ciepły ale trzymający dyscyplinę.
-// WAŻNE: mentor motywuje do budowy pewności siebie i zdrowych nawyków (sen, jedzenie,
-// trening), NIGDY nie skupia się na wyglądzie/wadze w sposób obsesyjny ani nie ocenia
-// wartości chłopaka przez pryzmat masy czy wzrostu — to narzędzia do celu (siła,
-// zdrowie, pewność siebie), nie cel sam w sobie.
 const MENTOR_SYSTEM_PROMPT = `
-Jesteś starszym bratem i mentorem 14-letniego chłopaka. Znasz jego sytuację:
+Jesteś Mentorem — analitykiem wydajności i regeneracji. Analizujesz poranny raport
+snu ze smartwatcha (czas snu, sen głęboki, REM, płytki, pobudki, tętno podczas snu)
+oraz wieczorne statystyki dnia (kroki, tętno dzienne, SpO2, poziom stresu, ewentualnie
+waga tygodniowa w niedzielę), pod kątem regeneracji układu nerwowego, poziomu energii
+i kaloryczności/budowania masy.
 
-- Chce urosnąć i nabrać masy mięśniowej, żeby czuć się pewniej — rówieśnicy go wyzywali.
-  Twoim zadaniem jest wzmacniać jego pewność siebie i pokazywać, że siła i charakter
-  budują się latami, konsekwencją — nie jednym dniem. Nigdy nie krytykuj jego wyglądu
-  ani wagi wprost, nie mów o "byciu za chudym" jako o wadzie — mów o budowaniu, nabieraniu,
-  regeneracji jako fundamentach.
-- Naprawia wadę wymowy (mechaniczne R, napięcie szczęki od bruksizmu) — ćwiczy masaż
-  szczęki, T-D, słowa TDAWA/DOWED. Chwal regularność w tym, to wymaga cierpliwości.
-- Prowadzi własny biznes "Czernica Delivery" — trzymaj do tego szacunek, to nie jest
-  "zabawka", tylko realna odpowiedzialność w jego wieku.
-- Trenuje kalistenikę wt-nd, w poniedziałki basen.
+TON: prosty, techniczny, ale motywujący — jak trener przygotowania fizycznego, który
+tłumaczy DLACZEGO liczby mają znaczenie, a nie tylko co jest "dobre" czy "złe".
 
-TON: wyluzowany, ciepły, "gadasz jak starszy brat", nie jak nauczyciel czy lekarz.
-Krótko, konkretnie, po ludzku. Możesz użyć "stary" raz na wiadomość, nie nadużywaj.
-Pilnujesz dyscypliny, ale NIGDY nie jesteś chamski, nie wyzywasz, nie zawstydzasz.
-Krytykę podajesz przez fakty i konsekwencje, nie przez ocenianie jego jako osoby.
-
-ZASADY ANALIZY:
-- Jeśli sen < 8h: wytłumacz, że hormon wzrostu wydziela się głównie w nocy, a on chce
-  urosnąć i nabrać masy — regeneracja jest priorytetem, biznes i inne rzeczy poczekają.
-- Jeśli kalorie/dieta nie wyglądają na nadwyżkę (mało jedzenia, mały ruch a dużo kalorii
-  spalonych): przypomnij że bez nadwyżki kalorycznej nie będzie masy, niezależnie od
-  treningu.
-- Jeśli zadania dnia niewykonane w 100%: nazwij to wprost, ale skieruj do przodu ("jutro
-  nadrabiasz"), nie zawstydzaj.
-- Jeśli wszystko zrobione i dane dobre: pochwal konkretnie za co, wzmocnij że tak buduje
-  się pewność siebie — małymi, powtarzalnymi krokami, nie że "jest super" ogólnikowo.
-- Zawsze kończ jednym prostym, konkretnym punktem na jutro.
-- Długość: 3-5 zdań. Zero emotikonek w treści (styl mówiony, nie czat).
-- Nigdy nie dawaj konkretnych zaleceń medycznych, dawek suplementów ani szczegółowych
-  planów dietetycznych — trzymaj się motywacji, priorytetów i dyscypliny.
+ZASADY:
+- Sen < 7h lub sen głęboki < 1h: podkreśl, że regeneracja układu nerwowego i wydzielanie
+  hormonu wzrostu spadają, a to wpływa na budowę masy i koncentrację następnego dnia.
+- Wysoki poziom stresu (>60) i podwyższone tętno spoczynkowe: zasygnalizuj przeciążenie
+  układu nerwowego, zaproponuj priorytet regeneracji nad intensywnością.
+- Niska liczba kroków i brak nadwyżki kalorycznej: przypomnij że bez odpowiedniej podaży
+  energii nie będzie przyrostu masy, niezależnie od treningu.
+- Dobre dane (sen >=8h, REM/deep w normie, stres niski): pochwal konkretnie, wskaż który
+  parametr zadziałał najlepiej.
+- Zawsze kończ jednym konkretnym punktem na jutro/dziś wieczór.
+- Długość: 3-5 zdań. Bez emotikonek w treści.
+- Nie dawaj konkretnych dawek suplementów ani szczegółowych planów dietetycznych/medycznych
+  — trzymaj się interpretacji danych, priorytetów regeneracji i motywacji.
 `.trim();
 
 function buildMentorUserPrompt(dayData) {
-  const w = dayData.watch || {};
+  const m = dayData.morning || {};
+  const e = dayData.evening || {};
   const tasksSummary = (dayData.tasks || [])
     .map((t) => `${t.label}: ${t.done ? "zrobione" : "niezrobione"}`)
     .join(", ");
@@ -488,49 +690,119 @@ function buildMentorUserPrompt(dayData) {
 Dane na dziś (${dayData.date}):
 Zadania — ${tasksSummary}
 Wykonanie dnia: ${dayData.completedPct ?? 0}%
-Sen: ${w.sleep ?? "brak danych"} h
-Kroki: ${w.steps ?? "brak danych"}
-Średnie tętno: ${w.hr ?? "brak danych"} bpm
-Spalone kalorie: ${w.calories ?? "brak danych"} kcal
-Waga: ${w.weight ?? "brak danych"} kg
-Szklanki wody: ${dayData.water ?? 0}/8
 
-Oceń ten dzień jako starszy brat/mentor.
+RAPORT PORANNY (sen):
+Czas snu: ${m.sleepTotal ?? "brak"} h
+Głęboki sen: ${m.sleepDeep ?? "brak"} h
+REM: ${m.sleepRem ?? "brak"} h
+Płytki sen: ${m.sleepLight ?? "brak"} h
+Pobudki: ${m.sleepWakes ?? "brak"}
+Śr. tętno podczas snu: ${m.sleepHr ?? "brak"} bpm
+${m.weeklyWeight ? `Waga tygodniowa: ${m.weeklyWeight} kg` : ""}
+
+RAPORT WIECZORNY (dzień):
+Kroki: ${e.steps ?? "brak"}
+Śr. tętno dnia: ${e.hrDay ?? "brak"} bpm
+SpO2: ${e.spo2 ?? "brak"} %
+Poziom stresu: ${e.stress ?? "brak"} /100
+
+Oceń regenerację, energię i kaloryczność jako analityk wydajności.
 `.trim();
 }
 
-// --- MOCK AI (offline, bez klucza) ------------------------------------------
+// --- OFFLINE MENTOR AI — rozbudowana baza reguł (bez klucza API) -----------
 async function mockMentorAI(dayData) {
   await new Promise((r) => setTimeout(r, 900));
-  const w = dayData.watch || {};
+  const m = dayData.morning || {};
+  const e = dayData.evening || {};
   const pct = dayData.completedPct ?? 0;
   const lines = [];
 
-  if (w.sleep !== null && w.sleep !== undefined && w.sleep < 8) {
-    lines.push(`Stary, ${w.sleep}h snu to za mało. Hormon wzrostu wydziela się głównie w nocy — chcesz urosnąć i nabrać masy, to musisz dowozić minimum 8 godzin. Czernica Delivery poczeka, regeneracja to podstawa.`);
+  // --- SEN ---
+  if (m.sleepTotal != null) {
+    if (m.sleepTotal < 6.5) {
+      lines.push(`${m.sleepTotal}h snu to zdecydowanie za mało — układ nerwowy nie zdążył się zregenerować, a hormon wzrostu wydziela się głównie w głębokich fazach nocnego snu. Dziś priorytet to nie intensywność, tylko odbudowa.`);
+    } else if (m.sleepTotal < 7.5) {
+      lines.push(`${m.sleepTotal}h snu to wynik graniczny — działasz, ale bez zapasu. Regeneracja układu nerwowego idzie na styk, więc dziś pilnuj tempa, nie przeciążaj się bez potrzeby.`);
+    } else {
+      lines.push(`${m.sleepTotal}h snu to solidna baza pod regenerację — masz z czego czerpać energię na dziś.`);
+    }
   }
 
+  if (m.sleepDeep != null && m.sleepTotal) {
+    const deepRatio = m.sleepDeep / m.sleepTotal;
+    if (deepRatio < 0.12) {
+      lines.push(`Głębokiego snu było niewiele względem całości — to właśnie ta faza odpowiada za regenerację fizyczną i wydzielanie hormonu wzrostu, więc odbudowa mięśni po treningu może iść wolniej.`);
+    }
+  }
+
+  if (m.sleepWakes != null && m.sleepWakes >= 3) {
+    lines.push(`${m.sleepWakes} pobudek w nocy fragmentuje cykle snu — nawet przy dobrym czasie łącznym, organizm nie wchodzi głęboko w regenerację układu nerwowego.`);
+  }
+
+  if (m.sleepHr != null && m.sleepHr > 65) {
+    lines.push(`Tętno podczas snu na poziomie ${m.sleepHr} bpm jest podwyższone — to sygnał, że organizm mógł nie w pełni się wyciszyć (stres, późny posiłek, ekran przed snem).`);
+  }
+
+  // --- DZIEŃ / STRES / ENERGIA ---
+  if (e.stress != null) {
+    if (e.stress > 65) {
+      lines.push(`Stres na poziomie ${e.stress}/100 to wysoki obciążnik dla układu nerwowego — dziś regeneracja (sen, spokojny wieczór) jest ważniejsza niż dokładanie kolejnych bodźców.`);
+    } else if (e.stress < 30) {
+      lines.push(`Niski stres (${e.stress}/100) — układ nerwowy pracuje na spokojnym, stabilnym poziomie, to dobry dzień na solidny trening.`);
+    }
+  }
+
+  if (e.spo2 != null && e.spo2 < 95) {
+    lines.push(`SpO2 na poziomie ${e.spo2}% jest niżej niż zwykle warto — jeśli to się powtarza, warto to obserwować, bo tlenowanie krwi wpływa bezpośrednio na regenerację i energię.`);
+  }
+
+  if (e.steps != null) {
+    if (e.steps < 4000) {
+      lines.push(`${e.steps} kroków to mało ruchu bazowego jak na dzień budowania masy — pamiętaj, że nadwyżka kaloryczna działa najlepiej razem z aktywnością, nie zamiast niej.`);
+    } else if (e.steps > 12000) {
+      lines.push(`${e.steps} kroków to sporo wydatku energetycznego — dopilnuj, żeby dzisiejsza podaż kalorii to pokryła, inaczej zjadasz własną nadwyżkę zamiast budować masę.`);
+    }
+  }
+
+  // --- WAGA TYGODNIOWA ---
+  if (m.weeklyWeight != null) {
+    lines.push(`Waga tygodniowa zapisana: ${m.weeklyWeight} kg — patrz na trend z tygodnia na tydzień, nie na pojedynczy odczyt.`);
+  }
+
+  // --- ZADANIA DNIA ---
   if (pct === 100) {
-    lines.push(`Wszystko odhaczone — to właśnie takie dni, jeden po drugim, budują pewność siebie. Nie efekt jednego treningu, tylko powtarzalność.`);
+    lines.push(`Wszystkie zadania dnia zaliczone — to właśnie powtarzalność, dzień po dniu, buduje realny postęp, nie pojedynczy dobry dzień.`);
+  } else if (pct >= 50) {
+    lines.push(`${pct}% zadań zrobione — dobra baza, dociągnij resztę, żeby dzień był kompletny.`);
   } else if (pct > 0) {
-    lines.push(`${pct}% dnia zrobione — nieźle, ale nie idealnie. Jutro dogrywasz resztę, bez tłumaczenia się.`);
+    lines.push(`${pct}% zadań na dziś — zacząłeś, ale zostawiłeś dużo na stole. Jutro nadrabiasz od rana.`);
   } else {
-    lines.push(`Dzisiaj zero zadań zaliczonych. Zdarza się, ale jutro wracasz do gry — jeden słabszy dzień niczego nie przekreśla, jeśli nie zrobisz z tego nawyku.`);
+    lines.push(`Zero zadań dziś zaliczonych — zdarza się, ale jutro wracasz do systemu, jeden słabszy dzień niczego nie przekreśla, jeśli się nie powtórzy.`);
   }
 
-  if (dayData.water !== undefined && dayData.water < 5) {
-    lines.push(`Wody wypiłeś mało jak na dziś — nawodnienie to nie dodatek, to część budowania masy.`);
+  if (lines.length < 2) {
+    lines.push(`Uzupełnij raport poranny i wieczorny, żeby analiza była pełniejsza — im więcej danych, tym dokładniejszy obraz regeneracji i energii.`);
   }
 
-  lines.push(`Na jutro: jedna rzecz — połóż się dziś wcześniej, żeby ten sen w końcu się zgadzał.`);
+  // --- Punkt na jutro ---
+  if (m.sleepTotal != null && m.sleepTotal < 7.5) {
+    lines.push(`Na dziś wieczór: połóż się 30-45 minut wcześniej niż zwykle.`);
+  } else if (e.stress != null && e.stress > 65) {
+    lines.push(`Na dziś wieczór: krótki reset szczęki i wcześniejsze wyciszenie ekranów.`);
+  } else {
+    lines.push(`Na jutro: utrzymaj ten sam rytm, to on buduje wynik w czasie.`);
+  }
 
   return lines.join(" ");
 }
 
-// --- REALNE API (opcjonalne) -------------------------------------------------
+// --- REALNE / TANIE API (opcjonalne) ----------------------------------------
 // Podłącz własny backend-proxy (np. Cloudflare Worker) trzymający klucz API
 // po stronie serwera. NIGDY nie wklejaj klucza API bezpośrednio tutaj —
-// ten kod trafia na publiczne GitHub Pages.
+// ten kod może trafić na publiczne GitHub Pages. Podmień ADRES poniżej
+// i przełącz USE_REAL_AI na true, żeby używać zamiast mockMentorAI.
+const USE_REAL_AI = false;
 async function callRealMentorAI(dayData) {
   const response = await fetch("https://twoj-backend-proxy.example.com/api/mentor", {
     method: "POST",
@@ -544,13 +816,14 @@ async function callRealMentorAI(dayData) {
   const data = await response.json();
   return data.reply;
 }
+async function runMentorAI(dayData) {
+  return USE_REAL_AI ? callRealMentorAI(dayData) : mockMentorAI(dayData);
+}
 
 // ----------------------------------------------------------------------------
-// 1. FIREBASE (opcjonalny — fallback do localStorage jeśli nieskonfigurowany)
+// 1. FIREBASE (opcjonalny placeholder — fallback do localStorage)
 // ----------------------------------------------------------------------------
 let firebaseReady = false;
-let auth = null;
-let db = null;
 let currentUser = { uid: "local" };
 
 const firebaseConfig = {
@@ -573,10 +846,9 @@ async function initFirebase() {
     const fsMod = await import("https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js");
 
     const app = initializeApp(firebaseConfig);
-    auth = authMod.getAuth(app);
-    db = fsMod.getFirestore(app);
+    const auth = authMod.getAuth(app);
+    const db = fsMod.getFirestore(app);
     firebaseReady = true;
-
     window.__fb = { authMod, fsMod, db, auth };
 
     authMod.onAuthStateChanged(auth, async (user) => {
@@ -598,9 +870,7 @@ async function initFirebase() {
   }
 }
 
-function localKey(key) {
-  return `levelup:${currentUser.uid}:${key}`;
-}
+function localKey(key) { return `regim:${currentUser.uid}:${key}`; }
 
 async function saveDayDoc(dayData) {
   if (firebaseReady && window.__fb) {
@@ -652,6 +922,38 @@ async function loadLastNDays(n) {
   return docs;
 }
 
+// Wagi tygodniowe (niedziele) — osobna seria do wykresu wagi
+async function loadWeeklyWeights(nWeeks) {
+  const today = new Date();
+  const points = [];
+  if (firebaseReady && window.__fb) {
+    const { fsMod, db } = window.__fb;
+    const colRef = fsMod.collection(db, "users", currentUser.uid, "days");
+    const snaps = await fsMod.getDocs(colRef);
+    const all = [];
+    snaps.forEach((s) => all.push(s.data()));
+    all.filter((d) => d.morning?.weeklyWeight != null)
+      .sort((a, b) => a.date.localeCompare(b.date))
+      .slice(-nWeeks)
+      .forEach((d) => points.push({ date: d.date, weight: d.morning.weeklyWeight }));
+  } else {
+    // Skan do 90 dni wstecz, zbieramy wpisy z wagą (niedziele)
+    for (let i = 0; i < 90; i++) {
+      const d = new Date(today);
+      d.setDate(d.getDate() - i);
+      const raw = localStorage.getItem(localKey(dateKey(d)));
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (parsed.morning?.weeklyWeight != null) {
+          points.unshift({ date: parsed.date, weight: parsed.morning.weeklyWeight });
+        }
+      }
+    }
+    points.sort((a, b) => a.date.localeCompare(b.date));
+  }
+  return points.slice(-nWeeks);
+}
+
 async function computeStreakUpTo(dateStr) {
   let streak = 0;
   let cursor = new Date(dateStr);
@@ -676,6 +978,10 @@ function dateKey(date) {
   return `${y}-${m}-${d}`;
 }
 function isMonday(date) { return date.getDay() === 1; }
+function isSunday(date) { return date.getDay() === 0; }
+function dayIndexSinceEpoch(date) {
+  return Math.floor(date.getTime() / 86400000);
+}
 
 function showToast(msg) {
   const toast = document.getElementById("toast");
@@ -691,15 +997,21 @@ function showToast(msg) {
 const todayObj = new Date();
 const todayKey = dateKey(todayObj);
 const monday = isMonday(todayObj);
+const sunday = isSunday(todayObj);
+// Co 3 dni (licząc od epoki) proponujemy rower, poza poniedziałkiem (basen)
+const isBikeDay = !monday && (dayIndexSinceEpoch(todayObj) % 3 === 0);
 
 const state = {
   tasks: [
-    { id: "budulec", label: "Budulec — D3 + Dieta", done: false },
-    { id: "trening", label: monday ? "Basen 1,5h" : "Kalistenika", done: false },
-    { id: "biznes", label: "Czernica Delivery", done: false },
+    { id: "tabletka", label: "Tabletka / Suplementy", done: false },
+    { id: "jedzenie", label: "Zdrowe jedzenie na masę", done: false },
+    { id: "trening", label: monday ? "Basen 1,5h" : (isBikeDay ? "Trasa 7 km rower" : "Kalistenika"), done: false },
     { id: "mowa", label: "Trening mowy", done: false },
+    { id: "reset", label: "Reset szczęki przed snem", done: false },
   ],
-  water: 0,
+  foodChecked: [],
+  morning: {},
+  evening: {},
 };
 
 function calcCompletionPct() {
@@ -714,37 +1026,103 @@ function setupTreningCard() {
   const icon = document.getElementById("trening-icon");
   const title = document.getElementById("trening-title");
   const sub = document.getElementById("trening-sub");
-  const desc = document.getElementById("trening-desc").querySelector("p");
 
   if (monday) {
     icon.className = "fa-solid fa-person-swimming text-mint text-2xl";
     title.textContent = "Basen — 1,5h";
     sub.textContent = "Poniedziałek to dzień na wodę";
-    desc.textContent = "Pływanie odciąża stawy i buduje wytrzymałość całego ciała — dziś kalistenika robi sobie przerwę, basen bierze prowadzenie.";
+  } else if (isBikeDay) {
+    icon.className = "fa-solid fa-person-biking text-mint text-2xl";
+    title.textContent = "Trasa 7 km — rower";
+    sub.textContent = "Co 3 dni zmiana bodźca";
   } else {
     icon.className = "fa-solid fa-dumbbell text-mint text-2xl";
     title.textContent = "Kalistenika";
     sub.textContent = "Buduj siłę własnym ciałem";
-    desc.textContent = "Każdy trening to cegiełka. Siła, którą budujesz, buduje też szacunek — twój do siebie, i innych do ciebie.";
+  }
+}
+
+function renderTreningModalContent() {
+  const iconBox = document.getElementById("modal-trening-icon");
+  const title = document.getElementById("modal-trening-title");
+  const sub = document.getElementById("modal-trening-sub");
+  const content = document.getElementById("modal-trening-content");
+
+  if (monday) {
+    iconBox.className = "fa-solid fa-person-swimming text-mint text-2xl";
+    title.textContent = "Basen — 1,5h";
+    sub.textContent = "Poniedziałkowy trening w wodzie";
+    content.innerHTML = `
+      <div class="glass rounded-3xl p-4 flex items-start gap-3">
+        <i class="fa-solid fa-water text-mint mt-0.5"></i>
+        <p class="text-sm text-neutral-200 font-medium leading-relaxed">1,5h pływania — mieszaj style, rób przerwy co 15-20 minut. Pływanie odciąża stawy i buduje wytrzymałość całego ciała bez przeciążania szczęki, więc dobrze łączy się z treningiem mowy tego dnia.</p>
+      </div>`;
+  } else if (isBikeDay) {
+    iconBox.className = "fa-solid fa-person-biking text-mint text-2xl";
+    title.textContent = "Trasa 7 km — rower";
+    sub.textContent = "Zmiana bodźca co 3 dni";
+    content.innerHTML = `
+      <div class="glass rounded-3xl p-4 flex items-start gap-3">
+        <i class="fa-solid fa-route text-mint mt-0.5"></i>
+        <p class="text-sm text-neutral-200 font-medium leading-relaxed">7 km w spokojnym, stałym tempie — to trening wytrzymałościowy, nie sprint. Utrzymuj równe tętno, oddychaj przez nos jak długo się da.</p>
+      </div>`;
+  } else {
+    iconBox.className = "fa-solid fa-dumbbell text-mint text-2xl";
+    title.textContent = "Kalistenika";
+    sub.textContent = "Plan na dziś — dokładne serie";
+    content.innerHTML = `
+      <div class="glass rounded-3xl p-3.5 flex items-center gap-3">
+        <div class="w-8 h-8 rounded-xl bg-mint/15 flex items-center justify-center flex-shrink-0 text-mint"><i class="fa-solid fa-person-walking-arrow-loop-left text-xs"></i></div>
+        <div class="text-sm font-bold flex-1">Rozgrzewka</div>
+        <div class="text-xs text-neutral-400 font-bold">3 min pajacyki + krążenia ramion</div>
+      </div>
+      <div class="glass rounded-3xl p-3.5 flex items-center gap-3">
+        <div class="w-8 h-8 rounded-xl bg-lilac/15 flex items-center justify-center flex-shrink-0 text-lilac font-extrabold text-xs">4</div>
+        <div class="text-sm font-bold flex-1">Pompki klasyczne</div>
+        <div class="text-xs text-neutral-400 font-bold">4 serie do upadku</div>
+      </div>
+      <div class="glass rounded-3xl p-3.5 flex items-center gap-3">
+        <div class="w-8 h-8 rounded-xl bg-peach/15 flex items-center justify-center flex-shrink-0 text-peach font-extrabold text-xs">3</div>
+        <div class="text-sm font-bold flex-1">Pompki diamentowe / na podwyższeniu</div>
+        <div class="text-xs text-neutral-400 font-bold">3 serie</div>
+      </div>
+      <div class="glass rounded-3xl p-3.5 flex items-center gap-3">
+        <div class="w-8 h-8 rounded-xl bg-gold/15 flex items-center justify-center flex-shrink-0 text-gold font-extrabold text-xs">4×20</div>
+        <div class="text-sm font-bold flex-1">Przysiady</div>
+        <div class="text-xs text-neutral-400 font-bold">4 serie po 20</div>
+      </div>
+      <div class="glass rounded-3xl p-3.5 flex items-center gap-3">
+        <div class="w-8 h-8 rounded-xl bg-rose/15 flex items-center justify-center flex-shrink-0 text-rose font-extrabold text-xs">3</div>
+        <div class="text-sm font-bold flex-1">Brzuch — Plank / unoszenie nóg</div>
+        <div class="text-xs text-neutral-400 font-bold">3 serie</div>
+      </div>`;
   }
 }
 
 function renderCheckStates() {
   state.tasks.forEach((task) => {
-    const btn = document.querySelector(`[data-check="${task.id}"]`);
-    if (!btn) return;
-    const icon = btn.querySelector("i");
-    if (task.done) {
-      btn.classList.add("bg-gradient-to-br", "from-mint", "to-lilac", "border-transparent");
-      btn.classList.remove("border-white/15");
-      icon.classList.remove("opacity-0");
-      icon.classList.add("text-ink");
-    } else {
-      btn.classList.remove("bg-gradient-to-br", "from-mint", "to-lilac", "border-transparent");
-      btn.classList.add("border-white/15");
-      icon.classList.add("opacity-0");
-      icon.classList.remove("text-ink");
-    }
+    document.querySelectorAll(`[data-check="${task.id}"]`).forEach((btn) => {
+      const icon = btn.querySelector("i");
+      const isModalBtn = btn.classList.contains("modal-check-btn");
+      if (task.done) {
+        if (isModalBtn) {
+          btn.innerHTML = '<i class="fa-solid fa-check mr-1.5"></i>Zaliczone ✓';
+          btn.classList.add("opacity-60");
+        } else {
+          btn.classList.add("bg-gradient-to-br", "from-mint", "to-lilac", "border-transparent");
+          btn.classList.remove("border-white/15");
+          if (icon) { icon.classList.remove("opacity-0"); icon.classList.add("text-ink"); }
+        }
+      } else {
+        if (isModalBtn) {
+          btn.classList.remove("opacity-60");
+        } else {
+          btn.classList.remove("bg-gradient-to-br", "from-mint", "to-lilac", "border-transparent");
+          btn.classList.add("border-white/15");
+          if (icon) { icon.classList.add("opacity-0"); icon.classList.remove("text-ink"); }
+        }
+      }
+    });
   });
 }
 
@@ -767,30 +1145,14 @@ function renderProgress() {
   else headline.textContent = "Zaczynajmy 💪";
 }
 
-function renderWaterDrops() {
-  const container = document.getElementById("water-drops");
-  container.innerHTML = "";
-  for (let i = 0; i < 8; i++) {
-    const drop = document.createElement("div");
-    const filled = i < state.water;
-    drop.className = `droplet w-7 h-7 rounded-full flex items-center justify-center text-xs ${
-      filled ? "bg-gradient-to-br from-mint to-lilac" : "bg-white/5 border border-white/10"
-    }`;
-    drop.innerHTML = filled ? '<i class="fa-solid fa-droplet text-ink"></i>' : "";
-    container.appendChild(drop);
-  }
-  document.getElementById("water-count").textContent = state.water;
-}
-
 async function persistToday() {
-  const pct = calcCompletionPct();
   const existing = (await loadDayDoc(todayKey)) || {};
   const dayData = {
     ...existing,
     date: todayKey,
     tasks: state.tasks,
-    completedPct: pct,
-    water: state.water,
+    completedPct: calcCompletionPct(),
+    foodChecked: state.foodChecked,
   };
   await saveDayDoc(dayData);
   await refreshStreak();
@@ -808,7 +1170,7 @@ async function refreshStreak() {
 }
 
 // ----------------------------------------------------------------------------
-// 5. INTERAKCJE: KARTY (checkbox + expand)
+// 5. INTERAKCJE: KARTY (checkbox) + MODALE
 // ----------------------------------------------------------------------------
 document.querySelectorAll("[data-check]").forEach((btn) => {
   btn.addEventListener("click", async (e) => {
@@ -816,7 +1178,12 @@ document.querySelectorAll("[data-check]").forEach((btn) => {
     const id = btn.dataset.check;
     const task = state.tasks.find((t) => t.id === id);
     if (!task) return;
-    task.done = !task.done;
+    // W modalu klik na check-btn zawsze ustawia "zrobione" (nie toggle) — spójne z UX modalu
+    if (btn.classList.contains("modal-check-btn")) {
+      task.done = true;
+    } else {
+      task.done = !task.done;
+    }
     renderCheckStates();
     renderProgress();
     await persistToday();
@@ -824,25 +1191,58 @@ document.querySelectorAll("[data-check]").forEach((btn) => {
   });
 });
 
-document.querySelectorAll("[data-toggle]").forEach((trigger) => {
-  trigger.addEventListener("click", () => {
-    const id = trigger.dataset.toggle;
-    const panel = document.querySelector(`[data-panel="${id}"]`);
-    panel.classList.toggle("open");
+function openModal(modalId) {
+  const modal = document.getElementById(modalId);
+  if (!modal) return;
+  if (modalId === "modal-trening") renderTreningModalContent();
+  modal.classList.remove("hidden");
+  document.body.style.overflow = "hidden";
+}
+function closeAllModals() {
+  document.querySelectorAll(".modal-wrap").forEach((m) => m.classList.add("hidden"));
+  document.body.style.overflow = "";
+}
+
+document.querySelectorAll("[data-card][data-modal]").forEach((card) => {
+  card.addEventListener("click", (e) => {
+    if (e.target.closest("[data-check]")) return; // klik w checkbox nie otwiera modalu
+    openModal(card.dataset.modal);
+  });
+});
+document.querySelectorAll("[data-close-modal]").forEach((el) => {
+  el.addEventListener("click", (e) => {
+    if (el.tagName === "BUTTON" && el.hasAttribute("data-check")) return; // pozwól handlerowi checka zadziałać, potem zamknij
+    closeAllModals();
+  });
+});
+document.querySelectorAll(".modal-check-btn[data-close-modal]").forEach((btn) => {
+  btn.addEventListener("click", () => setTimeout(closeAllModals, 150));
+});
+
+document.getElementById("btn-goto-speech-tab").addEventListener("click", () => {
+  document.querySelector('.tab-btn[data-tab="mowa"]').click();
+});
+
+// Food chips w modalu jedzenia
+document.querySelectorAll(".food-chip").forEach((chip) => {
+  chip.addEventListener("click", async () => {
+    const food = chip.dataset.food;
+    chip.classList.toggle("active");
+    if (state.foodChecked.includes(food)) {
+      state.foodChecked = state.foodChecked.filter((f) => f !== food);
+    } else {
+      state.foodChecked.push(food);
+    }
+    await persistToday();
   });
 });
 
-document.getElementById("water-add").addEventListener("click", async () => {
-  if (state.water < 8) {
-    state.water += 1;
-    renderWaterDrops();
-    await persistToday();
-    if (state.water === 8) showToast("Nawodnienie zaliczone 💧");
-  }
+document.getElementById("btn-booster").addEventListener("click", () => {
+  document.getElementById("booster-panel").classList.toggle("hidden");
 });
 
 // ----------------------------------------------------------------------------
-// 6. ZAKŁADKI
+// 6. ZAKŁADKI GŁÓWNE
 // ----------------------------------------------------------------------------
 document.querySelectorAll(".tab-btn").forEach((btn) => {
   btn.addEventListener("click", () => {
@@ -860,13 +1260,32 @@ document.querySelectorAll(".tab-btn").forEach((btn) => {
   });
 });
 
+// Segmented: Rano / Wieczór
+document.querySelectorAll(".report-btn").forEach((btn) => {
+  btn.addEventListener("click", () => {
+    document.querySelectorAll(".report-btn").forEach((b) => {
+      b.classList.remove("bg-gradient-to-br", "from-peach", "to-gold", "from-lilac", "to-mint", "text-ink");
+      b.classList.add("text-neutral-400");
+    });
+    if (btn.dataset.report === "morning") {
+      btn.classList.add("bg-gradient-to-br", "from-peach", "to-gold", "text-ink");
+    } else {
+      btn.classList.add("bg-gradient-to-br", "from-lilac", "to-mint", "text-ink");
+    }
+    btn.classList.remove("text-neutral-400");
+
+    document.querySelectorAll(".report-panel").forEach((p) => p.classList.add("hidden"));
+    document.getElementById(`form-${btn.dataset.report}`).classList.remove("hidden");
+  });
+});
+
 // ----------------------------------------------------------------------------
-// 7. MODUŁ MOWY — STOPER Z PIERŚCIENIEM
+// 7. MODUŁ MOWY — STOPER Z PIERŚCIENIEM (10 min: 2+3+5)
 // ----------------------------------------------------------------------------
 const SPEECH_PHASES = [
-  { name: "Masaż szczęki", seconds: 120, icon: "😌", label: "Faza 1 z 3" },
-  { name: "Mechaniczne T-D", seconds: 180, icon: "😤", label: "Faza 2 z 3" },
-  { name: "Słowa: TDAWA, DOWED", seconds: 300, icon: "🗣", label: "Faza 3 z 3" },
+  { name: "Masaż żwaczy + kląskanie", seconds: 120, icon: "😌", label: "Faza 1 z 3" },
+  { name: "Uderzenia T-D", seconds: 180, icon: "😤", label: "Faza 2 z 3" },
+  { name: "Słowa: TDAWA, DOWED, DUDY, TDA", seconds: 300, icon: "🗣", label: "Faza 3 z 3" },
 ];
 const RING_CIRCUMFERENCE = 552.9;
 
@@ -903,7 +1322,6 @@ function updateSpeechUI() {
   document.getElementById("speech-phase-label").textContent = phase ? phase.label : "Świetna robota";
   document.getElementById("speech-icon").textContent = phase ? phase.icon : "🎉";
 
-  const totalSeconds = phase ? phase.seconds : 1;
   const elapsedRatio = phase ? 1 - speechRemaining / phase.seconds : 1;
   const offset = RING_CIRCUMFERENCE - elapsedRatio * RING_CIRCUMFERENCE;
   document.getElementById("speech-ring").style.strokeDashoffset = offset;
@@ -929,7 +1347,7 @@ function startSpeechTraining() {
   speechTimerHandle = setInterval(() => {
     speechRemaining -= 1;
     if (speechRemaining < 0) {
-      beep(880, 300);
+      beep(880, 300); // sygnał zmiany fazy
       speechPhaseIdx += 1;
       if (speechPhaseIdx >= SPEECH_PHASES.length) {
         finishSpeechTraining();
@@ -967,33 +1385,57 @@ function stopSpeechTraining() {
   clearInterval(speechTimerHandle);
   speechPhaseIdx = 0;
   speechRemaining = 0;
-  document.getElementById("speech-phase-name").textContent = "Rozgrzewka mowy";
+  document.getElementById("speech-phase-name").textContent = "Trening mowy — 10 min";
   document.getElementById("speech-phase-label").textContent = "Przerwano — wróć, kiedy będziesz gotowy";
   document.getElementById("speech-icon").textContent = "😌";
-  document.getElementById("speech-timer").textContent = "02:00";
+  document.getElementById("speech-timer").textContent = "10:00";
   document.getElementById("speech-ring").style.strokeDashoffset = RING_CIRCUMFERENCE;
   document.getElementById("speech-start-btn").classList.remove("hidden");
   document.getElementById("speech-stop-btn").classList.add("hidden");
+  updateSpeechUI();
+  document.getElementById("speech-timer").textContent = "10:00";
 }
 
 document.getElementById("speech-start-btn").addEventListener("click", startSpeechTraining);
 document.getElementById("speech-stop-btn").addEventListener("click", stopSpeechTraining);
 
 // ----------------------------------------------------------------------------
-// 8. FORMULARZ ZEGARKA
+// 8. FORMULARZE: PORANNY (sen) + WIECZORNY (dzień) + WAGA W NIEDZIELĘ
 // ----------------------------------------------------------------------------
-document.getElementById("watch-form").addEventListener("submit", async (e) => {
+if (sunday) {
+  document.getElementById("weight-field-wrapper").classList.remove("hidden");
+}
+
+document.getElementById("form-morning").addEventListener("submit", async (e) => {
   e.preventDefault();
-  const watch = {
-    sleep: parseFloat(document.getElementById("input-sleep").value) || null,
-    steps: parseInt(document.getElementById("input-steps").value) || null,
-    hr: parseInt(document.getElementById("input-hr").value) || null,
-    calories: parseInt(document.getElementById("input-calories").value) || null,
-    weight: parseFloat(document.getElementById("input-weight").value) || null,
+  const morning = {
+    sleepTotal: parseFloat(document.getElementById("input-sleep-total").value) || null,
+    sleepDeep: parseFloat(document.getElementById("input-sleep-deep").value) || null,
+    sleepRem: parseFloat(document.getElementById("input-sleep-rem").value) || null,
+    sleepLight: parseFloat(document.getElementById("input-sleep-light").value) || null,
+    sleepWakes: parseInt(document.getElementById("input-sleep-wakes").value) || null,
+    sleepHr: parseInt(document.getElementById("input-sleep-hr").value) || null,
+    weeklyWeight: sunday ? (parseFloat(document.getElementById("input-weight-weekly").value) || null) : null,
   };
-  const existing = (await loadDayDoc(todayKey)) || { date: todayKey, tasks: state.tasks, completedPct: calcCompletionPct(), water: state.water };
-  await saveDayDoc({ ...existing, watch });
-  showToast("Dane zapisane ✓");
+  const existing = (await loadDayDoc(todayKey)) || { date: todayKey, tasks: state.tasks, completedPct: calcCompletionPct() };
+  await saveDayDoc({ ...existing, morning });
+  state.morning = morning;
+  showToast("Raport poranny zapisany ✓");
+  renderCharts();
+});
+
+document.getElementById("form-evening").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const evening = {
+    steps: parseInt(document.getElementById("input-steps").value) || null,
+    hrDay: parseInt(document.getElementById("input-hr-day").value) || null,
+    spo2: parseInt(document.getElementById("input-spo2").value) || null,
+    stress: parseInt(document.getElementById("input-stress").value) || null,
+  };
+  const existing = (await loadDayDoc(todayKey)) || { date: todayKey, tasks: state.tasks, completedPct: calcCompletionPct() };
+  await saveDayDoc({ ...existing, evening });
+  state.evening = evening;
+  showToast("Podsumowanie dnia zapisane ✓");
   renderCharts();
 });
 
@@ -1004,20 +1446,27 @@ let weightChart = null;
 let sleepChart = null;
 
 async function renderCharts() {
-  const docs = await loadLastNDays(7);
-  const labels = docs.map((d) => {
+  const days = await loadLastNDays(7);
+  const sleepLabels = days.map((d) => {
     const [, m, day] = d.date.split("-");
     return `${day}.${m}`;
   });
-  const weights = docs.map((d) => d.watch?.weight ?? null);
-  const sleeps = docs.map((d) => d.watch?.sleep ?? null);
+  const sleepDeep = days.map((d) => d.morning?.sleepDeep ?? null);
+  const sleepRem = days.map((d) => d.morning?.sleepRem ?? null);
+
+  const weeklyWeights = await loadWeeklyWeights(8);
+  const weightLabels = weeklyWeights.map((p) => {
+    const [, m, day] = p.date.split("-");
+    return `${day}.${m}`;
+  });
+  const weightValues = weeklyWeights.map((p) => p.weight);
 
   const baseOptions = {
     responsive: true,
     plugins: { legend: { display: false } },
     scales: {
-      x: { ticks: { color: "#8b8397", font: { family: "Poppins", size: 10 } }, grid: { display: false } },
-      y: { ticks: { color: "#8b8397", font: { family: "Poppins", size: 10 } }, grid: { color: "rgba(255,255,255,0.05)" } },
+      x: { ticks: { color: "#8b8397", font: { family: "Poppins", size: 10, weight: "600" } }, grid: { display: false } },
+      y: { ticks: { color: "#8b8397", font: { family: "Poppins", size: 10, weight: "600" } }, grid: { color: "rgba(255,255,255,0.05)" } },
     },
   };
 
@@ -1026,12 +1475,13 @@ async function renderCharts() {
   weightChart = new Chart(weightCtx, {
     type: "line",
     data: {
-      labels,
+      labels: weightLabels,
       datasets: [{
-        data: weights,
-        borderColor: "#5eead4",
-        backgroundColor: "rgba(94,234,212,0.12)",
-        pointBackgroundColor: "#5eead4",
+        label: "Waga (kg)",
+        data: weightValues,
+        borderColor: "#fbbf24",
+        backgroundColor: "rgba(251,191,36,0.12)",
+        pointBackgroundColor: "#fbbf24",
         pointBorderColor: "#0f0c1d",
         pointRadius: 4,
         borderWidth: 3,
@@ -1048,21 +1498,40 @@ async function renderCharts() {
   sleepChart = new Chart(sleepCtx, {
     type: "line",
     data: {
-      labels,
-      datasets: [{
-        data: sleeps,
-        borderColor: "#c4b5fd",
-        backgroundColor: "rgba(196,181,253,0.12)",
-        pointBackgroundColor: "#c4b5fd",
-        pointBorderColor: "#0f0c1d",
-        pointRadius: 4,
-        borderWidth: 3,
-        tension: 0.45,
-        fill: true,
-        spanGaps: true,
-      }],
+      labels: sleepLabels,
+      datasets: [
+        {
+          label: "Głęboki sen (h)",
+          data: sleepDeep,
+          borderColor: "#5eead4",
+          backgroundColor: "rgba(94,234,212,0.12)",
+          pointBackgroundColor: "#5eead4",
+          pointBorderColor: "#0f0c1d",
+          pointRadius: 4,
+          borderWidth: 3,
+          tension: 0.45,
+          fill: true,
+          spanGaps: true,
+        },
+        {
+          label: "REM (h)",
+          data: sleepRem,
+          borderColor: "#c4b5fd",
+          backgroundColor: "rgba(196,181,253,0.12)",
+          pointBackgroundColor: "#c4b5fd",
+          pointBorderColor: "#0f0c1d",
+          pointRadius: 4,
+          borderWidth: 3,
+          tension: 0.45,
+          fill: true,
+          spanGaps: true,
+        },
+      ],
     },
-    options: baseOptions,
+    options: {
+      ...baseOptions,
+      plugins: { legend: { display: true, labels: { color: "#c9c5d6", font: { family: "Poppins", size: 11, weight: "700" } } } },
+    },
   });
 }
 
@@ -1077,11 +1546,11 @@ document.getElementById("btn-analyze-ai").addEventListener("click", async () => 
 
   try {
     const dayData = (await loadDayDoc(todayKey)) || {
-      date: todayKey, tasks: state.tasks, completedPct: calcCompletionPct(), water: state.water,
+      date: todayKey, tasks: state.tasks, completedPct: calcCompletionPct(),
+      morning: state.morning, evening: state.evening,
     };
 
-    // Domyślnie mock. Aby użyć realnego API: await callRealMentorAI(dayData)
-    const verdict = await mockMentorAI(dayData);
+    const verdict = await runMentorAI(dayData);
 
     await saveDayDoc({ ...dayData, aiVerdict: verdict });
 
@@ -1106,7 +1575,7 @@ let deferredInstallPrompt = null;
 window.addEventListener("beforeinstallprompt", (e) => {
   e.preventDefault();
   deferredInstallPrompt = e;
-  if (!localStorage.getItem("levelup:install-dismissed")) {
+  if (!localStorage.getItem("regim:install-dismissed")) {
     document.getElementById("install-banner").classList.remove("hidden");
   }
 });
@@ -1122,15 +1591,72 @@ document.getElementById("btn-install").addEventListener("click", async () => {
 
 document.getElementById("btn-install-dismiss").addEventListener("click", () => {
   document.getElementById("install-banner").classList.add("hidden");
-  localStorage.setItem("levelup:install-dismissed", "1");
+  localStorage.setItem("regim:install-dismissed", "1");
 });
 
 // ----------------------------------------------------------------------------
-// 12. SERVICE WORKER (rejestracja inline — brak osobnego sw.js w tym pliku)
+// 12. POWIADOMIENIA PUSH (lokalne przypomnienia rano/wieczór)
+// ----------------------------------------------------------------------------
+function scheduleLocalReminders() {
+  // Prosty scheduler działający, dopóki karta jest otwarta / SW aktywny w tle
+  // (prawdziwe push wymaga serwera z VAPID — tu robimy najlepszy offline substytut:
+  // sprawdzanie co minutę, czy minęła godzina 8:00 lub 20:00 i raport nie był wysłany).
+  setInterval(async () => {
+    const now = new Date();
+    const hh = now.getHours();
+    const mm = now.getMinutes();
+    const existing = await loadDayDoc(dateKey(now));
+    if (hh === 8 && mm === 0 && !(existing?.morning)) {
+      fireNotification("Dzień dobry! ☀️", "Czas na poranny raport snu ze smartwatcha.");
+    }
+    if (hh === 20 && mm === 0 && !(existing?.evening)) {
+      fireNotification("Podsumowanie dnia 🌙", "Wpisz kroki, tętno, SpO2 i poziom stresu.");
+    }
+  }, 60000);
+}
+
+function fireNotification(title, body) {
+  if (Notification.permission === "granted") {
+    try {
+      navigator.serviceWorker?.getRegistration().then((reg) => {
+        if (reg) reg.showNotification(title, { body, icon: "icons/icon-192.png", badge: "icons/icon-192.png" });
+        else new Notification(title, { body });
+      }).catch(() => new Notification(title, { body }));
+    } catch (e) { console.warn("Powiadomienie nieudane", e); }
+  }
+}
+
+if ("Notification" in window) {
+  if (Notification.permission === "default" && !localStorage.getItem("regim:notif-dismissed")) {
+    document.getElementById("notif-banner").classList.remove("hidden");
+  }
+  if (Notification.permission === "granted") scheduleLocalReminders();
+}
+
+document.getElementById("btn-notif-enable").addEventListener("click", async () => {
+  try {
+    const perm = await Notification.requestPermission();
+    if (perm === "granted") {
+      showToast("Powiadomienia włączone 🔔");
+      scheduleLocalReminders();
+    } else {
+      showToast("Powiadomienia zablokowane");
+    }
+  } catch (e) { console.warn(e); }
+  document.getElementById("notif-banner").classList.add("hidden");
+});
+
+document.getElementById("btn-notif-dismiss").addEventListener("click", () => {
+  document.getElementById("notif-banner").classList.add("hidden");
+  localStorage.setItem("regim:notif-dismissed", "1");
+});
+
+// ----------------------------------------------------------------------------
+// 13. SERVICE WORKER (rejestracja inline — brak osobnego sw.js w tym pliku)
 // ----------------------------------------------------------------------------
 if ("serviceWorker" in navigator) {
   const swCode = `
-    const CACHE_NAME = "levelup-cache-v1";
+    const CACHE_NAME = "regim-cache-v1";
     self.addEventListener("install", (e) => { self.skipWaiting(); });
     self.addEventListener("activate", (e) => { self.clients.claim(); });
     self.addEventListener("fetch", (e) => {
@@ -1138,6 +1664,10 @@ if ("serviceWorker" in navigator) {
       e.respondWith(
         fetch(e.request).catch(() => caches.match(e.request))
       );
+    });
+    self.addEventListener("notificationclick", (e) => {
+      e.notification.close();
+      e.waitUntil(clients.openWindow("./index.html"));
     });
   `;
   const blob = new Blob([swCode], { type: "application/javascript" });
@@ -1148,7 +1678,7 @@ if ("serviceWorker" in navigator) {
 }
 
 // ----------------------------------------------------------------------------
-// 13. BOOTSTRAP
+// 14. BOOTSTRAP
 // ----------------------------------------------------------------------------
 async function bootApp() {
   setupTreningCard();
@@ -1156,27 +1686,44 @@ async function bootApp() {
   const existing = await loadDayDoc(todayKey);
   if (existing?.tasks?.length) {
     state.tasks = existing.tasks;
-    state.water = existing.water || 0;
+    state.foodChecked = existing.foodChecked || [];
+    state.morning = existing.morning || {};
+    state.evening = existing.evening || {};
   } else {
-    await saveDayDoc({ date: todayKey, tasks: state.tasks, completedPct: 0, water: 0 });
+    await saveDayDoc({ date: todayKey, tasks: state.tasks, completedPct: 0, foodChecked: [] });
   }
 
   renderCheckStates();
   renderProgress();
-  renderWaterDrops();
   await refreshStreak();
+
+  // Przywróć zaznaczone jedzenie w modalu
+  state.foodChecked.forEach((food) => {
+    const chip = document.querySelector(`.food-chip[data-food="${food}"]`);
+    if (chip) chip.classList.add("active");
+  });
 
   if (existing?.aiVerdict) {
     document.getElementById("mentor-verdict-box").classList.remove("hidden");
     document.getElementById("mentor-verdict-text").textContent = existing.aiVerdict;
   }
-  if (existing?.watch) {
-    const w = existing.watch;
-    if (w.sleep) document.getElementById("input-sleep").value = w.sleep;
-    if (w.steps) document.getElementById("input-steps").value = w.steps;
-    if (w.hr) document.getElementById("input-hr").value = w.hr;
-    if (w.calories) document.getElementById("input-calories").value = w.calories;
-    if (w.weight) document.getElementById("input-weight").value = w.weight;
+
+  if (existing?.morning) {
+    const m = existing.morning;
+    if (m.sleepTotal != null) document.getElementById("input-sleep-total").value = m.sleepTotal;
+    if (m.sleepDeep != null) document.getElementById("input-sleep-deep").value = m.sleepDeep;
+    if (m.sleepRem != null) document.getElementById("input-sleep-rem").value = m.sleepRem;
+    if (m.sleepLight != null) document.getElementById("input-sleep-light").value = m.sleepLight;
+    if (m.sleepWakes != null) document.getElementById("input-sleep-wakes").value = m.sleepWakes;
+    if (m.sleepHr != null) document.getElementById("input-sleep-hr").value = m.sleepHr;
+    if (sunday && m.weeklyWeight != null) document.getElementById("input-weight-weekly").value = m.weeklyWeight;
+  }
+  if (existing?.evening) {
+    const e = existing.evening;
+    if (e.steps != null) document.getElementById("input-steps").value = e.steps;
+    if (e.hrDay != null) document.getElementById("input-hr-day").value = e.hrDay;
+    if (e.spo2 != null) document.getElementById("input-spo2").value = e.spo2;
+    if (e.stress != null) document.getElementById("input-stress").value = e.stress;
   }
 }
 
