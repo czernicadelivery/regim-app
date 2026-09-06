@@ -1033,7 +1033,7 @@ async function mockMentorAI(dayData) {
    ============================================================================ */
 const USE_REAL_AI = true;
 const GEMINI_API_KEY = "AQ.Ab8RN6IZgY_1yPYLsiemiLHE2MPUL8LmFZ72ZhaBhZhYNoA9YA"; // Wklej tutaj swój darmowy klucz z Google AI Studio
-const GEMINI_ENDPOINT = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`;
+const GEMINI_ENDPOINT = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=${GEMINI_API_KEY}`;
 
 async function callRealMentorAI(dayData) {
   const fullPrompt = `${MENTOR_SYSTEM_PROMPT}\n\nDane użytkownika:\n${buildMentorUserPrompt(dayData)}`;
