@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>REGIM / LevelUp</title>
-<meta name="description" content="Twój codzienny system regeneracji, treningu i mowy — raport ze smartwatcha, zadania dnia i Rada Trenera Personalnego.">
+<meta name="description" content="Codzienny system regeneracji, treningu i mowy — raport ze smartwatcha, zadania dnia i Rada Trenera Personalnego.">
 <meta name="theme-color" content="#1a1530">
 <link rel="manifest" href="manifest.json">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2222%22 fill=%22%231a1530%22/><text x=%2250%22 y=%2270%22 font-size=%2258%22 text-anchor=%22middle%22 fill=%22%235eead4%22 font-family=%22Arial%22 font-weight=%22900%22>L</text></svg>">
@@ -50,11 +50,7 @@
     min-height: 100%;
   }
   * { -webkit-tap-highlight-color: transparent; }
-  body {
-    font-weight: 500;
-    letter-spacing: -0.01em;
-    -webkit-font-smoothing: antialiased;
-  }
+  body { font-weight: 500; letter-spacing: -0.01em; -webkit-font-smoothing: antialiased; }
   h1,h2,h3,.font-extrabold,.font-bold { letter-spacing: -0.02em; }
   ::-webkit-scrollbar { width: 6px; }
   ::-webkit-scrollbar-track { background: transparent; }
@@ -66,28 +62,13 @@
     -webkit-backdrop-filter: blur(18px);
     border: 1px solid rgba(255,255,255,0.08);
   }
-
   .card-tap:active { transform: scale(0.98); }
 
-  @keyframes rise {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
+  @keyframes rise { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
   .rise { animation: rise 0.35s cubic-bezier(0.16,1,0.3,1) both; }
 
-  @keyframes ring-pulse {
-    0%, 100% { box-shadow: 0 0 0 0 rgba(94,234,212,0.35); }
-    50% { box-shadow: 0 0 0 14px rgba(94,234,212,0); }
-  }
+  @keyframes ring-pulse { 0%,100% { box-shadow: 0 0 0 0 rgba(94,234,212,0.35);} 50% { box-shadow: 0 0 0 14px rgba(94,234,212,0);} }
   .ring-pulse { animation: ring-pulse 2.4s infinite; }
-
-  .expand-enter {
-    display: grid;
-    grid-template-rows: 0fr;
-    transition: grid-template-rows 0.35s cubic-bezier(0.16,1,0.3,1);
-  }
-  .expand-enter.open { grid-template-rows: 1fr; }
-  .expand-enter > div { overflow: hidden; }
 
   input[type="number"]::-webkit-outer-spin-button,
   input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
@@ -97,33 +78,72 @@
   .progress-fill { transition: width 0.6s cubic-bezier(0.16,1,0.3,1); }
   .timer-ring { transition: stroke-dashoffset 1s linear; }
 
-  .modal-backdrop {
-    background: rgba(10, 8, 20, 0.72);
-    backdrop-filter: blur(6px);
-    -webkit-backdrop-filter: blur(6px);
-  }
-  @keyframes modal-pop {
-    from { opacity: 0; transform: translateY(24px) scale(0.97); }
-    to { opacity: 1; transform: translateY(0) scale(1); }
-  }
+  .modal-backdrop { background: rgba(10, 8, 20, 0.72); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); }
+  @keyframes modal-pop { from { opacity: 0; transform: translateY(24px) scale(0.97); } to { opacity: 1; transform: translateY(0) scale(1); } }
   .modal-pop { animation: modal-pop 0.3s cubic-bezier(0.16,1,0.3,1) both; }
 
   .food-chip { transition: all 0.2s ease; }
-  .food-chip.active {
-    background: linear-gradient(135deg, rgba(94,234,212,0.25), rgba(196,181,253,0.25));
-    border-color: rgba(94,234,212,0.5);
-  }
+  .food-chip.active { background: linear-gradient(135deg, rgba(94,234,212,0.25), rgba(196,181,253,0.25)); border-color: rgba(94,234,212,0.5); }
+
+  .mood-chip { transition: all 0.2s ease; }
+  .mood-chip.active { background: linear-gradient(135deg, rgba(251,191,157,0.3), rgba(196,181,253,0.3)); border-color: rgba(251,191,157,0.6); }
 
   .segmented { transition: all 0.3s cubic-bezier(0.16,1,0.3,1); }
+
+  /* Suwaki */
+  input[type="range"].slider-custom {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 8px;
+    background: rgba(255,255,255,0.08);
+    border-radius: 999px;
+    outline: none;
+  }
+  input[type="range"].slider-custom::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 22px;
+    height: 22px;
+    background: linear-gradient(135deg, #5eead4, #c4b5fd);
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 2px 12px rgba(94,234,212,0.5);
+  }
+  input[type="range"].slider-custom::-moz-range-thumb {
+    width: 22px;
+    height: 22px;
+    background: linear-gradient(135deg, #5eead4, #c4b5fd);
+    border-radius: 50%;
+    cursor: pointer;
+    border: none;
+    box-shadow: 0 2px 12px rgba(94,234,212,0.5);
+  }
+
+  /* Breathing circle */
+  .breath-circle {
+    width: 180px;
+    height: 180px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 30% 30%, rgba(94,234,212,0.4), rgba(196,181,253,0.15));
+    border: 3px solid rgba(94,234,212,0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+    transition: transform 4s ease-in-out;
+    transform: scale(0.6);
+    box-shadow: 0 0 60px rgba(94,234,212,0.3);
+  }
+  .breath-circle.inhale { transform: scale(1); transition: transform 4s ease-in-out; }
+  .breath-circle.hold   { transform: scale(1); transition: transform 0.3s; }
+  .breath-circle.exhale { transform: scale(0.6); transition: transform 8s ease-in-out; }
 
   html.light-theme, html.light-theme body {
     background: radial-gradient(ellipse 120% 80% at 50% -10%, #eef2ff 0%, #f7f5fb 55%), #f7f5fb;
     color: #1e1a35;
   }
-  html.light-theme .glass {
-    background: rgba(30, 26, 53, 0.045);
-    border: 1px solid rgba(30, 26, 53, 0.08);
-  }
+  html.light-theme .glass { background: rgba(30, 26, 53, 0.045); border: 1px solid rgba(30, 26, 53, 0.08); }
   html.light-theme .text-neutral-100 { color: #1e1a35; }
   html.light-theme .text-neutral-200 { color: #2d2740; }
   html.light-theme .text-neutral-300 { color: #433c5c; }
@@ -136,27 +156,16 @@
   html.light-theme .bg-white\/10 { background-color: rgba(30,26,53,0.07); }
   html.light-theme ::-webkit-scrollbar-thumb { background: #6d5fd6; }
   html.light-theme .modal-backdrop { background: rgba(120, 113, 140, 0.35); }
+  html.light-theme input[type="range"].slider-custom { background: rgba(30,26,53,0.1); }
 
-  .cal-day {
-    aspect-ratio: 1;
-    border-radius: 12px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    font-size: 11px;
-    font-weight: 700;
-    position: relative;
-  }
+  .cal-day { aspect-ratio: 1; border-radius: 12px; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; position: relative; }
   .cal-dot { width: 6px; height: 6px; border-radius: 50%; margin-top: 2px; }
 
   .badge-card { transition: all 0.25s ease; }
   .badge-card.locked { opacity: 0.35; filter: grayscale(1); }
   .badge-card.unlocked { animation: rise 0.4s cubic-bezier(0.16,1,0.3,1) both; }
 
-  #confetti-canvas {
-    position: fixed; inset: 0; z-index: 60; pointer-events: none;
-  }
+  #confetti-canvas { position: fixed; inset: 0; z-index: 60; pointer-events: none; }
 
   @keyframes quote-fade {
     0% { opacity: 0; transform: translateY(4px); }
@@ -168,6 +177,27 @@
 
   .history-item { border-left: 2px solid rgba(255,255,255,0.1); }
   html.light-theme .history-item { border-left-color: rgba(30,26,53,0.12); }
+
+  .readiness-ring { transition: stroke-dashoffset 0.8s cubic-bezier(0.16,1,0.3,1); }
+
+  @keyframes recovery-glow {
+    0%,100% { box-shadow: 0 0 24px -6px rgba(251,113,133,0.4); }
+    50% { box-shadow: 0 0 32px -4px rgba(251,113,133,0.6); }
+  }
+  .recovery-glow { animation: recovery-glow 2.5s infinite; }
+
+  @keyframes deload-glow {
+    0%,100% { box-shadow: 0 0 24px -6px rgba(196,181,253,0.4); }
+    50% { box-shadow: 0 0 32px -4px rgba(196,181,253,0.6); }
+  }
+  .deload-glow { animation: deload-glow 2.5s infinite; }
+
+  .weekoflive-card {
+    background: linear-gradient(135deg, #1e1a35 0%, #2d2456 100%);
+    border-radius: 28px;
+    padding: 24px;
+    color: #f7f5fb;
+  }
 </style>
 </head>
 <body class="text-neutral-100 font-sans min-h-screen pb-28">
@@ -189,19 +219,20 @@
         <i class="fa-solid fa-fire text-peach"></i>
         <span id="streak-count">0</span>
       </div>
+      <button id="btn-settings" class="glass rounded-full w-9 h-9 flex items-center justify-center text-neutral-400 hover:text-mint transition">
+        <i class="fa-solid fa-gear"></i>
+      </button>
       <button id="btn-theme-toggle" class="glass rounded-full w-9 h-9 flex items-center justify-center text-neutral-400 hover:text-gold transition">
         <i class="fa-solid fa-moon" id="theme-icon"></i>
       </button>
       <button id="btn-export" class="glass rounded-full w-9 h-9 flex items-center justify-center text-neutral-400 hover:text-mint transition">
         <i class="fa-solid fa-download"></i>
       </button>
-      <button id="btn-signin" class="glass rounded-full w-9 h-9 flex items-center justify-center text-neutral-400 hover:text-mint transition">
-        <i class="fa-solid fa-user"></i>
-      </button>
     </div>
   </div>
 </header>
 
+<!-- BANERY -->
 <div id="install-banner" class="hidden max-w-lg mx-auto px-5 mb-2">
   <div class="rise glass rounded-3xl p-4 flex items-center gap-3 shadow-soft">
     <div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-mint/30 to-lilac/30 flex items-center justify-center flex-shrink-0">
@@ -211,12 +242,8 @@
       <div class="font-bold text-sm">Miej REGIM zawsze pod ręką</div>
       <div class="text-xs text-neutral-400">Dodaj do ekranu głównego — działa jak apka</div>
     </div>
-    <button id="btn-install" class="bg-gradient-to-br from-mint to-lilac text-ink font-extrabold text-sm px-4 py-2 rounded-full whitespace-nowrap active:scale-95 transition">
-      Dodaj
-    </button>
-    <button id="btn-install-dismiss" class="text-neutral-500 hover:text-neutral-300 w-6 h-6 flex items-center justify-center flex-shrink-0">
-      <i class="fa-solid fa-xmark"></i>
-    </button>
+    <button id="btn-install" class="bg-gradient-to-br from-mint to-lilac text-ink font-extrabold text-sm px-4 py-2 rounded-full whitespace-nowrap active:scale-95 transition">Dodaj</button>
+    <button id="btn-install-dismiss" class="text-neutral-500 hover:text-neutral-300 w-6 h-6 flex items-center justify-center flex-shrink-0"><i class="fa-solid fa-xmark"></i></button>
   </div>
 </div>
 
@@ -229,12 +256,8 @@
       <div class="font-bold text-sm">Włącz przypomnienia</div>
       <div class="text-xs text-neutral-400">Rano i wieczorem przypomnimy o raporcie</div>
     </div>
-    <button id="btn-notif-enable" class="bg-gradient-to-br from-peach to-gold text-ink font-extrabold text-sm px-4 py-2 rounded-full whitespace-nowrap active:scale-95 transition">
-      Włącz
-    </button>
-    <button id="btn-notif-dismiss" class="text-neutral-500 hover:text-neutral-300 w-6 h-6 flex items-center justify-center flex-shrink-0">
-      <i class="fa-solid fa-xmark"></i>
-    </button>
+    <button id="btn-notif-enable" class="bg-gradient-to-br from-peach to-gold text-ink font-extrabold text-sm px-4 py-2 rounded-full whitespace-nowrap active:scale-95 transition">Włącz</button>
+    <button id="btn-notif-dismiss" class="text-neutral-500 hover:text-neutral-300 w-6 h-6 flex items-center justify-center flex-shrink-0"><i class="fa-solid fa-xmark"></i></button>
   </div>
 </div>
 
@@ -244,36 +267,28 @@
       <i class="fa-solid fa-tower-broadcast text-lilac text-lg"></i>
     </div>
     <div class="flex-1 min-w-0">
-      <div class="font-bold text-sm">Prawdziwy push (nawet gdy telefon śpi)</div>
-      <div class="text-xs text-neutral-400">Wysyłany przez serwer Firebase, nie przez kartę przeglądarki</div>
+      <div class="font-bold text-sm">Prawdziwy push</div>
+      <div class="text-xs text-neutral-400">Wysyłany przez Firebase</div>
     </div>
-    <button id="btn-push-enable" class="bg-gradient-to-br from-lilac to-mint text-ink font-extrabold text-sm px-4 py-2 rounded-full whitespace-nowrap active:scale-95 transition">
-      Włącz
-    </button>
-    <button id="btn-push-dismiss" class="text-neutral-500 hover:text-neutral-300 w-6 h-6 flex items-center justify-center flex-shrink-0">
-      <i class="fa-solid fa-xmark"></i>
-    </button>
+    <button id="btn-push-enable" class="bg-gradient-to-br from-lilac to-mint text-ink font-extrabold text-sm px-4 py-2 rounded-full whitespace-nowrap active:scale-95 transition">Włącz</button>
+    <button id="btn-push-dismiss" class="text-neutral-500 hover:text-neutral-300 w-6 h-6 flex items-center justify-center flex-shrink-0"><i class="fa-solid fa-xmark"></i></button>
   </div>
 </div>
 
 <main class="max-w-lg mx-auto px-5">
 
+  <!-- PROGRESS HEADER -->
   <section class="rise glass rounded-4xl p-5 mb-5 shadow-soft">
     <div class="flex items-center justify-between mb-3">
       <div>
         <div class="text-2xl font-extrabold" id="progress-headline">Zaczynajmy 💪</div>
-        <div class="text-xs text-neutral-400 font-semibold" id="progress-sub">0 z 6 zadań na dziś</div>
+        <div class="text-xs text-neutral-400 font-semibold" id="progress-sub">0 z 7 zadań na dziś</div>
       </div>
       <div class="relative w-16 h-16 flex-shrink-0">
         <svg class="w-16 h-16 -rotate-90" viewBox="0 0 64 64">
           <circle cx="32" cy="32" r="27" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="7"/>
           <circle id="hero-ring" cx="32" cy="32" r="27" fill="none" stroke="url(#heroGrad)" stroke-width="7" stroke-linecap="round" stroke-dasharray="169.6" stroke-dashoffset="169.6" style="transition: stroke-dashoffset 0.6s cubic-bezier(0.16,1,0.3,1);"/>
-          <defs>
-            <linearGradient id="heroGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stop-color="#5eead4"/>
-              <stop offset="100%" stop-color="#c4b5fd"/>
-            </linearGradient>
-          </defs>
+          <defs><linearGradient id="heroGrad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#5eead4"/><stop offset="100%" stop-color="#c4b5fd"/></linearGradient></defs>
         </svg>
         <div class="absolute inset-0 flex items-center justify-center font-extrabold text-sm" id="hero-pct">0%</div>
       </div>
@@ -283,11 +298,13 @@
     </div>
   </section>
 
+  <!-- FISZKA MOTYWACYJNA -->
   <div class="glass rounded-3xl px-4 py-3 mb-5 flex items-center gap-3 overflow-hidden">
-    <i class="fa-solid fa-quote-left text-mint text-sm flex-shrink-0"></i>
+    <i class="fa-solid fa-dumbbell text-mint text-sm flex-shrink-0"></i>
     <p id="daily-quote" class="quote-anim text-xs text-neutral-300 font-semibold leading-snug"></p>
   </div>
 
+  <!-- NAWIGACJA -->
   <nav class="flex glass rounded-full p-1.5 mb-5 gap-1">
     <button data-tab="dashboard" class="tab-btn tab-underline flex-1 py-2.5 rounded-full text-xs sm:text-sm font-bold bg-gradient-to-br from-mint to-lilac text-ink">
       <i class="fa-solid fa-house mr-1"></i>Dziś
@@ -299,12 +316,57 @@
       <i class="fa-solid fa-chart-simple mr-1"></i>Postępy
     </button>
     <button data-tab="mentor" class="tab-btn tab-underline flex-1 py-2.5 rounded-full text-xs sm:text-sm font-bold text-neutral-400">
-      <i class="fa-solid fa-dumbbell mr-1"></i>Rada Trenera
+      <i class="fa-solid fa-dumbbell mr-1"></i>Trener
     </button>
   </nav>
 
+  <!-- ==================== DZIŚ ==================== -->
   <section id="tab-dashboard" class="tab-panel space-y-4">
 
+    <!-- READINESS SCORE -->
+    <div class="glass rounded-4xl p-5 shadow-soft">
+      <div class="flex items-center gap-2 mb-3">
+        <i class="fa-solid fa-gauge-high text-mint"></i>
+        <span class="font-bold text-sm">Gotowość dnia</span>
+      </div>
+      <div class="flex items-center gap-4">
+        <div class="relative w-20 h-20 flex-shrink-0">
+          <svg class="w-20 h-20 -rotate-90" viewBox="0 0 80 80">
+            <circle cx="40" cy="40" r="34" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="8"/>
+            <circle id="readiness-ring" class="readiness-ring" cx="40" cy="40" r="34" fill="none" stroke="#5eead4" stroke-width="8" stroke-linecap="round" stroke-dasharray="213.6" stroke-dashoffset="213.6"/>
+          </svg>
+          <div class="absolute inset-0 flex items-center justify-center font-extrabold text-lg" id="readiness-pct">—</div>
+        </div>
+        <div class="flex-1 min-w-0">
+          <div id="readiness-label" class="font-extrabold text-base mb-1">Uzupełnij raport</div>
+          <div id="readiness-tip" class="text-xs text-neutral-400 font-medium leading-snug">Im więcej danych, tym dokładniejsza ocena.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- LAST DAY OFF + DELOAD -->
+    <div id="recovery-banner" class="hidden rise glass rounded-4xl p-5 border border-rose/30 recovery-glow">
+      <div class="flex items-center gap-2 mb-2">
+        <i class="fa-solid fa-shield-heart text-rose"></i>
+        <span class="font-bold text-sm text-rose">Ostatni dzień OFF:</span>
+        <span id="last-off-days" class="font-extrabold text-rose">—</span>
+        <span class="text-xs text-neutral-400 font-semibold">dni temu</span>
+      </div>
+      <p id="recovery-text" class="text-sm text-neutral-200 leading-relaxed font-medium"></p>
+      <button id="btn-recovery-day" class="mt-3 w-full py-2.5 rounded-full glass font-extrabold text-rose text-sm active:scale-95 transition border border-rose/20">
+        <i class="fa-solid fa-leaf mr-1.5"></i>Włącz tryb regeneracji
+      </button>
+    </div>
+
+    <div id="deload-banner" class="hidden rise glass rounded-4xl p-5 border border-lilac/30 deload-glow">
+      <div class="flex items-center gap-2 mb-2">
+        <i class="fa-solid fa-rotate-left text-lilac"></i>
+        <span class="font-bold text-sm text-lilac">Czas na DELOAD</span>
+      </div>
+      <p id="deload-text" class="text-sm text-neutral-200 leading-relaxed font-medium"></p>
+    </div>
+
+    <!-- RAPORT SMARTWATCH -->
     <div class="glass rounded-4xl p-4 shadow-soft">
       <div class="flex items-center gap-2 mb-3">
         <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-lilac/25 to-mint/25 flex items-center justify-center flex-shrink-0">
@@ -322,6 +384,7 @@
         </button>
       </div>
 
+      <!-- PORANNY -->
       <form id="form-morning" class="report-panel grid grid-cols-2 gap-3">
         <label class="block col-span-2">
           <span class="text-[11px] text-neutral-400 ml-1 font-semibold">Czas snu (h):</span>
@@ -343,15 +406,40 @@
           <span class="text-[11px] text-neutral-400 ml-1 font-semibold">Pobudki:</span>
           <input type="number" id="input-sleep-wakes" placeholder="2" class="w-full mt-1 bg-white/5 border border-white/10 rounded-2xl px-3 py-2.5 text-neutral-100 font-semibold focus:outline-none focus:border-mint transition">
         </label>
-        <label class="block col-span-2">
-          <span class="text-[11px] text-neutral-400 ml-1 font-semibold">Śr. tętno podczas snu (bpm):</span>
+        <label class="block">
+          <span class="text-[11px] text-neutral-400 ml-1 font-semibold">Śr. tętno snu (bpm):</span>
           <input type="number" id="input-sleep-hr" placeholder="58" class="w-full mt-1 bg-white/5 border border-white/10 rounded-2xl px-3 py-2.5 text-neutral-100 font-semibold focus:outline-none focus:border-mint transition">
         </label>
-
+        <label class="block">
+          <span class="text-[11px] text-mint ml-1 font-bold"><i class="fa-solid fa-heart-pulse mr-1"></i>RHR rano (bpm):</span>
+          <input type="number" id="input-rhr" placeholder="62" class="w-full mt-1 bg-mint/10 border border-mint/30 rounded-2xl px-3 py-2.5 text-neutral-100 font-semibold focus:outline-none focus:border-mint transition">
+        </label>
         <label class="block col-span-2">
           <span class="text-[11px] text-gold ml-1 font-bold"><i class="fa-solid fa-scale-balanced mr-1"></i>Waga (kg) — codziennie:</span>
           <input type="number" step="0.1" id="input-weight-daily" placeholder="52.5" class="w-full mt-1 bg-gold/10 border border-gold/30 rounded-2xl px-3 py-2.5 text-neutral-100 font-semibold focus:outline-none focus:border-gold transition">
         </label>
+
+        <div class="col-span-2 block">
+          <span class="text-[11px] text-lilac ml-1 font-bold"><i class="fa-solid fa-face-tired mr-1"></i>Napięcie szczęki rano (1-10):</span>
+          <div class="mt-2 flex items-center gap-3">
+            <input type="range" min="1" max="10" value="5" id="input-jaw-tension" class="slider-custom flex-1">
+            <span id="jaw-tension-value" class="text-lg font-extrabold text-lilac w-8 text-center">5</span>
+          </div>
+        </div>
+
+        <div class="col-span-2 block">
+          <span class="text-[11px] text-peach ml-1 font-bold"><i class="fa-solid fa-sun mr-1"></i>Nastrój rano (1-10):</span>
+          <div class="mt-2 flex items-center gap-3">
+            <input type="range" min="1" max="10" value="5" id="input-mood-morning" class="slider-custom flex-1">
+            <span id="mood-morning-value" class="text-lg font-extrabold text-peach w-8 text-center">5</span>
+          </div>
+          <div class="flex flex-wrap gap-1.5 mt-2" id="mood-tags-morning">
+            <button type="button" data-tag="spokój" class="mood-chip glass rounded-full px-3 py-1 text-[11px] font-bold border border-transparent">😌 spokój</button>
+            <button type="button" data-tag="energia" class="mood-chip glass rounded-full px-3 py-1 text-[11px] font-bold border border-transparent">⚡ energia</button>
+            <button type="button" data-tag="zmęczenie" class="mood-chip glass rounded-full px-3 py-1 text-[11px] font-bold border border-transparent">😴 zmęczenie</button>
+            <button type="button" data-tag="motywacja" class="mood-chip glass rounded-full px-3 py-1 text-[11px] font-bold border border-transparent">🔥 motywacja</button>
+          </div>
+        </div>
 
         <label id="weight-field-wrapper" class="hidden block col-span-2 rise">
           <span class="text-[11px] text-gold ml-1 font-bold"><i class="fa-solid fa-calendar-check mr-1"></i>Niedziela — waga tygodniowa (kg):</span>
@@ -363,13 +451,14 @@
         </button>
       </form>
 
+      <!-- WIECZORNY -->
       <form id="form-evening" class="report-panel hidden grid grid-cols-2 gap-3">
         <label class="block">
           <span class="text-[11px] text-neutral-400 ml-1 font-semibold">Kroki:</span>
           <input type="number" id="input-steps" placeholder="9000" class="w-full mt-1 bg-white/5 border border-white/10 rounded-2xl px-3 py-2.5 text-neutral-100 font-semibold focus:outline-none focus:border-lilac transition">
         </label>
         <label class="block">
-          <span class="text-[11px] text-neutral-400 ml-1 font-semibold">Śr. tętno dnia (bpm):</span>
+          <span class="text-[11px] text-neutral-400 ml-1 font-semibold">Śr. tętno dnia:</span>
           <input type="number" id="input-hr-day" placeholder="78" class="w-full mt-1 bg-white/5 border border-white/10 rounded-2xl px-3 py-2.5 text-neutral-100 font-semibold focus:outline-none focus:border-lilac transition">
         </label>
         <label class="block">
@@ -380,10 +469,26 @@
           <span class="text-[11px] text-neutral-400 ml-1 font-semibold">Stres (1-100):</span>
           <input type="number" min="1" max="100" id="input-stress" placeholder="35" class="w-full mt-1 bg-white/5 border border-white/10 rounded-2xl px-3 py-2.5 text-neutral-100 font-semibold focus:outline-none focus:border-lilac transition">
         </label>
+        <label class="block">
+          <span class="text-[11px] text-rose ml-1 font-bold"><i class="fa-solid fa-fire mr-1"></i>RPE treningu (1-10):</span>
+          <input type="number" min="1" max="10" id="input-rpe" placeholder="7" class="w-full mt-1 bg-rose/10 border border-rose/30 rounded-2xl px-3 py-2.5 text-neutral-100 font-semibold focus:outline-none focus:border-rose transition">
+        </label>
+        <label class="block">
+          <span class="text-[11px] text-neutral-400 ml-1 font-semibold">Screen time (min):</span>
+          <input type="number" id="input-screen-time" placeholder="180" class="w-full mt-1 bg-white/5 border border-white/10 rounded-2xl px-3 py-2.5 text-neutral-100 font-semibold focus:outline-none focus:border-lilac transition">
+        </label>
         <label class="block col-span-2">
           <span class="text-[11px] text-gold ml-1 font-bold"><i class="fa-solid fa-scale-balanced mr-1"></i>Waga wieczorna (kg) — opcjonalnie:</span>
           <input type="number" step="0.1" id="input-weight-evening" placeholder="52.5" class="w-full mt-1 bg-gold/10 border border-gold/30 rounded-2xl px-3 py-2.5 text-neutral-100 font-semibold focus:outline-none focus:border-gold transition">
         </label>
+
+        <div class="col-span-2 block">
+          <span class="text-[11px] text-peach ml-1 font-bold"><i class="fa-solid fa-moon mr-1"></i>Nastrój wieczór (1-10):</span>
+          <div class="mt-2 flex items-center gap-3">
+            <input type="range" min="1" max="10" value="5" id="input-mood-evening" class="slider-custom flex-1">
+            <span id="mood-evening-value" class="text-lg font-extrabold text-peach w-8 text-center">5</span>
+          </div>
+        </div>
 
         <button type="submit" class="col-span-2 mt-1 py-3 rounded-full bg-gradient-to-br from-lilac to-mint text-ink font-extrabold active:scale-95 transition">
           <i class="fa-solid fa-floppy-disk mr-1.5"></i>Zapisz podsumowanie dnia
@@ -391,7 +496,29 @@
       </form>
     </div>
 
-    <!-- Rada Trenera na dziś (na górze) -->
+    <!-- MIKRO-NAWYKI -->
+    <div class="glass rounded-4xl p-5 shadow-soft">
+      <div class="flex items-center gap-2 mb-3">
+        <i class="fa-solid fa-seedling text-mint"></i>
+        <span class="font-bold text-sm">Mikro-nawyki dnia</span>
+      </div>
+      <div class="space-y-2.5">
+        <label class="flex items-center gap-3 cursor-pointer">
+          <input type="checkbox" id="habit-water-salt" class="w-5 h-5 rounded-md accent-mint">
+          <span class="text-sm font-medium flex-1">💧 Woda z solą morską (rano)</span>
+        </label>
+        <label class="flex items-center gap-3 cursor-pointer">
+          <input type="checkbox" id="habit-cold-shower" class="w-5 h-5 rounded-md accent-mint">
+          <span class="text-sm font-medium flex-1">🚿 Zimny prysznic 30-60s</span>
+        </label>
+        <label class="flex items-center gap-3 cursor-pointer">
+          <input type="checkbox" id="habit-walk-meal" class="w-5 h-5 rounded-md accent-mint">
+          <span class="text-sm font-medium flex-1">🚶 Spacer 10 min po posiłku</span>
+        </label>
+      </div>
+    </div>
+
+    <!-- RADA TRENERA (na dziś) -->
     <div id="mentor-verdict-box" class="hidden rise glass rounded-4xl p-5 shadow-warm">
       <div class="flex items-center gap-2 mb-2">
         <i class="fa-solid fa-dumbbell text-peach"></i>
@@ -400,14 +527,14 @@
       <p id="mentor-verdict-text" class="text-sm text-neutral-200 leading-relaxed font-medium"></p>
     </div>
 
-    <!-- Zadania dnia -->
+    <!-- ZADANIA -->
     <div class="glass rounded-4xl overflow-hidden shadow-soft card-tap transition cursor-pointer" data-card="tabletka" data-modal="modal-tabletka">
       <div class="p-5 flex items-center gap-4">
         <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-gold/25 to-peach/25 flex items-center justify-center flex-shrink-0">
           <i class="fa-solid fa-pills text-gold text-2xl"></i>
         </div>
         <div class="flex-1 min-w-0">
-          <div class="font-bold text-base">💊 Wziąłem tabletkę (D3/Witaminy)</div>
+          <div class="font-bold text-base">💊 D3 + Tran z dorsza</div>
           <div class="text-xs text-neutral-400 font-semibold">Rano, z posiłkiem tłuszczowym</div>
         </div>
         <button data-check="tabletka" class="check-btn w-9 h-9 rounded-full border-2 border-white/15 flex items-center justify-center flex-shrink-0 transition">
@@ -452,8 +579,8 @@
           <i class="fa-solid fa-comment-dots text-lilac text-2xl"></i>
         </div>
         <div class="flex-1 min-w-0">
-          <div class="font-bold text-base">🗣️ Zrobiłem mowę</div>
-          <div class="text-xs text-neutral-400 font-semibold">10 min — mechaniczne R, bruksizm</div>
+          <div class="font-bold text-base">🗣️ Trening mowy</div>
+          <div class="text-xs text-neutral-400 font-semibold">5 min — mechaniczne R, bruksizm</div>
         </div>
         <button data-check="mowa" class="check-btn w-9 h-9 rounded-full border-2 border-white/15 flex items-center justify-center flex-shrink-0 transition">
           <i class="fa-solid fa-check text-xs opacity-0 transition"></i>
@@ -461,17 +588,46 @@
       </div>
     </div>
 
-    <!-- NOWE: Ćwiczenia na twarz (looksmaxing) -->
     <div class="glass rounded-4xl overflow-hidden shadow-soft card-tap transition cursor-pointer" data-card="twarz" data-modal="modal-twarz">
       <div class="p-5 flex items-center gap-4">
         <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-lilac/25 to-peach/25 flex items-center justify-center flex-shrink-0">
           <i class="fa-solid fa-face-smile text-lilac text-2xl"></i>
         </div>
         <div class="flex-1 min-w-0">
-          <div class="font-bold text-base">✨ Ćwiczenia na twarz (looksmaxing)</div>
-          <div class="text-xs text-neutral-400 font-semibold">Rozciąganie oczu, masaż, napięcie mięśni</div>
+          <div class="font-bold text-base">✨ Looksmaxing — twarz</div>
+          <div class="text-xs text-neutral-400 font-semibold">Oczy, masaż, napięcie mięśni, szczęka</div>
         </div>
         <button data-check="twarz" class="check-btn w-9 h-9 rounded-full border-2 border-white/15 flex items-center justify-center flex-shrink-0 transition">
+          <i class="fa-solid fa-check text-xs opacity-0 transition"></i>
+        </button>
+      </div>
+    </div>
+
+    <div class="glass rounded-4xl overflow-hidden shadow-soft card-tap transition cursor-pointer" data-card="postawa" data-modal="modal-postawa">
+      <div class="p-5 flex items-center gap-4">
+        <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-mint/25 to-gold/25 flex items-center justify-center flex-shrink-0">
+          <i class="fa-solid fa-user-tie text-mint text-2xl"></i>
+        </div>
+        <div class="flex-1 min-w-0">
+          <div class="font-bold text-base">🧍 Postawa szyi i barków</div>
+          <div class="text-xs text-neutral-400 font-semibold">3 min — chin tuck, łopatki, ściana</div>
+        </div>
+        <button data-check="postawa" class="check-btn w-9 h-9 rounded-full border-2 border-white/15 flex items-center justify-center flex-shrink-0 transition">
+          <i class="fa-solid fa-check text-xs opacity-0 transition"></i>
+        </button>
+      </div>
+    </div>
+
+    <div id="nail-card" class="hidden glass rounded-4xl overflow-hidden shadow-soft card-tap transition cursor-pointer" data-card="paznokcie" data-modal="modal-paznokcie">
+      <div class="p-5 flex items-center gap-4">
+        <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-lilac/25 to-rose/25 flex items-center justify-center flex-shrink-0">
+          <i class="fa-solid fa-hand-sparkles text-lilac text-2xl"></i>
+        </div>
+        <div class="flex-1 min-w-0">
+          <div class="font-bold text-base">💅 Check paznokci (co 2 tyg)</div>
+          <div class="text-xs text-neutral-400 font-semibold">Sprawdź, obetnij jeśli trzeba</div>
+        </div>
+        <button data-check="paznokcie" class="check-btn w-9 h-9 rounded-full border-2 border-white/15 flex items-center justify-center flex-shrink-0 transition">
           <i class="fa-solid fa-check text-xs opacity-0 transition"></i>
         </button>
       </div>
@@ -483,8 +639,8 @@
           <i class="fa-solid fa-face-tired text-rose text-2xl"></i>
         </div>
         <div class="flex-1 min-w-0">
-          <div class="font-bold text-base">🌙 Reset Szczęki Przed Snem</div>
-          <div class="text-xs text-neutral-400 font-semibold">2 min — mniej zgrzytania w nocy</div>
+          <div class="font-bold text-base">🌙 Reset szczęki przed snem</div>
+          <div class="text-xs text-neutral-400 font-semibold">2 min + oddech 4-7-8</div>
         </div>
         <button data-check="reset" class="check-btn w-9 h-9 rounded-full border-2 border-white/15 flex items-center justify-center flex-shrink-0 transition">
           <i class="fa-solid fa-check text-xs opacity-0 transition"></i>
@@ -492,48 +648,40 @@
       </div>
     </div>
 
-    <!-- NOWE: Co polepszyć u mnie -->
+    <!-- CO POLEPSZYĆ -->
     <div class="glass rounded-4xl p-5 shadow-warm">
       <div class="flex items-center gap-2 mb-3">
         <i class="fa-solid fa-lightbulb text-gold"></i>
         <span class="font-bold text-sm text-gold">💡 Co polepszyć u mnie:</span>
       </div>
       <div id="improvement-tips" class="space-y-2.5 text-sm text-neutral-200 leading-relaxed font-medium">
-        <p class="text-neutral-400">Uzupełnij raporty, aby Trener Personalny mógł dać Ci wskazówki.</p>
+        <p class="text-neutral-400">Uzupełnij raporty, aby Trener mógł dać Ci wskazówki.</p>
       </div>
     </div>
 
   </section>
 
+  <!-- ==================== MOWA ==================== -->
   <section id="tab-mowa" class="tab-panel hidden space-y-5">
-
     <div class="glass rounded-4xl p-6 shadow-soft text-center">
       <div id="speech-phase-label" class="text-sm text-neutral-400 font-semibold mb-1">Gotowy, kiedy chcesz</div>
-      <div id="speech-phase-name" class="font-extrabold text-xl mb-6">Trening mowy — 10 min</div>
-
+      <div id="speech-phase-name" class="font-extrabold text-xl mb-6">Trening mowy — 5 min</div>
       <div class="relative w-56 h-56 mx-auto mb-6">
         <svg class="w-56 h-56 -rotate-90" viewBox="0 0 200 200">
           <circle cx="100" cy="100" r="88" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="12"/>
           <circle id="speech-ring" cx="100" cy="100" r="88" fill="none" stroke="url(#speechGrad)" stroke-width="12" stroke-linecap="round" stroke-dasharray="552.9" stroke-dashoffset="552.9" class="timer-ring"/>
-          <defs>
-            <linearGradient id="speechGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stop-color="#5eead4"/>
-              <stop offset="100%" stop-color="#c4b5fd"/>
-            </linearGradient>
-          </defs>
+          <defs><linearGradient id="speechGrad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#5eead4"/><stop offset="100%" stop-color="#c4b5fd"/></linearGradient></defs>
         </svg>
         <div class="absolute inset-0 flex flex-col items-center justify-center">
-          <div id="speech-timer" class="font-extrabold text-5xl tabular-nums">10:00</div>
+          <div id="speech-timer" class="font-extrabold text-5xl tabular-nums">05:00</div>
           <div id="speech-icon" class="text-3xl mt-2">😌</div>
         </div>
       </div>
-
       <div class="flex justify-center gap-2 mb-6">
         <div id="phase-dot-1" class="h-2 w-10 rounded-full bg-white/10 transition"></div>
         <div id="phase-dot-2" class="h-2 w-10 rounded-full bg-white/10 transition"></div>
         <div id="phase-dot-3" class="h-2 w-10 rounded-full bg-white/10 transition"></div>
       </div>
-
       <button id="speech-start-btn" class="w-full py-4 bg-gradient-to-br from-mint to-lilac text-ink font-extrabold rounded-full text-lg active:scale-95 transition shadow-glow">
         <i class="fa-solid fa-play mr-2"></i>Zaczynamy
       </button>
@@ -546,27 +694,28 @@
       <div class="flex items-start gap-3">
         <div class="w-9 h-9 rounded-xl bg-mint/15 flex items-center justify-center flex-shrink-0 text-mint font-extrabold text-sm">1</div>
         <div>
-          <div class="font-bold text-sm">Masaż żwaczy + kląskanie — 2 min</div>
-          <div class="text-xs text-neutral-400 font-medium">Rozluźnienie bruksizmu, mięśni szczęki</div>
+          <div class="font-bold text-sm">Masaż żwaczy — 1 min</div>
+          <div class="text-xs text-neutral-400 font-medium">Rozluźnienie bruksizmu</div>
         </div>
       </div>
       <div class="flex items-start gap-3">
         <div class="w-9 h-9 rounded-xl bg-lilac/15 flex items-center justify-center flex-shrink-0 text-lilac font-extrabold text-sm">2</div>
         <div>
-          <div class="font-bold text-sm">Uderzenia języka T-D — 3 min</div>
-          <div class="text-xs text-neutral-400 font-medium">Czubek języka o wałek dziąsłowy, zero dźwięku z gardła</div>
+          <div class="font-bold text-sm">Uderzenia T-D — 2 min</div>
+          <div class="text-xs text-neutral-400 font-medium">Czubek języka o wałek dziąsłowy</div>
         </div>
       </div>
       <div class="flex items-start gap-3">
         <div class="w-9 h-9 rounded-xl bg-peach/15 flex items-center justify-center flex-shrink-0 text-peach font-extrabold text-sm">3</div>
         <div>
-          <div class="font-bold text-sm">Słowa: TDAWA, DOWED, DUDY, TDA — 5 min</div>
-          <div class="text-xs text-neutral-400 font-medium">Przenosisz technikę na realne dźwięki mowy</div>
+          <div class="font-bold text-sm">Słowa: TDAWA, DOWED, DUDY, TDA — 2 min</div>
+          <div class="text-xs text-neutral-400 font-medium">Przenosisz technikę na realną mowę</div>
         </div>
       </div>
     </div>
   </section>
 
+  <!-- ==================== POSTĘPY ==================== -->
   <section id="tab-postepy" class="tab-panel hidden space-y-5">
 
     <div class="glass rounded-4xl p-5 shadow-warm">
@@ -586,6 +735,93 @@
       </div>
     </div>
 
+    <!-- CEL WAGOWY -->
+    <div class="glass rounded-4xl p-5 shadow-warm">
+      <div class="flex items-center gap-2 mb-3">
+        <i class="fa-solid fa-bullseye text-mint"></i>
+        <span class="font-bold text-sm">Cel wagowy</span>
+        <button id="btn-goal-edit" class="ml-auto text-[11px] font-bold text-neutral-400 glass rounded-full px-3 py-1 active:scale-95 transition">
+          <i class="fa-solid fa-gear mr-1"></i>Zmień
+        </button>
+      </div>
+      <div id="goal-display" class="space-y-3">
+        <div class="flex items-end justify-between">
+          <div>
+            <div class="text-3xl font-extrabold" id="goal-current">—</div>
+            <div class="text-[11px] text-neutral-400 font-semibold">aktualna waga</div>
+          </div>
+          <div class="text-right">
+            <div class="text-2xl font-extrabold text-mint" id="goal-target">55.0 kg</div>
+            <div class="text-[11px] text-neutral-400 font-semibold">cel</div>
+          </div>
+        </div>
+        <div id="goal-progress-text" class="text-xs text-neutral-300 font-medium leading-snug">Wpisz wagę, żeby zobaczyć progres.</div>
+        <div class="h-2 bg-white/5 rounded-full overflow-hidden">
+          <div id="goal-bar" class="progress-fill h-full rounded-full bg-gradient-to-r from-mint to-lilac" style="width:0%"></div>
+        </div>
+      </div>
+      <div id="goal-edit-wrapper" class="hidden rise mt-3">
+        <label class="block">
+          <span class="text-[11px] text-neutral-400 ml-1 font-semibold">Cel wagowy (kg)</span>
+          <div class="flex gap-2 mt-1">
+            <input type="number" step="0.1" id="input-goal-weight" placeholder="55.0" class="flex-1 bg-white/5 border border-white/10 rounded-2xl px-3 py-2.5 text-neutral-100 font-semibold focus:outline-none focus:border-mint transition">
+            <button id="btn-goal-save" class="px-4 rounded-2xl bg-gradient-to-br from-mint to-lilac text-ink font-extrabold active:scale-95 transition">Zapisz</button>
+          </div>
+        </label>
+      </div>
+    </div>
+
+    <!-- SMART GOALS -->
+    <div class="glass rounded-4xl p-5 shadow-warm">
+      <div class="flex items-center gap-2 mb-3">
+        <i class="fa-solid fa-list-check text-lilac"></i>
+        <span class="font-bold text-sm">Cele SMART</span>
+      </div>
+      <div class="space-y-2.5">
+        <div class="glass rounded-2xl p-3">
+          <div class="flex items-center justify-between mb-1.5">
+            <span class="text-xs font-bold">😴 Sen 8h</span>
+            <span id="smart-sleep-count" class="text-[11px] font-extrabold text-mint">0/30</span>
+          </div>
+          <div class="h-1.5 bg-white/5 rounded-full overflow-hidden">
+            <div id="smart-sleep-bar" class="progress-fill h-full bg-mint rounded-full" style="width:0%"></div>
+          </div>
+        </div>
+        <div class="glass rounded-2xl p-3">
+          <div class="flex items-center justify-between mb-1.5">
+            <span class="text-xs font-bold">🗣️ Mowa codziennie</span>
+            <span id="smart-speech-count" class="text-[11px] font-extrabold text-lilac">0/21</span>
+          </div>
+          <div class="h-1.5 bg-white/5 rounded-full overflow-hidden">
+            <div id="smart-speech-bar" class="progress-fill h-full bg-lilac rounded-full" style="width:0%"></div>
+          </div>
+        </div>
+        <div class="glass rounded-2xl p-3">
+          <div class="flex items-center justify-between mb-1.5">
+            <span class="text-xs font-bold">🧘 Reset szczęki przed snem</span>
+            <span id="smart-jaw-count" class="text-[11px] font-extrabold text-peach">0/21</span>
+          </div>
+          <div class="h-1.5 bg-white/5 rounded-full overflow-hidden">
+            <div id="smart-jaw-bar" class="progress-fill h-full bg-peach rounded-full" style="width:0%"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- WEEK OF LIFE -->
+    <div class="glass rounded-4xl p-5 shadow-warm border border-mint/20">
+      <div class="flex items-center justify-between mb-3">
+        <div class="flex items-center gap-2">
+          <i class="fa-solid fa-camera text-mint"></i>
+          <span class="font-bold text-sm text-mint">Tydzień z życia</span>
+        </div>
+        <button id="btn-week-of-life" class="text-xs font-bold text-mint glass rounded-full px-3 py-1.5 active:scale-95 transition">
+          <i class="fa-solid fa-image mr-1"></i>Pokaż
+        </button>
+      </div>
+      <p class="text-xs text-neutral-400 font-medium">Karta podsumowania tygodnia — gotowa do screenshota.</p>
+    </div>
+
     <div class="glass rounded-4xl p-5 shadow-warm">
       <div class="flex items-center justify-between mb-3">
         <div class="flex items-center gap-2">
@@ -599,6 +835,7 @@
       <p id="weekly-summary-text" class="text-sm text-neutral-200 leading-relaxed font-medium">Kliknij "Odśwież", żeby Trener przeanalizował Twój ostatni tydzień.</p>
     </div>
 
+    <!-- KALENDARZ -->
     <div class="glass rounded-4xl p-5 shadow-soft">
       <div class="flex items-center justify-between mb-4">
         <button id="cal-prev" class="w-8 h-8 rounded-full glass flex items-center justify-center text-neutral-400 active:scale-90 transition"><i class="fa-solid fa-chevron-left text-xs"></i></button>
@@ -632,6 +869,7 @@
 
   </section>
 
+  <!-- ==================== MENTOR / TRENER ==================== -->
   <section id="tab-mentor" class="tab-panel hidden space-y-5">
 
     <button id="btn-analyze-ai" class="w-full py-4 bg-gradient-to-br from-peach to-gold text-ink font-extrabold rounded-full text-base active:scale-95 transition shadow-warm flex items-center justify-center gap-2">
@@ -651,7 +889,7 @@
       <div class="flex items-center justify-between mb-3">
         <div class="flex items-center gap-2">
           <i class="fa-solid fa-sparkles text-mint"></i>
-          <span class="font-bold text-sm text-mint">✨ Glow Up — ten tydzień vs poprzedni</span>
+          <span class="font-bold text-sm text-mint">✨ Glow Up</span>
         </div>
         <button id="btn-glowup-refresh" class="text-xs font-bold text-mint glass rounded-full px-3 py-1.5 active:scale-95 transition">
           <i class="fa-solid fa-arrows-rotate mr-1"></i>Odśwież
@@ -662,33 +900,60 @@
       </div>
     </div>
 
+    <!-- RANGE TOGGLE -->
+    <div class="flex glass rounded-full p-1">
+      <button data-range="7" class="range-btn segmented flex-1 py-2 rounded-full text-xs font-bold bg-gradient-to-br from-mint to-lilac text-ink">7 dni</button>
+      <button data-range="30" class="range-btn segmented flex-1 py-2 rounded-full text-xs font-bold text-neutral-400">30 dni</button>
+      <button data-range="90" class="range-btn segmented flex-1 py-2 rounded-full text-xs font-bold text-neutral-400">90 dni</button>
+    </div>
+
+    <!-- WYKRESY -->
     <div class="glass rounded-4xl p-4 shadow-soft">
-      <div class="flex items-center gap-2 mb-3 text-sm font-bold text-neutral-300">
-        <i class="fa-solid fa-scale-balanced text-gold"></i>📊 Wykres wagi — 7 dni
+      <div class="flex items-center justify-between mb-3">
+        <div class="flex items-center gap-2 text-sm font-bold text-neutral-300">
+          <i class="fa-solid fa-scale-balanced text-gold"></i>Waga
+        </div>
+        <button id="btn-1rm" class="text-[11px] font-bold text-gold glass rounded-full px-3 py-1 active:scale-95 transition">
+          <i class="fa-solid fa-calculator mr-1"></i>1RM
+        </button>
       </div>
       <canvas id="chart-weight" height="140"></canvas>
-      <div class="text-[11px] text-neutral-500 font-semibold mt-2 text-center">Aktualizowany codziennie + niedzielna waga tygodniowa</div>
     </div>
 
     <div class="glass rounded-4xl p-4 shadow-soft">
       <div class="flex items-center gap-2 mb-3 text-sm font-bold text-neutral-300">
-        <i class="fa-solid fa-moon text-lilac"></i>😴 Wykres snu — głęboki / REM
+        <i class="fa-solid fa-moon text-lilac"></i>😴 Sen — głęboki / REM
       </div>
       <canvas id="chart-sleep" height="140"></canvas>
     </div>
 
     <div class="glass rounded-4xl p-4 shadow-soft">
       <div class="flex items-center gap-2 mb-3 text-sm font-bold text-neutral-300">
-        <i class="fa-solid fa-shoe-prints text-peach"></i>🚶 Wykres kroków — 7 dni
+        <i class="fa-solid fa-heart-pulse text-mint"></i>💓 RHR rano — trend
+      </div>
+      <canvas id="chart-rhr" height="140"></canvas>
+      <div class="text-[11px] text-neutral-500 font-semibold mt-2 text-center">Wzrost o 5+ bpm dzień do dnia = sygnał przemęczenia</div>
+    </div>
+
+    <div class="glass rounded-4xl p-4 shadow-soft">
+      <div class="flex items-center gap-2 mb-3 text-sm font-bold text-neutral-300">
+        <i class="fa-solid fa-shoe-prints text-peach"></i>🚶 Kroki
       </div>
       <canvas id="chart-steps" height="140"></canvas>
     </div>
 
     <div class="glass rounded-4xl p-4 shadow-soft">
       <div class="flex items-center gap-2 mb-3 text-sm font-bold text-neutral-300">
-        <i class="fa-solid fa-heart-pulse text-rose"></i>💓 Wykres stresu — 7 dni
+        <i class="fa-solid fa-heart-pulse text-rose"></i>💓 Stres
       </div>
       <canvas id="chart-stress" height="140"></canvas>
+    </div>
+
+    <div class="glass rounded-4xl p-4 shadow-soft">
+      <div class="flex items-center gap-2 mb-3 text-sm font-bold text-neutral-300">
+        <i class="fa-solid fa-face-smile text-peach"></i>😊 Nastrój (rano / wieczór)
+      </div>
+      <canvas id="chart-mood" height="140"></canvas>
     </div>
 
     <div id="correlation-box" class="hidden glass rounded-4xl p-5 shadow-soft border border-lilac/20">
@@ -710,7 +975,7 @@
         </button>
       </div>
       <div id="mentor-history-list" class="space-y-3 max-h-96 overflow-y-auto pr-1">
-        <p class="text-sm text-neutral-500 font-medium">Brak jeszcze historii — zrób analizę Trenera, żeby zaczęła się budować.</p>
+        <p class="text-sm text-neutral-500 font-medium">Brak jeszcze historii — zrób analizę Trenera.</p>
       </div>
     </div>
   </section>
@@ -719,39 +984,41 @@
 
 <div id="toast" class="hidden fixed bottom-6 left-1/2 -translate-x-1/2 z-50 glass rounded-full px-5 py-3 text-sm font-bold shadow-soft rise"></div>
 
-<!-- MODALE -->
+<!-- ==================== MODALE ==================== -->
+
+<!-- TABLETKA -->
 <div id="modal-tabletka" class="modal-wrap hidden fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-5">
   <div class="modal-backdrop absolute inset-0" data-close-modal></div>
   <div class="modal-pop relative glass rounded-t-4xl sm:rounded-4xl w-full sm:max-w-md p-6 shadow-soft max-h-[85vh] overflow-y-auto">
     <div class="flex items-start justify-between mb-4">
-      <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-gold/25 to-peach/25 flex items-center justify-center">
-        <i class="fa-solid fa-pills text-gold text-2xl"></i>
-      </div>
+      <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-gold/25 to-peach/25 flex items-center justify-center"><i class="fa-solid fa-pills text-gold text-2xl"></i></div>
       <button data-close-modal class="w-9 h-9 rounded-full glass flex items-center justify-center text-neutral-400"><i class="fa-solid fa-xmark"></i></button>
     </div>
-    <h3 class="font-extrabold text-xl mb-3">💊 Tabletka / Suplementy</h3>
+    <h3 class="font-extrabold text-xl mb-3">💊 D3 + Tran z dorsza</h3>
+    <div class="glass rounded-3xl p-4 mb-3 flex items-start gap-3">
+      <i class="fa-solid fa-fish text-mint mt-0.5"></i>
+      <p class="text-sm text-neutral-200 leading-relaxed font-medium"><strong>Tran z wątroby dorsza islandzkiego</strong> to naturalne źródło witaminy D i A oraz kwasów omega-3. Łącz z D3 w jednej porcji rano, do posiłku z tłuszczem (jaja, masło orzechowe). Tłuszcz jest konieczny — witamina D rozpuszcza się w tłuszczach.</p>
+    </div>
     <div class="glass rounded-3xl p-4 mb-5 flex items-start gap-3">
       <i class="fa-solid fa-lightbulb text-gold mt-0.5"></i>
-      <p class="text-sm text-neutral-200 leading-relaxed font-medium">Bierz rano do posiłku z tłuszczem (np. jaja, masło orzechowe, orzechy). Bez tłuszczu witamina D3 się nie wchłonie — to witamina rozpuszczalna w tłuszczach, więc suchy posiłek praktycznie ją marnuje.</p>
+      <p class="text-sm text-neutral-200 leading-relaxed font-medium">Tran dostarcza też omega-3 (EPA/DHA), które wspierają pracę mózgu i redukują stany zapalne — istotne przy intensywnym treningu i regeneracji.</p>
     </div>
     <button data-check="tabletka" data-close-modal class="modal-check-btn w-full py-3.5 rounded-full bg-gradient-to-br from-gold to-peach text-ink font-extrabold active:scale-95 transition">
-      <i class="fa-solid fa-check mr-1.5"></i>Wziąłem tabletkę
+      <i class="fa-solid fa-check mr-1.5"></i>Wziąłem
     </button>
   </div>
 </div>
 
+<!-- JEDZENIE -->
 <div id="modal-jedzenie" class="modal-wrap hidden fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-5">
   <div class="modal-backdrop absolute inset-0" data-close-modal></div>
   <div class="modal-pop relative glass rounded-t-4xl sm:rounded-4xl w-full sm:max-w-md p-6 shadow-soft max-h-[85vh] overflow-y-auto">
     <div class="flex items-start justify-between mb-4">
-      <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-peach/25 to-rose/25 flex items-center justify-center">
-        <i class="fa-solid fa-apple-whole text-peach text-2xl"></i>
-      </div>
+      <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-peach/25 to-rose/25 flex items-center justify-center"><i class="fa-solid fa-apple-whole text-peach text-2xl"></i></div>
       <button data-close-modal class="w-9 h-9 rounded-full glass flex items-center justify-center text-neutral-400"><i class="fa-solid fa-xmark"></i></button>
     </div>
-    <h3 class="font-extrabold text-xl mb-1">🍎 Zdrowe jedzenie na masę</h3>
+    <h3 class="font-extrabold text-xl mb-1">🍎 Zdrowe jedzenie</h3>
     <p class="text-xs text-neutral-400 font-semibold mb-4">Odhacz co dziś zjadłeś</p>
-
     <div class="grid grid-cols-2 gap-2.5 mb-5" id="food-chip-list">
       <button data-food="jablko" class="food-chip glass rounded-2xl px-3 py-3 text-sm font-bold flex items-center gap-2 border border-transparent"><i class="fa-solid fa-apple-whole text-rose"></i>Jabłko</button>
       <button data-food="banan" class="food-chip glass rounded-2xl px-3 py-3 text-sm font-bold flex items-center gap-2 border border-transparent"><i class="fa-solid fa-lemon text-gold"></i>Banan</button>
@@ -760,152 +1027,344 @@
       <button data-food="serek" class="food-chip glass rounded-2xl px-3 py-3 text-sm font-bold flex items-center gap-2 border border-transparent"><i class="fa-solid fa-cheese text-gold"></i>Serek wiejski</button>
       <button data-food="owsianka" class="food-chip glass rounded-2xl px-3 py-3 text-sm font-bold flex items-center gap-2 border border-transparent"><i class="fa-solid fa-wheat-awn text-lilac"></i>Płatki owsiane</button>
     </div>
-
-    <button id="btn-booster" class="w-full py-3 rounded-full glass font-extrabold text-mint active:scale-95 transition mb-3 border border-mint/20">
-      <i class="fa-solid fa-bolt mr-1.5"></i>Szybki Booster Kalorii
-    </button>
-
-    <div id="booster-panel" class="hidden rise glass rounded-3xl p-4 mb-5 border border-gold/20">
-      <div class="flex items-start gap-3 mb-2">
-        <i class="fa-solid fa-fire text-gold mt-0.5"></i>
-        <p class="text-sm text-neutral-200 leading-relaxed font-medium">Ściąga na szybkie kalorie: <strong class="text-gold">masło orzechowe</strong> (łyżka do wszystkiego), <strong class="text-gold">kabanosy</strong> (białko + tłuszcz w kieszeni), <strong class="text-gold">szejk proteinowy</strong> (mleko + odżywka + banan zamiast wody).</p>
-      </div>
-    </div>
-
     <button data-check="jedzenie" data-close-modal class="modal-check-btn w-full py-3.5 rounded-full bg-gradient-to-br from-peach to-rose text-ink font-extrabold active:scale-95 transition">
-      <i class="fa-solid fa-check mr-1.5"></i>Zjadłem coś zdrowego
+      <i class="fa-solid fa-check mr-1.5"></i>Zjadłem
     </button>
   </div>
 </div>
 
+<!-- TRENING -->
 <div id="modal-trening" class="modal-wrap hidden fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-5">
   <div class="modal-backdrop absolute inset-0" data-close-modal></div>
   <div class="modal-pop relative glass rounded-t-4xl sm:rounded-4xl w-full sm:max-w-md p-6 shadow-soft max-h-[85vh] overflow-y-auto">
     <div class="flex items-start justify-between mb-4">
-      <div id="modal-trening-icon-box" class="w-14 h-14 rounded-2xl bg-gradient-to-br from-mint/25 to-lilac/25 flex items-center justify-center">
-        <i id="modal-trening-icon" class="fa-solid fa-dumbbell text-mint text-2xl"></i>
-      </div>
+      <div id="modal-trening-icon-box" class="w-14 h-14 rounded-2xl bg-gradient-to-br from-mint/25 to-lilac/25 flex items-center justify-center"><i id="modal-trening-icon" class="fa-solid fa-dumbbell text-mint text-2xl"></i></div>
       <button data-close-modal class="w-9 h-9 rounded-full glass flex items-center justify-center text-neutral-400"><i class="fa-solid fa-xmark"></i></button>
     </div>
     <h3 id="modal-trening-title" class="font-extrabold text-xl mb-1">💪 Kalistenika</h3>
     <p id="modal-trening-sub" class="text-xs text-neutral-400 font-semibold mb-4">Plan na dziś</p>
-
     <div id="modal-trening-content" class="space-y-3 mb-5"></div>
-
+    <div class="glass rounded-3xl p-3.5 mb-3 flex items-start gap-3 border border-mint/20">
+      <i class="fa-solid fa-shield-heart text-mint mt-0.5"></i>
+      <p class="text-xs text-neutral-200 leading-relaxed font-medium">Jesteś <strong>przedtrenowany</strong> — serie są skrócone, reszta 60-90s, objętość niższa niż standard. Priorytet: regeneracja, nie rekordy.</p>
+    </div>
     <button data-check="trening" data-close-modal class="modal-check-btn w-full py-3.5 rounded-full bg-gradient-to-br from-mint to-lilac text-ink font-extrabold active:scale-95 transition">
-      <i class="fa-solid fa-check mr-1.5"></i>Zrobiłem trening
+      <i class="fa-solid fa-check mr-1.5"></i>Zrobiłem
     </button>
   </div>
 </div>
 
+<!-- MOWA -->
 <div id="modal-mowa" class="modal-wrap hidden fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-5">
   <div class="modal-backdrop absolute inset-0" data-close-modal></div>
   <div class="modal-pop relative glass rounded-t-4xl sm:rounded-4xl w-full sm:max-w-md p-6 shadow-soft max-h-[85vh] overflow-y-auto">
     <div class="flex items-start justify-between mb-4">
-      <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-lilac/25 to-mint/25 flex items-center justify-center">
-        <i class="fa-solid fa-comment-dots text-lilac text-2xl"></i>
-      </div>
+      <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-lilac/25 to-mint/25 flex items-center justify-center"><i class="fa-solid fa-comment-dots text-lilac text-2xl"></i></div>
       <button data-close-modal class="w-9 h-9 rounded-full glass flex items-center justify-center text-neutral-400"><i class="fa-solid fa-xmark"></i></button>
     </div>
-    <h3 class="font-extrabold text-xl mb-1">🗣️ Trening mowy — 10 min</h3>
-    <p class="text-xs text-neutral-400 font-semibold mb-4">Mechaniczne R + rozluźnienie bruksizmu</p>
-
+    <h3 class="font-extrabold text-xl mb-1">🗣️ Trening mowy — 5 min</h3>
+    <p class="text-xs text-neutral-400 font-semibold mb-4">Skrócona wersja, mniej logopedy</p>
     <div class="space-y-3 mb-5">
       <div class="glass rounded-3xl p-4 flex items-start gap-3">
         <div class="w-8 h-8 rounded-xl bg-mint/15 flex items-center justify-center flex-shrink-0 text-mint font-extrabold text-xs">1</div>
         <div>
-          <div class="font-bold text-sm mb-0.5">Krok 1 (2 min) — Masaż żwaczy + kląskanie</div>
-          <p class="text-xs text-neutral-300 font-medium leading-relaxed">Rozmasuj mięśnie żwacze (szczęki) opuszkami palców okrężnymi ruchami. Dodaj kląskanie językiem — to rozluźnia napięcie od bruksizmu przed dalszą pracą.</p>
+          <div class="font-bold text-sm mb-0.5">Krok 1 (1 min) — Masaż żwaczy</div>
+          <p class="text-xs text-neutral-300 font-medium leading-relaxed">Okrężnymi ruchami rozluźnij mięśnie żwacze. Mniejszy bruksizm, mniejsze napięcie szczęki.</p>
         </div>
       </div>
       <div class="glass rounded-3xl p-4 flex items-start gap-3">
         <div class="w-8 h-8 rounded-xl bg-lilac/15 flex items-center justify-center flex-shrink-0 text-lilac font-extrabold text-xs">2</div>
         <div>
-          <div class="font-bold text-sm mb-0.5">Krok 2 (3 min) — Uderzenia T-D</div>
-          <p class="text-xs text-neutral-300 font-medium leading-relaxed">Uderzaj czubkiem języka o wałek dziąsłowy za górnymi zębami: T-T-T, D-D-D. Wyraźnie, mechanicznie. Zero dźwięku z gardła!</p>
+          <div class="font-bold text-sm mb-0.5">Krok 2 (2 min) — T-D</div>
+          <p class="text-xs text-neutral-300 font-medium leading-relaxed">Uderzaj czubkiem języka o wałek dziąsłowy: T-T-T, D-D-D.</p>
         </div>
       </div>
       <div class="glass rounded-3xl p-4 flex items-start gap-3">
         <div class="w-8 h-8 rounded-xl bg-peach/15 flex items-center justify-center flex-shrink-0 text-peach font-extrabold text-xs">3</div>
         <div>
-          <div class="font-bold text-sm mb-0.5">Krok 3 (5 min) — Repetycja słów</div>
-          <p class="text-xs text-neutral-300 font-medium leading-relaxed">Powtarzaj: TDAWA, DOWED, DUDY, TDA. Przenosisz precyzję uderzenia języka na realne słowa.</p>
+          <div class="font-bold text-sm mb-0.5">Krok 3 (2 min) — Słowa</div>
+          <p class="text-xs text-neutral-300 font-medium leading-relaxed">TDAWA, DOWED, DUDY, TDA.</p>
         </div>
       </div>
     </div>
-
     <button id="btn-goto-speech-tab" data-close-modal class="w-full py-3.5 rounded-full bg-gradient-to-br from-lilac to-mint text-ink font-extrabold active:scale-95 transition">
-      <i class="fa-solid fa-stopwatch mr-1.5"></i>Otwórz timer 10 min
+      <i class="fa-solid fa-stopwatch mr-1.5"></i>Otwórz timer
     </button>
   </div>
 </div>
 
-<!-- NOWY MODAL: Ćwiczenia na twarz -->
+<!-- TWARZ -->
 <div id="modal-twarz" class="modal-wrap hidden fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-5">
   <div class="modal-backdrop absolute inset-0" data-close-modal></div>
   <div class="modal-pop relative glass rounded-t-4xl sm:rounded-4xl w-full sm:max-w-md p-6 shadow-soft max-h-[85vh] overflow-y-auto">
     <div class="flex items-start justify-between mb-4">
-      <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-lilac/25 to-peach/25 flex items-center justify-center">
-        <i class="fa-solid fa-face-smile text-lilac text-2xl"></i>
-      </div>
+      <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-lilac/25 to-peach/25 flex items-center justify-center"><i class="fa-solid fa-face-smile text-lilac text-2xl"></i></div>
       <button data-close-modal class="w-9 h-9 rounded-full glass flex items-center justify-center text-neutral-400"><i class="fa-solid fa-xmark"></i></button>
     </div>
-    <h3 class="font-extrabold text-xl mb-1">✨ Ćwiczenia na twarz (looksmaxing)</h3>
-    <p class="text-xs text-neutral-400 font-semibold mb-4">Napięcie mięśni + redukcja stresu wokół oczu i szczęki</p>
-
+    <h3 class="font-extrabold text-xl mb-1">✨ Looksmaxing — twarz</h3>
+    <p class="text-xs text-neutral-400 font-semibold mb-4">Rutyna 8 min</p>
     <div class="space-y-3 mb-5">
       <div class="glass rounded-3xl p-4 flex items-start gap-3">
         <div class="w-8 h-8 rounded-xl bg-mint/15 flex items-center justify-center flex-shrink-0 text-mint font-extrabold text-xs">1</div>
         <div>
           <div class="font-bold text-sm mb-0.5">Rozciąganie oczu — 2 min 👁️</div>
-          <p class="text-xs text-neutral-300 font-medium leading-relaxed">Zamknij oczy, delikatnie rozciągnij skórę wokół oczu opuszkami palców. Patrz w górę, w dół, w lewo, w prawo (po 5 sekund). Redukuje napięcie mięśni okoruchowych i poprawia mikrokrążenie — oczy wyglądają na bardziej wypoczęte.</p>
+          <p class="text-xs text-neutral-300 font-medium leading-relaxed">Zamknij oczy, rozciągnij skórę wokół opuszkami. Patrz w górę, w dół, boki — po 5s. Redukuje napięcie mięśni okoruchowych i obrzęk.</p>
         </div>
       </div>
       <div class="glass rounded-3xl p-4 flex items-start gap-3">
         <div class="w-8 h-8 rounded-xl bg-lilac/15 flex items-center justify-center flex-shrink-0 text-lilac font-extrabold text-xs">2</div>
         <div>
           <div class="font-bold text-sm mb-0.5">Masaż twarzy — 2 min 🤲</div>
-          <p class="text-xs text-neutral-300 font-medium leading-relaxed">Okrężne ruchy palców na policzkach, czole, brodzie i skroniach. Zwiększa ukrwienie, redukuje opuchliznę, poprawia napięcie skóry. Punktowo na czole (między brwiami) rozluźnia "zmarszczkę myśliciela".</p>
+          <p class="text-xs text-neutral-300 font-medium leading-relaxed">Okrężne ruchy na policzkach, czole, brodzie. Punktowo między brwiami (zmarszczka myśliciela).</p>
         </div>
       </div>
       <div class="glass rounded-3xl p-4 flex items-start gap-3">
         <div class="w-8 h-8 rounded-xl bg-peach/15 flex items-center justify-center flex-shrink-0 text-peach font-extrabold text-xs">3</div>
         <div>
           <div class="font-bold text-sm mb-0.5">Napięcie mięśni twarzy — 3 min 💪</div>
-          <p class="text-xs text-neutral-300 font-medium leading-relaxed">Nadymaj policzki, przesuwaj powietrze raz na jedną, raz na drugą stronę. Unoś brwi (najwyżej jak możesz) i przytrzymaj 5s, potem mocno je zmarszcz. Wzmacnia mięśnie i nadaje kontur twarzy.</p>
+          <p class="text-xs text-neutral-300 font-medium leading-relaxed">Nadymaj policzki, przesuwaj powietrze. Unoś brwi 5s. Marszcz czoło 5s. Kontur twarzy + napięcie.</p>
         </div>
       </div>
       <div class="glass rounded-3xl p-4 flex items-start gap-3">
         <div class="w-8 h-8 rounded-xl bg-gold/15 flex items-center justify-center flex-shrink-0 text-gold font-extrabold text-xs">4</div>
         <div>
           <div class="font-bold text-sm mb-0.5">Relaks szczęki — 1 min 😮‍💨</div>
-          <p class="text-xs text-neutral-300 font-medium leading-relaxed">Otwórz szeroko usta, przytrzymaj 3 sekundy, zamknij. Powtórz 10 razy. Bezpośrednio rozluźnia mięśnie żwacze — mniejszy bruksizm i mniejszy napięciowy ból głowy.</p>
+          <p class="text-xs text-neutral-300 font-medium leading-relaxed">Otwórz szeroko, przytrzymaj 3s, zamknij. 10 razy. Rozluźnia żwacze, mniej bólu głowy.</p>
+        </div>
+      </div>
+      <div class="glass rounded-3xl p-4 flex items-start gap-3">
+        <div class="w-8 h-8 rounded-xl bg-mint/15 flex items-center justify-center flex-shrink-0 text-mint font-extrabold text-xs">5</div>
+        <div>
+          <div class="font-bold text-sm mb-0.5">Kontrola wyrazu — 30s 🪞</div>
+          <p class="text-xs text-neutral-300 font-medium leading-relaxed">Spojrzenie w lustro. Sprawdź: czy szczęka rozluźniona? Czy brwi nienapięte? Świadomość = mniej mimiki stresu.</p>
         </div>
       </div>
     </div>
-
     <button data-check="twarz" data-close-modal class="modal-check-btn w-full py-3.5 rounded-full bg-gradient-to-br from-lilac to-peach text-ink font-extrabold active:scale-95 transition">
-      <i class="fa-solid fa-check mr-1.5"></i>Zrobiłem ćwiczenia na twarz
+      <i class="fa-solid fa-check mr-1.5"></i>Zrobiłem rutynę
     </button>
   </div>
 </div>
 
+<!-- POSTAWA -->
+<div id="modal-postawa" class="modal-wrap hidden fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-5">
+  <div class="modal-backdrop absolute inset-0" data-close-modal></div>
+  <div class="modal-pop relative glass rounded-t-4xl sm:rounded-4xl w-full sm:max-w-md p-6 shadow-soft max-h-[85vh] overflow-y-auto">
+    <div class="flex items-start justify-between mb-4">
+      <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-mint/25 to-gold/25 flex items-center justify-center"><i class="fa-solid fa-user-tie text-mint text-2xl"></i></div>
+      <button data-close-modal class="w-9 h-9 rounded-full glass flex items-center justify-center text-neutral-400"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <h3 class="font-extrabold text-xl mb-1">🧍 Postawa szyi i barków</h3>
+    <p class="text-xs text-neutral-400 font-semibold mb-4">3 min — korekcja</p>
+    <div class="space-y-3 mb-5">
+      <div class="glass rounded-3xl p-4 flex items-start gap-3">
+        <div class="w-8 h-8 rounded-xl bg-mint/15 flex items-center justify-center flex-shrink-0 text-mint font-extrabold text-xs">1</div>
+        <div>
+          <div class="font-bold text-sm mb-0.5">Chin tuck — 1 min</div>
+          <p class="text-xs text-neutral-300 font-medium leading-relaxed">Cofnij brodę do siebie ("gęsią szyję"), przytrzymaj 3s, wróć. 10 powtórzeń. Wzmacnia mięśnie głębokie szyi.</p>
+        </div>
+      </div>
+      <div class="glass rounded-3xl p-4 flex items-start gap-3">
+        <div class="w-8 h-8 rounded-xl bg-lilac/15 flex items-center justify-center flex-shrink-0 text-lilac font-extrabold text-xs">2</div>
+        <div>
+          <div class="font-bold text-sm mb-0.5">Ściąganie łopatek — 1 min</div>
+          <p class="text-xs text-neutral-300 font-medium leading-relaxed">Wyobraź sobie że trzymasz ołówek między łopatkami. Ściągaj 5s, rozluźniaj 5s. 6 powtórzeń.</p>
+        </div>
+      </div>
+      <div class="glass rounded-3xl p-4 flex items-start gap-3">
+        <div class="w-8 h-8 rounded-xl bg-gold/15 flex items-center justify-center flex-shrink-0 text-gold font-extrabold text-xs">3</div>
+        <div>
+          <div class="font-bold text-sm mb-0.5">Ściana — 1 min</div>
+          <p class="text-xs text-neutral-300 font-medium leading-relaxed">Oprzyj plecy o ścianę (pięty, pośladki, łopatki, kark). Przytrzymaj 60s. To Twój wzorzec postawy.</p>
+        </div>
+      </div>
+    </div>
+    <div class="glass rounded-3xl p-3.5 mb-3 flex items-start gap-3 border border-mint/20">
+      <i class="fa-solid fa-lightbulb text-mint mt-0.5"></i>
+      <p class="text-xs text-neutral-200 leading-relaxed font-medium">Dobra postawa szyi = mocniejsza linia żuchwy i lepszy profil. To jest realne looksmaxing, nie ściema.</p>
+    </div>
+    <button data-check="postawa" data-close-modal class="modal-check-btn w-full py-3.5 rounded-full bg-gradient-to-br from-mint to-gold text-ink font-extrabold active:scale-95 transition">
+      <i class="fa-solid fa-check mr-1.5"></i>Zrobiłem
+    </button>
+  </div>
+</div>
+
+<!-- PAZNOKCIE -->
+<div id="modal-paznokcie" class="modal-wrap hidden fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-5">
+  <div class="modal-backdrop absolute inset-0" data-close-modal></div>
+  <div class="modal-pop relative glass rounded-t-4xl sm:rounded-4xl w-full sm:max-w-md p-6 shadow-soft max-h-[85vh] overflow-y-auto">
+    <div class="flex items-start justify-between mb-4">
+      <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-lilac/25 to-rose/25 flex items-center justify-center"><i class="fa-solid fa-hand-sparkles text-lilac text-2xl"></i></div>
+      <button data-close-modal class="w-9 h-9 rounded-full glass flex items-center justify-center text-neutral-400"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <h3 class="font-extrabold text-xl mb-3">💅 Check paznokci</h3>
+    <div class="glass rounded-3xl p-4 mb-5 flex items-start gap-3">
+      <i class="fa-solid fa-lightbulb text-lilac mt-0.5"></i>
+      <p class="text-sm text-neutral-200 leading-relaxed font-medium">Co 2 tygodnie sprawdź: długość, czy nie ma zadziorów, czy nie ma zmian na płytce. Obetnij równo i na prosto. Czyste, zadbane paznokcie to detal, który dużo wnosi w ogólnym wrażeniu.</p>
+    </div>
+    <button data-check="paznokcie" data-close-modal class="modal-check-btn w-full py-3.5 rounded-full bg-gradient-to-br from-lilac to-rose text-ink font-extrabold active:scale-95 transition">
+      <i class="fa-solid fa-check mr-1.5"></i>Sprawdzone
+    </button>
+  </div>
+</div>
+
+<!-- RESET SZCZĘKI + ODDECH -->
 <div id="modal-reset" class="modal-wrap hidden fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-5">
   <div class="modal-backdrop absolute inset-0" data-close-modal></div>
   <div class="modal-pop relative glass rounded-t-4xl sm:rounded-4xl w-full sm:max-w-md p-6 shadow-soft max-h-[85vh] overflow-y-auto">
     <div class="flex items-start justify-between mb-4">
-      <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-rose/25 to-lilac/25 flex items-center justify-center">
-        <i class="fa-solid fa-face-tired text-rose text-2xl"></i>
-      </div>
+      <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-rose/25 to-lilac/25 flex items-center justify-center"><i class="fa-solid fa-face-tired text-rose text-2xl"></i></div>
       <button data-close-modal class="w-9 h-9 rounded-full glass flex items-center justify-center text-neutral-400"><i class="fa-solid fa-xmark"></i></button>
     </div>
-    <h3 class="font-extrabold text-xl mb-3">🌙 Reset Szczęki Przed Snem</h3>
-    <div class="glass rounded-3xl p-4 mb-5 flex items-start gap-3">
+    <h3 class="font-extrabold text-xl mb-3">🌙 Reset szczęki + oddech</h3>
+    <div class="glass rounded-3xl p-4 mb-4 flex items-start gap-3">
       <i class="fa-solid fa-lightbulb text-rose mt-0.5"></i>
-      <p class="text-sm text-neutral-200 leading-relaxed font-medium">2-minutowy przewodnik anti-bruksizm: rozmasuj żwacze okrężnymi ruchami, oprzyj czubek języka na podniebieniu tuż za górnymi zębami, rozluźnij usta i szczękę. To zmniejszy zgrzytanie zębami w nocy.</p>
+      <p class="text-sm text-neutral-200 leading-relaxed font-medium">2 min: rozmasuj żwacze, oprzyj czubek języka na podniebieniu za górnymi zębami, rozluźnij usta i szczękę. Potem <strong>3 min oddechu 4-7-8</strong> — obniża kortyzol i przygotowuje do snu.</p>
     </div>
+    <button id="btn-open-breathing" class="w-full py-3 rounded-full glass font-extrabold text-mint active:scale-95 transition border border-mint/20 mb-3">
+      <i class="fa-solid fa-wind mr-1.5"></i>Otwórz timer oddechowy
+    </button>
     <button data-check="reset" data-close-modal class="modal-check-btn w-full py-3.5 rounded-full bg-gradient-to-br from-rose to-lilac text-ink font-extrabold active:scale-95 transition">
-      <i class="fa-solid fa-check mr-1.5"></i>Zrobiłem reset szczęki
+      <i class="fa-solid fa-check mr-1.5"></i>Zrobione
+    </button>
+  </div>
+</div>
+
+<!-- ODDYCHANIE -->
+<div id="modal-breathing" class="modal-wrap hidden fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-5">
+  <div class="modal-backdrop absolute inset-0" data-close-modal></div>
+  <div class="modal-pop relative glass rounded-t-4xl sm:rounded-4xl w-full sm:max-w-md p-6 shadow-soft max-h-[85vh] overflow-y-auto text-center">
+    <div class="flex items-start justify-between mb-4">
+      <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-mint/25 to-lilac/25 flex items-center justify-center mx-auto"><i class="fa-solid fa-wind text-mint text-2xl"></i></div>
+      <button data-close-modal class="w-9 h-9 rounded-full glass flex items-center justify-center text-neutral-400"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <h3 class="font-extrabold text-xl mb-1">🫁 Oddech 4-7-8</h3>
+    <p class="text-xs text-neutral-400 font-semibold mb-5">Wdech 4s — trzymaj 7s — wydech 8s</p>
+    <div id="breath-circle" class="breath-circle mb-5">
+      <div id="breath-phase-text" class="text-3xl font-extrabold text-mint">Gotowy</div>
+    </div>
+    <div id="breath-timer" class="text-lg font-extrabold text-neutral-400 mb-5">03:00</div>
+    <button id="btn-breath-start" class="w-full py-3.5 rounded-full bg-gradient-to-br from-mint to-lilac text-ink font-extrabold active:scale-95 transition mb-2">
+      <i class="fa-solid fa-play mr-2"></i>Start
+    </button>
+    <button id="btn-breath-stop" class="hidden w-full py-3 rounded-full glass font-bold text-neutral-300 active:scale-95 transition">
+      Stop
+    </button>
+  </div>
+</div>
+
+<!-- 1RM -->
+<div id="modal-1rm" class="modal-wrap hidden fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-5">
+  <div class="modal-backdrop absolute inset-0" data-close-modal></div>
+  <div class="modal-pop relative glass rounded-t-4xl sm:rounded-4xl w-full sm:max-w-md p-6 shadow-soft max-h-[85vh] overflow-y-auto">
+    <div class="flex items-start justify-between mb-4">
+      <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-gold/25 to-peach/25 flex items-center justify-center"><i class="fa-solid fa-calculator text-gold text-2xl"></i></div>
+      <button data-close-modal class="w-9 h-9 rounded-full glass flex items-center justify-center text-neutral-400"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <h3 class="font-extrabold text-xl mb-1">🏋️ Kalkulator 1RM</h3>
+    <p class="text-xs text-neutral-400 font-semibold mb-5">Szacowane maksimum z formuły Epleya</p>
+    <div class="grid grid-cols-2 gap-3 mb-4">
+      <label class="block">
+        <span class="text-[11px] text-neutral-400 ml-1 font-semibold">Ciężar (kg):</span>
+        <input type="number" step="0.5" id="input-rm-weight" placeholder="50" class="w-full mt-1 bg-white/5 border border-white/10 rounded-2xl px-3 py-2.5 text-neutral-100 font-semibold focus:outline-none focus:border-gold transition">
+      </label>
+      <label class="block">
+        <span class="text-[11px] text-neutral-400 ml-1 font-semibold">Powtórzenia:</span>
+        <input type="number" id="input-rm-reps" placeholder="5" class="w-full mt-1 bg-white/5 border border-white/10 rounded-2xl px-3 py-2.5 text-neutral-100 font-semibold focus:outline-none focus:border-gold transition">
+      </label>
+    </div>
+    <div id="rm-result" class="glass rounded-3xl p-5 mb-5 text-center">
+      <div class="text-3xl font-extrabold text-gold" id="rm-value">—</div>
+      <div class="text-xs text-neutral-400 font-semibold mt-1">szacowane 1RM (kg)</div>
+    </div>
+    <button id="btn-rm-calculate" class="w-full py-3.5 rounded-full bg-gradient-to-br from-gold to-peach text-ink font-extrabold active:scale-95 transition">
+      <i class="fa-solid fa-equals mr-1.5"></i>Oblicz
+    </button>
+  </div>
+</div>
+
+<!-- SETTINGS -->
+<div id="modal-settings" class="modal-wrap hidden fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-5">
+  <div class="modal-backdrop absolute inset-0" data-close-modal></div>
+  <div class="modal-pop relative glass rounded-t-4xl sm:rounded-4xl w-full sm:max-w-md p-6 shadow-soft max-h-[85vh] overflow-y-auto">
+    <div class="flex items-start justify-between mb-4">
+      <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-mint/25 to-lilac/25 flex items-center justify-center"><i class="fa-solid fa-gear text-mint text-2xl"></i></div>
+      <button data-close-modal class="w-9 h-9 rounded-full glass flex items-center justify-center text-neutral-400"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <h3 class="font-extrabold text-xl mb-5">⚙️ Ustawienia</h3>
+
+    <div class="space-y-4">
+      <label class="block">
+        <span class="text-[11px] text-neutral-400 ml-1 font-semibold">Wzrost (cm):</span>
+        <input type="number" id="input-height" placeholder="170" class="w-full mt-1 bg-white/5 border border-white/10 rounded-2xl px-3 py-2.5 text-neutral-100 font-semibold focus:outline-none focus:border-mint transition">
+      </label>
+      <label class="block">
+        <span class="text-[11px] text-neutral-400 ml-1 font-semibold">Cel wagowy (kg):</span>
+        <input type="number" step="0.1" id="input-goal-weight-settings" placeholder="55.0" class="w-full mt-1 bg-white/5 border border-white/10 rounded-2xl px-3 py-2.5 text-neutral-100 font-semibold focus:outline-none focus:border-mint transition">
+      </label>
+      <label class="flex items-center gap-3 cursor-pointer">
+        <input type="checkbox" id="input-auto-theme" class="w-5 h-5 rounded-md accent-mint">
+        <span class="text-sm font-medium flex-1">🌗 Auto-motyw dzień/noc (6:00-19:00 jasny)</span>
+      </label>
+
+      <div class="glass rounded-3xl p-4">
+        <div class="text-[11px] text-neutral-400 font-bold mb-2">TWOJE BMI</div>
+        <div id="settings-bmi" class="text-2xl font-extrabold text-mint">—</div>
+        <div id="settings-bmi-label" class="text-xs text-neutral-400 font-medium mt-1">Wpisz wagę i wzrost</div>
+      </div>
+    </div>
+
+    <button id="btn-settings-save" class="w-full py-3.5 rounded-full bg-gradient-to-br from-mint to-lilac text-ink font-extrabold active:scale-95 transition mt-5">
+      <i class="fa-solid fa-floppy-disk mr-1.5"></i>Zapisz ustawienia
+    </button>
+  </div>
+</div>
+
+<!-- WEEK OF LIFE -->
+<div id="modal-week-of-life" class="modal-wrap hidden fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-5">
+  <div class="modal-backdrop absolute inset-0" data-close-modal></div>
+  <div class="modal-pop relative glass rounded-t-4xl sm:rounded-4xl w-full sm:max-w-md p-6 shadow-soft max-h-[85vh] overflow-y-auto">
+    <div class="flex items-start justify-between mb-4">
+      <button data-close-modal class="w-9 h-9 rounded-full glass flex items-center justify-center text-neutral-400"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div id="week-of-life-content"></div>
+    <div class="text-center text-xs text-neutral-500 font-semibold mt-4">📸 Zrzut ekranu i wysyłaj</div>
+  </div>
+</div>
+
+<!-- RECOVERY DAY INFO -->
+<div id="modal-recovery" class="modal-wrap hidden fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-5">
+  <div class="modal-backdrop absolute inset-0" data-close-modal></div>
+  <div class="modal-pop relative glass rounded-t-4xl sm:rounded-4xl w-full sm:max-w-md p-6 shadow-soft max-h-[85vh] overflow-y-auto">
+    <div class="flex items-start justify-between mb-4">
+      <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-rose/25 to-lilac/25 flex items-center justify-center"><i class="fa-solid fa-leaf text-rose text-2xl"></i></div>
+      <button data-close-modal class="w-9 h-9 rounded-full glass flex items-center justify-center text-neutral-400"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <h3 class="font-extrabold text-xl mb-3">🌿 Tryb regeneracji</h3>
+    <div class="space-y-3 mb-5">
+      <div class="glass rounded-3xl p-4">
+        <div class="font-bold text-sm mb-1">🚶 Spacer 30-45 min</div>
+        <p class="text-xs text-neutral-400 font-medium leading-relaxed">Zamiast treningu. Niskie tempo, w miarę możliwości zielona przestrzeń.</p>
+      </div>
+      <div class="glass rounded-3xl p-4">
+        <div class="font-bold text-sm mb-1">🧘 Mobility 10 min</div>
+        <p class="text-xs text-neutral-400 font-medium leading-relaxed">Rozciąganie klatki, barków, bioder, karku. Bez forsowania.</p>
+      </div>
+      <div class="glass rounded-3xl p-4">
+        <div class="font-bold text-sm mb-1">🫁 Oddech 5 min</div>
+        <p class="text-xs text-neutral-400 font-medium leading-relaxed">4-7-8 lub box breathing. Układ nerwowy przechodzi w tryb regeneracji.</p>
+      </div>
+      <div class="glass rounded-3xl p-4">
+        <div class="font-bold text-sm mb-1">💧 Nawodnienie</div>
+        <p class="text-xs text-neutral-400 font-medium leading-relaxed">2-3 litry wody w ciągu dnia + elektrolity.</p>
+      </div>
+      <div class="glass rounded-3xl p-4">
+        <div class="font-bold text-sm mb-1">😴 Sen 8-9h</div>
+        <p class="text-xs text-neutral-400 font-medium leading-relaxed">Dziś priorytet snu, zero ekranów 1h przed.</p>
+      </div>
+    </div>
+    <button id="btn-recovery-confirm" data-close-modal class="w-full py-3.5 rounded-full bg-gradient-to-br from-rose to-lilac text-ink font-extrabold active:scale-95 transition">
+      <i class="fa-solid fa-check mr-1.5"></i>Włącz tryb na dziś
     </button>
   </div>
 </div>
@@ -918,62 +1377,93 @@ window.addEventListener("error", (e) => {
 const USER_NAME = "Karol";
 document.getElementById("header-greeting").textContent = `Cześć, ${USER_NAME} 👋`;
 
-// ----------------------------------------------------------------------------
-// PROMPT DLA RADY TRENERA PERSONALNEGO
-// ----------------------------------------------------------------------------
+// ============================================================================
+// USTAWIENIA UŻYTKOWNIKA
+// ============================================================================
+function getSettings() {
+  return {
+    height: parseFloat(localStorage.getItem("regim:height")) || 170,
+    goalWeight: parseFloat(localStorage.getItem("regim:goal-weight")) || 55.0,
+    autoTheme: localStorage.getItem("regim:auto-theme") === "1",
+  };
+}
+function saveSettings(s) {
+  localStorage.setItem("regim:height", String(s.height));
+  localStorage.setItem("regim:goal-weight", String(s.goalWeight));
+  localStorage.setItem("regim:auto-theme", s.autoTheme ? "1" : "0");
+}
+
+function calcBMI(weightKg, heightCm) {
+  if (!weightKg || !heightCm) return null;
+  const h = heightCm / 100;
+  return weightKg / (h * h);
+}
+function bmiLabel(bmi) {
+  if (bmi == null) return "";
+  if (bmi < 18.5) return "Niedowaga — buduj masę";
+  if (bmi < 25) return "Norma — trzymaj rytm";
+  if (bmi < 30) return "Nadwaga";
+  return "Otyłość";
+}
+
+// ============================================================================
+// PROMPT TRENERA
+// ============================================================================
 const MENTOR_SYSTEM_PROMPT = `
 Jesteś Radą Trenera Personalnego ${USER_NAME}a. Analizujesz poranny raport snu ze smartwatcha
-(czas snu, sen głęboki, REM, płytki, pobudki, tętno podczas snu) oraz wieczorne statystyki
-dnia (kroki, tętno dzienne, SpO2, poziom stresu, waga) pod kątem regeneracji układu nerwowego,
-poziomu energii i skuteczności codziennego planu (suplementacja, zdrowe jedzenie, trening,
-trening mowy, ćwiczenia na twarz, reset szczęki).
+(czas snu, sen głęboki, REM, płytki, pobudki, tętno w nocy, RHR rano, napięcie szczęki, nastrój)
+oraz wieczorne statystyki dnia (kroki, tętno dzienne, SpO2, stres, RPE, nastrój, screen time, waga)
+pod kątem regeneracji układu nerwowego, poziomu energii i skuteczności planu.
 
-TON: prosty, techniczny, ale motywujący — jak trener personalny, który tłumaczy DLACZEGO
-liczby mają znaczenie, a nie tylko co jest "dobre" czy "złe".
+KONTEKST: ${USER_NAME} jest PRZETRENOWANY — priorytet to regeneracja, nie rekordy.
+Deload i dni OFF są częścią planu, nie porażką.
+
+TON: prosty, techniczny, motywujący — jak trener personalny tłumaczący DLACZEGO liczby mają znaczenie.
 
 ZASADY:
-- Sen < 7h lub sen głęboki < 1h: podkreśl spadek regeneracji układu nerwowego i hormonu wzrostu.
-- Wysoki stres (>60): sygnalizuj przeciążenie, priorytet regeneracji nad intensywnością.
-- Dobre dane: pochwal konkretnie, wskaż który parametr zadziałał najlepiej.
+- Sen < 7h lub deep < 1h: podkreśl spadek regeneracji.
+- RHR wzrosło o 5+ bpm vs poprzednie dni: sygnał przemęczenia, priorytet odpoczynek.
+- RPE ≥ 8 przez 3 dni: alarm przeciążenia, zalecaj deload.
+- Wysoki stres (>60): priorytet regeneracji.
+- Napięcie szczęki wysokie (>7): sprawdź czy reset szczęki działa.
 - Zawsze kończ jednym konkretnym punktem na jutro.
-- Długość: 3-5 zdań. Bez emotikonek. Nie dawaj dawek suplementów ani porad medycznych.
+- 3-5 zdań. Bez emotikonek w treści. Zero dawek medycznych.
 `.trim();
 
 function buildMentorUserPrompt(dayData) {
   const m = dayData.morning || {};
   const e = dayData.evening || {};
-  const tasksSummary = (dayData.tasks || [])
-    .map((t) => `${t.label}: ${t.done ? "zrobione" : "niezrobione"}`)
-    .join(", ");
+  const tasksSummary = (dayData.tasks || []).map((t) => `${t.label}: ${t.done ? "zrobione" : "niezrobione"}`).join(", ");
   return `
 Dane na dziś (${dayData.date}):
 Zadania — ${tasksSummary}
 Wykonanie dnia: ${dayData.completedPct ?? 0}%
 
-RAPORT PORANNY (sen):
+PORANNY:
 Czas snu: ${m.sleepTotal ?? "brak"} h
 Głęboki sen: ${m.sleepDeep ?? "brak"} h
 REM: ${m.sleepRem ?? "brak"} h
-Płytki sen: ${m.sleepLight ?? "brak"} h
+Płytki: ${m.sleepLight ?? "brak"} h
 Pobudki: ${m.sleepWakes ?? "brak"}
-Śr. tętno podczas snu: ${m.sleepHr ?? "brak"} bpm
-Waga poranna: ${m.dailyWeight ?? "brak"} kg
-${m.weeklyWeight ? `Waga tygodniowa: ${m.weeklyWeight} kg` : ""}
+Śr. tętno snu: ${m.sleepHr ?? "brak"} bpm
+RHR rano: ${m.rhr ?? "brak"} bpm
+Napięcie szczęki: ${m.jawTension ?? "brak"}/10
+Nastrój rano: ${m.moodMorning ?? "brak"}/10
+Waga: ${m.dailyWeight ?? "brak"} kg
 
-RAPORT WIECZORNY (dzień):
+WIECZORNY:
 Kroki: ${e.steps ?? "brak"}
 Śr. tętno dnia: ${e.hrDay ?? "brak"} bpm
 SpO2: ${e.spo2 ?? "brak"} %
-Poziom stresu: ${e.stress ?? "brak"} /100
-${e.weightEvening ? `Waga wieczorna: ${e.weightEvening} kg` : ""}
+Stres: ${e.stress ?? "brak"}/100
+RPE: ${e.rpe ?? "brak"}/10
+Nastrój wieczór: ${e.moodEvening ?? "brak"}/10
+Screen time: ${e.screenTime ?? "brak"} min
 
-Oceń regenerację, energię i wykonanie planu jako trener personalny.
+Oceń regenerację i wykonanie planu jako trener personalny.
 `.trim();
 }
 
-// ----------------------------------------------------------------------------
-// MOCK RADA TRENERA (offline, dużo tekstów)
-// ----------------------------------------------------------------------------
 async function mockMentorAI(dayData) {
   await new Promise((r) => setTimeout(r, 900));
   const m = dayData.morning || {};
@@ -981,112 +1471,47 @@ async function mockMentorAI(dayData) {
   const pct = dayData.completedPct ?? 0;
   const lines = [];
 
-  // ZADANIA
-  if (pct === 100) {
-    lines.push(`🔥 100% zadań odhaczone — pełen plan dowieziony, tak trzymaj.`);
-  } else if (pct >= 70) {
-    lines.push(`💪 ${pct}% planu zrobione — solidnie, ale jeszcze jest rezerwa, żeby dobić do setki.`);
-  } else if (pct >= 40) {
-    lines.push(`⚠️ Tylko ${pct}% — odpuściłeś dzisiaj za dużo rzeczy, które sam sobie zaplanowałeś.`);
-  } else if (pct > 0) {
-    lines.push(`😐 Ledwie ${pct}% wykonania — dzień na przeczekanie, nie na progres.`);
-  } else {
-    lines.push(`❌ Zero zadań dzisiaj. Jutro od rana wracasz do ciśnięcia, bez dyskusji.`);
-  }
+  if (pct === 100) lines.push(`🔥 100% zadań — pełen plan dowieziony, tak trzymaj.`);
+  else if (pct >= 70) lines.push(`💪 ${pct}% — solidnie, jeszcze jest rezerwa.`);
+  else if (pct >= 40) lines.push(`⚠️ Tylko ${pct}% — za dużo odpuszczone.`);
+  else if (pct > 0) lines.push(`😐 Ledwie ${pct}% — dzień na przeczekanie.`);
+  else lines.push(`❌ Zero zadań. Jutro od rana ciśnięcie.`);
 
-  // SEN
   if (m.sleepTotal != null) {
-    if (m.sleepTotal < 5) {
-      lines.push(`😴 Spałeś tylko ${m.sleepTotal}h — organizm na oparach, dzisiejszy trening traktuj ulgowo.`);
-    } else if (m.sleepTotal < 7) {
-      lines.push(`😴 ${m.sleepTotal}h snu to za mało na pełną regenerację układu nerwowego.`);
-    } else if (m.sleepTotal <= 9) {
-      lines.push(`✅ ${m.sleepTotal}h snu — bateria naładowana, masz z czego czerpać siłę.`);
-    } else {
-      lines.push(`🛌 Spałeś aż ${m.sleepTotal}h — dobry reset, ale uważaj na rozbicie rytmu dobowego.`);
-    }
-
-    if (m.sleepDeep != null && m.sleepTotal) {
-      const deepRatio = m.sleepDeep / m.sleepTotal;
-      if (deepRatio < 0.15) {
-        lines.push(`🔻 Za mało snu głębokiego — to wtedy mięśnie się regenerują, dzisiaj fizycznie możesz być niedorobiony.`);
-      } else if (deepRatio > 0.22) {
-        lines.push(`✅ Głęboki sen wszedł wzorowo — idealne warunki pod budowę masy.`);
-      }
-    }
-
-    if (m.sleepRem != null && m.sleepTotal && (m.sleepRem / m.sleepTotal) < 0.15) {
-      lines.push(`🧠 Faza REM poniżej normy — mózg słabiej przetwarza stres z całego dnia.`);
-    }
-    if (m.sleepLight != null && m.sleepTotal && (m.sleepLight / m.sleepTotal) > 0.60) {
-      lines.push(`🌊 Bardzo dużo płytkiego snu — prawdopodobnie kręciłeś się w nocy i nie wszedłeś w głęboki odpoczynek.`);
-    }
-
-    if (m.sleepWakes != null) {
-      if (m.sleepWakes >= 4) {
-        lines.push(`⏰ Wybudzałeś się ${m.sleepWakes} razy — tak szarpana noc totalnie psuje regenerację.`);
-      } else if (m.sleepWakes === 0) {
-        lines.push(`😌 Zero pobudek, spałeś jak kamień — tak trzeba.`);
-      }
-    }
-
-    if (m.sleepHr != null) {
-      if (m.sleepHr > 65) {
-        lines.push(`💓 Puls w nocy ${m.sleepHr} bpm — organizm z czymś walczył (późne jedzenie? stres przed snem?).`);
-      } else if (m.sleepHr < 50) {
-        lines.push(`💓 Serce spokojne (${m.sleepHr} bpm) — głęboki luz.`);
-      }
-    }
+    if (m.sleepTotal < 5) lines.push(`😴 ${m.sleepTotal}h snu — organizm na oparach, trening ulgowo.`);
+    else if (m.sleepTotal < 7) lines.push(`😴 ${m.sleepTotal}h — za mało na pełną regenerację.`);
+    else if (m.sleepTotal <= 9) lines.push(`✅ ${m.sleepTotal}h — bateria naładowana.`);
+    else lines.push(`🛌 ${m.sleepTotal}h — dobry reset, pilnuj rytmu dobowego.`);
   }
 
-  // KROKI + STRES
-  if (e.steps != null) {
-    if (e.steps < 4000) {
-      lines.push(`🚶 Tylko ${e.steps} kroków — przesiedziałeś dzień na tyłku, brak ruchu spowalnia metabolizm.`);
-    } else if (e.steps > 10000) {
-      lines.push(`🚶 ${e.steps} kroków — konkretny ruch dzisiaj, tak trzymaj.`);
-    }
+  if (m.rhr != null) {
+    if (m.rhr > 70) lines.push(`💓 RHR ${m.rhr} bpm — wysoko, prawdopodobnie przemęczenie lub choroba w drodze.`);
+    else if (m.rhr < 55) lines.push(`💓 RHR ${m.rhr} bpm — świetna regeneracja.`);
+  }
+
+  if (m.jawTension != null && m.jawTension >= 7) {
+    lines.push(`😬 Napięcie szczęki ${m.jawTension}/10 — wzmocnij reset szczęki przed snem.`);
+  }
+
+  if (e.rpe != null && e.rpe >= 8) {
+    lines.push(`🔥 RPE ${e.rpe}/10 — trening był ciężki, następny zrób lżejszy.`);
   }
 
   if (e.stress != null) {
-    if (e.stress > 65) {
-      lines.push(`🧘 Stres ${e.stress}/100 — układ nerwowy przeciążony, dzisiaj priorytet to regeneracja, nie intensywność.`);
-    } else if (e.stress < 35) {
-      lines.push(`✅ Stres ${e.stress}/100 — pełna kontrola, głowa na miejscu.`);
-    }
+    if (e.stress > 65) lines.push(`🧘 Stres ${e.stress}/100 — przeciążenie, priorytet regeneracja.`);
+    else if (e.stress < 35) lines.push(`✅ Stres ${e.stress}/100 — pełna kontrola.`);
   }
 
-  if (e.spo2 != null && e.spo2 < 94) {
-    lines.push(`🫁 SpO2 ${e.spo2}% — słabe dotlenienie, koniecznie przewietrz pokój przed snem.`);
-  }
+  if (e.steps != null && e.steps < 4000) lines.push(`🚶 ${e.steps} kroków — mało ruchu, dodaj spacer.`);
 
-  // WAGA
-  if (m.dailyWeight != null) {
-    lines.push(`⚖️ Dzisiejsza waga: ${m.dailyWeight} kg — patrzymy na trend z tygodnia, nie na pojedynczy skok.`);
-  }
-  if (m.weeklyWeight != null) {
-    lines.push(`📊 Waga tygodniowa: ${m.weeklyWeight} kg — to jest liczba, która się liczy do trendu masy.`);
-  }
+  if (lines.length === 0) return "Pusto tu. Uzupełnij raporty.";
 
-  // PODSUMOWANIE
-  if (lines.length === 0) {
-    return "Pusto tu. Uzupełnij raporty, to będę miał z czego wyciągać wnioski.";
-  }
-
-  if (m.sleepTotal != null && m.sleepTotal < 6) {
-    lines.push(`🎯 Zadanie na teraz: odetnij ekrany wcześniej i idź spać, musisz odespać braki.`);
-  } else if (e.stress != null && e.stress > 60) {
-    lines.push(`🎯 Zadanie na teraz: reset szczęki + ćwiczenia na twarz przed snem, wycisz głowę.`);
-  } else {
-    lines.push(`🎯 Trzymaj ten sam rytm jutro — dobrze Ci idzie, nie psuj tego.`);
-  }
+  if (m.sleepTotal != null && m.sleepTotal < 6) lines.push(`🎯 Zadanie na teraz: idź spać, odespij braki.`);
+  else lines.push(`🎯 Trzymaj rytm jutro, dobrze Ci idzie.`);
 
   return lines.join(" ");
 }
 
-/* ============================================================================
-   REAL AI — Google Gemini (bezpośrednie wywołanie z przeglądarki).
-   ============================================================================ */
 const USE_REAL_AI = true;
 const GEMINI_API_KEY = "AQ.Ab8RN6IZgY_1yPYLsiemiLHE2MPUL8LmFZ72ZhaBhZhYNoA9YA";
 const GEMINI_ENDPOINT = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`;
@@ -1104,21 +1529,19 @@ async function callRealMentorAI(dayData) {
   if (!reply) throw new Error("Pusta odpowiedź");
   return reply;
 }
-
 async function runMentorAI(dayData) {
   if (!USE_REAL_AI) return mockMentorAI(dayData);
-  try {
-    return await callRealMentorAI(dayData);
-  } catch (e) {
-    console.warn("Real AI niedostępny, offline.", e);
-    showToast("Trener offline — używam trybu lokalnego");
+  try { return await callRealMentorAI(dayData); }
+  catch (e) {
+    console.warn("Real AI offline.", e);
+    showToast("Trener offline — tryb lokalny");
     return mockMentorAI(dayData);
   }
 }
 
-// ----------------------------------------------------------------------------
+// ============================================================================
 // FIREBASE
-// ----------------------------------------------------------------------------
+// ============================================================================
 let firebaseReady = false;
 let currentUser = { uid: "local" };
 let fcmMessaging = null;
@@ -1132,7 +1555,6 @@ const firebaseConfig = {
   messagingSenderId: "1025631760665",
   appId: "1:1025631760665:web:93c5b62295bd8b0b675588",
 };
-
 const VAPID_KEY = "TWOJ_VAPID_KEY";
 
 async function initFirebase() {
@@ -1140,7 +1562,6 @@ async function initFirebase() {
     const { initializeApp } = await import("https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js");
     const authMod = await import("https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js");
     const fsMod = await import("https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js");
-
     const app = initializeApp(firebaseConfig);
     const auth = authMod.getAuth(app);
     const db = fsMod.getFirestore(app);
@@ -1152,27 +1573,24 @@ async function initFirebase() {
       await bootApp();
     });
 
-    document.getElementById("btn-signin").addEventListener("click", async () => {
+    document.getElementById("btn-signin")?.addEventListener("click", async () => {
       try {
         const provider = new authMod.GoogleAuthProvider();
         await authMod.signInWithPopup(auth, provider);
       } catch (e) {
-        console.warn("Logowanie Google nieudane, próbuję anonimowo.", e);
         await authMod.signInAnonymously(auth);
       }
     });
   } catch (e) {
-    console.warn("Błąd inicjalizacji Firebase — tryb lokalny.", e);
+    console.warn("Firebase offline.", e);
     firebaseReady = false;
   }
 }
 
-// ----------------------------------------------------------------------------
+// ============================================================================
 // WARSTWA DANYCH
-// ----------------------------------------------------------------------------
-function localKey(key) {
-  return `regim:${currentUser?.uid || "local"}:${key}`;
-}
+// ============================================================================
+function localKey(key) { return `regim:${currentUser?.uid || "local"}:${key}`; }
 
 async function saveDayDoc(dayData) {
   if (firebaseReady && window.__fb && currentUser?.uid && currentUser.uid !== "local") {
@@ -1183,7 +1601,6 @@ async function saveDayDoc(dayData) {
     localStorage.setItem(localKey(dayData.date), JSON.stringify(dayData));
   }
 }
-
 async function loadDayDoc(dateStr) {
   if (firebaseReady && window.__fb && currentUser?.uid && currentUser.uid !== "local") {
     const { fsMod, db } = window.__fb;
@@ -1195,7 +1612,6 @@ async function loadDayDoc(dateStr) {
     return raw ? JSON.parse(raw) : null;
   }
 }
-
 async function loadLastNDays(n) {
   const docs = [];
   const today = new Date();
@@ -1217,7 +1633,6 @@ async function loadLastNDays(n) {
   }
   return docs;
 }
-
 async function loadDaysRange(n, offsetDays) {
   const docs = [];
   const today = new Date();
@@ -1229,7 +1644,6 @@ async function loadDaysRange(n, offsetDays) {
   }
   return docs;
 }
-
 async function loadWeeklyWeights(nWeeks) {
   const today = new Date();
   const points = [];
@@ -1240,8 +1654,7 @@ async function loadWeeklyWeights(nWeeks) {
     const all = [];
     snaps.forEach((s) => all.push(s.data()));
     all.filter((d) => d.morning?.weeklyWeight != null)
-      .sort((a, b) => a.date.localeCompare(b.date))
-      .slice(-nWeeks)
+      .sort((a, b) => a.date.localeCompare(b.date)).slice(-nWeeks)
       .forEach((d) => points.push({ date: d.date, weight: d.morning.weeklyWeight }));
   } else {
     for (let i = 0; i < 90; i++) {
@@ -1259,22 +1672,24 @@ async function loadWeeklyWeights(nWeeks) {
   }
   return points.slice(-nWeeks);
 }
-
+async function loadAllDaysForRange(n) {
+  return await loadLastNDays(n);
+}
 async function computeStreakUpTo(dateStr) {
   let streak = 0;
   let cursor = new Date(dateStr);
   cursor.setDate(cursor.getDate() - 1);
   for (let i = 0; i < 400; i++) {
     const data = await loadDayDoc(dateKey(cursor));
-    if (data && data.completedPct === 100) {
-      streak++;
-      cursor.setDate(cursor.getDate() - 1);
-    } else break;
+    if (data && data.completedPct === 100) { streak++; cursor.setDate(cursor.getDate() - 1); }
+    else break;
   }
   return streak;
 }
 
+// ============================================================================
 // POMOCNICZE
+// ============================================================================
 function dateKey(date) {
   const y = date.getFullYear();
   const m = String(date.getMonth() + 1).padStart(2, "0");
@@ -1294,27 +1709,33 @@ function showToast(msg) {
   showToast._t = setTimeout(() => toast.classList.add("hidden"), 2400);
 }
 
-// ----------------------------------------------------------------------------
-// STAN + ZADANIA DNIA
-// ----------------------------------------------------------------------------
+// ============================================================================
+// STAN
+// ============================================================================
 const todayObj = new Date();
 const todayKey = dateKey(todayObj);
 const monday = isMonday(todayObj);
 const sunday = isSunday(todayObj);
 const isBikeDay = !monday && (dayIndexSinceEpoch(todayObj) % 3 === 0);
+const nailCheckDay = (dayIndexSinceEpoch(todayObj) % 14 === 0);
 
 const state = {
   tasks: [
-    { id: "tabletka", label: "Tabletka / Suplementy", done: false },
-    { id: "jedzenie", label: "Zdrowe jedzenie na masę", done: false },
+    { id: "tabletka", label: "D3 + Tran z dorsza", done: false },
+    { id: "jedzenie", label: "Zdrowe jedzenie", done: false },
     { id: "trening", label: monday ? "Basen 1,5h" : (isBikeDay ? "Trasa 7 km rower" : "Kalistenika"), done: false },
     { id: "mowa", label: "Trening mowy", done: false },
-    { id: "twarz", label: "Ćwiczenia na twarz (looksmaxing)", done: false },
+    { id: "twarz", label: "Looksmaxing twarz", done: false },
+    { id: "postawa", label: "Postawa szyi i barków", done: false },
     { id: "reset", label: "Reset szczęki przed snem", done: false },
   ],
   foodChecked: [],
   morning: {},
   evening: {},
+  moodTagsMorning: [],
+  habits: { waterSalt: false, coldShower: false, walkMeal: false },
+  recoveryMode: false,
+  chartRange: 7,
 };
 
 function calcCompletionPct() {
@@ -1322,14 +1743,112 @@ function calcCompletionPct() {
   return Math.round((done / state.tasks.length) * 100);
 }
 
-// ----------------------------------------------------------------------------
-// RENDER: TRENING dzień-zależny
-// ----------------------------------------------------------------------------
+// ============================================================================
+// READINESS SCORE
+// ============================================================================
+function calculateReadiness() {
+  const m = state.morning || {};
+  const e = state.evening || {};
+  let score = 0;
+  let maxScore = 0;
+
+  if (m.sleepTotal != null) {
+    maxScore += 30;
+    const s = m.sleepTotal;
+    if (s >= 8) score += 30;
+    else if (s >= 7) score += 24;
+    else if (s >= 6) score += 16;
+    else if (s >= 5) score += 8;
+  }
+  if (m.sleepDeep != null && m.sleepTotal) {
+    maxScore += 15;
+    const r = m.sleepDeep / m.sleepTotal;
+    if (r >= 0.20) score += 15;
+    else if (r >= 0.15) score += 10;
+    else if (r >= 0.10) score += 5;
+  }
+  if (m.rhr != null) {
+    maxScore += 20;
+    if (m.rhr < 55) score += 20;
+    else if (m.rhr < 62) score += 16;
+    else if (m.rhr < 68) score += 10;
+    else if (m.rhr < 75) score += 5;
+  }
+  if (e.stress != null) {
+    maxScore += 20;
+    const s = e.stress;
+    if (s < 25) score += 20;
+    else if (s < 40) score += 15;
+    else if (s < 55) score += 10;
+    else if (s < 70) score += 5;
+  }
+  if (m.jawTension != null) {
+    maxScore += 15;
+    const j = m.jawTension;
+    if (j <= 3) score += 15;
+    else if (j <= 5) score += 10;
+    else if (j <= 7) score += 5;
+  }
+
+  if (maxScore === 0) return null;
+  return Math.round((score / maxScore) * 100);
+}
+
+function renderReadiness() {
+  const pct = calculateReadiness();
+  const ring = document.getElementById("readiness-ring");
+  const pctEl = document.getElementById("readiness-pct");
+  const labelEl = document.getElementById("readiness-label");
+  const tipEl = document.getElementById("readiness-tip");
+  const circumference = 213.6;
+
+  if (pct == null) {
+    pctEl.textContent = "—";
+    ring.style.strokeDashoffset = circumference;
+    ring.setAttribute("stroke", "#8b8397");
+    labelEl.textContent = "Uzupełnij raport";
+    labelEl.className = "font-extrabold text-base mb-1 text-neutral-400";
+    tipEl.textContent = "Im więcej danych, tym dokładniejsza ocena.";
+    return;
+  }
+
+  const offset = circumference - (pct / 100) * circumference;
+  ring.style.strokeDashoffset = offset;
+  pctEl.textContent = `${pct}%`;
+
+  let color, label, tip;
+  if (pct >= 80) {
+    color = "#5eead4"; label = "Pełna gotowość"; tip = "Trenuj normalnie, możesz nawet zwiększyć intensywność.";
+    labelEl.className = "font-extrabold text-base mb-1 text-mint";
+  } else if (pct >= 60) {
+    color = "#fbbf24"; label = "Umiarkowana gotowość"; tip = "Trening normalny, ale nie forsuj rekordów.";
+    labelEl.className = "font-extrabold text-base mb-1 text-gold";
+  } else if (pct >= 40) {
+    color = "#fbbf9d"; label = "Obniżona gotowość"; tip = "Lżejszy trening, priorytet snu i regeneracji.";
+    labelEl.className = "font-extrabold text-base mb-1 text-peach";
+  } else {
+    color = "#fb7185"; label = "Niska gotowość"; tip = "Dziś tylko regeneracja — spacer, mobility, sen.";
+    labelEl.className = "font-extrabold text-base mb-1 text-rose";
+  }
+  ring.setAttribute("stroke", color);
+  labelEl.textContent = label;
+  tipEl.textContent = tip;
+}
+
+// ============================================================================
+// TRENING + DELOAD
+// ============================================================================
 function setupTreningCard() {
   const icon = document.getElementById("trening-icon");
   const title = document.getElementById("trening-title");
   const sub = document.getElementById("trening-sub");
 
+  if (state.recoveryMode) {
+    icon.className = "fa-solid fa-leaf text-rose text-2xl";
+    title.textContent = "🌿 Tryb regeneracji";
+    sub.textContent = "Spacer + mobility + oddech";
+    return;
+  }
   if (monday) {
     icon.className = "fa-solid fa-person-swimming text-mint text-2xl";
     title.textContent = "🏊 Basen — 1,5h";
@@ -1340,20 +1859,18 @@ function setupTreningCard() {
     sub.textContent = "Co 3 dni zmiana bodźca";
   } else {
     icon.className = "fa-solid fa-dumbbell text-mint text-2xl";
-    title.textContent = "💪 Kalistenika";
-    sub.textContent = "3x15 pompek • plank na czas • przysiady";
+    title.textContent = "💪 Kalistenika (ulga)";
+    sub.textContent = "2 serie • 10-12 powt • pełna regeneracja";
   }
 }
 
 const CALISTHENICS_PLAN = [
-  { icon: "fa-person-walking-arrow-loop-left", color: "mint", tag: "3 min", name: "Rozgrzewka", detail: "Pajacyki + krążenia ramion i bioder, dynamiczne rozciąganie" },
-  { icon: "fa-arrow-up", color: "lilac", tag: "3×15", name: "Pompki klasyczne", detail: "Pełny zakres ruchu, klatka blisko podłogi, 60-90s przerwy między seriami" },
-  { icon: "fa-hand", color: "peach", tag: "3×10", name: "Pompki diamentowe", detail: "Dłonie razem pod klatką — mocniej angażują triceps" },
-  { icon: "fa-down-left-and-up-right-to-center", color: "gold", tag: "4×20", name: "Przysiady", detail: "Pełny zakres, pięty na ziemi, tempo kontrolowane" },
-  { icon: "fa-shoe-prints", color: "mint", tag: "3×12 / noga", name: "Wykroki chodzone", detail: "Naprzemiennie, kolano prawie do ziemi" },
-  { icon: "fa-water", color: "lilac", tag: "3×45s", name: "Deska (plank)", detail: "Biodra w linii z ciałem, napięty brzuch, licz sekundy na stoperze" },
-  { icon: "fa-arrows-up-down", color: "rose", tag: "3×20", name: "Unoszenie nóg leżąc", detail: "Dolne partie brzucha, powolne opuszczanie bez odbicia" },
-  { icon: "fa-person-running", color: "gold", tag: "3×30s", name: "Mountain climbers", detail: "Szybkie tempo, spięty core, płynny oddech" },
+  { icon: "fa-person-walking-arrow-loop-left", color: "mint", tag: "2 min", name: "Rozgrzewka", detail: "Pajacyki + krążenia" },
+  { icon: "fa-arrow-up", color: "lilac", tag: "2×10", name: "Pompki klasyczne", detail: "Kontrolowane tempo, klatka do ziemi" },
+  { icon: "fa-hand", color: "peach", tag: "2×8", name: "Pompki diamentowe", detail: "Triceps, mniejsza objętość" },
+  { icon: "fa-down-left-and-up-right-to-center", color: "gold", tag: "2×15", name: "Przysiady", detail: "Pełny zakres, bez pośpiechu" },
+  { icon: "fa-water", color: "lilac", tag: "2×30s", name: "Deska (plank)", detail: "Biodra w linii, brzuch napięty" },
+  { icon: "fa-arrows-up-down", color: "rose", tag: "2×12", name: "Unoszenie nóg", detail: "Bez odbicia, wolne opuszczanie" },
 ];
 
 function renderTreningModalContent() {
@@ -1362,28 +1879,39 @@ function renderTreningModalContent() {
   const sub = document.getElementById("modal-trening-sub");
   const content = document.getElementById("modal-trening-content");
 
+  if (state.recoveryMode) {
+    iconEl.className = "fa-solid fa-leaf text-rose text-2xl";
+    title.textContent = "🌿 Tryb regeneracji";
+    sub.textContent = "Dziś NIE trenujemy";
+    content.innerHTML = `
+      <div class="glass rounded-3xl p-4 flex items-start gap-3 border border-rose/20">
+        <i class="fa-solid fa-shoe-prints text-rose mt-0.5"></i>
+        <p class="text-sm text-neutral-200 font-medium leading-relaxed">🚶 Spacer 30-45 min. Niskie tempo, w miarę możliwości zielona przestrzeń.</p>
+      </div>
+      <div class="glass rounded-3xl p-4 flex items-start gap-3 border border-rose/20">
+        <i class="fa-solid fa-person-walking text-rose mt-0.5"></i>
+        <p class="text-sm text-neutral-200 font-medium leading-relaxed">🧘 Mobility 10 min: rozciąganie klatki, barków, bioder, karku.</p>
+      </div>
+      <div class="glass rounded-3xl p-4 flex items-start gap-3 border border-rose/20">
+        <i class="fa-solid fa-wind text-rose mt-0.5"></i>
+        <p class="text-sm text-neutral-200 font-medium leading-relaxed">🫁 Oddech 4-7-8 przez 5 min. Układ nerwowy w tryb regeneracji.</p>
+      </div>`;
+    return;
+  }
   if (monday) {
     iconEl.className = "fa-solid fa-person-swimming text-mint text-2xl";
     title.textContent = "🏊 Basen — 1,5h";
-    sub.textContent = "Poniedziałkowy trening w wodzie";
-    content.innerHTML = `
-      <div class="glass rounded-3xl p-4 flex items-start gap-3">
-        <i class="fa-solid fa-water text-mint mt-0.5"></i>
-        <p class="text-sm text-neutral-200 font-medium leading-relaxed">1,5h pływania — mieszaj style, rób przerwy co 15-20 minut. Pływanie odciąża stawy i buduje wytrzymałość całego ciała bez przeciążania szczęki.</p>
-      </div>`;
+    sub.textContent = "Poniedziałek w wodzie";
+    content.innerHTML = `<div class="glass rounded-3xl p-4 flex items-start gap-3"><i class="fa-solid fa-water text-mint mt-0.5"></i><p class="text-sm text-neutral-200 font-medium leading-relaxed">1,5h pływania — mieszaj style, przerwy co 15-20 min. Pływanie odciąża stawy i buduje wytrzymałość bez przeciążania szczęki.</p></div>`;
   } else if (isBikeDay) {
     iconEl.className = "fa-solid fa-person-biking text-mint text-2xl";
     title.textContent = "🚴 Trasa 7 km — rower";
     sub.textContent = "Zmiana bodźca co 3 dni";
-    content.innerHTML = `
-      <div class="glass rounded-3xl p-4 flex items-start gap-3">
-        <i class="fa-solid fa-route text-mint mt-0.5"></i>
-        <p class="text-sm text-neutral-200 font-medium leading-relaxed">7 km w spokojnym, stałym tempie — to trening wytrzymałościowy, nie sprint. Utrzymuj równe tętno, oddychaj przez nos jak długo się da.</p>
-      </div>`;
+    content.innerHTML = `<div class="glass rounded-3xl p-4 flex items-start gap-3"><i class="fa-solid fa-route text-mint mt-0.5"></i><p class="text-sm text-neutral-200 font-medium leading-relaxed">7 km spokojnym tempem — wytrzymałość, nie sprint. Równe tętno, oddychaj przez nos.</p></div>`;
   } else {
     iconEl.className = "fa-solid fa-dumbbell text-mint text-2xl";
-    title.textContent = "💪 Kalistenika";
-    sub.textContent = "Plan na dziś — konkretne serie, powtórzenia i czas";
+    title.textContent = "💪 Kalistenika (wersja ulga)";
+    sub.textContent = "Zmniejszona objętość — jesteś przedtrenowany";
     content.innerHTML = CALISTHENICS_PLAN.map((ex) => `
       <div class="glass rounded-3xl p-3.5 flex items-center gap-3">
         <div class="w-9 h-9 rounded-xl bg-${ex.color}/15 flex items-center justify-center flex-shrink-0 text-${ex.color}">
@@ -1398,6 +1926,49 @@ function renderTreningModalContent() {
   }
 }
 
+// ============================================================================
+// DETEKTOR DELOAD / OSTATNI DZIEŃ OFF
+// ============================================================================
+async function checkRecoveryNeeds() {
+  const days = await loadLastNDays(14);
+  const withData = days.filter((d) => d.morning || d.evening);
+
+  // Ostatni dzień off — completedPct < 40 lub brak zadań
+  let lastOffDays = null;
+  for (let i = 0; i < days.length; i++) {
+    const d = days[days.length - 1 - i];
+    if (!d || (d.completedPct ?? 0) < 40) {
+      lastOffDays = i;
+      break;
+    }
+  }
+
+  const banner = document.getElementById("recovery-banner");
+  if (lastOffDays != null && lastOffDays >= 5) {
+    document.getElementById("last-off-days").textContent = lastOffDays;
+    document.getElementById("recovery-text").textContent = `Nie miałeś pełnego dnia regeneracji od ${lastOffDays} dni. To realne ryzyko przedtrenowania. Włącz tryb regeneracji na dziś albo zaplanuj go w ciągu najbliższych 2 dni.`;
+    banner.classList.remove("hidden");
+  } else if (lastOffDays != null) {
+    banner.classList.add("hidden");
+  } else {
+    banner.classList.add("hidden");
+  }
+
+  // Deload detector: 3 ostatnie dni RPE >= 8
+  const last3 = withData.slice(-3);
+  const rpeDays = last3.filter((d) => (d.evening?.rpe ?? 0) >= 8).length;
+  const deloadBanner = document.getElementById("deload-banner");
+  if (rpeDays >= 3) {
+    document.getElementById("deload-text").textContent = `3 ostatnie treningi z RPE ≥ 8. Układ nerwowy pod dużym obciążeniem. Zalecany tydzień deload: połowa serii, 60% intensywności, sen priorytet.`;
+    deloadBanner.classList.remove("hidden");
+  } else {
+    deloadBanner.classList.add("hidden");
+  }
+}
+
+// ============================================================================
+// RENDER: CHECK STANÓW, POSTĘP
+// ============================================================================
 function renderCheckStates() {
   state.tasks.forEach((task) => {
     document.querySelectorAll(`[data-check="${task.id}"]`).forEach((btn) => {
@@ -1413,9 +1984,8 @@ function renderCheckStates() {
           if (icon) { icon.classList.remove("opacity-0"); icon.classList.add("text-ink"); }
         }
       } else {
-        if (isModalBtn) {
-          btn.classList.remove("opacity-60");
-        } else {
+        if (isModalBtn) btn.classList.remove("opacity-60");
+        else {
           btn.classList.remove("bg-gradient-to-br", "from-mint", "to-lilac", "border-transparent");
           btn.classList.add("border-white/15");
           if (icon) { icon.classList.add("opacity-0"); icon.classList.remove("text-ink"); }
@@ -1428,19 +1998,15 @@ function renderCheckStates() {
 function renderProgress() {
   const pct = calcCompletionPct();
   const doneCount = state.tasks.filter((t) => t.done).length;
-
   document.getElementById("progress-bar").style.width = `${pct}%`;
   document.getElementById("hero-pct").textContent = `${pct}%`;
   document.getElementById("progress-sub").textContent = `${doneCount} z ${state.tasks.length} zadań na dziś`;
-
   const circumference = 169.6;
-  const offset = circumference - (pct / 100) * circumference;
-  document.getElementById("hero-ring").style.strokeDashoffset = offset;
-
+  document.getElementById("hero-ring").style.strokeDashoffset = circumference - (pct / 100) * circumference;
   const headline = document.getElementById("progress-headline");
   if (pct === 100) headline.textContent = "Level up! 🚀";
-  else if (pct >= 50) headline.textContent = "Dobra robota, jedziesz dalej 🔥";
-  else if (pct > 0) headline.textContent = "Ruszyłeś, nie zwalniaj 💪";
+  else if (pct >= 50) headline.textContent = "Dobra robota 🔥";
+  else if (pct > 0) headline.textContent = "Ruszyłeś 💪";
   else headline.textContent = `Zaczynajmy, ${USER_NAME} 💪`;
 }
 
@@ -1452,10 +2018,17 @@ async function persistToday() {
     tasks: state.tasks,
     completedPct: calcCompletionPct(),
     foodChecked: state.foodChecked,
+    habits: state.habits,
+    recoveryMode: state.recoveryMode,
+    morning: { ...(existing.morning || {}), ...state.morning },
+    evening: { ...(existing.evening || {}), ...state.evening },
+    moodTagsMorning: state.moodTagsMorning,
   };
   await saveDayDoc(dayData);
   await refreshStreak();
   renderImprovementTips();
+  renderReadiness();
+  checkRecoveryNeeds();
 }
 
 async function refreshStreak() {
@@ -1469,69 +2042,39 @@ async function refreshStreak() {
   else pill.classList.remove("ring-pulse");
 }
 
-// ----------------------------------------------------------------------------
-// CO POLEPSZYĆ U MNIE — dynamiczne wskazówki
-// ----------------------------------------------------------------------------
+// ============================================================================
+// CO POLEPSZYĆ U MNIE
+// ============================================================================
 function renderImprovementTips() {
   const m = state.morning || {};
   const e = state.evening || {};
   const tips = [];
 
-  // SEN
   if (m.sleepTotal != null) {
-    if (m.sleepTotal < 7) tips.push({ icon: "😴", text: `Wydłuż sen z ${m.sleepTotal}h do minimum 7-8h — regeneracja układu nerwowego leży.` });
-    else if (m.sleepTotal >= 8) tips.push({ icon: "✅", text: `Sen ${m.sleepTotal}h — świetnie, utrzymaj ten rytm.` });
+    if (m.sleepTotal < 7) tips.push({ icon: "😴", text: `Wydłuż sen z ${m.sleepTotal}h do minimum 7-8h.` });
+    else if (m.sleepTotal >= 8) tips.push({ icon: "✅", text: `Sen ${m.sleepTotal}h — utrzymaj ten rytm.` });
   }
-  if (m.sleepDeep != null && m.sleepTotal) {
-    const r = m.sleepDeep / m.sleepTotal;
-    if (r < 0.15) tips.push({ icon: "🛌", text: "Za mało snu głębokiego — unikaj ekranów 2h przed snem, ciemny i chłodny pokój." });
-  }
-  if (m.sleepWakes != null && m.sleepWakes >= 3) {
-    tips.push({ icon: "⏰", text: `${m.sleepWakes} pobudek w nocy — sprawdź temperaturę pokoju, ostatni posiłek 3h przed snem.` });
-  }
+  if (m.rhr != null && m.rhr > 68) tips.push({ icon: "💓", text: `RHR ${m.rhr} bpm — wysoko. Sprawdź czy nie jesteś przemęczony.` });
+  if (m.jawTension != null && m.jawTension >= 6) tips.push({ icon: "😬", text: `Napięcie szczęki ${m.jawTension}/10 — wzmocnij reset szczęki.` });
+  if (e.stress != null && e.stress > 60) tips.push({ icon: "🧘", text: `Stres ${e.stress}/100 — 5 min oddechu 4-7-8 pomoże.` });
+  if (e.steps != null && e.steps < 5000) tips.push({ icon: "🚶", text: `Tylko ${e.steps} kroków — dodaj 15 min spaceru.` });
+  if (e.spo2 != null && e.spo2 < 94) tips.push({ icon: "🫁", text: `SpO2 ${e.spo2}% — przewietrz sypialnię.` });
+  if (e.rpe != null && e.rpe >= 8) tips.push({ icon: "🔥", text: `RPE ${e.rpe}/10 — następny trening zrób lżejszy.` });
+  if (e.screenTime != null && e.screenTime > 240) tips.push({ icon: "📱", text: `Screen time ${e.screenTime} min — ogranicz wieczorem.` });
 
-  // STRES
-  if (e.stress != null && e.stress > 60) {
-    tips.push({ icon: "🧘", text: `Stres ${e.stress}/100 — wprowadź 5 min oddechu 4-7-8 lub reset szczęki w ciągu dnia.` });
-  } else if (e.stress != null && e.stress < 35) {
-    tips.push({ icon: "🧠", text: `Stres ${e.stress}/100 — pełna kontrola, dobra baza pod regenerację.` });
-  }
-
-  // KROKI
-  if (e.steps != null && e.steps < 5000) {
-    tips.push({ icon: "🚶", text: `Tylko ${e.steps} kroków — dodaj 15 min spaceru, choćby po treningu.` });
-  } else if (e.steps != null && e.steps >= 10000) {
-    tips.push({ icon: "👟", text: `${e.steps} kroków — konkretny ruch, tak trzymaj.` });
-  }
-
-  // SpO2
-  if (e.spo2 != null && e.spo2 < 94) {
-    tips.push({ icon: "🫁", text: `SpO2 ${e.spo2}% — słabe dotlenienie, przewietrz sypialnię przed snem.` });
-  }
-
-  // ZADANIA
   const doneCount = state.tasks.filter((t) => t.done).length;
-  const totalCount = state.tasks.length;
-  if (doneCount < totalCount) {
-    tips.push({ icon: "⚡", text: `Zostało ${totalCount - doneCount} zadań do zrobienia — dokończ plan na dziś.` });
-  } else {
-    tips.push({ icon: "🏆", text: "Wszystkie zadania dnia zaliczone — perfekcyjny dzień." });
-  }
+  if (doneCount < state.tasks.length) tips.push({ icon: "⚡", text: `Zostało ${state.tasks.length - doneCount} zadań do zrobienia.` });
+  else tips.push({ icon: "🏆", text: "Wszystkie zadania dnia zaliczone!" });
 
-  // ĆWICZENIA NA TWARZ
   const twarzTask = state.tasks.find((t) => t.id === "twarz");
-  if (twarzTask && !twarzTask.done) {
-    tips.push({ icon: "✨", text: "Ćwiczenia na twarz jeszcze nie zrobione — 8 min dla lepszego napięcia mięśni i konturu." });
-  }
+  if (twarzTask && !twarzTask.done) tips.push({ icon: "✨", text: "Looksmaxing jeszcze nie zrobiony — 8 min rutyny." });
 
-  // WAGA
-  if (m.dailyWeight != null) {
-    tips.push({ icon: "⚖️", text: `Waga dzisiejsza: ${m.dailyWeight} kg — nie spinaj się jednym dniem, patrzymy na trend.` });
-  }
+  const postTask = state.tasks.find((t) => t.id === "postawa");
+  if (postTask && !postTask.done) tips.push({ icon: "🧍", text: "Postawa szyi i barków — 3 min, wpływa na linię żuchwy." });
 
-  if (tips.length === 0) {
-    tips.push({ icon: "💪", text: "Uzupełnij raporty poranny i wieczorny, żeby Trener mógł dać Ci konkretne wskazówki." });
-  }
+  if (m.dailyWeight != null) tips.push({ icon: "⚖️", text: `Waga: ${m.dailyWeight} kg — patrzymy na trend.` });
+
+  if (tips.length === 0) tips.push({ icon: "💪", text: "Uzupełnij raporty, żeby Trener dał Ci konkretne wskazówki." });
 
   const container = document.getElementById("improvement-tips");
   container.innerHTML = tips.map((t) =>
@@ -1542,25 +2085,107 @@ function renderImprovementTips() {
   ).join("");
 }
 
-// ----------------------------------------------------------------------------
-// INTERAKCJE: KARTY (checkbox) + MODALE
-// ----------------------------------------------------------------------------
+// ============================================================================
+// CEL WAGOWY + BMI
+// ============================================================================
+async function renderGoal() {
+  const settings = getSettings();
+  const days = await loadLastNDays(30);
+  const lastWeight = [...days].reverse().find((d) => d.morning?.dailyWeight != null);
+  const current = lastWeight?.morning?.dailyWeight ?? null;
+
+  document.getElementById("goal-current").textContent = current != null ? `${current} kg` : "—";
+  document.getElementById("goal-target").textContent = `${settings.goalWeight.toFixed(1)} kg`;
+
+  const goalText = document.getElementById("goal-progress-text");
+  const bar = document.getElementById("goal-bar");
+
+  if (current == null) {
+    goalText.textContent = "Wpisz wagę, żeby zobaczyć progres.";
+    bar.style.width = "0%";
+    return;
+  }
+
+  const diff = settings.goalWeight - current;
+  if (Math.abs(diff) < 0.3) {
+    goalText.textContent = `🏆 Cel osiągnięty! Utrzymuj wagę.`;
+    bar.style.width = "100%";
+  } else if (diff > 0) {
+    goalText.textContent = `📈 Do celu: ${diff.toFixed(1)} kg. Przy tempie +0.25 kg/tyg to ~${Math.ceil(diff / 0.25)} tyg.`;
+    const start = 45; // orientacyjna startowa waga
+    const progress = Math.min(100, Math.max(0, ((current - start) / (settings.goalWeight - start)) * 100));
+    bar.style.width = `${progress}%`;
+  } else {
+    goalText.textContent = `📉 Jesteś ${Math.abs(diff).toFixed(1)} kg powyżej celu.`;
+    bar.style.width = "100%";
+  }
+}
+
+function renderBMI() {
+  const settings = getSettings();
+  const el = document.getElementById("settings-bmi");
+  const labelEl = document.getElementById("settings-bmi-label");
+
+  // ostatnia waga
+  let currentWeight = null;
+  for (let i = 0; i < 30; i++) {
+    const d = new Date();
+    d.setDate(d.getDate() - i);
+    const raw = localStorage.getItem(localKey(dateKey(d)));
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (parsed.morning?.dailyWeight != null) { currentWeight = parsed.morning.dailyWeight; break; }
+      if (parsed.morning?.weeklyWeight != null) { currentWeight = parsed.morning.weeklyWeight; break; }
+    }
+  }
+
+  if (currentWeight == null || !settings.height) {
+    el.textContent = "—";
+    labelEl.textContent = "Wpisz wagę i wzrost";
+    return;
+  }
+  const bmi = calcBMI(currentWeight, settings.height);
+  el.textContent = bmi.toFixed(1);
+  labelEl.textContent = bmiLabel(bmi);
+}
+
+// ============================================================================
+// SMART GOALS
+// ============================================================================
+async function renderSmartGoals() {
+  const days = await loadLastNDays(60);
+
+  const sleep8 = days.filter((d) => (d.morning?.sleepTotal ?? 0) >= 8).length;
+  const speechDone = days.filter((d) => d.tasks?.find((t) => t.id === "mowa" && t.done)).length;
+  const jawDone = days.filter((d) => d.tasks?.find((t) => t.id === "reset" && t.done)).length;
+
+  document.getElementById("smart-sleep-count").textContent = `${Math.min(sleep8, 30)}/30`;
+  document.getElementById("smart-speech-count").textContent = `${Math.min(speechDone, 21)}/21`;
+  document.getElementById("smart-jaw-count").textContent = `${Math.min(jawDone, 21)}/21`;
+
+  document.getElementById("smart-sleep-bar").style.width = `${Math.min(100, (sleep8 / 30) * 100)}%`;
+  document.getElementById("smart-speech-bar").style.width = `${Math.min(100, (speechDone / 21) * 100)}%`;
+  document.getElementById("smart-jaw-bar").style.width = `${Math.min(100, (jawDone / 21) * 100)}%`;
+}
+
+// ============================================================================
+// INTERAKCJE
+// ============================================================================
 document.querySelectorAll("[data-check]").forEach((btn) => {
   btn.addEventListener("click", async (e) => {
     e.stopPropagation();
     const id = btn.dataset.check;
     const task = state.tasks.find((t) => t.id === id);
     if (!task) return;
-    if (btn.classList.contains("modal-check-btn")) {
-      task.done = true;
-    } else {
-      task.done = !task.done;
-    }
+    if (btn.classList.contains("modal-check-btn")) task.done = true;
+    else task.done = !task.done;
+
     renderCheckStates();
     renderProgress();
     await persistToday();
     if (task.done) {
       vibrate(30);
+      playSound("done");
       showToast("Zaliczone ✓");
       if (calcCompletionPct() === 100) {
         setTimeout(() => { fireConfetti(); vibrate([40, 60, 40, 60, 80]); }, 250);
@@ -1573,6 +2198,7 @@ function openModal(modalId) {
   const modal = document.getElementById(modalId);
   if (!modal) return;
   if (modalId === "modal-trening") renderTreningModalContent();
+  if (modalId === "modal-settings") populateSettings();
   modal.classList.remove("hidden");
   document.body.style.overflow = "hidden";
 }
@@ -1580,7 +2206,6 @@ function closeAllModals() {
   document.querySelectorAll(".modal-wrap").forEach((m) => m.classList.add("hidden"));
   document.body.style.overflow = "";
 }
-
 document.querySelectorAll("[data-card][data-modal]").forEach((card) => {
   card.addEventListener("click", (e) => {
     if (e.target.closest("[data-check]")) return;
@@ -1588,7 +2213,7 @@ document.querySelectorAll("[data-card][data-modal]").forEach((card) => {
   });
 });
 document.querySelectorAll("[data-close-modal]").forEach((el) => {
-  el.addEventListener("click", (e) => {
+  el.addEventListener("click", () => {
     if (el.tagName === "BUTTON" && el.hasAttribute("data-check")) return;
     closeAllModals();
   });
@@ -1597,30 +2222,54 @@ document.querySelectorAll(".modal-check-btn[data-close-modal]").forEach((btn) =>
   btn.addEventListener("click", () => setTimeout(closeAllModals, 150));
 });
 
-document.getElementById("btn-goto-speech-tab").addEventListener("click", () => {
+document.getElementById("btn-goto-speech-tab")?.addEventListener("click", () => {
   document.querySelector('.tab-btn[data-tab="mowa"]').click();
 });
+
+document.getElementById("btn-settings")?.addEventListener("click", () => openModal("modal-settings"));
+document.getElementById("btn-open-breathing")?.addEventListener("click", () => { closeAllModals(); setTimeout(() => openModal("modal-breathing"), 200); });
 
 document.querySelectorAll(".food-chip").forEach((chip) => {
   chip.addEventListener("click", async () => {
     const food = chip.dataset.food;
     chip.classList.toggle("active");
-    if (state.foodChecked.includes(food)) {
-      state.foodChecked = state.foodChecked.filter((f) => f !== food);
-    } else {
-      state.foodChecked.push(food);
-    }
+    if (state.foodChecked.includes(food)) state.foodChecked = state.foodChecked.filter((f) => f !== food);
+    else state.foodChecked.push(food);
     await persistToday();
   });
 });
 
-document.getElementById("btn-booster").addEventListener("click", () => {
-  document.getElementById("booster-panel").classList.toggle("hidden");
+document.querySelectorAll(".mood-chip").forEach((chip) => {
+  chip.addEventListener("click", () => {
+    const tag = chip.dataset.tag;
+    chip.classList.toggle("active");
+    if (state.moodTagsMorning.includes(tag)) state.moodTagsMorning = state.moodTagsMorning.filter((t) => t !== tag);
+    else state.moodTagsMorning.push(tag);
+  });
 });
 
-// ----------------------------------------------------------------------------
-// ZAKŁADKI GŁÓWNE
-// ----------------------------------------------------------------------------
+// Sliders
+document.getElementById("input-jaw-tension")?.addEventListener("input", (e) => {
+  document.getElementById("jaw-tension-value").textContent = e.target.value;
+});
+document.getElementById("input-mood-morning")?.addEventListener("input", (e) => {
+  document.getElementById("mood-morning-value").textContent = e.target.value;
+});
+document.getElementById("input-mood-evening")?.addEventListener("input", (e) => {
+  document.getElementById("mood-evening-value").textContent = e.target.value;
+});
+
+// Mikro-nawyki
+["habit-water-salt", "habit-cold-shower", "habit-walk-meal"].forEach((id) => {
+  const el = document.getElementById(id);
+  const key = id === "habit-water-salt" ? "waterSalt" : id === "habit-cold-shower" ? "coldShower" : "walkMeal";
+  el.addEventListener("change", async () => {
+    state.habits[key] = el.checked;
+    await persistToday();
+  });
+});
+
+// Tabs
 document.querySelectorAll(".tab-btn").forEach((btn) => {
   btn.addEventListener("click", () => {
     document.querySelectorAll(".tab-btn").forEach((b) => {
@@ -1629,43 +2278,70 @@ document.querySelectorAll(".tab-btn").forEach((btn) => {
     });
     btn.classList.add("bg-gradient-to-br", "from-mint", "to-lilac", "text-ink");
     btn.classList.remove("text-neutral-400");
-
     document.querySelectorAll(".tab-panel").forEach((p) => p.classList.add("hidden"));
     document.getElementById(`tab-${btn.dataset.tab}`).classList.remove("hidden");
-
     if (btn.dataset.tab === "mentor") { renderCharts(); renderMentorHistory(); }
-    if (btn.dataset.tab === "postepy") { renderCalendar(); renderBadges(); renderBestStats(); }
+    if (btn.dataset.tab === "postepy") { renderCalendar(); renderBadges(); renderBestStats(); renderGoal(); renderSmartGoals(); }
   });
 });
 
+// Report toggle
 document.querySelectorAll(".report-btn").forEach((btn) => {
   btn.addEventListener("click", () => {
     document.querySelectorAll(".report-btn").forEach((b) => {
       b.classList.remove("bg-gradient-to-br", "from-peach", "to-gold", "from-lilac", "to-mint", "text-ink");
       b.classList.add("text-neutral-400");
     });
-    if (btn.dataset.report === "morning") {
-      btn.classList.add("bg-gradient-to-br", "from-peach", "to-gold", "text-ink");
-    } else {
-      btn.classList.add("bg-gradient-to-br", "from-lilac", "to-mint", "text-ink");
-    }
+    if (btn.dataset.report === "morning") btn.classList.add("bg-gradient-to-br", "from-peach", "to-gold", "text-ink");
+    else btn.classList.add("bg-gradient-to-br", "from-lilac", "to-mint", "text-ink");
     btn.classList.remove("text-neutral-400");
-
     document.querySelectorAll(".report-panel").forEach((p) => p.classList.add("hidden"));
     document.getElementById(`form-${btn.dataset.report}`).classList.remove("hidden");
   });
 });
 
-// ----------------------------------------------------------------------------
-// MODUŁ MOWY
-// ----------------------------------------------------------------------------
+// Range toggle
+document.querySelectorAll(".range-btn").forEach((btn) => {
+  btn.addEventListener("click", () => {
+    document.querySelectorAll(".range-btn").forEach((b) => {
+      b.classList.remove("bg-gradient-to-br", "from-mint", "to-lilac", "text-ink");
+      b.classList.add("text-neutral-400");
+    });
+    btn.classList.add("bg-gradient-to-br", "from-mint", "to-lilac", "text-ink");
+    btn.classList.remove("text-neutral-400");
+    state.chartRange = parseInt(btn.dataset.range, 10);
+    renderCharts();
+  });
+});
+
+// ============================================================================
+// DŹWIĘKI TRENINGU
+// ============================================================================
+let audioCtx = null;
+function playSound(type) {
+  try {
+    audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    if (type === "done") { osc.frequency.value = 880; gain.gain.setValueAtTime(0.08, audioCtx.currentTime); }
+    else if (type === "rest") { osc.frequency.value = 440; gain.gain.setValueAtTime(0.08, audioCtx.currentTime); }
+    osc.type = "sine";
+    osc.start();
+    osc.stop(audioCtx.currentTime + 0.15);
+  } catch (e) {}
+}
+
+// ============================================================================
+// MOWA — STOPER
+// ============================================================================
 const SPEECH_PHASES = [
-  { name: "Masaż żwaczy + kląskanie", seconds: 120, icon: "😌", label: "Faza 1 z 3" },
-  { name: "Uderzenia T-D", seconds: 180, icon: "😤", label: "Faza 2 z 3" },
-  { name: "Słowa: TDAWA, DOWED, DUDY, TDA", seconds: 300, icon: "🗣", label: "Faza 3 z 3" },
+  { name: "Masaż żwaczy", seconds: 60, icon: "😌", label: "Faza 1 z 3" },
+  { name: "Uderzenia T-D", seconds: 120, icon: "😤", label: "Faza 2 z 3" },
+  { name: "Słowa: TDAWA, DOWED, DUDY", seconds: 120, icon: "🗣", label: "Faza 3 z 3" },
 ];
 const RING_CIRCUMFERENCE = 552.9;
-
 let speechTimerHandle = null;
 let speechPhaseIdx = 0;
 let speechRemaining = 0;
@@ -1683,7 +2359,7 @@ function beep(freq = 880, duration = 250) {
     gain.connect(speechAudioCtx.destination);
     osc.start();
     osc.stop(speechAudioCtx.currentTime + duration / 1000);
-  } catch (e) { console.warn("Audio nieobsługiwane", e); }
+  } catch (e) {}
 }
 
 function formatMMSS(totalSeconds) {
@@ -1698,11 +2374,9 @@ function updateSpeechUI() {
   document.getElementById("speech-phase-name").textContent = phase ? phase.name : "Gotowe!";
   document.getElementById("speech-phase-label").textContent = phase ? phase.label : "Świetna robota";
   document.getElementById("speech-icon").textContent = phase ? phase.icon : "🎉";
-
   const elapsedRatio = phase ? 1 - speechRemaining / phase.seconds : 1;
   const offset = RING_CIRCUMFERENCE - elapsedRatio * RING_CIRCUMFERENCE;
   document.getElementById("speech-ring").style.strokeDashoffset = offset;
-
   for (let i = 0; i < 3; i++) {
     const dot = document.getElementById(`phase-dot-${i + 1}`);
     if (i < speechPhaseIdx) dot.className = "h-2 w-10 rounded-full bg-mint transition";
@@ -1719,17 +2393,13 @@ function startSpeechTraining() {
   document.getElementById("speech-ring").style.strokeDashoffset = RING_CIRCUMFERENCE;
   beep(660, 200);
   updateSpeechUI();
-
   clearInterval(speechTimerHandle);
   speechTimerHandle = setInterval(() => {
     speechRemaining -= 1;
     if (speechRemaining < 0) {
       beep(880, 300);
       speechPhaseIdx += 1;
-      if (speechPhaseIdx >= SPEECH_PHASES.length) {
-        finishSpeechTraining();
-        return;
-      }
+      if (speechPhaseIdx >= SPEECH_PHASES.length) { finishSpeechTraining(); return; }
       speechRemaining = SPEECH_PHASES[speechPhaseIdx].seconds;
     }
     updateSpeechUI();
@@ -1748,17 +2418,15 @@ async function finishSpeechTraining() {
   document.getElementById("speech-ring").style.strokeDashoffset = 0;
   document.getElementById("speech-start-btn").classList.remove("hidden");
   document.getElementById("speech-stop-btn").classList.add("hidden");
-
   const task = state.tasks.find((t) => t.id === "mowa");
   if (task && !task.done) {
     task.done = true;
     renderCheckStates();
     renderProgress();
     await persistToday();
-    showToast("Trening mowy zaliczony ✓");
-    if (calcCompletionPct() === 100) {
-      setTimeout(() => { fireConfetti(); vibrate([40, 60, 40, 60, 80]); }, 250);
-    }
+    showToast("Trening mowy ✓");
+    playSound("done");
+    if (calcCompletionPct() === 100) setTimeout(() => fireConfetti(), 250);
   }
 }
 
@@ -1766,26 +2434,195 @@ function stopSpeechTraining() {
   clearInterval(speechTimerHandle);
   speechPhaseIdx = 0;
   speechRemaining = 0;
-  document.getElementById("speech-phase-name").textContent = "Trening mowy — 10 min";
-  document.getElementById("speech-phase-label").textContent = "Przerwano — wróć, kiedy będziesz gotowy";
+  document.getElementById("speech-phase-name").textContent = "Trening mowy — 5 min";
+  document.getElementById("speech-phase-label").textContent = "Przerwano";
   document.getElementById("speech-icon").textContent = "😌";
-  document.getElementById("speech-timer").textContent = "10:00";
+  document.getElementById("speech-timer").textContent = "05:00";
   document.getElementById("speech-ring").style.strokeDashoffset = RING_CIRCUMFERENCE;
   document.getElementById("speech-start-btn").classList.remove("hidden");
   document.getElementById("speech-stop-btn").classList.add("hidden");
-  updateSpeechUI();
-  document.getElementById("speech-timer").textContent = "10:00";
+  for (let i = 0; i < 3; i++) document.getElementById(`phase-dot-${i + 1}`).className = "h-2 w-10 rounded-full bg-white/10 transition";
 }
 
 document.getElementById("speech-start-btn").addEventListener("click", startSpeechTraining);
 document.getElementById("speech-stop-btn").addEventListener("click", stopSpeechTraining);
 
-// ----------------------------------------------------------------------------
-// FORMULARZE
-// ----------------------------------------------------------------------------
-if (sunday) {
-  document.getElementById("weight-field-wrapper").classList.remove("hidden");
+// ============================================================================
+// ODDYCHANIE
+// ============================================================================
+let breathTimer = null;
+let breathTotalRemaining = 180;
+let breathCycleTimer = null;
+
+function runBreathCycle() {
+  const circle = document.getElementById("breath-circle");
+  const text = document.getElementById("breath-phase-text");
+  function cycle() {
+    text.textContent = "Wdech";
+    circle.className = "breath-circle inhale mb-5";
+    setTimeout(() => {
+      if (!breathTimer) return;
+      text.textContent = "Trzymaj";
+      circle.className = "breath-circle hold mb-5";
+      setTimeout(() => {
+        if (!breathTimer) return;
+        text.textContent = "Wydech";
+        circle.className = "breath-circle exhale mb-5";
+        setTimeout(() => { if (breathTimer) cycle(); }, 8000);
+      }, 7000);
+    }, 4000);
+  }
+  cycle();
 }
+
+document.getElementById("btn-breath-start").addEventListener("click", () => {
+  if (breathTimer) return;
+  breathTotalRemaining = 180;
+  document.getElementById("breath-timer").textContent = formatMMSS(breathTotalRemaining);
+  document.getElementById("btn-breath-start").classList.add("hidden");
+  document.getElementById("btn-breath-stop").classList.remove("hidden");
+  breathTimer = setInterval(() => {
+    breathTotalRemaining -= 1;
+    document.getElementById("breath-timer").textContent = formatMMSS(breathTotalRemaining);
+    if (breathTotalRemaining <= 0) stopBreath();
+  }, 1000);
+  runBreathCycle();
+});
+
+function stopBreath() {
+  clearInterval(breathTimer);
+  breathTimer = null;
+  document.getElementById("breath-circle").className = "breath-circle mb-5";
+  document.getElementById("breath-phase-text").textContent = "Gotowy";
+  document.getElementById("breath-timer").textContent = "03:00";
+  document.getElementById("btn-breath-start").classList.remove("hidden");
+  document.getElementById("btn-breath-stop").classList.add("hidden");
+}
+document.getElementById("btn-breath-stop").addEventListener("click", stopBreath);
+
+// ============================================================================
+// 1RM
+// ============================================================================
+document.getElementById("btn-rm-calculate").addEventListener("click", () => {
+  const w = parseFloat(document.getElementById("input-rm-weight").value);
+  const r = parseInt(document.getElementById("input-rm-reps").value, 10);
+  if (!w || !r || r < 1 || r > 15) { showToast("Podaj sensowne wartości (1-15 powt)"); return; }
+  const rm = w * (1 + r / 30);
+  document.getElementById("rm-value").textContent = rm.toFixed(1);
+});
+document.getElementById("btn-1rm").addEventListener("click", () => openModal("modal-1rm"));
+
+// ============================================================================
+// SETTINGS
+// ============================================================================
+function populateSettings() {
+  const s = getSettings();
+  document.getElementById("input-height").value = s.height;
+  document.getElementById("input-goal-weight-settings").value = s.goalWeight;
+  document.getElementById("input-auto-theme").checked = s.autoTheme;
+  renderBMI();
+}
+document.getElementById("btn-settings-save").addEventListener("click", () => {
+  const s = {
+    height: parseFloat(document.getElementById("input-height").value) || 170,
+    goalWeight: parseFloat(document.getElementById("input-goal-weight-settings").value) || 55.0,
+    autoTheme: document.getElementById("input-auto-theme").checked,
+  };
+  saveSettings(s);
+  applyAutoTheme();
+  renderGoal();
+  renderBMI();
+  showToast("Ustawienia zapisane ✓");
+  closeAllModals();
+});
+
+// ============================================================================
+// RECOVERY DAY
+// ============================================================================
+document.getElementById("btn-recovery-day").addEventListener("click", () => openModal("modal-recovery"));
+document.getElementById("btn-recovery-confirm").addEventListener("click", async () => {
+  state.recoveryMode = true;
+  setupTreningCard();
+  const task = state.tasks.find((t) => t.id === "trening");
+  if (task) task.label = "Tryb regeneracji";
+  renderCheckStates();
+  renderProgress();
+  await persistToday();
+  showToast("Tryb regeneracji włączony 🌿");
+});
+
+// ============================================================================
+// GOAL EDIT
+// ============================================================================
+document.getElementById("btn-goal-edit").addEventListener("click", () => {
+  const w = document.getElementById("goal-edit-wrapper");
+  w.classList.toggle("hidden");
+  if (!w.classList.contains("hidden")) document.getElementById("input-goal-weight").value = getSettings().goalWeight;
+});
+document.getElementById("btn-goal-save").addEventListener("click", () => {
+  const v = parseFloat(document.getElementById("input-goal-weight").value);
+  if (v && v > 30 && v < 200) {
+    const s = getSettings(); s.goalWeight = v; saveSettings(s);
+    document.getElementById("goal-edit-wrapper").classList.add("hidden");
+    renderGoal();
+    showToast("Cel wagowy zapisany ✓");
+  } else showToast("Podaj sensowną wartość");
+});
+
+// ============================================================================
+// WEEK OF LIFE
+// ============================================================================
+document.getElementById("btn-week-of-life").addEventListener("click", async () => {
+  const days = await loadLastNDays(7);
+  const withData = days.filter((d) => d.morning || d.evening);
+  const perfectDays = days.filter((d) => d.completedPct === 100).length;
+  const avgPct = Math.round(average(days.map((d) => d.completedPct ?? 0)) || 0);
+  const avgSleep = average(withData.map((d) => d.morning?.sleepTotal).filter(Boolean));
+  const avgStress = average(withData.map((d) => d.evening?.stress).filter(Boolean));
+  const avgSteps = average(withData.map((d) => d.evening?.steps).filter(Boolean));
+  const weights = days.map((d) => d.morning?.dailyWeight).filter((w) => w != null);
+  const weightChange = weights.length >= 2 ? weights[weights.length - 1] - weights[0] : null;
+  const streak = parseInt(document.getElementById("streak-count").textContent, 10) || 0;
+
+  const el = document.getElementById("week-of-life-content");
+  el.innerHTML = `
+    <div class="weekoflive-card">
+      <div class="text-center mb-5">
+        <div class="text-xs font-bold text-mint tracking-widest mb-1">TYDZIEŃ Z ŻYCIA</div>
+        <div class="text-2xl font-extrabold">${new Date().toLocaleDateString("pl-PL", { day: "numeric", month: "long" })}</div>
+      </div>
+      <div class="grid grid-cols-2 gap-3 mb-4">
+        <div class="rounded-2xl p-3 bg-white/5">
+          <div class="text-[10px] text-neutral-400 font-bold tracking-widest">STREAK</div>
+          <div class="text-2xl font-extrabold text-gold">${streak} <span class="text-sm text-neutral-400">dni</span></div>
+        </div>
+        <div class="rounded-2xl p-3 bg-white/5">
+          <div class="text-[10px] text-neutral-400 font-bold tracking-widest">WYKONANIE</div>
+          <div class="text-2xl font-extrabold text-mint">${avgPct}%</div>
+        </div>
+        <div class="rounded-2xl p-3 bg-white/5">
+          <div class="text-[10px] text-neutral-400 font-bold tracking-widest">IDEALNE DNI</div>
+          <div class="text-2xl font-extrabold text-lilac">${perfectDays}/7</div>
+        </div>
+        <div class="rounded-2xl p-3 bg-white/5">
+          <div class="text-[10px] text-neutral-400 font-bold tracking-widest">SEN</div>
+          <div class="text-2xl font-extrabold text-peach">${avgSleep != null ? avgSleep.toFixed(1) + "h" : "—"}</div>
+        </div>
+      </div>
+      <div class="space-y-2">
+        ${avgSteps != null ? `<div class="flex justify-between text-xs"><span class="text-neutral-400 font-medium">Średnie kroki:</span><span class="font-bold">${Math.round(avgSteps)}</span></div>` : ""}
+        ${avgStress != null ? `<div class="flex justify-between text-xs"><span class="text-neutral-400 font-medium">Średni stres:</span><span class="font-bold">${Math.round(avgStress)}/100</span></div>` : ""}
+        ${weightChange != null ? `<div class="flex justify-between text-xs"><span class="text-neutral-400 font-medium">Zmiana wagi:</span><span class="font-bold ${weightChange > 0 ? "text-mint" : weightChange < 0 ? "text-rose" : ""}">${weightChange > 0 ? "+" : ""}${weightChange.toFixed(1)} kg</span></div>` : ""}
+      </div>
+    </div>`;
+  openModal("modal-week-of-life");
+});
+
+// ============================================================================
+// FORMULARZE
+// ============================================================================
+if (sunday) document.getElementById("weight-field-wrapper").classList.remove("hidden");
+if (nailCheckDay) document.getElementById("nail-card").classList.remove("hidden");
 
 document.getElementById("form-morning").addEventListener("submit", async (e) => {
   e.preventDefault();
@@ -1796,15 +2633,21 @@ document.getElementById("form-morning").addEventListener("submit", async (e) => 
     sleepLight: parseFloat(document.getElementById("input-sleep-light").value) || null,
     sleepWakes: parseInt(document.getElementById("input-sleep-wakes").value) || null,
     sleepHr: parseInt(document.getElementById("input-sleep-hr").value) || null,
+    rhr: parseInt(document.getElementById("input-rhr").value) || null,
     dailyWeight: parseFloat(document.getElementById("input-weight-daily").value) || null,
+    jawTension: parseInt(document.getElementById("input-jaw-tension").value, 10) || null,
+    moodMorning: parseInt(document.getElementById("input-mood-morning").value, 10) || null,
     weeklyWeight: sunday ? (parseFloat(document.getElementById("input-weight-weekly").value) || null) : null,
   };
-  const existing = (await loadDayDoc(todayKey)) || { date: todayKey, tasks: state.tasks, completedPct: calcCompletionPct() };
-  await saveDayDoc({ ...existing, morning });
   state.morning = morning;
+  const existing = (await loadDayDoc(todayKey)) || { date: todayKey };
+  await saveDayDoc({ ...existing, morning });
   showToast("Raport poranny zapisany ✓");
   renderImprovementTips();
+  renderReadiness();
+  renderGoal();
   renderCharts();
+  checkRecoveryNeeds();
 });
 
 document.getElementById("form-evening").addEventListener("submit", async (e) => {
@@ -1814,38 +2657,33 @@ document.getElementById("form-evening").addEventListener("submit", async (e) => 
     hrDay: parseInt(document.getElementById("input-hr-day").value) || null,
     spo2: parseInt(document.getElementById("input-spo2").value) || null,
     stress: parseInt(document.getElementById("input-stress").value) || null,
+    rpe: parseInt(document.getElementById("input-rpe").value) || null,
+    screenTime: parseInt(document.getElementById("input-screen-time").value) || null,
+    moodEvening: parseInt(document.getElementById("input-mood-evening").value, 10) || null,
     weightEvening: parseFloat(document.getElementById("input-weight-evening").value) || null,
   };
-  const existing = (await loadDayDoc(todayKey)) || { date: todayKey, tasks: state.tasks, completedPct: calcCompletionPct() };
-  await saveDayDoc({ ...existing, evening });
   state.evening = evening;
-  showToast("Podsumowanie dnia zapisane ✓");
+  const existing = (await loadDayDoc(todayKey)) || { date: todayKey };
+  await saveDayDoc({ ...existing, evening });
+  showToast("Podsumowanie zapisane ✓");
   renderImprovementTips();
+  renderReadiness();
   renderCharts();
+  checkRecoveryNeeds();
 });
 
-// ----------------------------------------------------------------------------
+// ============================================================================
 // WYKRESY
-// ----------------------------------------------------------------------------
-let weightChart = null;
-let sleepChart = null;
+// ============================================================================
+let weightChart = null, sleepChart = null, rhrChart = null, stepsChart = null, stressChart = null, moodChart = null;
 
 async function renderCharts() {
-  const days = await loadLastNDays(7);
-  const sleepLabels = days.map((d) => {
+  const n = state.chartRange;
+  const days = await loadLastNDays(n);
+  const labels = days.map((d) => {
     const [, m, day] = d.date.split("-");
     return `${day}.${m}`;
   });
-  const sleepDeep = days.map((d) => d.morning?.sleepDeep ?? null);
-  const sleepRem = days.map((d) => d.morning?.sleepRem ?? null);
-
-  // Waga: łączy wagę codzienną i tygodniową (niedziele mają priorytet)
-  const weeklyWeights = await loadWeeklyWeights(8);
-  const weightLabels = weeklyWeights.map((p) => {
-    const [, m, day] = p.date.split("-");
-    return `${day}.${m}`;
-  });
-  const weightValues = weeklyWeights.map((p) => p.weight);
 
   const baseOptions = {
     responsive: true,
@@ -1856,12 +2694,13 @@ async function renderCharts() {
     },
   };
 
-  const weightCtx = document.getElementById("chart-weight");
+  // WAGA — bierzemy dailyWeight, fallback weeklyWeight
+  const weightValues = days.map((d) => d.morning?.dailyWeight ?? d.morning?.weeklyWeight ?? null);
   if (weightChart) weightChart.destroy();
-  weightChart = new Chart(weightCtx, {
+  weightChart = new Chart(document.getElementById("chart-weight"), {
     type: "line",
     data: {
-      labels: weightLabels,
+      labels,
       datasets: [{
         label: "Waga (kg)",
         data: weightValues,
@@ -1871,7 +2710,7 @@ async function renderCharts() {
         pointBorderColor: "#0f0c1d",
         pointRadius: 4,
         borderWidth: 3,
-        tension: 0.45,
+        tension: 0.4,
         fill: true,
         spanGaps: true,
       }],
@@ -1879,115 +2718,106 @@ async function renderCharts() {
     options: baseOptions,
   });
 
-  const sleepCtx = document.getElementById("chart-sleep");
+  // SEN
+  const sleepDeep = days.map((d) => d.morning?.sleepDeep ?? null);
+  const sleepRem = days.map((d) => d.morning?.sleepRem ?? null);
   if (sleepChart) sleepChart.destroy();
-  sleepChart = new Chart(sleepCtx, {
+  sleepChart = new Chart(document.getElementById("chart-sleep"), {
     type: "line",
     data: {
-      labels: sleepLabels,
+      labels,
       datasets: [
-        {
-          label: "Głęboki sen (h)",
-          data: sleepDeep,
-          borderColor: "#5eead4",
-          backgroundColor: "rgba(94,234,212,0.12)",
-          pointBackgroundColor: "#5eead4",
-          pointBorderColor: "#0f0c1d",
-          pointRadius: 4,
-          borderWidth: 3,
-          tension: 0.45,
-          fill: true,
-          spanGaps: true,
-        },
-        {
-          label: "REM (h)",
-          data: sleepRem,
-          borderColor: "#c4b5fd",
-          backgroundColor: "rgba(196,181,253,0.12)",
-          pointBackgroundColor: "#c4b5fd",
-          pointBorderColor: "#0f0c1d",
-          pointRadius: 4,
-          borderWidth: 3,
-          tension: 0.45,
-          fill: true,
-          spanGaps: true,
-        },
+        { label: "Głęboki (h)", data: sleepDeep, borderColor: "#5eead4", backgroundColor: "rgba(94,234,212,0.12)", pointBackgroundColor: "#5eead4", pointBorderColor: "#0f0c1d", pointRadius: 4, borderWidth: 3, tension: 0.4, fill: true, spanGaps: true },
+        { label: "REM (h)", data: sleepRem, borderColor: "#c4b5fd", backgroundColor: "rgba(196,181,253,0.12)", pointBackgroundColor: "#c4b5fd", pointBorderColor: "#0f0c1d", pointRadius: 4, borderWidth: 3, tension: 0.4, fill: true, spanGaps: true },
       ],
     },
-    options: {
-      ...baseOptions,
-      plugins: { legend: { display: true, labels: { color: "#c9c5d6", font: { family: "Poppins", size: 11, weight: "700" } } } },
-    },
+    options: { ...baseOptions, plugins: { legend: { display: true, labels: { color: "#c9c5d6", font: { family: "Poppins", size: 11, weight: "700" } } } } },
   });
 
-  const stepsValues = days.map((d) => d.evening?.steps ?? null);
-  const stepsCtx = document.getElementById("chart-steps");
-  if (window.__stepsChart) window.__stepsChart.destroy();
-  window.__stepsChart = new Chart(stepsCtx, {
-    type: "bar",
-    data: {
-      labels: sleepLabels,
-      datasets: [{
-        data: stepsValues,
-        backgroundColor: "rgba(251,191,157,0.55)",
-        borderRadius: 8,
-        maxBarThickness: 28,
-      }],
-    },
-    options: baseOptions,
-  });
-
-  const stressValues = days.map((d) => d.evening?.stress ?? null);
-  const stressCtx = document.getElementById("chart-stress");
-  if (window.__stressChart) window.__stressChart.destroy();
-  window.__stressChart = new Chart(stressCtx, {
+  // RHR
+  const rhrValues = days.map((d) => d.morning?.rhr ?? null);
+  if (rhrChart) rhrChart.destroy();
+  rhrChart = new Chart(document.getElementById("chart-rhr"), {
     type: "line",
     data: {
-      labels: sleepLabels,
+      labels,
       datasets: [{
-        data: stressValues,
-        borderColor: "#fb7185",
-        backgroundColor: "rgba(251,113,133,0.12)",
-        pointBackgroundColor: "#fb7185",
+        data: rhrValues,
+        borderColor: "#5eead4",
+        backgroundColor: "rgba(94,234,212,0.12)",
+        pointBackgroundColor: "#5eead4",
         pointBorderColor: "#0f0c1d",
         pointRadius: 4,
         borderWidth: 3,
-        tension: 0.45,
+        tension: 0.4,
         fill: true,
         spanGaps: true,
       }],
     },
+    options: baseOptions,
+  });
+
+  // KROKI
+  if (stepsChart) stepsChart.destroy();
+  stepsChart = new Chart(document.getElementById("chart-steps"), {
+    type: "bar",
+    data: {
+      labels,
+      datasets: [{ data: days.map((d) => d.evening?.steps ?? null), backgroundColor: "rgba(251,191,157,0.55)", borderRadius: 8, maxBarThickness: 28 }],
+    },
+    options: baseOptions,
+  });
+
+  // STRES
+  if (stressChart) stressChart.destroy();
+  stressChart = new Chart(document.getElementById("chart-stress"), {
+    type: "line",
+    data: {
+      labels,
+      datasets: [{ data: days.map((d) => d.evening?.stress ?? null), borderColor: "#fb7185", backgroundColor: "rgba(251,113,133,0.12)", pointBackgroundColor: "#fb7185", pointBorderColor: "#0f0c1d", pointRadius: 4, borderWidth: 3, tension: 0.4, fill: true, spanGaps: true }],
+    },
     options: { ...baseOptions, scales: { ...baseOptions.scales, y: { ...baseOptions.scales.y, min: 0, max: 100 } } },
+  });
+
+  // NASTRÓJ
+  if (moodChart) moodChart.destroy();
+  moodChart = new Chart(document.getElementById("chart-mood"), {
+    type: "line",
+    data: {
+      labels,
+      datasets: [
+        { label: "Rano", data: days.map((d) => d.morning?.moodMorning ?? null), borderColor: "#fbbf9d", pointBackgroundColor: "#fbbf9d", pointBorderColor: "#0f0c1d", pointRadius: 4, borderWidth: 3, tension: 0.4, spanGaps: true },
+        { label: "Wieczór", data: days.map((d) => d.evening?.moodEvening ?? null), borderColor: "#c4b5fd", pointBackgroundColor: "#c4b5fd", pointBorderColor: "#0f0c1d", pointRadius: 4, borderWidth: 3, tension: 0.4, spanGaps: true },
+      ],
+    },
+    options: { ...baseOptions, scales: { ...baseOptions.scales, y: { ...baseOptions.scales.y, min: 0, max: 10 } }, plugins: { legend: { display: true, labels: { color: "#c9c5d6", font: { family: "Poppins", size: 11, weight: "700" } } } } },
   });
 
   renderCorrelation();
 }
 
-// ----------------------------------------------------------------------------
-// RADA TRENERA — analiza AI
-// ----------------------------------------------------------------------------
+// ============================================================================
+// AI ANALIZA
+// ============================================================================
 document.getElementById("btn-analyze-ai").addEventListener("click", async () => {
   const label = document.getElementById("ai-btn-label");
   const spinner = document.getElementById("ai-btn-spinner");
   label.classList.add("opacity-0");
   spinner.classList.remove("hidden");
-
   try {
     const dayData = (await loadDayDoc(todayKey)) || {
       date: todayKey, tasks: state.tasks, completedPct: calcCompletionPct(),
       morning: state.morning, evening: state.evening,
     };
-
     const verdict = await runMentorAI(dayData);
     await saveDayDoc({ ...dayData, aiVerdict: verdict });
-
     document.getElementById("ai-result-box").classList.remove("hidden");
     document.getElementById("ai-result-text").textContent = verdict;
     document.getElementById("mentor-verdict-box").classList.remove("hidden");
     document.getElementById("mentor-verdict-text").textContent = verdict;
     renderMentorHistory();
   } catch (err) {
-    showToast("Coś poszło nie tak z Trenerem");
+    showToast("Błąd analizy");
     console.error(err);
   } finally {
     label.classList.remove("opacity-0");
@@ -1995,29 +2825,19 @@ document.getElementById("btn-analyze-ai").addEventListener("click", async () => 
   }
 });
 
-// HISTORIA TRENERA
 async function renderMentorHistory() {
   const list = document.getElementById("mentor-history-list");
   const days = await loadLastNDays(30);
   const withVerdict = days.filter((d) => d.aiVerdict).sort((a, b) => b.date.localeCompare(a.date));
-
   if (withVerdict.length === 0) {
-    list.innerHTML = `<p class="text-sm text-neutral-500 font-medium">Brak jeszcze historii — zrób analizę Trenera, żeby zaczęła się budować.</p>`;
+    list.innerHTML = `<p class="text-sm text-neutral-500 font-medium">Brak historii.</p>`;
     return;
   }
-
   list.innerHTML = withVerdict.map((d) => {
     const [y, m, day] = d.date.split("-");
     const pct = d.completedPct ?? 0;
     const pctColor = pct === 100 ? "text-mint" : pct >= 50 ? "text-gold" : "text-rose";
-    return `
-      <div class="history-item pl-3">
-        <div class="flex items-center gap-2 mb-1">
-          <span class="text-xs font-extrabold">${day}.${m}.${y}</span>
-          <span class="text-[11px] font-bold ${pctColor}">${pct}%</span>
-        </div>
-        <p class="text-xs text-neutral-400 leading-relaxed font-medium">${escapeHtml(d.aiVerdict)}</p>
-      </div>`;
+    return `<div class="history-item pl-3"><div class="flex items-center gap-2 mb-1"><span class="text-xs font-extrabold">${day}.${m}.${y}</span><span class="text-[11px] font-bold ${pctColor}">${pct}%</span></div><p class="text-xs text-neutral-400 leading-relaxed font-medium">${escapeHtml(d.aiVerdict)}</p></div>`;
   }).join("");
 }
 document.getElementById("btn-history-refresh").addEventListener("click", renderMentorHistory);
@@ -2033,84 +2853,64 @@ async function renderGlowUp() {
   const content = document.getElementById("glowup-content");
   const thisWeek = await loadDaysRange(7, 0);
   const lastWeek = await loadDaysRange(7, 7);
-
   if (thisWeek.length === 0 || lastWeek.length === 0) {
-    content.innerHTML = `<p class="text-sm text-neutral-400 font-medium">Za mało danych z dwóch tygodni, żeby porównać — wróć za kilka dni.</p>`;
+    content.innerHTML = `<p class="text-sm text-neutral-400 font-medium">Za mało danych.</p>`;
     return;
   }
-
   const metrics = [
-    { key: "completedPct", label: "Wykonanie zadań", unit: "%", get: (d) => d.completedPct, higherIsBetter: true },
+    { key: "completedPct", label: "Wykonanie", unit: "%", get: (d) => d.completedPct, higherIsBetter: true },
     { key: "sleepTotal", label: "Sen", unit: "h", get: (d) => d.morning?.sleepTotal, higherIsBetter: true },
     { key: "steps", label: "Kroki", unit: "", get: (d) => d.evening?.steps, higherIsBetter: true },
     { key: "stress", label: "Stres", unit: "/100", get: (d) => d.evening?.stress, higherIsBetter: false },
+    { key: "rhr", label: "RHR", unit: " bpm", get: (d) => d.morning?.rhr, higherIsBetter: false },
   ];
-
-  const rows = metrics.map((metric) => {
-    const thisAvg = average(thisWeek.map(metric.get).filter((v) => v != null));
-    const lastAvg = average(lastWeek.map(metric.get).filter((v) => v != null));
+  const rows = metrics.map((m) => {
+    const thisAvg = average(thisWeek.map(m.get).filter((v) => v != null));
+    const lastAvg = average(lastWeek.map(m.get).filter((v) => v != null));
     if (thisAvg == null || lastAvg == null) return null;
-
     const diff = thisAvg - lastAvg;
-    const improved = metric.higherIsBetter ? diff > 0 : diff < 0;
+    const improved = m.higherIsBetter ? diff > 0 : diff < 0;
     const arrow = diff === 0 ? "→" : (diff > 0 ? "↑" : "↓");
     const color = diff === 0 ? "text-neutral-400" : (improved ? "text-mint" : "text-rose");
-    const fmt = (v) => (metric.key === "steps" ? Math.round(v) : v.toFixed(1));
-
-    return `
-      <div class="flex items-center justify-between glass rounded-2xl px-4 py-2.5">
-        <span class="text-xs font-bold text-neutral-300">${metric.label}:</span>
-        <span class="text-xs font-extrabold ${color}">${fmt(thisAvg)}${metric.unit} ${arrow} <span class="text-neutral-500 font-semibold">(było ${fmt(lastAvg)}${metric.unit})</span></span>
-      </div>`;
+    const fmt = (v) => (m.key === "steps" ? Math.round(v) : v.toFixed(1));
+    return `<div class="flex items-center justify-between glass rounded-2xl px-4 py-2.5"><span class="text-xs font-bold text-neutral-300">${m.label}:</span><span class="text-xs font-extrabold ${color}">${fmt(thisAvg)}${m.unit} ${arrow} <span class="text-neutral-500 font-semibold">(${fmt(lastAvg)}${m.unit})</span></span></div>`;
   }).filter(Boolean);
-
-  content.innerHTML = rows.length
-    ? rows.join("")
-    : `<p class="text-sm text-neutral-400 font-medium">Za mało wspólnych danych do porównania — uzupełniaj raporty codziennie.</p>`;
+  content.innerHTML = rows.length ? rows.join("") : `<p class="text-sm text-neutral-400 font-medium">Za mało danych.</p>`;
 }
 document.getElementById("btn-glowup-refresh").addEventListener("click", renderGlowUp);
 
-// PWA INSTALL
+// ============================================================================
+// PWA / NOTIF / PUSH / THEME / CYTATY
+// ============================================================================
 let deferredInstallPrompt = null;
-
 window.addEventListener("beforeinstallprompt", (e) => {
   e.preventDefault();
   deferredInstallPrompt = e;
-  if (!localStorage.getItem("regim:install-dismissed")) {
-    document.getElementById("install-banner").classList.remove("hidden");
-  }
+  if (!localStorage.getItem("regim:install-dismissed")) document.getElementById("install-banner").classList.remove("hidden");
 });
-
 document.getElementById("btn-install").addEventListener("click", async () => {
   if (!deferredInstallPrompt) return;
   deferredInstallPrompt.prompt();
   const { outcome } = await deferredInstallPrompt.userChoice;
-  if (outcome === "accepted") showToast("Dodano do ekranu głównego 🎉");
+  if (outcome === "accepted") showToast("Dodano 🎉");
   deferredInstallPrompt = null;
   document.getElementById("install-banner").classList.add("hidden");
 });
-
 document.getElementById("btn-install-dismiss").addEventListener("click", () => {
   document.getElementById("install-banner").classList.add("hidden");
   localStorage.setItem("regim:install-dismissed", "1");
 });
 
-// POWIADOMIENIA LOKALNE
 function scheduleLocalReminders() {
   setInterval(async () => {
     const now = new Date();
     const hh = now.getHours();
     const mm = now.getMinutes();
     const existing = await loadDayDoc(dateKey(now));
-    if (hh === 8 && mm === 0 && !(existing?.morning)) {
-      fireNotification("Dzień dobry! ☀️", "Czas na poranny raport snu ze smartwatcha.");
-    }
-    if (hh === 20 && mm === 0 && !(existing?.evening)) {
-      fireNotification("Podsumowanie dnia 🌙", "Wpisz kroki, tętno, SpO2, stres i wagę.");
-    }
+    if (hh === 8 && mm === 0 && !(existing?.morning)) fireNotification("Dzień dobry! ☀️", "Czas na raport snu.");
+    if (hh === 20 && mm === 0 && !(existing?.evening)) fireNotification("Podsumowanie 🌙", "Wpisz kroki, stres, RPE, nastrój.");
   }, 60000);
 }
-
 function fireNotification(title, body) {
   if (Notification.permission === "granted") {
     try {
@@ -2118,126 +2918,88 @@ function fireNotification(title, body) {
         if (reg) reg.showNotification(title, { body, icon: "icons/icon-192.png", badge: "icons/icon-192.png" });
         else new Notification(title, { body });
       }).catch(() => new Notification(title, { body }));
-    } catch (e) { console.warn("Powiadomienie nieudane", e); }
+    } catch (e) {}
   }
 }
-
 if ("Notification" in window) {
-  if (Notification.permission === "default" && !localStorage.getItem("regim:notif-dismissed")) {
-    document.getElementById("notif-banner").classList.remove("hidden");
-  }
+  if (Notification.permission === "default" && !localStorage.getItem("regim:notif-dismissed")) document.getElementById("notif-banner").classList.remove("hidden");
   if (Notification.permission === "granted") scheduleLocalReminders();
 }
-
 document.getElementById("btn-notif-enable").addEventListener("click", async () => {
-  try {
-    const perm = await Notification.requestPermission();
-    if (perm === "granted") {
-      showToast("Powiadomienia włączone 🔔");
-      scheduleLocalReminders();
-    } else {
-      showToast("Powiadomienia zablokowane");
-    }
-  } catch (e) { console.warn(e); }
+  const perm = await Notification.requestPermission();
+  if (perm === "granted") { showToast("Powiadomienia włączone 🔔"); scheduleLocalReminders(); }
   document.getElementById("notif-banner").classList.add("hidden");
 });
-
 document.getElementById("btn-notif-dismiss").addEventListener("click", () => {
   document.getElementById("notif-banner").classList.add("hidden");
   localStorage.setItem("regim:notif-dismissed", "1");
 });
 
-// PRAWDZIWY PUSH
 async function enableRealPush() {
-  if (!firebaseReady || !window.__fb) {
-    showToast("Najpierw skonfiguruj Firebase.");
-    return;
-  }
-  if (VAPID_KEY === "TWOJ_VAPID_KEY") {
-    showToast("Ustaw VAPID_KEY w kodzie.");
-    return;
-  }
+  if (!firebaseReady || !window.__fb) { showToast("Skonfiguruj Firebase."); return; }
+  if (VAPID_KEY === "TWOJ_VAPID_KEY") { showToast("Ustaw VAPID_KEY."); return; }
   try {
     const perm = await Notification.requestPermission();
-    if (perm !== "granted") {
-      showToast("Powiadomienia zablokowane w przeglądarce.");
-      return;
-    }
+    if (perm !== "granted") { showToast("Zablokowane."); return; }
     const reg = await navigator.serviceWorker.register("./firebase-messaging-sw.js");
     const messagingMod = await import("https://www.gstatic.com/firebasejs/10.13.0/firebase-messaging.js");
     fcmMessaging = messagingMod.getMessaging(window.__fb.app || undefined);
     const token = await messagingMod.getToken(fcmMessaging, { vapidKey: VAPID_KEY, serviceWorkerRegistration: reg });
-    if (!token) {
-      showToast("Nie udało się uzyskać tokenu push.");
-      return;
-    }
+    if (!token) { showToast("Brak tokenu."); return; }
     const { fsMod, db } = window.__fb;
     const ref = fsMod.doc(db, "users", currentUser.uid, "pushTokens", token);
     await fsMod.setDoc(ref, { token, createdAt: Date.now(), platform: navigator.userAgent });
-    messagingMod.onMessage(fcmMessaging, (payload) => {
-      showToast(payload.notification?.title || "Nowe powiadomienie");
-    });
-    showToast("Prawdziwy push włączony ✓");
+    showToast("Push włączony ✓");
     document.getElementById("push-banner").classList.add("hidden");
-  } catch (e) {
-    console.error("Błąd włączania push", e);
-    showToast("Błąd włączania push — sprawdź konsolę.");
-  }
+  } catch (e) { console.error(e); showToast("Błąd push."); }
 }
-
 document.getElementById("btn-push-enable").addEventListener("click", enableRealPush);
 document.getElementById("btn-push-dismiss").addEventListener("click", () => {
   document.getElementById("push-banner").classList.add("hidden");
   localStorage.setItem("regim:push-dismissed", "1");
 });
 
-// SERVICE WORKER
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => {
     navigator.serviceWorker.register("./sw.js").catch((e) => console.warn("SW nieudany", e));
   });
 }
 
-// MOTYW
+// Theme
 function applyTheme(theme) {
   const icon = document.getElementById("theme-icon");
-  if (theme === "light") {
-    document.documentElement.classList.add("light-theme");
-    icon.className = "fa-solid fa-sun";
-  } else {
-    document.documentElement.classList.remove("light-theme");
-    icon.className = "fa-solid fa-moon";
-  }
+  if (theme === "light") { document.documentElement.classList.add("light-theme"); icon.className = "fa-solid fa-sun"; }
+  else { document.documentElement.classList.remove("light-theme"); icon.className = "fa-solid fa-moon"; }
   localStorage.setItem("regim:theme", theme);
+}
+function applyAutoTheme() {
+  const s = getSettings();
+  if (!s.autoTheme) return;
+  const h = new Date().getHours();
+  applyTheme((h >= 6 && h < 19) ? "light" : "dark");
 }
 document.getElementById("btn-theme-toggle").addEventListener("click", () => {
   const isLight = document.documentElement.classList.contains("light-theme");
   applyTheme(isLight ? "dark" : "light");
 });
-applyTheme(localStorage.getItem("regim:theme") || "dark");
 
-// CYTAT DNIA (rozszerzony — dużo tekstów Trenera)
+// Cytaty — fiszki motywacyjne Trenera
 const DAILY_QUOTES = [
-  "🏋️ Sen to nie przestój — to główna zmiana produkcyjna Twojego ciała.",
-  "💪 Hormon wzrostu wydziela się głównie w głębokim śnie, nie na siłowni.",
-  "🔥 Regularność bije intensywność. Codziennie trochę > raz dużo.",
-  "✨ Ćwiczenia na twarz to inwestycja w kontur i napięcie mięśni.",
-  "🗣️ Mechaniczne R buduje się powtórzeniem, nie jednym dniem ćwiczeń.",
-  "💓 Tętno spoczynkowe to Twój najtańszy wskaźnik regeneracji.",
-  "🫁 SpO2 poniżej normy to sygnał, nie statystyka do zignorowania.",
-  "🧘 Stres kumuluje się cicho — reset szczęki to mały, tani wentyl.",
-  "🚶 Kroki liczą się nawet w dni, gdy nie masz planowanego treningu.",
-  "💊 Woda i tłuszcz przy D3 to różnica między wchłonięciem a marnowaniem.",
-  "⚡ Jeden słabszy dzień nie niszczy postępu. Nawyk zniszczonego dnia — tak.",
-  "👁️ Rozciąganie oczu rano = mniej napięciowych bólów głowy wieczorem.",
-  "🍎 Jedz dla celu, nie dla nastroju. Nadwyżka + ruch = masa.",
-  "🌙 Ostatni posiłek 3h przed snem = lepszy sen głęboki i REM.",
-  "🏆 Dyscyplina to wybieranie tego, czego chcesz najbardziej, nad tym, czego chcesz teraz.",
-  "📊 Mierzysz, więc wiesz. Wiesz, więc możesz to zmienić.",
-  "💧 2 litry wody dziennie — nawodnienie przekłada się na jasność umysłu.",
-  "⏰ Wstawaj o tej samej porze, nawet w weekend — rytm dobowy to fundament.",
-  "🎯 Zaczynaj dzień od najtrudniejszego zadania — reszta pójdzie z górki.",
-  "🌟 Małe kroki każdego dnia budują coś, czego nie da się zbudować w jeden dzień.",
+  "🏋️ Regeneracja to też trening. Bez niej nie ma progresu.",
+  "😴 Sen to fundament — bez 7-8h nie zbudujesz niczego trwale.",
+  "💓 RHR w normie = organizm gotowy. RHR wysoko = słuchaj go.",
+  "🫁 3 min oddechu 4-7-8 obniża kortyzol mocniej niż myślisz.",
+  "🧍 Dobra postawa szyi = mocniejsza linia żuchwy.",
+  "✨ Looksmaxing to nie próżność, to świadome budowanie siebie.",
+  "🗣️ 5 min mowy dziennie buduje więcej niż jedna długa sesja.",
+  "🚶 10 min spaceru po posiłku reguluje glikemię.",
+  "🚿 Zimny prysznic rano = czujność na 3h.",
+  "💧 Woda z solą rano uzupełnia elektrolity po nocy.",
+  "🎯 Jesteś przedtrenowany — deload to nie porażka, to mądrość.",
+  "💪 Siła rośnie w przerwie, nie w trakcie treningu.",
+  "📊 Mierzysz = wiesz. Wiesz = możesz zmienić.",
+  "🌿 Jeden dzień regeneracji oszczędza tydzień przestoju.",
+  "🔥 Konsekwencja > intensywność. Zawsze.",
 ];
 function renderDailyQuote() {
   const idx = dayIndexSinceEpoch(new Date()) % DAILY_QUOTES.length;
@@ -2245,23 +3007,13 @@ function renderDailyQuote() {
 }
 setInterval(() => {
   const el = document.getElementById("daily-quote");
-  const pool = DAILY_QUOTES;
-  const randomIdx = Math.floor(Math.random() * pool.length);
+  const randomIdx = Math.floor(Math.random() * DAILY_QUOTES.length);
   el.style.animation = "none";
-  requestAnimationFrame(() => {
-    el.textContent = pool[randomIdx];
-    el.style.animation = "";
-  });
-}, 8000);
+  requestAnimationFrame(() => { el.textContent = DAILY_QUOTES[randomIdx]; el.style.animation = ""; });
+}, 10000);
 
-// HAPTYKA
-function vibrate(pattern) {
-  if (navigator.vibrate) {
-    try { navigator.vibrate(pattern); } catch (e) { /* noop */ }
-  }
-}
+function vibrate(pattern) { if (navigator.vibrate) try { navigator.vibrate(pattern); } catch (e) {} }
 
-// CONFETTI
 function fireConfetti() {
   const canvas = document.getElementById("confetti-canvas");
   const ctx = canvas.getContext("2d");
@@ -2280,23 +3032,17 @@ function fireConfetti() {
     gravity: 0.35 + Math.random() * 0.15,
   }));
   let frame = 0;
-  const maxFrames = 130;
   function tick() {
     frame++;
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     particles.forEach((p) => {
-      p.vy += p.gravity;
-      p.x += p.vx;
-      p.y += p.vy;
-      p.rot += p.vr;
-      ctx.save();
-      ctx.translate(p.x, p.y);
-      ctx.rotate(p.rot);
+      p.vy += p.gravity; p.x += p.vx; p.y += p.vy; p.rot += p.vr;
+      ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.rot);
       ctx.fillStyle = p.color;
       ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size * 0.6);
       ctx.restore();
     });
-    if (frame < maxFrames) requestAnimationFrame(tick);
+    if (frame < 130) requestAnimationFrame(tick);
     else ctx.clearRect(0, 0, canvas.width, canvas.height);
   }
   tick();
@@ -2307,14 +3053,10 @@ function downloadFile(filename, content, mime) {
   const blob = new Blob([content], { type: mime });
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
-  a.href = url;
-  a.download = filename;
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  URL.revokeObjectURL(url);
+  a.href = url; a.download = filename;
+  document.body.appendChild(a); a.click();
+  document.body.removeChild(a); URL.revokeObjectURL(url);
 }
-
 async function collectAllDays() {
   const results = [];
   if (firebaseReady && window.__fb && currentUser?.uid && currentUser.uid !== "local") {
@@ -2325,46 +3067,25 @@ async function collectAllDays() {
   } else {
     const today = new Date();
     for (let i = 0; i < 365; i++) {
-      const d = new Date(today);
-      d.setDate(d.getDate() - i);
+      const d = new Date(today); d.setDate(d.getDate() - i);
       const raw = localStorage.getItem(localKey(dateKey(d)));
       if (raw) results.push(JSON.parse(raw));
     }
   }
   return results.sort((a, b) => a.date.localeCompare(b.date));
 }
-
-function exportAsJSON(days) {
-  downloadFile(`regim-export-${todayKey}.json`, JSON.stringify(days, null, 2), "application/json");
-}
-
-function exportAsCSV(days) {
-  const headers = [
-    "date", "completedPct",
-    "morning_sleepTotal", "morning_sleepDeep", "morning_sleepRem", "morning_sleepLight",
-    "morning_sleepWakes", "morning_sleepHr", "morning_dailyWeight", "morning_weeklyWeight",
-    "evening_steps", "evening_hrDay", "evening_spo2", "evening_stress", "evening_weightEvening",
-  ];
-  const rows = days.map((d) => {
-    const m = d.morning || {};
-    const e = d.evening || {};
-    return [
-      d.date, d.completedPct ?? "",
-      m.sleepTotal ?? "", m.sleepDeep ?? "", m.sleepRem ?? "", m.sleepLight ?? "",
-      m.sleepWakes ?? "", m.sleepHr ?? "", m.dailyWeight ?? "", m.weeklyWeight ?? "",
-      e.steps ?? "", e.hrDay ?? "", e.spo2 ?? "", e.stress ?? "", e.weightEvening ?? "",
-    ].join(",");
-  });
-  const csv = [headers.join(","), ...rows].join("\n");
-  downloadFile(`regim-export-${todayKey}.csv`, csv, "text/csv");
-}
-
 document.getElementById("btn-export").addEventListener("click", async () => {
-  const choice = confirm("OK = eksport CSV, Anuluj = eksport JSON");
+  const choice = confirm("OK = CSV, Anuluj = JSON");
   const days = await collectAllDays();
-  if (days.length === 0) { showToast("Brak danych do eksportu"); return; }
-  if (choice) exportAsCSV(days); else exportAsJSON(days);
-  showToast("Eksport gotowy — sprawdź pobrane pliki 📁");
+  if (days.length === 0) { showToast("Brak danych"); return; }
+  if (choice) {
+    const headers = ["date", "completedPct", "morning_sleepTotal", "morning_sleepDeep", "morning_sleepRem", "morning_sleepWakes", "morning_sleepHr", "morning_rhr", "morning_dailyWeight", "morning_weeklyWeight", "morning_jawTension", "morning_moodMorning", "evening_steps", "evening_hrDay", "evening_spo2", "evening_stress", "evening_rpe", "evening_screenTime", "evening_moodEvening"];
+    const rows = days.map((d) => { const m = d.morning || {}; const e = d.evening || {}; return [d.date, d.completedPct ?? "", m.sleepTotal ?? "", m.sleepDeep ?? "", m.sleepRem ?? "", m.sleepWakes ?? "", m.sleepHr ?? "", m.rhr ?? "", m.dailyWeight ?? "", m.weeklyWeight ?? "", m.jawTension ?? "", m.moodMorning ?? "", e.steps ?? "", e.hrDay ?? "", e.spo2 ?? "", e.stress ?? "", e.rpe ?? "", e.screenTime ?? "", e.moodEvening ?? ""].join(","); });
+    downloadFile(`regim-export-${todayKey}.csv`, [headers.join(","), ...rows].join("\n"), "text/csv");
+  } else {
+    downloadFile(`regim-export-${todayKey}.json`, JSON.stringify(days, null, 2), "application/json");
+  }
+  showToast("Eksport gotowy 📁");
 });
 
 // KALENDARZ
@@ -2375,89 +3096,67 @@ async function renderCalendar() {
   const year = calViewDate.getFullYear();
   const month = calViewDate.getMonth();
   document.getElementById("cal-month-label").textContent = `${MONTH_NAMES_PL[month]} ${year}`;
-
   const firstDay = new Date(year, month, 1);
-  const lastDay = new Date(year, month + 1, 0);
-  const daysInMonth = lastDay.getDate();
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
   const startOffset = (firstDay.getDay() + 6) % 7;
-
   const grid = document.getElementById("cal-grid");
   grid.innerHTML = "";
-
-  for (let i = 0; i < startOffset; i++) {
-    const empty = document.createElement("div");
-    grid.appendChild(empty);
-  }
-
+  for (let i = 0; i < startOffset; i++) grid.appendChild(document.createElement("div"));
   for (let day = 1; day <= daysInMonth; day++) {
     const d = new Date(year, month, day);
     const key = dateKey(d);
     const isToday = key === todayKey;
     const doc = await loadDayDoc(key);
     const pct = doc?.completedPct ?? null;
-
     const cell = document.createElement("div");
     let dotColor = "bg-white/10";
     let textColor = "text-neutral-500";
     if (pct === 100) { dotColor = "bg-mint"; textColor = "text-neutral-200"; }
     else if (pct != null && pct > 0) { dotColor = "bg-gold"; textColor = "text-neutral-200"; }
-
     cell.className = `cal-day glass ${textColor} ${isToday ? "ring-2 ring-mint" : ""}`;
     cell.innerHTML = `<span>${day}</span><span class="cal-dot ${dotColor}"></span>`;
     grid.appendChild(cell);
   }
 }
-
-document.getElementById("cal-prev").addEventListener("click", () => {
-  calViewDate.setMonth(calViewDate.getMonth() - 1);
-  renderCalendar();
-});
-document.getElementById("cal-next").addEventListener("click", () => {
-  calViewDate.setMonth(calViewDate.getMonth() + 1);
-  renderCalendar();
-});
+document.getElementById("cal-prev").addEventListener("click", () => { calViewDate.setMonth(calViewDate.getMonth() - 1); renderCalendar(); });
+document.getElementById("cal-next").addEventListener("click", () => { calViewDate.setMonth(calViewDate.getMonth() + 1); renderCalendar(); });
 
 // ODZNAKI
 const BADGES = [
-  { id: "streak3", icon: "fa-fire", label: "3 dni z rzędu", check: (ctx) => ctx.streak >= 3 },
-  { id: "streak7", icon: "fa-fire-flame-curved", label: "Tydzień streak", check: (ctx) => ctx.streak >= 7 },
-  { id: "streak30", icon: "fa-crown", label: "30 dni streak", check: (ctx) => ctx.streak >= 30 },
-  { id: "speech7", icon: "fa-comment-dots", label: "7× mowa", check: (ctx) => ctx.speechCount >= 7 },
-  { id: "speech30", icon: "fa-microphone", label: "30× mowa", check: (ctx) => ctx.speechCount >= 30 },
-  { id: "face7", icon: "fa-face-smile", label: "7× twarz", check: (ctx) => ctx.faceCount >= 7 },
-  { id: "sleep7", icon: "fa-moon", label: "7× sen ≥8h", check: (ctx) => ctx.goodSleepCount >= 7 },
-  { id: "weight4", icon: "fa-scale-balanced", label: "4 wpisy wagi", check: (ctx) => ctx.weightEntries >= 4 },
-  { id: "perfect", icon: "fa-star", label: "Idealny dzień", check: (ctx) => ctx.hadPerfectDay },
-  { id: "early", icon: "fa-sun", label: "Ranny ptaszek", check: (ctx) => ctx.morningEntries >= 5 },
+  { id: "streak3", icon: "fa-fire", label: "3 dni streak", check: (c) => c.streak >= 3 },
+  { id: "streak7", icon: "fa-fire-flame-curved", label: "7 dni streak", check: (c) => c.streak >= 7 },
+  { id: "streak30", icon: "fa-crown", label: "30 dni streak", check: (c) => c.streak >= 30 },
+  { id: "speech7", icon: "fa-comment-dots", label: "7× mowa", check: (c) => c.speechCount >= 7 },
+  { id: "face7", icon: "fa-face-smile", label: "7× twarz", check: (c) => c.faceCount >= 7 },
+  { id: "posture7", icon: "fa-user-tie", label: "7× postawa", check: (c) => c.postureCount >= 7 },
+  { id: "sleep7", icon: "fa-moon", label: "7× sen ≥8h", check: (c) => c.goodSleepCount >= 7 },
+  { id: "cold7", icon: "fa-snowflake", label: "7× zimny prysznic", check: (c) => c.coldCount >= 7 },
+  { id: "perfect", icon: "fa-star", label: "Idealny dzień", check: (c) => c.hadPerfectDay },
+  { id: "recovery3", icon: "fa-leaf", label: "3× recovery", check: (c) => c.recoveryCount >= 3 },
+  { id: "1rm", icon: "fa-calculator", label: "1RM kalkulator", check: () => localStorage.getItem("regim:used-1rm") === "1" },
+  { id: "weekoflive", icon: "fa-camera", label: "Week of life", check: () => localStorage.getItem("regim:used-wol") === "1" },
 ];
 
 async function renderBadges() {
   const allDays = await collectAllDays();
-  const streakEl = document.getElementById("streak-count");
-  const streak = parseInt(streakEl.textContent) || 0;
-
+  const streak = parseInt(document.getElementById("streak-count").textContent) || 0;
   const ctx = {
     streak,
     speechCount: allDays.filter((d) => d.tasks?.find((t) => t.id === "mowa" && t.done)).length,
     faceCount: allDays.filter((d) => d.tasks?.find((t) => t.id === "twarz" && t.done)).length,
+    postureCount: allDays.filter((d) => d.tasks?.find((t) => t.id === "postawa" && t.done)).length,
     goodSleepCount: allDays.filter((d) => (d.morning?.sleepTotal ?? 0) >= 8).length,
-    weightEntries: allDays.filter((d) => d.morning?.weeklyWeight != null || d.morning?.dailyWeight != null).length,
+    coldCount: allDays.filter((d) => d.habits?.coldShower).length,
     hadPerfectDay: allDays.some((d) => d.completedPct === 100),
-    morningEntries: allDays.filter((d) => d.morning && Object.keys(d.morning).length > 0).length,
+    recoveryCount: allDays.filter((d) => d.recoveryMode).length,
   };
-
   const grid = document.getElementById("badges-grid");
   grid.innerHTML = "";
   BADGES.forEach((badge) => {
     const unlocked = badge.check(ctx);
     const card = document.createElement("div");
     card.className = `badge-card ${unlocked ? "unlocked" : "locked"} glass rounded-2xl p-3 flex flex-col items-center gap-1.5 text-center`;
-    card.innerHTML = `
-      <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-mint/25 to-lilac/25 flex items-center justify-center">
-        <i class="fa-solid ${badge.icon} ${unlocked ? "text-gold" : "text-neutral-500"}"></i>
-      </div>
-      <div class="text-[10px] font-bold leading-tight">${badge.label}</div>
-    `;
+    card.innerHTML = `<div class="w-10 h-10 rounded-xl bg-gradient-to-br from-mint/25 to-lilac/25 flex items-center justify-center"><i class="fa-solid ${badge.icon} ${unlocked ? "text-gold" : "text-neutral-500"}"></i></div><div class="text-[10px] font-bold leading-tight">${badge.label}</div>`;
     grid.appendChild(card);
   });
 }
@@ -2465,128 +3164,104 @@ async function renderBadges() {
 // NAJLEPSZY WYNIK
 async function renderBestStats() {
   const allDays = await collectAllDays();
-  if (allDays.length === 0) {
-    document.getElementById("best-streak-value").textContent = "0";
-    document.getElementById("best-week-value").textContent = "0%";
-    return;
-  }
-
-  let bestStreak = 0;
-  let current = 0;
-  let prevDate = null;
+  if (allDays.length === 0) { document.getElementById("best-streak-value").textContent = "0"; document.getElementById("best-week-value").textContent = "0%"; return; }
+  let bestStreak = 0, current = 0, prevDate = null;
   allDays.forEach((d) => {
     const isConsecutive = prevDate ? (new Date(d.date) - new Date(prevDate)) === 86400000 : true;
-    if (d.completedPct === 100 && isConsecutive) {
-      current += 1;
-    } else if (d.completedPct === 100) {
-      current = 1;
-    } else {
-      current = 0;
-    }
+    if (d.completedPct === 100 && isConsecutive) current += 1;
+    else if (d.completedPct === 100) current = 1;
+    else current = 0;
     bestStreak = Math.max(bestStreak, current);
     prevDate = d.date;
   });
-
   let bestWeekPct = 0;
   for (let i = 0; i <= allDays.length - 7; i++) {
-    const slice = allDays.slice(i, i + 7);
-    const avgPct = average(slice.map((d) => d.completedPct ?? 0));
+    const avgPct = average(allDays.slice(i, i + 7).map((d) => d.completedPct ?? 0));
     if (avgPct != null) bestWeekPct = Math.max(bestWeekPct, avgPct);
   }
-  if (allDays.length < 7) {
-    bestWeekPct = Math.round(average(allDays.map((d) => d.completedPct ?? 0)) || 0);
-  }
-
+  if (allDays.length < 7) bestWeekPct = Math.round(average(allDays.map((d) => d.completedPct ?? 0)) || 0);
   document.getElementById("best-streak-value").textContent = bestStreak;
   document.getElementById("best-week-value").textContent = `${Math.round(bestWeekPct)}%`;
 }
 
-// COTYGODNIOWE PODSUMOWANIE
+// TYGODNIOWE PODSUMOWANIE
 async function generateWeeklySummary() {
   const days = await loadLastNDays(7);
   const withData = days.filter((d) => d.morning || d.evening);
-  if (withData.length === 0) {
-    return "Za mało danych z tego tygodnia — uzupełniaj raporty poranne i wieczorne, żeby Trener mógł ocenić tydzień.";
-  }
-
+  if (withData.length === 0) return "Za mało danych z tego tygodnia.";
   const avgSleep = average(withData.map((d) => d.morning?.sleepTotal).filter(Boolean));
   const avgStress = average(withData.map((d) => d.evening?.stress).filter(Boolean));
   const avgSteps = average(withData.map((d) => d.evening?.steps).filter(Boolean));
   const perfectDays = days.filter((d) => d.completedPct === 100).length;
-  const avgPct = Math.round(average(days.map((d) => d.completedPct ?? 0)));
-
-  const lines = [];
-  lines.push(`🏆 W tym tygodniu zaliczyłeś ${perfectDays} z 7 dni na 100%, a średnie wykonanie zadań to ${avgPct}%.`);
-
-  if (avgSleep != null) {
-    if (avgSleep < 7) lines.push(`😴 Średni sen ${avgSleep.toFixed(1)}h — poniżej progu regeneracyjnego, warto to podciągnąć.`);
-    else lines.push(`✅ Średni sen ${avgSleep.toFixed(1)}h — solidny wynik tygodnia.`);
-  }
-  if (avgStress != null) {
-    if (avgStress > 55) lines.push(`🧘 Średni stres ${Math.round(avgStress)}/100 — układ nerwowy pracował pod obciążeniem.`);
-    else lines.push(`😌 Stres trzymał się nisko (${Math.round(avgStress)}/100) — dobra baza pod regenerację.`);
-  }
-  if (avgSteps != null) {
-    lines.push(`🚶 Średnio ${Math.round(avgSteps)} kroków dziennie.`);
-  }
-
-  lines.push(perfectDays >= 5 ? "🔥 Taki tydzień to fundament pod realny postęp — utrzymuj rytm." : "🎯 Na przyszły tydzień: jeden konkretny cel, np. dowiezienie snu każdego dnia.");
-
+  const avgPct = Math.round(average(days.map((d) => d.completedPct ?? 0)) || 0);
+  const lines = [`🏆 Zaliczyłeś ${perfectDays} z 7 dni na 100%, średnia: ${avgPct}%.`];
+  if (avgSleep != null) lines.push(avgSleep < 7 ? `😴 Średni sen ${avgSleep.toFixed(1)}h — poniżej progu.` : `✅ Sen ${avgSleep.toFixed(1)}h — solidny wynik.`);
+  if (avgStress != null) lines.push(avgStress > 55 ? `🧘 Stres ${Math.round(avgStress)}/100 — podwyższony.` : `😌 Stres nisko (${Math.round(avgStress)}/100).`);
+  if (avgSteps != null) lines.push(`🚶 Średnio ${Math.round(avgSteps)} kroków.`);
+  lines.push(perfectDays >= 5 ? "🔥 Świetny tydzień, trzymaj rytm." : "🎯 Na przyszły tydzień: jeden konkretny cel.");
   return lines.join(" ");
 }
-
 document.getElementById("btn-weekly-summary").addEventListener("click", async () => {
   const btn = document.getElementById("btn-weekly-summary");
-  btn.disabled = true;
-  btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-1"></i>...';
-  const summary = await generateWeeklySummary();
-  document.getElementById("weekly-summary-text").textContent = summary;
-  btn.disabled = false;
-  btn.innerHTML = '<i class="fa-solid fa-arrows-rotate mr-1"></i>Odśwież';
+  btn.disabled = true; btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-1"></i>...';
+  const s = await generateWeeklySummary();
+  document.getElementById("weekly-summary-text").textContent = s;
+  btn.disabled = false; btn.innerHTML = '<i class="fa-solid fa-arrows-rotate mr-1"></i>Odśwież';
 });
 
-// KORELACJE
+// KORELACJA
 async function renderCorrelation() {
   const days = await loadLastNDays(14);
   const lowSleepDays = days.filter((d) => (d.morning?.sleepTotal ?? 99) < 7 && d.evening?.stress != null);
   const highSleepDays = days.filter((d) => (d.morning?.sleepTotal ?? 0) >= 7.5 && d.evening?.stress != null);
-
-  if (lowSleepDays.length < 2 || highSleepDays.length < 2) {
-    document.getElementById("correlation-box").classList.add("hidden");
-    return;
-  }
-
-  const avgStressLow = average(lowSleepDays.map((d) => d.evening.stress));
-  const avgStressHigh = average(highSleepDays.map((d) => d.evening.stress));
-  const diff = Math.round(avgStressLow - avgStressHigh);
-
+  if (lowSleepDays.length < 2 || highSleepDays.length < 2) { document.getElementById("correlation-box").classList.add("hidden"); return; }
+  const avgLow = average(lowSleepDays.map((d) => d.evening.stress));
+  const avgHigh = average(highSleepDays.map((d) => d.evening.stress));
+  const diff = Math.round(avgLow - avgHigh);
   document.getElementById("correlation-box").classList.remove("hidden");
-  if (diff > 5) {
-    document.getElementById("correlation-text").textContent =
-      `🔗 W dni gdy spałeś poniżej 7h, Twój wieczorny stres był średnio o ${diff} pkt wyższy niż w dni z co najmniej 7,5h snu (${Math.round(avgStressLow)} vs ${Math.round(avgStressHigh)}). Sen bezpośrednio obniża Twój poziom stresu.`;
-  } else {
-    document.getElementById("correlation-text").textContent =
-      `🔗 Różnica w stresie między dniami z krótszym i dłuższym snem jest niewielka (${Math.round(avgStressLow)} vs ${Math.round(avgStressHigh)}) — inne czynniki mogą mieć teraz większy wpływ na Twój stres.`;
-  }
+  document.getElementById("correlation-text").textContent = diff > 5
+    ? `🔗 W dni ze snem <7h stres był średnio o ${diff} pkt wyższy (${Math.round(avgLow)} vs ${Math.round(avgHigh)}). Sen bezpośrednio obniża stres.`
+    : `🔗 Różnica stresu między krótkim i długim snem jest niewielka (${Math.round(avgLow)} vs ${Math.round(avgHigh)}). Inne czynniki dominują.`;
 }
 
+// 1RM badge
+document.getElementById("btn-rm-calculate").addEventListener("click", () => {
+  localStorage.setItem("regim:used-1rm", "1");
+}, { once: false });
+
+// Week of life badge
+document.getElementById("btn-week-of-life").addEventListener("click", () => {
+  localStorage.setItem("regim:used-wol", "1");
+});
+
+// ============================================================================
 // BOOTSTRAP
+// ============================================================================
 let booted = false;
 
 async function bootApp() {
   setupTreningCard();
   renderDailyQuote();
+  applyAutoTheme();
+  setInterval(applyAutoTheme, 60000);
 
   const existing = await loadDayDoc(todayKey);
   if (existing?.tasks?.length) {
     state.tasks = existing.tasks;
-    // Dodaj brakujące zadanie "twarz" (migracja starych wpisów)
-    if (!state.tasks.find((t) => t.id === "twarz")) {
-      state.tasks.splice(4, 0, { id: "twarz", label: "Ćwiczenia na twarz (looksmaxing)", done: false });
-    }
+    // Migracja — dodaj brakujące nowe zadania
+    const required = ["tabletka", "jedzenie", "trening", "mowa", "twarz", "postawa", "reset"];
+    required.forEach((id) => {
+      if (!state.tasks.find((t) => t.id === id)) {
+        const labels = { tabletka: "D3 + Tran z dorsza", jedzenie: "Zdrowe jedzenie", trening: "Kalistenika", mowa: "Trening mowy", twarz: "Looksmaxing twarz", postawa: "Postawa szyi i barków", reset: "Reset szczęki przed snem" };
+        state.tasks.push({ id, label: labels[id], done: false });
+      }
+    });
     state.foodChecked = existing.foodChecked || [];
     state.morning = existing.morning || {};
     state.evening = existing.evening || {};
+    state.moodTagsMorning = existing.moodTagsMorning || [];
+    state.habits = existing.habits || { waterSalt: false, coldShower: false, walkMeal: false };
+    state.recoveryMode = existing.recoveryMode || false;
   } else {
     state.tasks = state.tasks.map((t) => ({ ...t, done: false }));
     await saveDayDoc({ date: todayKey, tasks: state.tasks, completedPct: 0, foodChecked: [] });
@@ -2594,14 +3269,27 @@ async function bootApp() {
 
   renderCheckStates();
   renderProgress();
-  await refreshStreak();
+  renderReadiness();
   renderImprovementTips();
+  await refreshStreak();
+  checkRecoveryNeeds();
+  renderGoal();
 
   document.querySelectorAll(".food-chip").forEach((chip) => chip.classList.remove("active"));
   state.foodChecked.forEach((food) => {
     const chip = document.querySelector(`.food-chip[data-food="${food}"]`);
     if (chip) chip.classList.add("active");
   });
+
+  state.moodTagsMorning.forEach((tag) => {
+    const chip = document.querySelector(`.mood-chip[data-tag="${tag}"]`);
+    if (chip) chip.classList.add("active");
+  });
+
+  // Wypełnij mikro-nawyki
+  document.getElementById("habit-water-salt").checked = state.habits.waterSalt;
+  document.getElementById("habit-cold-shower").checked = state.habits.coldShower;
+  document.getElementById("habit-walk-meal").checked = state.habits.walkMeal;
 
   if (existing?.aiVerdict) {
     document.getElementById("mentor-verdict-box").classList.remove("hidden");
@@ -2616,7 +3304,10 @@ async function bootApp() {
     if (m.sleepLight != null) document.getElementById("input-sleep-light").value = m.sleepLight;
     if (m.sleepWakes != null) document.getElementById("input-sleep-wakes").value = m.sleepWakes;
     if (m.sleepHr != null) document.getElementById("input-sleep-hr").value = m.sleepHr;
+    if (m.rhr != null) document.getElementById("input-rhr").value = m.rhr;
     if (m.dailyWeight != null) document.getElementById("input-weight-daily").value = m.dailyWeight;
+    if (m.jawTension != null) { document.getElementById("input-jaw-tension").value = m.jawTension; document.getElementById("jaw-tension-value").textContent = m.jawTension; }
+    if (m.moodMorning != null) { document.getElementById("input-mood-morning").value = m.moodMorning; document.getElementById("mood-morning-value").textContent = m.moodMorning; }
     if (sunday && m.weeklyWeight != null) document.getElementById("input-weight-weekly").value = m.weeklyWeight;
   }
   if (existing?.evening) {
@@ -2625,6 +3316,9 @@ async function bootApp() {
     if (e.hrDay != null) document.getElementById("input-hr-day").value = e.hrDay;
     if (e.spo2 != null) document.getElementById("input-spo2").value = e.spo2;
     if (e.stress != null) document.getElementById("input-stress").value = e.stress;
+    if (e.rpe != null) document.getElementById("input-rpe").value = e.rpe;
+    if (e.screenTime != null) document.getElementById("input-screen-time").value = e.screenTime;
+    if (e.moodEvening != null) { document.getElementById("input-mood-evening").value = e.moodEvening; document.getElementById("mood-evening-value").textContent = e.moodEvening; }
     if (e.weightEvening != null) document.getElementById("input-weight-evening").value = e.weightEvening;
   }
 
