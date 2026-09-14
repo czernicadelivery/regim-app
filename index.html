@@ -80,46 +80,54 @@ html.light-theme .history-item{border-left-color:rgba(30,26,53,.12)}
 .weekoflive-card{background:linear-gradient(135deg,#1e1a35 0%,#2d2456 100%);border-radius:28px;padding:24px;color:#f7f5fb}
 .help-btn{width:16px;height:16px;border-radius:50%;background:rgba(94,234,212,.15);color:#5eead4;font-size:10px;font-weight:900;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;margin-left:4px;transition:all .2s;border:1px solid rgba(94,234,212,.3)}
 .help-btn:hover{background:rgba(94,234,212,.3);transform:scale(1.1)}
-.tooltip{position:relative;cursor:help;border-bottom:1px dotted rgba(94,234,212,.4)}
-.tooltip:hover::after{content:attr(data-tip);position:absolute;bottom:120%;left:50%;transform:translateX(-50%);background:#0f0c1d;color:#f7f5fb;padding:8px 12px;border-radius:12px;font-size:11px;font-weight:600;white-space:nowrap;z-index:100;border:1px solid rgba(94,234,212,.3);box-shadow:0 4px 16px rgba(0,0,0,.5)}
 .streak-freeze{background:linear-gradient(135deg,rgba(94,234,212,.15),rgba(196,181,253,.15));border:1px solid rgba(94,234,212,.4);border-radius:20px;padding:12px;display:flex;align-items:center;gap:10px}
 .record-card{background:linear-gradient(135deg,rgba(251,191,36,.12),rgba(251,191,157,.12));border:1px solid rgba(251,191,36,.3);border-radius:16px;padding:12px}
 .special-mode{padding:6px 12px;border-radius:999px;font-size:11px;font-weight:800;border:1px solid;transition:all .2s;cursor:pointer}
 .special-mode.off{background:rgba(255,255,255,.03);border-color:rgba(255,255,255,.1);color:#837c99}
 .special-mode.on-sick{background:rgba(251,113,133,.2);border-color:rgba(251,113,133,.5);color:#fb7185}
 .special-mode.on-vacation{background:rgba(251,191,36,.2);border-color:rgba(251,191,36,.5);color:#fbbf24}
+.special-mode.on-recovery{background:rgba(196,181,253,.2);border-color:rgba(196,181,253,.5);color:#c4b5fd}
+#sync-status{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:800;padding:3px 8px;border-radius:999px;transition:all .3s}
+#sync-status.offline{background:rgba(251,113,133,.15);color:#fb7185}
+#sync-status.syncing{background:rgba(251,191,36,.15);color:#fbbf24}
+#sync-status.synced{background:rgba(94,234,212,.15);color:#5eead4}
 </style>
 </head>
 <body class="text-neutral-100 font-sans min-h-screen pb-28">
 <canvas id="confetti-canvas"></canvas>
 
 <header class="sticky top-0 z-30 px-5 pt-5 pb-3 bg-gradient-to-b from-ink via-ink/95 to-transparent">
-  <div class="max-w-lg mx-auto flex items-center justify-between">
-    <div class="flex items-center gap-2.5">
+  <div class="max-w-lg mx-auto flex items-center justify-between gap-2">
+    <div class="flex items-center gap-2.5 flex-shrink-0">
       <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-mint to-lilac flex items-center justify-center shadow-glow">
         <i class="fa-solid fa-bolt text-ink text-lg"></i>
       </div>
       <div>
         <div class="font-extrabold text-lg leading-none tracking-tight">REGIM</div>
-        <div class="text-[11px] text-neutral-400 leading-none mt-0.5" id="header-greeting">Twój codzienny wzrost</div>
+        <div class="text-[11px] text-neutral-400 leading-none mt-0.5" id="header-greeting">Ładuję...</div>
       </div>
     </div>
-    <div class="flex items-center gap-2">
+    <div class="flex items-center gap-1.5 flex-wrap justify-end">
+      <div id="sync-status" class="offline"><i class="fa-solid fa-cloud"></i><span id="sync-label">Lokalnie</span></div>
       <div id="streak-pill" class="flex items-center gap-1.5 glass rounded-full px-3 py-1.5 text-sm font-bold">
         <i class="fa-solid fa-fire text-peach"></i>
         <span id="streak-count">0</span>
         <span id="freeze-indicator" class="hidden text-[10px] text-mint font-bold">❄️</span>
       </div>
+      <div id="user-badge" class="hidden glass rounded-full px-3 py-1.5 text-[11px] font-bold text-mint max-w-[100px] truncate"></div>
+      <button id="btn-signin" class="glass rounded-full w-9 h-9 flex items-center justify-center text-neutral-400 hover:text-mint transition" title="Zaloguj się (Google)">
+        <i class="fa-solid fa-user"></i>
+      </button>
       <button id="btn-glossary" class="glass rounded-full w-9 h-9 flex items-center justify-center text-neutral-400 hover:text-lilac transition" title="Słowniczek">
         <i class="fa-solid fa-book"></i>
       </button>
-      <button id="btn-settings" class="glass rounded-full w-9 h-9 flex items-center justify-center text-neutral-400 hover:text-mint transition">
+      <button id="btn-settings" class="glass rounded-full w-9 h-9 flex items-center justify-center text-neutral-400 hover:text-mint transition" title="Ustawienia">
         <i class="fa-solid fa-gear"></i>
       </button>
-      <button id="btn-theme-toggle" class="glass rounded-full w-9 h-9 flex items-center justify-center text-neutral-400 hover:text-gold transition">
+      <button id="btn-theme-toggle" class="glass rounded-full w-9 h-9 flex items-center justify-center text-neutral-400 hover:text-gold transition" title="Motyw">
         <i class="fa-solid fa-moon" id="theme-icon"></i>
       </button>
-      <button id="btn-export" class="glass rounded-full w-9 h-9 flex items-center justify-center text-neutral-400 hover:text-mint transition">
+      <button id="btn-export" class="glass rounded-full w-9 h-9 flex items-center justify-center text-neutral-400 hover:text-mint transition" title="Eksport">
         <i class="fa-solid fa-download"></i>
       </button>
     </div>
@@ -144,15 +152,6 @@ html.light-theme .history-item{border-left-color:rgba(30,26,53,.12)}
   </div>
 </div>
 
-<div id="push-banner" class="hidden max-w-lg mx-auto px-5 mb-2">
-  <div class="rise glass rounded-3xl p-4 flex items-center gap-3 shadow-soft border border-lilac/25">
-    <div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-lilac/30 to-mint/30 flex items-center justify-center flex-shrink-0"><i class="fa-solid fa-tower-broadcast text-lilac text-lg"></i></div>
-    <div class="flex-1 min-w-0"><div class="font-bold text-sm">Prawdziwy push</div><div class="text-xs text-neutral-400">Firebase Cloud Messaging</div></div>
-    <button id="btn-push-enable" class="bg-gradient-to-br from-lilac to-mint text-ink font-extrabold text-sm px-4 py-2 rounded-full whitespace-nowrap active:scale-95 transition">Włącz</button>
-    <button id="btn-push-dismiss" class="text-neutral-500 hover:text-neutral-300 w-6 h-6 flex items-center justify-center flex-shrink-0"><i class="fa-solid fa-xmark"></i></button>
-  </div>
-</div>
-
 <main class="max-w-lg mx-auto px-5">
 
   <section class="rise glass rounded-4xl p-5 mb-5 shadow-soft">
@@ -173,27 +172,21 @@ html.light-theme .history-item{border-left-color:rgba(30,26,53,.12)}
     <div class="h-2 bg-white/5 rounded-full overflow-hidden"><div id="progress-bar" class="progress-fill h-full rounded-full bg-gradient-to-r from-mint to-lilac" style="width:0%"></div></div>
   </section>
 
-  <!-- AUTO BRIEF TRENERA (bez klikania) -->
   <div class="glass rounded-3xl px-4 py-3 mb-5 overflow-hidden">
     <div class="flex items-center justify-between mb-1.5">
       <div class="flex items-center gap-2">
         <i class="fa-solid fa-comment-dots text-mint text-sm"></i>
-        <span class="text-[10px] font-extrabold text-mint tracking-widest uppercase" id="brief-label">BRIEF TRENERA</span>
-        <span id="brief-live-dot" class="w-1.5 h-1.5 rounded-full bg-mint animate-pulse"></span>
+        <span class="text-[10px] font-extrabold text-mint tracking-widest uppercase">Brief Trenera</span>
+        <span class="w-1.5 h-1.5 rounded-full bg-mint animate-pulse"></span>
       </div>
       <div class="flex items-center gap-2">
-        <button id="btn-speak-brief" class="text-neutral-400 hover:text-mint transition text-xs" title="Czytaj na głos">
-          <i class="fa-solid fa-volume-high"></i>
-        </button>
-        <button id="btn-refresh-brief" class="text-neutral-400 hover:text-mint transition text-xs" title="Odśwież">
-          <i class="fa-solid fa-arrows-rotate"></i>
-        </button>
+        <button id="btn-speak-brief" class="text-neutral-400 hover:text-mint transition text-xs" title="Czytaj na głos"><i class="fa-solid fa-volume-high"></i></button>
+        <button id="btn-refresh-brief" class="text-neutral-400 hover:text-mint transition text-xs" title="Odśwież"><i class="fa-solid fa-arrows-rotate"></i></button>
       </div>
     </div>
     <p id="brief-text" class="text-xs text-neutral-200 font-semibold leading-snug">Ładuję brief...</p>
   </div>
 
-  <!-- TRYBY SPECJALNE -->
   <div class="flex gap-2 mb-4 overflow-x-auto pb-1">
     <button id="mode-normal" class="special-mode off whitespace-nowrap"><i class="fa-solid fa-circle-check mr-1"></i>Normalny</button>
     <button id="mode-sick" class="special-mode off whitespace-nowrap"><i class="fa-solid fa-bed-pulse mr-1"></i>Choroba</button>
@@ -201,40 +194,27 @@ html.light-theme .history-item{border-left-color:rgba(30,26,53,.12)}
     <button id="mode-recovery" class="special-mode off whitespace-nowrap"><i class="fa-solid fa-leaf mr-1"></i>Regeneracja</button>
   </div>
 
-  <!-- STREAK FREEZE -->
   <div id="freeze-card" class="hidden streak-freeze mb-4">
     <div class="w-10 h-10 rounded-2xl bg-mint/20 flex items-center justify-center flex-shrink-0"><span class="text-xl">❄️</span></div>
     <div class="flex-1">
       <div class="text-xs font-extrabold">Streak Freeze dostępny</div>
-      <div class="text-[11px] text-neutral-400 font-medium">1 raz na tydzień możesz zamrozić streak — na wypadek choroby, wyjazdu, gorszego dnia.</div>
+      <div class="text-[11px] text-neutral-400 font-medium">1 raz na tydzień — na wypadek choroby, wyjazdu, słabego dnia.</div>
     </div>
     <button id="btn-freeze-use" class="text-[11px] font-extrabold bg-gradient-to-br from-mint to-lilac text-ink px-3 py-2 rounded-full active:scale-95 transition">Użyj</button>
   </div>
 
-  <!-- CHALLENGE 30 DNI -->
   <div class="glass rounded-4xl p-5 shadow-soft mb-4">
     <div class="flex items-center justify-between mb-3">
-      <div class="flex items-center gap-2">
-        <i class="fa-solid fa-flag-checkered text-gold"></i>
-        <span class="font-bold text-sm">Challenge 30 dni</span>
-      </div>
-      <button id="btn-challenge-edit" class="text-[11px] font-bold text-neutral-400 glass rounded-full px-3 py-1">
-        <i class="fa-solid fa-gear mr-1"></i>Zmień
-      </button>
+      <div class="flex items-center gap-2"><i class="fa-solid fa-flag-checkered text-gold"></i><span class="font-bold text-sm">Challenge 30 dni</span></div>
+      <button id="btn-challenge-edit" class="text-[11px] font-bold text-neutral-400 glass rounded-full px-3 py-1"><i class="fa-solid fa-gear mr-1"></i>Zmień</button>
     </div>
     <div id="challenge-display">
-      <div class="flex items-center justify-between mb-2">
-        <span id="challenge-name" class="text-sm font-extrabold">Nie wybrano</span>
-        <span id="challenge-count" class="text-xs font-extrabold text-gold">0/30</span>
-      </div>
-      <div class="h-2 bg-white/5 rounded-full overflow-hidden">
-        <div id="challenge-bar" class="progress-fill h-full rounded-full bg-gradient-to-r from-gold to-peach" style="width:0%"></div>
-      </div>
+      <div class="flex items-center justify-between mb-2"><span id="challenge-name" class="text-sm font-extrabold">Nie wybrano</span><span id="challenge-count" class="text-xs font-extrabold text-gold">0/30</span></div>
+      <div class="h-2 bg-white/5 rounded-full overflow-hidden"><div id="challenge-bar" class="progress-fill h-full rounded-full bg-gradient-to-r from-gold to-peach" style="width:0%"></div></div>
       <div id="challenge-tip" class="text-[11px] text-neutral-400 font-medium mt-2">Wybierz challenge — np. sen 8h przez 30 dni.</div>
     </div>
   </div>
 
-  <!-- NAWIGACJA -->
   <nav class="flex glass rounded-full p-1.5 mb-5 gap-1">
     <button data-tab="dashboard" class="tab-btn tab-underline flex-1 py-2.5 rounded-full text-xs sm:text-sm font-bold bg-gradient-to-br from-mint to-lilac text-ink"><i class="fa-solid fa-house mr-1"></i>Dziś</button>
     <button data-tab="mowa" class="tab-btn tab-underline flex-1 py-2.5 rounded-full text-xs sm:text-sm font-bold text-neutral-400"><i class="fa-solid fa-comment-dots mr-1"></i>Mowa</button>
@@ -244,13 +224,8 @@ html.light-theme .history-item{border-left-color:rgba(30,26,53,.12)}
 
   <section id="tab-dashboard" class="tab-panel space-y-4">
 
-    <!-- READINESS -->
     <div class="glass rounded-4xl p-5 shadow-soft">
-      <div class="flex items-center gap-2 mb-3">
-        <i class="fa-solid fa-gauge-high text-mint"></i>
-        <span class="font-bold text-sm">Gotowość dnia</span>
-        <span class="help-btn" data-help="readiness">?</span>
-      </div>
+      <div class="flex items-center gap-2 mb-3"><i class="fa-solid fa-gauge-high text-mint"></i><span class="font-bold text-sm">Gotowość dnia</span><span class="help-btn" data-help="readiness">?</span></div>
       <div class="flex items-center gap-4">
         <div class="relative w-20 h-20 flex-shrink-0">
           <svg class="w-20 h-20 -rotate-90" viewBox="0 0 80 80">
@@ -282,7 +257,6 @@ html.light-theme .history-item{border-left-color:rgba(30,26,53,.12)}
       <p id="milestone-text" class="text-sm text-neutral-200 leading-relaxed font-medium"></p>
     </div>
 
-    <!-- RAPORT SMARTWATCH -->
     <div class="glass rounded-4xl p-4 shadow-soft">
       <div class="flex items-center gap-2 mb-3">
         <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-lilac/25 to-mint/25 flex items-center justify-center flex-shrink-0"><i class="fa-solid fa-watch-fitness text-lilac"></i></div>
@@ -311,7 +285,6 @@ html.light-theme .history-item{border-left-color:rgba(30,26,53,.12)}
           <input type="number" id="input-rhr" placeholder="62" class="w-full mt-1 bg-mint/10 border border-mint/30 rounded-2xl px-3 py-2.5 text-neutral-100 font-semibold focus:outline-none focus:border-mint transition"></label>
         <label class="block col-span-2"><span class="text-[11px] text-gold ml-1 font-bold"><i class="fa-solid fa-scale-balanced mr-1"></i>Waga (kg) — codziennie:</span>
           <input type="number" step="0.1" id="input-weight-daily" placeholder="52.5" class="w-full mt-1 bg-gold/10 border border-gold/30 rounded-2xl px-3 py-2.5 text-neutral-100 font-semibold focus:outline-none focus:border-gold transition"></label>
-
         <div class="col-span-2 block">
           <span class="text-[11px] text-lilac ml-1 font-bold"><i class="fa-solid fa-face-tired mr-1"></i>Napięcie szczęki rano (1-10):</span>
           <div class="mt-2 flex items-center gap-3"><input type="range" min="1" max="10" value="5" id="input-jaw-tension" class="slider-custom flex-1"><span id="jaw-tension-value" class="text-lg font-extrabold text-lilac w-8 text-center">5</span></div>
@@ -326,17 +299,14 @@ html.light-theme .history-item{border-left-color:rgba(30,26,53,.12)}
             <button type="button" data-tag="motywacja" class="mood-chip glass rounded-full px-3 py-1 text-[11px] font-bold border border-transparent">🔥 motywacja</button>
           </div>
         </div>
-
         <label id="weight-field-wrapper" class="hidden block col-span-2 rise">
           <span class="text-[11px] text-gold ml-1 font-bold"><i class="fa-solid fa-calendar-check mr-1"></i>Niedziela — waga tygodniowa (kg):</span>
           <input type="number" step="0.1" id="input-weight-weekly" placeholder="52.5" class="w-full mt-1 bg-gold/10 border border-gold/30 rounded-2xl px-3 py-2.5 text-neutral-100 font-semibold focus:outline-none focus:border-gold transition">
         </label>
-
         <label class="block col-span-2">
           <span class="text-[11px] text-mint ml-1 font-bold"><i class="fa-solid fa-clock mr-1"></i>Suplementy — godzina wzięcia:</span>
           <input type="time" id="input-tabletka-time" class="w-full mt-1 bg-mint/10 border border-mint/30 rounded-2xl px-3 py-2.5 text-neutral-100 font-semibold focus:outline-none focus:border-mint transition">
         </label>
-
         <button type="submit" class="col-span-2 mt-1 py-3 rounded-full bg-gradient-to-br from-peach to-gold text-ink font-extrabold active:scale-95 transition"><i class="fa-solid fa-floppy-disk mr-1.5"></i>Zapisz raport poranny</button>
       </form>
 
@@ -353,26 +323,21 @@ html.light-theme .history-item{border-left-color:rgba(30,26,53,.12)}
           <input type="number" min="1" max="10" id="input-rpe" placeholder="7" class="w-full mt-1 bg-rose/10 border border-rose/30 rounded-2xl px-3 py-2.5 text-neutral-100 font-semibold focus:outline-none focus:border-rose transition"></label>
         <label class="block"><span class="text-[11px] text-neutral-400 ml-1 font-semibold">Screen time (min):</span>
           <input type="number" id="input-screen-time" placeholder="180" class="w-full mt-1 bg-white/5 border border-white/10 rounded-2xl px-3 py-2.5 text-neutral-100 font-semibold focus:outline-none focus:border-lilac transition"></label>
-
         <label id="bike-distance-wrapper" class="hidden block col-span-2">
           <span class="text-[11px] text-mint ml-1 font-bold"><i class="fa-solid fa-route mr-1"></i>Rower — dystans (km):</span>
           <input type="number" step="0.1" id="input-bike-distance" placeholder="7.5" class="w-full mt-1 bg-mint/10 border border-mint/30 rounded-2xl px-3 py-2.5 text-neutral-100 font-semibold focus:outline-none focus:border-mint transition">
         </label>
-
         <label class="block col-span-2"><span class="text-[11px] text-gold ml-1 font-bold"><i class="fa-solid fa-scale-balanced mr-1"></i>Waga wieczorna (kg) — opcjonalnie:</span>
           <input type="number" step="0.1" id="input-weight-evening" placeholder="52.5" class="w-full mt-1 bg-gold/10 border border-gold/30 rounded-2xl px-3 py-2.5 text-neutral-100 font-semibold focus:outline-none focus:border-gold transition"></label>
-
         <div class="col-span-2 block">
           <span class="text-[11px] text-peach ml-1 font-bold"><i class="fa-solid fa-moon mr-1"></i>Nastrój wieczór (1-10):</span>
           <div class="mt-2 flex items-center gap-3"><input type="range" min="1" max="10" value="5" id="input-mood-evening" class="slider-custom flex-1"><span id="mood-evening-value" class="text-lg font-extrabold text-peach w-8 text-center">5</span></div>
         </div>
-
         <div class="col-span-2 block">
           <span class="text-[11px] text-lilac ml-1 font-bold"><i class="fa-solid fa-note-sticky mr-1"></i>Notatka dnia:</span>
           <textarea id="input-note" rows="2" placeholder="np. dziś ciężki dzień w pracy, mało czasu, ale sen siadł..." class="w-full mt-1 bg-white/5 border border-white/10 rounded-2xl px-3 py-2.5 text-neutral-100 font-medium text-sm focus:outline-none focus:border-lilac transition resize-none"></textarea>
           <div class="text-[10px] text-neutral-500 font-medium mt-1">Trener wykryje słowa kluczowe i dostosuje radę.</div>
         </div>
-
         <div class="col-span-2 block">
           <span class="text-[11px] text-lilac ml-1 font-bold"><i class="fa-solid fa-tags mr-1"></i>Tagi dnia:</span>
           <div class="flex flex-wrap gap-1.5 mt-2" id="day-tags">
@@ -392,12 +357,10 @@ html.light-theme .history-item{border-left-color:rgba(30,26,53,.12)}
             <button type="button" data-tag="słaby-dzień" class="tag-chip glass rounded-full px-3 py-1 text-[11px] font-bold border border-transparent">💔 słaby dzień</button>
           </div>
         </div>
-
         <button type="submit" class="col-span-2 mt-1 py-3 rounded-full bg-gradient-to-br from-lilac to-mint text-ink font-extrabold active:scale-95 transition"><i class="fa-solid fa-floppy-disk mr-1.5"></i>Zapisz podsumowanie dnia</button>
       </form>
     </div>
 
-    <!-- MIKRO-NAWYKI -->
     <div class="glass rounded-4xl p-5 shadow-soft">
       <div class="flex items-center gap-2 mb-3"><i class="fa-solid fa-seedling text-mint"></i><span class="font-bold text-sm">Mikro-nawyki dnia</span></div>
       <div class="space-y-2.5">
@@ -412,7 +375,6 @@ html.light-theme .history-item{border-left-color:rgba(30,26,53,.12)}
       <p id="mentor-verdict-text" class="text-sm text-neutral-200 leading-relaxed font-medium"></p>
     </div>
 
-    <!-- ZADANIA -->
     <div class="glass rounded-4xl overflow-hidden shadow-soft card-tap transition cursor-pointer" data-card="tabletka" data-modal="modal-tabletka">
       <div class="p-5 flex items-center gap-4">
         <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-gold/25 to-peach/25 flex items-center justify-center flex-shrink-0"><i class="fa-solid fa-pills text-gold text-2xl"></i></div>
@@ -509,7 +471,6 @@ html.light-theme .history-item{border-left-color:rgba(30,26,53,.12)}
 
   <section id="tab-postepy" class="tab-panel hidden space-y-5">
 
-    <!-- REKORDY OSOBISTE -->
     <div class="glass rounded-4xl p-5 shadow-warm">
       <div class="flex items-center gap-2 mb-4"><i class="fa-solid fa-crown text-gold"></i><span class="font-bold text-sm">Rekordy osobiste</span></div>
       <div id="personal-records" class="grid grid-cols-2 gap-3"></div>
@@ -523,15 +484,11 @@ html.light-theme .history-item{border-left-color:rgba(30,26,53,.12)}
       </div>
     </div>
 
-    <!-- PORÓWNANIE MIESIĘCZNE -->
     <div class="glass rounded-4xl p-5 shadow-warm">
       <div class="flex items-center gap-2 mb-3"><i class="fa-solid fa-code-compare text-lilac"></i><span class="font-bold text-sm">Ten miesiąc vs poprzedni</span></div>
-      <div id="monthly-comparison" class="space-y-2">
-        <p class="text-xs text-neutral-400 font-medium">Za mało danych do porównania.</p>
-      </div>
+      <div id="monthly-comparison" class="space-y-2"><p class="text-xs text-neutral-400 font-medium">Za mało danych do porównania.</p></div>
     </div>
 
-    <!-- CEL WAGOWY -->
     <div class="glass rounded-4xl p-5 shadow-warm">
       <div class="flex items-center gap-2 mb-3">
         <i class="fa-solid fa-bullseye text-mint"></i>
@@ -550,7 +507,6 @@ html.light-theme .history-item{border-left-color:rgba(30,26,53,.12)}
       </div>
     </div>
 
-    <!-- SMART GOALS -->
     <div class="glass rounded-4xl p-5 shadow-warm">
       <div class="flex items-center gap-2 mb-3"><i class="fa-solid fa-list-check text-lilac"></i><span class="font-bold text-sm">Cele SMART</span></div>
       <div class="space-y-2.5">
@@ -621,37 +577,37 @@ html.light-theme .history-item{border-left-color:rgba(30,26,53,.12)}
     <div class="glass rounded-4xl p-4 shadow-soft">
       <div class="flex items-center justify-between mb-3"><div class="flex items-center gap-2 text-sm font-bold text-neutral-300"><i class="fa-solid fa-scale-balanced text-gold"></i>Waga</div><button id="btn-1rm" class="text-[11px] font-bold text-gold glass rounded-full px-3 py-1"><i class="fa-solid fa-calculator mr-1"></i>1RM</button></div>
       <canvas id="chart-weight" height="140"></canvas>
-      <div class="text-[10px] text-neutral-500 font-semibold mt-2 text-center">📖 Jak czytać: trend z 30 dni jest ważny, nie pojedynczy pomiar. Wahania ±0.5 kg dziennie to normalne (woda, jedzenie).</div>
+      <div class="text-[10px] text-neutral-500 font-semibold mt-2 text-center">📖 Trend z 30 dni jest ważny, nie pojedynczy pomiar. Wahania ±0.5 kg dziennie to normalne.</div>
     </div>
 
     <div class="glass rounded-4xl p-4 shadow-soft">
       <div class="flex items-center gap-2 mb-3 text-sm font-bold text-neutral-300"><i class="fa-solid fa-moon text-lilac"></i>😴 Sen — głęboki / REM</div>
       <canvas id="chart-sleep" height="140"></canvas>
-      <div class="text-[10px] text-neutral-500 font-semibold mt-2 text-center">📖 Jak czytać: głęboki sen (deep) to regeneracja fizyczna. REM to regeneracja mózgu i pamięci. Oba poniżej normy = słaba regeneracja.</div>
+      <div class="text-[10px] text-neutral-500 font-semibold mt-2 text-center">📖 Deep sen = regeneracja fizyczna, REM = mózg i pamięć. Oba poniżej normy = słaba regeneracja.</div>
     </div>
 
     <div class="glass rounded-4xl p-4 shadow-soft">
       <div class="flex items-center gap-2 mb-3 text-sm font-bold text-neutral-300"><i class="fa-solid fa-heart-pulse text-mint"></i>💓 RHR rano — trend</div>
       <canvas id="chart-rhr" height="140"></canvas>
-      <div class="text-[10px] text-neutral-500 font-semibold mt-2 text-center">📖 Jak czytać: wzrost RHR o 5+ bpm dzień do dnia = sygnał przemęczenia, stresu lub nadchodzącej choroby.</div>
+      <div class="text-[10px] text-neutral-500 font-semibold mt-2 text-center">📖 Wzrost RHR o 5+ bpm dzień do dnia = sygnał przemęczenia, stresu lub choroby.</div>
     </div>
 
     <div class="glass rounded-4xl p-4 shadow-soft">
       <div class="flex items-center gap-2 mb-3 text-sm font-bold text-neutral-300"><i class="fa-solid fa-shoe-prints text-peach"></i>🚶 Kroki</div>
       <canvas id="chart-steps" height="140"></canvas>
-      <div class="text-[10px] text-neutral-500 font-semibold mt-2 text-center">📖 Jak czytać: poniżej 4000 = siedzący dzień. 8000+ = aktywny. 12000+ = bardzo aktywny.</div>
+      <div class="text-[10px] text-neutral-500 font-semibold mt-2 text-center">📖 Poniżej 4000 = siedzący. 8000+ = aktywny. 12000+ = bardzo aktywny.</div>
     </div>
 
     <div class="glass rounded-4xl p-4 shadow-soft">
       <div class="flex items-center gap-2 mb-3 text-sm font-bold text-neutral-300"><i class="fa-solid fa-heart-pulse text-rose"></i>💓 Stres</div>
       <canvas id="chart-stress" height="140"></canvas>
-      <div class="text-[10px] text-neutral-500 font-semibold mt-2 text-center">📖 Jak czytać: 0-35 niski (dobry), 36-60 umiarkowany, 60+ wysoki (priorytet regeneracji).</div>
+      <div class="text-[10px] text-neutral-500 font-semibold mt-2 text-center">📖 0-35 niski (dobry), 36-60 umiarkowany, 60+ wysoki (priorytet regeneracja).</div>
     </div>
 
     <div class="glass rounded-4xl p-4 shadow-soft">
       <div class="flex items-center gap-2 mb-3 text-sm font-bold text-neutral-300"><i class="fa-solid fa-face-smile text-peach"></i>😊 Nastrój (rano / wieczór)</div>
       <canvas id="chart-mood" height="140"></canvas>
-      <div class="text-[10px] text-neutral-500 font-semibold mt-2 text-center">📖 Jak czytać: duże wahania między rano a wieczorem = nieodpowiednia regeneracja w ciągu dnia.</div>
+      <div class="text-[10px] text-neutral-500 font-semibold mt-2 text-center">📖 Duże wahania między rano a wieczorem = nieodpowiednia regeneracja w ciągu dnia.</div>
     </div>
 
     <div id="correlation-box" class="hidden glass rounded-4xl p-5 shadow-soft border border-lilac/20">
@@ -669,14 +625,12 @@ html.light-theme .history-item{border-left-color:rgba(30,26,53,.12)}
 
 <div id="toast" class="hidden fixed bottom-6 left-1/2 -translate-x-1/2 z-50 glass rounded-full px-5 py-3 text-sm font-bold shadow-soft rise"></div>
 
-<!-- MODALE - istniejące -->
 <div id="modal-tabletka" class="modal-wrap hidden fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-5">
   <div class="modal-backdrop absolute inset-0" data-close-modal></div>
   <div class="modal-pop relative glass rounded-t-4xl sm:rounded-4xl w-full sm:max-w-md p-6 shadow-soft max-h-[85vh] overflow-y-auto">
     <div class="flex items-start justify-between mb-4"><div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-gold/25 to-peach/25 flex items-center justify-center"><i class="fa-solid fa-pills text-gold text-2xl"></i></div><button data-close-modal class="w-9 h-9 rounded-full glass flex items-center justify-center text-neutral-400"><i class="fa-solid fa-xmark"></i></button></div>
     <h3 class="font-extrabold text-xl mb-3">💊 D3 + Tran z dorsza</h3>
-    <div class="glass rounded-3xl p-4 mb-3 flex items-start gap-3"><i class="fa-solid fa-fish text-mint mt-0.5"></i><p class="text-sm text-neutral-200 leading-relaxed font-medium"><strong>Tran z wątroby dorsza islandzkiego</strong> to naturalne źródło witaminy D i A oraz kwasów omega-3. Łącz z D3 rano, do posiłku z tłuszczem.</p></div>
-    <div class="glass rounded-3xl p-4 mb-5 flex items-start gap-3"><i class="fa-solid fa-lightbulb text-gold mt-0.5"></i><p class="text-sm text-neutral-200 leading-relaxed font-medium">Tran dostarcza omega-3 (EPA/DHA) — wspomaga pracę mózgu i redukuje stany zapalne.</p></div>
+    <div class="glass rounded-3xl p-4 mb-3 flex items-start gap-3"><i class="fa-solid fa-fish text-mint mt-0.5"></i><p class="text-sm text-neutral-200 leading-relaxed font-medium"><strong>Tran z wątroby dorsza islandzkiego</strong> to naturalne źródło witaminy D, A i omega-3. Łącz z D3 rano, do posiłku z tłuszczem.</p></div>
     <button data-check="tabletka" data-close-modal class="modal-check-btn w-full py-3.5 rounded-full bg-gradient-to-br from-gold to-peach text-ink font-extrabold active:scale-95 transition"><i class="fa-solid fa-check mr-1.5"></i>Wziąłem</button>
   </div>
 </div>
@@ -706,7 +660,6 @@ html.light-theme .history-item{border-left-color:rgba(30,26,53,.12)}
     <h3 id="modal-trening-title" class="font-extrabold text-xl mb-1">💪 Kalistenika</h3>
     <p id="modal-trening-sub" class="text-xs text-neutral-400 font-semibold mb-4">Plan na dziś</p>
     <div id="modal-trening-content" class="space-y-3 mb-5"></div>
-    <div class="glass rounded-3xl p-3.5 mb-3 flex items-start gap-3 border border-mint/20"><i class="fa-solid fa-shield-heart text-mint mt-0.5"></i><p class="text-xs text-neutral-200 leading-relaxed font-medium">Jesteś <strong>przedtrenowany</strong> — serie skrócone, objętość niższa. Priorytet regeneracja.</p></div>
     <button data-check="trening" data-close-modal class="modal-check-btn w-full py-3.5 rounded-full bg-gradient-to-br from-mint to-lilac text-ink font-extrabold active:scale-95 transition"><i class="fa-solid fa-check mr-1.5"></i>Zrobiłem</button>
   </div>
 </div>
@@ -818,6 +771,7 @@ html.light-theme .history-item{border-left-color:rgba(30,26,53,.12)}
       <label class="flex items-center gap-3 cursor-pointer"><input type="checkbox" id="input-auto-theme" class="w-5 h-5 rounded-md accent-mint"><span class="text-sm font-medium flex-1">🌗 Auto-motyw dzień/noc (6:00-19:00 jasny)</span></label>
       <label class="flex items-center gap-3 cursor-pointer"><input type="checkbox" id="input-voice-on" class="w-5 h-5 rounded-md accent-mint"><span class="text-sm font-medium flex-1">🔊 Czytaj brief Trenera na głos (rano)</span></label>
       <div class="glass rounded-3xl p-4"><div class="text-[11px] text-neutral-400 font-bold mb-2">TWOJE BMI</div><div id="settings-bmi" class="text-2xl font-extrabold text-mint">—</div><div id="settings-bmi-label" class="text-xs text-neutral-400 font-medium mt-1">Wpisz wagę i wzrost</div></div>
+      <div class="glass rounded-3xl p-4"><div class="text-[11px] text-neutral-400 font-bold mb-2">KONTO</div><div id="settings-account" class="text-xs text-neutral-300 font-medium">Niezalogowany — dane w tym urządzeniu</div></div>
     </div>
     <button id="btn-settings-save" class="w-full py-3.5 rounded-full bg-gradient-to-br from-mint to-lilac text-ink font-extrabold active:scale-95 transition mt-5"><i class="fa-solid fa-floppy-disk mr-1.5"></i>Zapisz ustawienia</button>
     <button id="btn-restart-onboarding" class="w-full py-3 rounded-full glass font-bold text-neutral-300 active:scale-95 transition mt-2 text-sm">Pokaż onboarding ponownie</button>
@@ -849,7 +803,6 @@ html.light-theme .history-item{border-left-color:rgba(30,26,53,.12)}
   </div>
 </div>
 
-<!-- NOWY: ONBOARDING -->
 <div id="modal-onboarding" class="modal-wrap hidden fixed inset-0 z-50 flex items-center justify-center p-5">
   <div class="modal-backdrop absolute inset-0"></div>
   <div class="modal-pop relative glass rounded-4xl w-full sm:max-w-md p-6 shadow-soft max-h-[85vh] overflow-y-auto text-center">
@@ -862,7 +815,6 @@ html.light-theme .history-item{border-left-color:rgba(30,26,53,.12)}
   </div>
 </div>
 
-<!-- NOWY: SŁOWNICZEK -->
 <div id="modal-glossary" class="modal-wrap hidden fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-5">
   <div class="modal-backdrop absolute inset-0" data-close-modal></div>
   <div class="modal-pop relative glass rounded-t-4xl sm:rounded-4xl w-full sm:max-w-md p-6 shadow-soft max-h-[85vh] overflow-y-auto">
@@ -873,7 +825,6 @@ html.light-theme .history-item{border-left-color:rgba(30,26,53,.12)}
   </div>
 </div>
 
-<!-- NOWY: HELP MODAL (dynamiczny) -->
 <div id="modal-help" class="modal-wrap hidden fixed inset-0 z-50 flex items-center justify-center p-5">
   <div class="modal-backdrop absolute inset-0" data-close-modal></div>
   <div class="modal-pop relative glass rounded-4xl w-full sm:max-w-md p-6 shadow-soft max-h-[85vh] overflow-y-auto">
@@ -884,7 +835,6 @@ html.light-theme .history-item{border-left-color:rgba(30,26,53,.12)}
   </div>
 </div>
 
-<!-- NOWY: DAY DETAIL -->
 <div id="modal-day-detail" class="modal-wrap hidden fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-5">
   <div class="modal-backdrop absolute inset-0" data-close-modal></div>
   <div class="modal-pop relative glass rounded-t-4xl sm:rounded-4xl w-full sm:max-w-md p-6 shadow-soft max-h-[85vh] overflow-y-auto">
@@ -894,7 +844,6 @@ html.light-theme .history-item{border-left-color:rgba(30,26,53,.12)}
   </div>
 </div>
 
-<!-- NOWY: CHALLENGE PICKER -->
 <div id="modal-challenge" class="modal-wrap hidden fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-5">
   <div class="modal-backdrop absolute inset-0" data-close-modal></div>
   <div class="modal-pop relative glass rounded-t-4xl sm:rounded-4xl w-full sm:max-w-md p-6 shadow-soft max-h-[85vh] overflow-y-auto">
@@ -910,10 +859,52 @@ html.light-theme .history-item{border-left-color:rgba(30,26,53,.12)}
 // KONFIGURACJA
 // ============================================================================
 const USER_NAME = "Karol";
-document.getElementById("header-greeting").textContent = `Cześć, ${USER_NAME} 👋`;
 
 // ============================================================================
-// USTAWIENIA
+// STAN GLOBALNY
+// ============================================================================
+let firebaseReady = false;
+let currentUser = { uid: "local" };
+let fcmMessaging = null;
+let authResolved = false;
+let syncInProgress = false;
+let booted = false;
+let migrateDone = false;
+
+// ============================================================================
+// FIREBASE CONFIG
+// ============================================================================
+const firebaseConfig = {
+  apiKey: "AIzaSyChzU-QWJ_lyE7kLePHCvYltIayMZuXlL8",
+  authDomain: "regim-web.firebaseapp.com",
+  databaseURL: "https://regim-web-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "regim-web",
+  storageBucket: "regim-web.firebasestorage.app",
+  messagingSenderId: "1025631760665",
+  appId: "1:1025631760665:web:93c5b62295bd8b0b675588",
+};
+const VAPID_KEY = "TWOJ_VAPID_KEY";
+
+// ============================================================================
+// SYNC STATUS UI
+// ============================================================================
+function setSyncStatus(mode, label) {
+  const el = document.getElementById("sync-status");
+  const lbl = document.getElementById("sync-label");
+  if (!el || !lbl) return;
+  el.className = mode;
+  const icons = { offline: "fa-cloud", syncing: "fa-cloud-arrow-up", synced: "fa-cloud-check" };
+  el.innerHTML = `<i class="fa-solid ${icons[mode] || "fa-cloud"}"></i><span id="sync-label">${label}</span>`;
+}
+function updateSyncUI() {
+  if (!firebaseReady) return setSyncStatus("offline", "Lokalnie");
+  if (currentUser?.uid === "local") return setSyncStatus("offline", "Lokalnie");
+  if (syncInProgress) return setSyncStatus("syncing", "Sync...");
+  setSyncStatus("synced", "Chmura");
+}
+
+// ============================================================================
+// SETTINGS
 // ============================================================================
 function getSettings() {
   return {
@@ -929,7 +920,7 @@ function saveSettings(s) {
   localStorage.setItem("regim:auto-theme", s.autoTheme ? "1" : "0");
   localStorage.setItem("regim:voice-on", s.voiceOn ? "1" : "0");
 }
-function calcBMI(w, h) { if (!w || !h) return null; return w / ((h/100)**2); }
+function calcBMI(w, h) { if (!w || !h) return null; return w / ((h / 100) ** 2); }
 function bmiLabel(b) {
   if (b == null) return "";
   if (b < 18.5) return "Niedowaga — buduj masę";
@@ -939,95 +930,8 @@ function bmiLabel(b) {
 }
 
 // ============================================================================
-// FIREBASE
+// POMOCNICZE
 // ============================================================================
-let firebaseReady = false;
-let currentUser = { uid: "local" };
-let fcmMessaging = null;
-const firebaseConfig = {
-  apiKey: "AIzaSyChzU-QWJ_lyE7kLePHCvYltIayMZuXlL8",
-  authDomain: "regim-web.firebaseapp.com",
-  databaseURL: "https://regim-web-default-rtdb.europe-west1.firebasedatabase.app",
-  projectId: "regim-web",
-  storageBucket: "regim-web.firebasestorage.app",
-  messagingSenderId: "1025631760665",
-  appId: "1:1025631760665:web:93c5b62295bd8b0b675588",
-};
-const VAPID_KEY = "TWOJ_VAPID_KEY";
-
-async function initFirebase() {
-  try {
-    const { initializeApp } = await import("https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js");
-    const authMod = await import("https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js");
-    const fsMod = await import("https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js");
-    const app = initializeApp(firebaseConfig);
-    const auth = authMod.getAuth(app);
-    const db = fsMod.getFirestore(app);
-    firebaseReady = true;
-    window.__fb = { authMod, fsMod, db, auth, app };
-    authMod.onAuthStateChanged(auth, async (user) => { currentUser = user || { uid: "local" }; await bootApp(); });
-  } catch (e) { console.warn("Firebase offline.", e); firebaseReady = false; }
-}
-
-function localKey(key) { return `regim:${currentUser?.uid || "local"}:${key}`; }
-async function saveDayDoc(d) {
-  if (firebaseReady && window.__fb && currentUser?.uid && currentUser.uid !== "local") {
-    const { fsMod, db } = window.__fb;
-    await fsMod.setDoc(fsMod.doc(db, "users", currentUser.uid, "days", d.date), d, { merge: true });
-  } else localStorage.setItem(localKey(d.date), JSON.stringify(d));
-}
-async function loadDayDoc(dateStr) {
-  if (firebaseReady && window.__fb && currentUser?.uid && currentUser.uid !== "local") {
-    const { fsMod, db } = window.__fb;
-    const snap = await fsMod.getDoc(fsMod.doc(db, "users", currentUser.uid, "days", dateStr));
-    return snap.exists() ? snap.data() : null;
-  }
-  const raw = localStorage.getItem(localKey(dateStr));
-  return raw ? JSON.parse(raw) : null;
-}
-async function loadLastNDays(n) {
-  const docs = [];
-  const today = new Date();
-  if (firebaseReady && window.__fb && currentUser?.uid && currentUser.uid !== "local") {
-    const { fsMod, db } = window.__fb;
-    const start = new Date(today); start.setDate(start.getDate() - (n - 1));
-    const q = fsMod.query(fsMod.collection(db, "users", currentUser.uid, "days"), fsMod.where("date", ">=", dateKey(start)), fsMod.orderBy("date", "asc"), fsMod.limit(n));
-    const snaps = await fsMod.getDocs(q); snaps.forEach((s) => docs.push(s.data()));
-  } else {
-    for (let i = n - 1; i >= 0; i--) {
-      const d = new Date(today); d.setDate(d.getDate() - i);
-      const raw = localStorage.getItem(localKey(dateKey(d)));
-      if (raw) docs.push(JSON.parse(raw));
-    }
-  }
-  return docs;
-}
-async function loadDaysRange(n, offset) {
-  const docs = []; const today = new Date();
-  for (let i = n - 1; i >= 0; i--) {
-    const d = new Date(today); d.setDate(d.getDate() - i - offset);
-    const doc = await loadDayDoc(dateKey(d));
-    if (doc) docs.push(doc);
-  }
-  return docs;
-}
-async function collectAllDays() {
-  const results = [];
-  if (firebaseReady && window.__fb && currentUser?.uid && currentUser.uid !== "local") {
-    const { fsMod, db } = window.__fb;
-    const snaps = await fsMod.getDocs(fsMod.collection(db, "users", currentUser.uid, "days"));
-    snaps.forEach((s) => results.push(s.data()));
-  } else {
-    const today = new Date();
-    for (let i = 0; i < 365; i++) {
-      const d = new Date(today); d.setDate(d.getDate() - i);
-      const raw = localStorage.getItem(localKey(dateKey(d)));
-      if (raw) results.push(JSON.parse(raw));
-    }
-  }
-  return results.sort((a, b) => a.date.localeCompare(b.date));
-}
-
 function dateKey(date) {
   const y = date.getFullYear();
   const m = String(date.getMonth() + 1).padStart(2, "0");
@@ -1038,43 +942,321 @@ function isMonday(d) { return d.getDay() === 1; }
 function isSunday(d) { return d.getDay() === 0; }
 function dayIndexSinceEpoch(d) { return Math.floor(d.getTime() / 86400000); }
 function average(arr) { return arr.length ? arr.reduce((a, b) => a + b, 0) / arr.length : null; }
+function escapeHtml(s) { const d = document.createElement("div"); d.textContent = s || ""; return d.innerHTML; }
 
 function showToast(msg) {
   const t = document.getElementById("toast");
-  t.textContent = msg; t.classList.remove("hidden");
+  if (!t) return;
+  t.textContent = msg;
+  t.classList.remove("hidden");
   clearTimeout(showToast._t);
   showToast._t = setTimeout(() => t.classList.add("hidden"), 2400);
 }
 
 // ============================================================================
-// KEYWORDS DLA TRENERA (inteligentne wykrywanie)
+// WARSTWA DANYCH (Firestore + localStorage fallback)
 // ============================================================================
-const KEYWORDS = {
-  sick: ["chory", "choroba", "gorączka", "przeziębienie", "katar", "kaszel", "grypa", "ból głowy", "migrena", "osłabiony", "rozbity", "niedobrze", "mdli"],
-  alcohol: ["piwo", "wódka", "alkohol", "impreza", "kac", "wino", "drink", "pub", "klub", "urodziny", "balet", "popiłem", "popiłam"],
-  stress: ["stres", "stresu", "stresujący", "deadline", "egzamin", "sprawdzian", "kolokwium", "praca", "szef", "kłótnia", "kłopot", "problem", "zawalony", "presja"],
-  travel: ["podróż", "wyjazd", "samolot", "pociąg", "lotnisko", "wakacje", "urlop", "hotel", "wyjechałem", "wyjechałam"],
-  happy: ["dobry", "świetny", "super", "radosny", "wesoły", "szczęśliwy", "udany", "wygrałem", "wygrałam", "zadowolony", "euforia"],
-  tired: ["zmęczony", "wyczerpany", "padnięty", "senny", "bez siły", "opary", "ledwo żyję", "słaby"],
-  workout: ["trening", "bieganie", "basen", "rower", "siłownia", "spacer", "bieg", "spalałem", "spalałam", "rozciąganie", "mobility"],
-  food: ["obiad", "kolacja", "śniadanie", "dużo jedzenia", "mało jedzenia", "fast food", "zdrowo", "pizza", "burger", "pączek"],
-  birthday: ["urodziny", "imieniny", "rocznica", "impreza urodzinowa"],
-  family: ["rodzina", "mama", "tata", "brat", "siostra", "babcia", "dziadek"],
-  lonely: ["sam", "samotny", "smutny", "przygnębiony", "dołek", "depresja", "płakałem"],
-};
+function localKey(key, uid) { return `regim:${uid || currentUser?.uid || "local"}:${key}`; }
+function isCloud() { return firebaseReady && window.__fb && currentUser?.uid && currentUser.uid !== "local"; }
 
-function detectKeywords(text) {
-  if (!text) return [];
-  const lower = text.toLowerCase();
-  const found = new Set();
-  Object.entries(KEYWORDS).forEach(([cat, words]) => {
-    if (words.some((w) => lower.includes(w))) found.add(cat);
-  });
-  return Array.from(found);
+async function saveDayDoc(d) {
+  // Zawsze zapisuj lokalnie (offline-first)
+  localStorage.setItem(localKey(d.date), JSON.stringify(d));
+
+  if (!isCloud()) { updateSyncUI(); return; }
+
+  // Jeśli chmura — zapisz też
+  syncInProgress = true; updateSyncUI();
+  try {
+    const { fsMod, db } = window.__fb;
+    await fsMod.setDoc(fsMod.doc(db, "users", currentUser.uid, "days", d.date), d, { merge: true });
+    console.log("✅ Firestore zapis:", d.date);
+  } catch (e) {
+    console.error("❌ Firestore save error:", e);
+    showToast("Błąd chmury — zapisano lokalnie");
+  } finally {
+    syncInProgress = false; updateSyncUI();
+  }
+}
+
+async function loadDayDoc(dateStr) {
+  // Zawsze najpierw lokalnie (szybkie)
+  const rawLocal = localStorage.getItem(localKey(dateStr));
+  const localDoc = rawLocal ? JSON.parse(rawLocal) : null;
+
+  // Jak jesteśmy w chmurze, pobierz z Firestore i zwróć "bogatszą" wersję
+  if (isCloud()) {
+    try {
+      const { fsMod, db } = window.__fb;
+      const snap = await fsMod.getDoc(fsMod.doc(db, "users", currentUser.uid, "days", dateStr));
+      if (snap.exists()) {
+        const cloudDoc = snap.data();
+        // Merge: cloud + local (cloud wygrywa dla pól zapisanych w cloud)
+        const merged = { ...(localDoc || {}), ...cloudDoc };
+        // Zapisz z powrotem lokalnie dla szybkiego dostępu
+        localStorage.setItem(localKey(dateStr), JSON.stringify(merged));
+        return merged;
+      }
+    } catch (e) {
+      console.warn("Firestore load error:", e);
+    }
+  }
+  return localDoc;
+}
+
+async function loadLastNDays(n) {
+  const today = new Date();
+  const dates = [];
+  for (let i = n - 1; i >= 0; i--) {
+    const d = new Date(today);
+    d.setDate(d.getDate() - i);
+    dates.push(dateKey(d));
+  }
+
+  // Zbierz z chmury jeśli jesteśmy zalogowani
+  let cloudDocs = {};
+  if (isCloud()) {
+    try {
+      const { fsMod, db } = window.__fb;
+      const start = new Date(today); start.setDate(start.getDate() - (n - 1));
+      const q = fsMod.query(
+        fsMod.collection(db, "users", currentUser.uid, "days"),
+        fsMod.where("date", ">=", dateKey(start)),
+        fsMod.orderBy("date", "asc")
+      );
+      const snaps = await fsMod.getDocs(q);
+      snaps.forEach((s) => { cloudDocs[s.id] = s.data(); });
+    } catch (e) {
+      console.warn("Firestore loadLastNDays error:", e);
+    }
+  }
+
+  const docs = [];
+  for (const dk of dates) {
+    const localRaw = localStorage.getItem(localKey(dk));
+    const localDoc = localRaw ? JSON.parse(localRaw) : null;
+    const cloudDoc = cloudDocs[dk];
+    const merged = cloudDoc ? { ...(localDoc || {}), ...cloudDoc } : localDoc;
+    if (merged) docs.push(merged);
+  }
+  return docs;
+}
+
+async function collectAllDays() {
+  const results = {};
+  // 1) wszystko z lokalnego
+  const today = new Date();
+  for (let i = 0; i < 365; i++) {
+    const d = new Date(today);
+    d.setDate(d.getDate() - i);
+    const dk = dateKey(d);
+    const raw = localStorage.getItem(localKey(dk));
+    if (raw) {
+      try { const parsed = JSON.parse(raw); results[dk] = parsed; } catch (e) {}
+    }
+  }
+  // 2) wszystko z chmury
+  if (isCloud()) {
+    try {
+      const { fsMod, db } = window.__fb;
+      const snaps = await fsMod.getDocs(fsMod.collection(db, "users", currentUser.uid, "days"));
+      snaps.forEach((s) => {
+        const cloudDoc = s.data();
+        results[s.id] = { ...(results[s.id] || {}), ...cloudDoc };
+      });
+    } catch (e) {
+      console.warn("collectAllDays cloud error:", e);
+    }
+  }
+  return Object.values(results).sort((a, b) => (a.date || "").localeCompare(b.date || ""));
+}
+
+async function loadDaysRange(n, offset) {
+  const docs = [];
+  const today = new Date();
+  for (let i = n - 1; i >= 0; i--) {
+    const d = new Date(today);
+    d.setDate(d.getDate() - i - offset);
+    const doc = await loadDayDoc(dateKey(d));
+    if (doc) docs.push(doc);
+  }
+  return docs;
 }
 
 // ============================================================================
-// STAN
+// MIGRACJA — lokalne dane → Firestore przy pierwszym logowaniu
+// ============================================================================
+async function migrateLocalToCloud() {
+  if (migrateDone || !isCloud()) return;
+  migrateDone = true;
+
+  // Sprawdź czy w Firestore już są dane — jeśli tak, nie nadpisuj
+  try {
+    const { fsMod, db } = window.__fb;
+    const metaRef = fsMod.doc(db, "users", currentUser.uid, "meta", "migration");
+    const metaSnap = await fsMod.getDoc(metaRef);
+    if (metaSnap.exists() && metaSnap.data().done) {
+      console.log("Migracja już zrobiona wcześniej — pomijam");
+      return;
+    }
+
+    // Zbierz wszystkie lokalne dni (klucze regim:local:YYYY-MM-DD)
+    const localDays = [];
+    for (let i = 0; i < localStorage.length; i++) {
+      const k = localStorage.key(i);
+      if (!k.startsWith("regim:local:")) continue;
+      const dateStr = k.slice("regim:local:".length);
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) continue;
+      try {
+        const parsed = JSON.parse(localStorage.getItem(k));
+        if (parsed) localDays.push(parsed);
+      } catch (e) {}
+    }
+
+    if (localDays.length === 0) {
+      await fsMod.setDoc(metaRef, { done: true, at: Date.now(), count: 0 });
+      return;
+    }
+
+    showToast(`Migracja ${localDays.length} dni do chmury...`);
+    syncInProgress = true; updateSyncUI();
+
+    // Batch upload
+    const chunks = [];
+    for (let i = 0; i < localDays.length; i += 400) chunks.push(localDays.slice(i, i + 400));
+
+    for (const chunk of chunks) {
+      const batch = fsMod.writeBatch(db);
+      chunk.forEach((day) => {
+        const ref = fsMod.doc(db, "users", currentUser.uid, "days", day.date);
+        batch.set(ref, day, { merge: true });
+      });
+      await batch.commit();
+    }
+
+    await fsMod.setDoc(metaRef, { done: true, at: Date.now(), count: localDays.length });
+    showToast(`✅ Zmigrowano ${localDays.length} dni do chmury`);
+    console.log(`Migracja zakończona: ${localDays.length} dni`);
+  } catch (e) {
+    console.error("Błąd migracji:", e);
+    showToast("Błąd migracji — spróbuj ponownie");
+  } finally {
+    syncInProgress = false; updateSyncUI();
+  }
+}
+
+// ============================================================================
+// AUTH UI
+// ============================================================================
+function updateAuthUI(user) {
+  const badge = document.getElementById("user-badge");
+  const signinBtn = document.getElementById("btn-signin");
+  const accountInfo = document.getElementById("settings-account");
+  if (!badge || !signinBtn) return;
+
+  if (user) {
+    const name = user.displayName || user.email?.split("@")[0] || user.uid.slice(0, 8);
+    badge.textContent = name;
+    badge.classList.remove("hidden");
+    signinBtn.title = `Wyloguj: ${name}`;
+    signinBtn.innerHTML = '<i class="fa-solid fa-right-from-bracket"></i>';
+    signinBtn.classList.remove("text-neutral-400");
+    signinBtn.classList.add("text-mint");
+    if (accountInfo) accountInfo.innerHTML = `✅ Zalogowany: <strong>${escapeHtml(name)}</strong><br>Email: ${escapeHtml(user.email || "—")}<br>UID: <span class="font-mono text-[10px]">${user.uid.slice(0, 12)}...</span>`;
+  } else {
+    badge.classList.add("hidden");
+    signinBtn.title = "Zaloguj się (Google)";
+    signinBtn.innerHTML = '<i class="fa-solid fa-user"></i>';
+    signinBtn.classList.add("text-neutral-400");
+    signinBtn.classList.remove("text-mint");
+    if (accountInfo) accountInfo.textContent = "Niezalogowany — dane w tym urządzeniu";
+  }
+}
+
+// ============================================================================
+// INIT FIREBASE + AUTH
+// ============================================================================
+async function initFirebase() {
+  try {
+    const { initializeApp } = await import("https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js");
+    const authMod = await import("https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js");
+    const fsMod = await import("https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js");
+
+    const app = initializeApp(firebaseConfig);
+    const auth = authMod.getAuth(app);
+    const db = fsMod.getFirestore(app);
+
+    // Persist auth między sesjami (nie pyta za każdym razem)
+    try {
+      await authMod.setPersistence(auth, authMod.browserLocalPersistence);
+    } catch (e) { /* nie zawsze działa */ }
+
+    firebaseReady = true;
+    window.__fb = { authMod, fsMod, db, auth, app };
+
+    // Listener auth
+    authMod.onAuthStateChanged(auth, async (user) => {
+      const wasLocal = !currentUser || currentUser.uid === "local";
+      currentUser = user || { uid: "local" };
+      updateAuthUI(user);
+      updateSyncUI();
+
+      // Migracja przy pierwszym logowaniu
+      if (user && wasLocal) {
+        await migrateLocalToCloud();
+      }
+
+      // Boot lub re-boot
+      if (!authResolved || !booted) {
+        authResolved = true;
+        await bootApp();
+      } else {
+        // Re-login: przeładuj dane
+        await reloadEverything();
+      }
+    });
+
+    // Klik na logowanie / wylogowanie
+    document.getElementById("btn-signin").addEventListener("click", async () => {
+      const user = auth.currentUser;
+      if (user) {
+        const name = user.displayName || user.email || "konta";
+        if (confirm(`Wylogować się z ${name}?\n\nDane w chmurze zostaną — możesz się zalogować ponownie.`)) {
+          try { await authMod.signOut(auth); showToast("Wylogowano"); } catch (e) { console.warn(e); }
+        }
+        return;
+      }
+      try {
+        const provider = new authMod.GoogleAuthProvider();
+        provider.setCustomParameters({ prompt: "select_account" });
+        await authMod.signInWithPopup(auth, provider);
+        showToast("Logowanie...");
+      } catch (e) {
+        console.warn("Google sign-in failed:", e);
+        if (e.code === "auth/popup-blocked" || e.code === "auth/popup-closed-by-user") {
+          showToast("Popup zablokowany — spróbuj ponownie");
+        } else {
+          try {
+            await authMod.signInAnonymously(auth);
+            showToast("Zalogowano anonimowo");
+          } catch (e2) {
+            showToast("Błąd logowania");
+            console.error(e2);
+          }
+        }
+      }
+    });
+
+  } catch (e) {
+    console.warn("Firebase init error — tryb lokalny:", e);
+    firebaseReady = false;
+    authResolved = true;
+    updateSyncUI();
+  }
+}
+
+// ============================================================================
+// STAN DNIA
 // ============================================================================
 const todayObj = new Date();
 const todayKey = dateKey(todayObj);
@@ -1100,7 +1282,7 @@ const state = {
   dayTags: [],
   habits: { waterSalt: false, coldShower: false, walkMeal: false },
   note: "",
-  specialMode: "normal", // normal | sick | vacation | recovery
+  specialMode: "normal",
   recoveryMode: false,
   chartRange: 7,
   lastMilestoneShown: null,
@@ -1140,9 +1322,13 @@ function renderReadiness() {
   const tipEl = document.getElementById("readiness-tip");
   const circ = 213.6;
   if (pct == null) {
-    pctEl.textContent = "—"; ring.style.strokeDashoffset = circ; ring.setAttribute("stroke", "#8b8397");
-    labelEl.textContent = "Uzupełnij raport"; labelEl.className = "font-extrabold text-base mb-1 text-neutral-400";
-    tipEl.textContent = "Im więcej danych, tym dokładniejsza ocena."; return;
+    pctEl.textContent = "—";
+    ring.style.strokeDashoffset = circ;
+    ring.setAttribute("stroke", "#8b8397");
+    labelEl.textContent = "Uzupełnij raport";
+    labelEl.className = "font-extrabold text-base mb-1 text-neutral-400";
+    tipEl.textContent = "Im więcej danych, tym dokładniejsza ocena.";
+    return;
   }
   ring.style.strokeDashoffset = circ - (pct / 100) * circ;
   pctEl.textContent = `${pct}%`;
@@ -1164,27 +1350,22 @@ function setupTreningCard() {
   const icon = document.getElementById("trening-icon");
   const title = document.getElementById("trening-title");
   const sub = document.getElementById("trening-sub");
+  if (!icon) return;
   if (state.specialMode === "sick") {
     icon.className = "fa-solid fa-bed-pulse text-rose text-2xl";
-    title.textContent = "🤒 Tryb choroby";
-    sub.textContent = "Odpoczynek, nawodnienie, sen";
-    return;
+    title.textContent = "🤒 Tryb choroby"; sub.textContent = "Odpoczynek, nawodnienie, sen"; return;
   }
   if (state.specialMode === "vacation") {
     icon.className = "fa-solid fa-umbrella-beach text-gold text-2xl";
-    title.textContent = "🏖️ Wakacje";
-    sub.textContent = "Luz — spacer i mobilność wystarczą";
-    return;
+    title.textContent = "🏖️ Wakacje"; sub.textContent = "Luz — spacer wystarczy"; return;
   }
   if (state.specialMode === "recovery") {
     icon.className = "fa-solid fa-leaf text-rose text-2xl";
-    title.textContent = "🌿 Tryb regeneracji";
-    sub.textContent = "Spacer + mobility + oddech";
-    return;
+    title.textContent = "🌿 Tryb regeneracji"; sub.textContent = "Spacer + mobility + oddech"; return;
   }
   if (monday) { icon.className = "fa-solid fa-person-swimming text-mint text-2xl"; title.textContent = "🏊 Basen — 1,5h"; sub.textContent = "Poniedziałek to dzień na wodę"; }
   else if (isBikeDay) { icon.className = "fa-solid fa-person-biking text-mint text-2xl"; title.textContent = "🚴 Trasa 7 km — rower"; sub.textContent = "Co 3 dni zmiana bodźca"; }
-  else { icon.className = "fa-solid fa-dumbbell text-mint text-2xl"; title.textContent = "💪 Kalistenika (ulga)"; sub.textContent = "2 serie • 10-12 powt • pełna regeneracja"; }
+  else { icon.className = "fa-solid fa-dumbbell text-mint text-2xl"; title.textContent = "💪 Kalistenika (ulga)"; sub.textContent = "2 serie • 10-12 powt • regeneracja"; }
 }
 
 const CALISTHENICS_PLAN = [
@@ -1202,31 +1383,34 @@ function renderTreningModalContent() {
   const sub = document.getElementById("modal-trening-sub");
   const content = document.getElementById("modal-trening-content");
   if (state.specialMode === "sick") {
-    iconEl.className = "fa-solid fa-bed-pulse text-rose text-2xl"; title.textContent = "🤒 Tryb choroby"; sub.textContent = "Dziś odpoczywasz";
-    content.innerHTML = `<div class="glass rounded-3xl p-4 border border-rose/20 flex items-start gap-3"><i class="fa-solid fa-mug-hot text-rose mt-0.5"></i><p class="text-sm text-neutral-200 font-medium leading-relaxed">Nawodnienie, ciepła herbata, sen. Zero treningu.</p></div>
-      <div class="glass rounded-3xl p-4 border border-rose/20 flex items-start gap-3"><i class="fa-solid fa-bed text-rose mt-0.5"></i><p class="text-sm text-neutral-200 font-medium leading-relaxed">Więcej snu niż zwykle — organizm walczy.</p></div>`;
+    iconEl.className = "fa-solid fa-bed-pulse text-rose text-2xl";
+    title.textContent = "🤒 Tryb choroby"; sub.textContent = "Dziś odpoczywasz";
+    content.innerHTML = `<div class="glass rounded-3xl p-4 border border-rose/20 flex items-start gap-3"><i class="fa-solid fa-mug-hot text-rose mt-0.5"></i><p class="text-sm text-neutral-200 font-medium leading-relaxed">Nawodnienie, ciepła herbata, sen. Zero treningu.</p></div>`;
     return;
   }
   if (state.specialMode === "vacation") {
-    iconEl.className = "fa-solid fa-umbrella-beach text-gold text-2xl"; title.textContent = "🏖️ Wakacje"; sub.textContent = "Zero ciśnienia";
-    content.innerHTML = `<div class="glass rounded-3xl p-4 border border-gold/20 flex items-start gap-3"><i class="fa-solid fa-shoe-prints text-gold mt-0.5"></i><p class="text-sm text-neutral-200 font-medium leading-relaxed">Spacer, zwiedzanie, pływanie — cokolwiek robisz na wakacjach.</p></div>`;
+    iconEl.className = "fa-solid fa-umbrella-beach text-gold text-2xl";
+    title.textContent = "🏖️ Wakacje"; sub.textContent = "Zero ciśnienia";
+    content.innerHTML = `<div class="glass rounded-3xl p-4 border border-gold/20 flex items-start gap-3"><i class="fa-solid fa-shoe-prints text-gold mt-0.5"></i><p class="text-sm text-neutral-200 font-medium leading-relaxed">Spacer, zwiedzanie, pływanie.</p></div>`;
     return;
   }
   if (state.specialMode === "recovery") {
-    iconEl.className = "fa-solid fa-leaf text-rose text-2xl"; title.textContent = "🌿 Tryb regeneracji"; sub.textContent = "Dziś NIE trenujemy";
-    content.innerHTML = `<div class="glass rounded-3xl p-4 border border-rose/20 flex items-start gap-3"><i class="fa-solid fa-shoe-prints text-rose mt-0.5"></i><p class="text-sm text-neutral-200 font-medium leading-relaxed">🚶 Spacer 30-45 min.</p></div>
-      <div class="glass rounded-3xl p-4 border border-rose/20 flex items-start gap-3"><i class="fa-solid fa-person-walking text-rose mt-0.5"></i><p class="text-sm text-neutral-200 font-medium leading-relaxed">🧘 Mobility 10 min.</p></div>
-      <div class="glass rounded-3xl p-4 border border-rose/20 flex items-start gap-3"><i class="fa-solid fa-wind text-rose mt-0.5"></i><p class="text-sm text-neutral-200 font-medium leading-relaxed">🫁 Oddech 5 min.</p></div>`;
+    iconEl.className = "fa-solid fa-leaf text-rose text-2xl";
+    title.textContent = "🌿 Tryb regeneracji"; sub.textContent = "Dziś NIE trenujemy";
+    content.innerHTML = `<div class="glass rounded-3xl p-4 border border-rose/20 flex items-start gap-3"><i class="fa-solid fa-shoe-prints text-rose mt-0.5"></i><p class="text-sm text-neutral-200 font-medium leading-relaxed">🚶 Spacer 30-45 min + mobility 10 min + oddech 5 min.</p></div>`;
     return;
   }
   if (monday) {
-    iconEl.className = "fa-solid fa-person-swimming text-mint text-2xl"; title.textContent = "🏊 Basen — 1,5h"; sub.textContent = "Poniedziałek w wodzie";
+    iconEl.className = "fa-solid fa-person-swimming text-mint text-2xl";
+    title.textContent = "🏊 Basen — 1,5h"; sub.textContent = "Poniedziałek w wodzie";
     content.innerHTML = `<div class="glass rounded-3xl p-4 flex items-start gap-3"><i class="fa-solid fa-water text-mint mt-0.5"></i><p class="text-sm text-neutral-200 font-medium leading-relaxed">1,5h pływania, przerwy co 15-20 min.</p></div>`;
   } else if (isBikeDay) {
-    iconEl.className = "fa-solid fa-person-biking text-mint text-2xl"; title.textContent = "🚴 Trasa 7 km — rower"; sub.textContent = "Zmiana bodźca co 3 dni";
+    iconEl.className = "fa-solid fa-person-biking text-mint text-2xl";
+    title.textContent = "🚴 Trasa 7 km — rower"; sub.textContent = "Zmiana bodźca co 3 dni";
     content.innerHTML = `<div class="glass rounded-3xl p-4 flex items-start gap-3"><i class="fa-solid fa-route text-mint mt-0.5"></i><p class="text-sm text-neutral-200 font-medium leading-relaxed">7 km spokojnym tempem. Zapisz dystans w raporcie wieczornym.</p></div>`;
   } else {
-    iconEl.className = "fa-solid fa-dumbbell text-mint text-2xl"; title.textContent = "💪 Kalistenika (wersja ulga)"; sub.textContent = "Zmniejszona objętość";
+    iconEl.className = "fa-solid fa-dumbbell text-mint text-2xl";
+    title.textContent = "💪 Kalistenika (wersja ulga)"; sub.textContent = "Zmniejszona objętość";
     content.innerHTML = CALISTHENICS_PLAN.map((ex) => `
       <div class="glass rounded-3xl p-3.5 flex items-center gap-3">
         <div class="w-9 h-9 rounded-xl bg-${ex.color}/15 flex items-center justify-center flex-shrink-0 text-${ex.color}"><i class="fa-solid ${ex.icon} text-sm"></i></div>
@@ -1262,12 +1446,10 @@ async function checkRecoveryNeeds() {
     deloadBanner.classList.remove("hidden");
   } else deloadBanner.classList.add("hidden");
 
-  // Sen debt check (3 dni < 6.5h)
   const last3Sleep = withData.slice(-3).map((d) => d.morning?.sleepTotal).filter((s) => s != null);
   if (last3Sleep.length === 3 && last3Sleep.every((s) => s < 6.5)) {
-    const deloadText = document.getElementById("deload-text");
-    if (deloadBanner.classList.contains("hidden")) deloadBanner.classList.remove("hidden");
-    deloadText.textContent = `3 dni z rzędu z niedoborem snu. Kumulujesz dług senny — dziś kluczowy wieczór, priorytet 8h+.`;
+    document.getElementById("deload-text").textContent = `3 dni z rzędu z niedoborem snu. Kumulujesz dług senny — priorytet 8h+.`;
+    document.getElementById("deload-banner").classList.remove("hidden");
   }
 }
 
@@ -1281,10 +1463,18 @@ function renderCheckStates() {
       const isModal = btn.classList.contains("modal-check-btn");
       if (task.done) {
         if (isModal) { btn.innerHTML = '<i class="fa-solid fa-check mr-1.5"></i>Zaliczone ✓'; btn.classList.add("opacity-60"); }
-        else { btn.classList.add("bg-gradient-to-br", "from-mint", "to-lilac", "border-transparent"); btn.classList.remove("border-white/15"); if (icon) { icon.classList.remove("opacity-0"); icon.classList.add("text-ink"); } }
+        else {
+          btn.classList.add("bg-gradient-to-br", "from-mint", "to-lilac", "border-transparent");
+          btn.classList.remove("border-white/15");
+          if (icon) { icon.classList.remove("opacity-0"); icon.classList.add("text-ink"); }
+        }
       } else {
         if (isModal) btn.classList.remove("opacity-60");
-        else { btn.classList.remove("bg-gradient-to-br", "from-mint", "to-lilac", "border-transparent"); btn.classList.add("border-white/15"); if (icon) { icon.classList.add("opacity-0"); icon.classList.remove("text-ink"); } }
+        else {
+          btn.classList.remove("bg-gradient-to-br", "from-mint", "to-lilac", "border-transparent");
+          btn.classList.add("border-white/15");
+          if (icon) { icon.classList.add("opacity-0"); icon.classList.remove("text-ink"); }
+        }
       }
     });
   });
@@ -1298,7 +1488,10 @@ function renderProgress() {
   document.getElementById("progress-sub").textContent = `${done} z ${state.tasks.length} zadań na dziś`;
   document.getElementById("hero-ring").style.strokeDashoffset = 169.6 - (pct / 100) * 169.6;
   const h = document.getElementById("progress-headline");
-  if (pct === 100) h.textContent = "Level up! 🚀"; else if (pct >= 50) h.textContent = "Dobra robota 🔥"; else if (pct > 0) h.textContent = "Ruszyłeś 💪"; else h.textContent = `Zaczynajmy, ${USER_NAME} 💪`;
+  if (pct === 100) h.textContent = "Level up! 🚀";
+  else if (pct >= 50) h.textContent = "Dobra robota 🔥";
+  else if (pct > 0) h.textContent = "Ruszyłeś 💪";
+  else h.textContent = `Zaczynajmy, ${USER_NAME} 💪`;
 }
 
 async function persistToday() {
@@ -1310,6 +1503,7 @@ async function persistToday() {
     morning: { ...(existing.morning || {}), ...state.morning },
     evening: { ...(existing.evening || {}), ...state.evening },
     moodTagsMorning: state.moodTagsMorning, dayTags: state.dayTags,
+    updatedAt: Date.now(),
   };
   await saveDayDoc(dayData);
   await refreshStreak();
@@ -1325,7 +1519,7 @@ async function refreshStreak() {
   const base = await computeStreakUpTo(todayKey);
   const freezeActive = checkFreezeUsed();
   let streak;
-  if (freezeActive) streak = base; // freeze: nie liczymy dzisiaj, ale nie resetujemy
+  if (freezeActive) streak = base;
   else streak = pctToday === 100 ? base + 1 : base;
   document.getElementById("streak-count").textContent = streak;
   const pill = document.getElementById("streak-pill");
@@ -1372,20 +1566,41 @@ async function checkMilestone() {
   const banner = document.getElementById("milestone-banner");
   document.getElementById("milestone-title").textContent = `🎉 ${hit} dni streak!`;
   const messages = {
-    7: "Tydzień z rzędu. Twoje ciało zaczyna to czuć — to już nie przypadek, to system.",
-    14: "Dwa tygodnie. W tym momencie większość ludzi się poddaje. Ty nie.",
-    21: "21 dni = naukowiec mówi że to próg nawyku. Twoje ciało już to pamięta.",
-    30: "Miesiąc! To nie eksperyment, to Twoje życie. Niesamowita konsekwencja.",
-    60: "Dwa miesiące. Jesteś inną osobą niż na starcie. Widzisz to w lustrze?",
-    90: "Kwartał! Jakieś 90% ludzi nie dolatuje tutaj. Ty dolatujesz.",
-    100: "Sto dni. Legendarny wynik. Zasługujesz na chwilę dumy.",
+    7: "Tydzień z rzędu. Twoje ciało zaczyna to czuć.",
+    14: "Dwa tygodnie. Większość ludzi się poddaje w tym momencie.",
+    21: "21 dni = próg nawyku. Twoje ciało już to pamięta.",
+    30: "Miesiąc! To nie eksperyment, to Twoje życie.",
+    60: "Dwa miesiące. Jesteś inną osobą niż na starcie.",
+    90: "Kwartał! 90% ludzi nie dolatuje tutaj. Ty dolatujesz.",
+    100: "Sto dni. Legendarny wynik.",
     180: "Pół roku. To nie streak, to styl życia.",
-    365: "Rok. Zmieniłeś się z człowieka w maszynę. Szacunek.",
+    365: "Rok. Zmieniłeś się z człowieka w maszynę.",
   };
-  document.getElementById("milestone-text").textContent = messages[hit] || `Świetny wynik! ${hit} dni z rzędu.`;
+  document.getElementById("milestone-text").textContent = messages[hit] || `${hit} dni z rzędu!`;
   banner.classList.remove("hidden");
   setTimeout(() => banner.classList.add("hidden"), 12000);
   fireConfetti();
+}
+
+// ============================================================================
+// KEYWORDS
+// ============================================================================
+const KEYWORDS = {
+  sick: ["chory", "choroba", "gorączka", "przeziębienie", "katar", "kaszel", "grypa", "ból głowy", "migrena", "osłabiony", "rozbity", "niedobrze", "mdli"],
+  alcohol: ["piwo", "wódka", "alkohol", "impreza", "kac", "wino", "drink", "pub", "klub", "popiłem", "popiłam"],
+  stress: ["stres", "stresu", "stresujący", "deadline", "egzamin", "sprawdzian", "kolokwium", "szef", "kłótnia", "kłopot", "problem", "zawalony", "presja"],
+  travel: ["podróż", "wyjazd", "samolot", "pociąg", "lotnisko", "wakacje", "urlop", "hotel"],
+  happy: ["dobry", "świetny", "super", "radosny", "wesoły", "szczęśliwy", "udany", "wygrałem", "wygrałam", "zadowolony"],
+  tired: ["zmęczony", "wyczerpany", "padnięty", "senny", "bez siły", "opary", "ledwo żyję"],
+};
+function detectKeywords(text) {
+  if (!text) return [];
+  const lower = text.toLowerCase();
+  const found = new Set();
+  Object.entries(KEYWORDS).forEach(([cat, words]) => {
+    if (words.some((w) => lower.includes(w))) found.add(cat);
+  });
+  return Array.from(found);
 }
 
 // ============================================================================
@@ -1397,23 +1612,23 @@ function renderImprovementTips() {
   const tips = [];
   const kws = detectKeywords(state.note);
 
-  if (state.specialMode === "sick") tips.push({ icon: "🤒", text: "Tryb choroby aktywny. Priorytet: sen, nawodnienie, zero treningu." });
-  if (state.specialMode === "vacation") tips.push({ icon: "🏖️", text: "Wakacje — luz, nie karć się za brak raportów." });
-  if (state.specialMode === "recovery") tips.push({ icon: "🌿", text: "Tryb regeneracji. Spacer + mobility + oddech." });
+  if (state.specialMode === "sick") tips.push({ icon: "🤒", text: "Tryb choroby. Priorytet: sen, nawodnienie, zero treningu." });
+  if (state.specialMode === "vacation") tips.push({ icon: "🏖️", text: "Wakacje — luz." });
+  if (state.specialMode === "recovery") tips.push({ icon: "🌿", text: "Tryb regeneracji — spacer + mobility." });
 
-  if (kws.includes("sick")) tips.push({ icon: "🤒", text: "W notatce wykryto chorobę — dziś priorytet zdrowie, nie trening." });
-  if (kws.includes("alcohol")) tips.push({ icon: "🍺", text: "Alkohol w notatce — dziś dużo wody i zero forsowania." });
-  if (kws.includes("stress")) tips.push({ icon: "😰", text: "Stres w notatce — 5 min oddechu 4-7-8 pomoże." });
-  if (kws.includes("travel")) tips.push({ icon: "✈️", text: "Podróż — zadbaj o sen w podróży, to fundament." });
-  if (kws.includes("happy")) tips.push({ icon: "🌟", text: "Dobry dzień w notatce — wykorzystaj energię!" });
-  if (kws.includes("tired")) tips.push({ icon: "😴", text: "Zmęczenie wykryte — priorytet sen." });
+  if (kws.includes("sick")) tips.push({ icon: "🤒", text: "Choroba w notatce — priorytet zdrowie." });
+  if (kws.includes("alcohol")) tips.push({ icon: "🍺", text: "Alkohol w notatce — dużo wody." });
+  if (kws.includes("stress")) tips.push({ icon: "😰", text: "Stres w notatce — 5 min oddechu 4-7-8." });
+  if (kws.includes("travel")) tips.push({ icon: "✈️", text: "Podróż — zadbaj o sen." });
+  if (kws.includes("happy")) tips.push({ icon: "🌟", text: "Dobry dzień — wykorzystaj energię!" });
+  if (kws.includes("tired")) tips.push({ icon: "😴", text: "Zmęczenie — priorytet sen." });
 
   if (m.sleepTotal != null) {
     if (m.sleepTotal < 7) tips.push({ icon: "😴", text: `Wydłuż sen z ${m.sleepTotal}h do 7-8h.` });
     else if (m.sleepTotal >= 8) tips.push({ icon: "✅", text: `Sen ${m.sleepTotal}h — utrzymaj.` });
   }
-  if (m.rhr != null && m.rhr > 68) tips.push({ icon: "💓", text: `RHR ${m.rhr} bpm — wysoko. Sprawdź czy nie przemęczony.` });
-  if (m.jawTension != null && m.jawTension >= 6) tips.push({ icon: "😬", text: `Napięcie szczęki ${m.jawTension}/10 — wzmocnij reset szczęki.` });
+  if (m.rhr != null && m.rhr > 68) tips.push({ icon: "💓", text: `RHR ${m.rhr} bpm — wysoko.` });
+  if (m.jawTension != null && m.jawTension >= 6) tips.push({ icon: "😬", text: `Napięcie szczęki ${m.jawTension}/10 — reset szczęki.` });
   if (e.stress != null && e.stress > 60) tips.push({ icon: "🧘", text: `Stres ${e.stress}/100 — 5 min oddechu.` });
   if (e.steps != null && e.steps < 5000) tips.push({ icon: "🚶", text: `Tylko ${e.steps} kroków — dodaj spacer.` });
   if (e.spo2 != null && e.spo2 < 94) tips.push({ icon: "🫁", text: `SpO2 ${e.spo2}% — przewietrz sypialnię.` });
@@ -1439,11 +1654,9 @@ function renderImprovementTips() {
 }
 
 // ============================================================================
-// AUTO BRIEF (bez klikania)
+// AUTO BRIEF
 // ============================================================================
-function getBriefCacheKey(trigger) {
-  return `regim:brief:${todayKey}:${trigger}`;
-}
+function getBriefCacheKey(trigger) { return `regim:brief:${todayKey}:${trigger}`; }
 function getCachedBrief(trigger, maxAgeMs) {
   const raw = localStorage.getItem(getBriefCacheKey(trigger));
   if (!raw) return null;
@@ -1456,7 +1669,6 @@ function getCachedBrief(trigger, maxAgeMs) {
 function setCachedBrief(trigger, text) {
   localStorage.setItem(getBriefCacheKey(trigger), JSON.stringify({ text, ts: Date.now() }));
 }
-
 function detectContext() {
   const h = new Date().getHours();
   const dayOfWeek = new Date().getDay();
@@ -1468,7 +1680,6 @@ function detectContext() {
   return { timeOfDay, h, dayOfWeek, isWeekend: dayOfWeek === 0 || dayOfWeek === 6 };
 }
 
-// GŁÓWNY MOCK TRENERA — obsługuje 30+ scenariuszy
 async function generateTrainerBrief() {
   const ctx = detectContext();
   const days = await loadLastNDays(14);
@@ -1478,104 +1689,73 @@ async function generateTrainerBrief() {
   const pct = calcCompletionPct();
   const kws = detectKeywords(state.note || today.note || "");
   const streak = parseInt(document.getElementById("streak-count").textContent) || 0;
-
   const yesterday = days[days.length - 2] || {};
-  const twoDaysAgo = days[days.length - 3] || {};
   const last7 = days.slice(-7);
 
-  // --- SPECJALNE TRYBY MAJĄ PRIORYTET ---
-  if (state.specialMode === "sick") {
-    return "🤒 Widzę że jesteś w trybie choroby. Dziś zero treningu, dużo wody, sen i regeneracja. Twój organizm walczy — nie przeszkadzaj mu. Wróć do planu jak poczujesz się lepiej.";
-  }
-  if (state.specialMode === "vacation") {
-    return "🏖️ Wakacje — luz. Zadbaj o spacer i sen, resztę olej. Nikt Cię nie ocenia, odpoczynek jest częścią planu.";
-  }
-  if (state.specialMode === "recovery") {
-    return "🌿 Tryb regeneracji aktywny. Spacer 30-45 min, mobility 10 min, oddech 4-7-8 przez 5 min. Sen dziś priorytet.";
-  }
+  if (state.specialMode === "sick") return "🤒 Widzę że jesteś w trybie choroby. Dziś zero treningu, dużo wody, sen. Twój organizm walczy — nie przeszkadzaj mu.";
+  if (state.specialMode === "vacation") return "🏖️ Wakacje — luz. Spacer i sen wystarczą. Odpoczynek jest częścią planu.";
+  if (state.specialMode === "recovery") return "🌿 Tryb regeneracji aktywny. Spacer 30-45 min, mobility 10 min, oddech 4-7-8 przez 5 min.";
 
-  // --- MILESTONE MOMENT ---
-  if ([7, 14, 21, 30, 60, 90, 100].includes(streak)) {
-    return `🏆 Masz ${streak} dni streak! To nie przypadek — to system, który działa. Zasłużyłeś na chwilę dumy, ale jutro wracasz do roboty. Konsekwencja to Twój największy atut.`;
-  }
+  if ([7, 14, 21, 30, 60, 90, 100].includes(streak)) return `🏆 Masz ${streak} dni streak! To nie przypadek — to system. Zasłużyłeś na chwilę dumy.`;
 
-  // --- KONTEKST CZASU ---
-  if (ctx.timeOfDay === "morning" && m.sleepTotal == null) {
-    return `☀️ Dzień dobry, ${USER_NAME}. Zanim zaczniesz dzień, wrzuć dane snu z zegarka — to fundament wszystkich decyzji na dziś. Bez tego nie ocenię Twojej gotowości.`;
-  }
-  if (ctx.timeOfDay === "afternoon" && m.sleepTotal == null && ctx.h >= 14) {
-    return `⚠️ Minęło już południe, a nie wypełniłeś raportu porannego. Wpisz teraz — nawet jeśli z pamięci. Bez punktu startowego trudno planować.`;
-  }
-  if (ctx.timeOfDay === "evening" && e.stress == null && ctx.h >= 19) {
-    return `🌙 Wieczór — czas domknąć dzień. Wpisz kroki, stres, nastrój i RPE. Bez tego nie zobaczysz pełnego obrazu dnia. Zajmie Ci to 30 sekund.`;
-  }
+  if (ctx.timeOfDay === "morning" && m.sleepTotal == null) return `☀️ Dzień dobry, ${USER_NAME}. Zanim zaczniesz dzień, wrzuć dane snu z zegarka — to fundament wszystkich decyzji na dziś.`;
+  if (ctx.timeOfDay === "afternoon" && m.sleepTotal == null && ctx.h >= 14) return `⚠️ Minęło już południe, a nie wypełniłeś raportu porannego. Wpisz teraz.`;
+  if (ctx.timeOfDay === "evening" && e.stress == null && ctx.h >= 19) return `🌙 Wieczór — czas domknąć dzień. Wpisz kroki, stres, nastrój i RPE. Zajmie Ci to 30 sekund.`;
 
-  // --- SŁOWA KLUCZOWE Z NOTATKI ---
-  if (kws.includes("sick")) return `🤒 Widzę w notatce że jesteś chory. Dziś odpuść trening — organizm potrzebuje energii na walkę, nie na spalanie. Sen, nawodnienie, ciepłe jedzenie. To część planu, nie porażka.`;
-  if (kws.includes("alcohol")) return `🍺 Alkohol w notatce. Dziś przede wszystkim woda i elektrolity. Trening odpuść albo zrób tylko spacer — kac + trening = kontuzja i spadek formy. Jutro wrócisz mocniejszy.`;
-  if (kws.includes("stress")) return `😰 Stres w notatce — to realny czynnik, który obniża regenerację. Dziś priorytet: sen, oddech 4-7-8, reset szczęki. Nie próbuj nadrabiać intensywnością, to pogorszy sprawę.`;
-  if (kws.includes("travel")) return `✈️ Podróż — zadbaj o sen mimo zmiany strefy. Nawodnienie, mało kofeiny po 14:00, spacer po przylocie. Sen to fundament, wszystko inne siada bez niego.`;
-  if (kws.includes("tired")) return `😴 Piszesz że jesteś zmęczony. Sprawdź RHR i sen z ostatnich 3 dni — jeśli oba są poniżej Twojej normy, to dziś regeneracja jest ważniejsza niż trening.`;
-  if (kws.includes("happy")) return `🌟 Dobry dzień w notatce! Wykorzystaj tę energię na trening i looksmaxing — ciało i głowa są dziś zsynchronizowane. Efekty przyjdą szybciej.`;
+  if (kws.includes("sick")) return `🤒 Widzę w notatce że jesteś chory. Dziś odpuść trening — organizm potrzebuje energii na walkę.`;
+  if (kws.includes("alcohol")) return `🍺 Alkohol w notatce. Dziś woda i elektrolity. Trening odpuść — kac + trening = kontuzja.`;
+  if (kws.includes("stress")) return `😰 Stres w notatce — obniża regenerację. Dziś priorytet: sen, oddech 4-7-8, reset szczęki.`;
+  if (kws.includes("travel")) return `✈️ Podróż — zadbaj o sen mimo zmiany strefy.`;
+  if (kws.includes("tired")) return `😴 Piszesz że jesteś zmęczony. Sprawdź RHR i sen z ostatnich 3 dni.`;
+  if (kws.includes("happy")) return `🌟 Dobry dzień! Wykorzystaj energię na trening i looksmaxing.`;
 
-  // --- ANALIZA SNU ---
   if (m.sleepTotal != null) {
-    if (m.sleepTotal < 5) return `😴 Spałeś ledwie ${m.sleepTotal}h. To bardzo mało — dziś trening ulgowo, priorytet to dojść do 8h dziś w nocy. Kofeina max 1 kawa, potem tylko woda.`;
-    if (m.sleepTotal < 6.5) return `😴 ${m.sleepTotal}h snu — poniżej progu. Zjedz więcej białka, ogranicz intensywność, zaplanuj wcześniej sen dziś. Jutro będzie lepiej jak dziś odpuścisz forsowanie.`;
-    if (m.sleepTotal >= 8.5) return `✅ Spałeś ${m.sleepTotal}h — bateria pełna. Dziś możesz cisnąć normalnie, a nawet dodać 1 serię. Wykorzystaj ten dzień, bo nie każdy taki będzie.`;
+    if (m.sleepTotal < 5) return `😴 Spałeś ledwie ${m.sleepTotal}h. Bardzo mało — dziś ulgowo, priorytet 8h dziś w nocy.`;
+    if (m.sleepTotal < 6.5) return `😴 ${m.sleepTotal}h snu — poniżej progu. Ogranicz intensywność, zaplanuj wcześniej sen.`;
+    if (m.sleepTotal >= 8.5) return `✅ Spałeś ${m.sleepTotal}h — bateria pełna. Możesz dziś cisnąć normalnie.`;
   }
 
-  // --- ANALIZA RHR ---
-  if (m.rhr != null && m.rhr > 70) return `💓 RHR ${m.rhr} bpm — wysoko. Możliwe przemęczenie, stres lub nadchodząca choroba. Dziś lekki trening, sen priorytet, obserwuj wieczorem.`;
-  if (m.rhr != null && m.rhr < 50) return `💓 RHR ${m.rhr} bpm — bardzo nisko, świetna regeneracja. Serce jest wypoczęte. Dziś możesz trenować mocniej niż zwykle.`;
+  if (m.rhr != null && m.rhr > 70) return `💓 RHR ${m.rhr} bpm — wysoko. Możliwe przemęczenie lub stres. Dziś lekki trening.`;
+  if (m.rhr != null && m.rhr < 50) return `💓 RHR ${m.rhr} bpm — bardzo nisko, świetna regeneracja. Możesz dziś trenować mocniej.`;
 
-  // --- DELOAD DETECTOR ---
   const rpe3 = last7.slice(-3).map((d) => d.evening?.rpe).filter((r) => r != null);
-  if (rpe3.length === 3 && rpe3.every((r) => r >= 8)) return `🔥 3 ostatnie treningi z RPE ≥ 8. Alarm przeciążenia. Zrób tydzień deload: połowa serii, 60% intensywności, więcej snu i mobilności. To nie słabość, to strategia.`;
+  if (rpe3.length === 3 && rpe3.every((r) => r >= 8)) return `🔥 3 ostatnie treningi z RPE ≥ 8. Alarm przeciążenia. Zrób tydzień deload.`;
 
-  // --- SEN DEBT ---
   const sleep3 = last7.slice(-3).map((d) => d.morning?.sleepTotal).filter((s) => s != null);
-  if (sleep3.length === 3 && sleep3.every((s) => s < 6.5)) return `😴 3 dni z rzędu poniżej 6.5h snu. Kumulujesz dług senny — to realnie obniża testosteron, koncentrację i regenerację. Dziś kluczowy wieczór: telefon off 1h przed, ciemny pokój, zero kofeiny po 14:00.`;
+  if (sleep3.length === 3 && sleep3.every((s) => s < 6.5)) return `😴 3 dni z rzędu poniżej 6.5h snu. Kumulujesz dług senny. Dziś kluczowy wieczór.`;
 
-  // --- WAGA ---
   if (m.dailyWeight != null && yesterday.morning?.dailyWeight != null) {
     const delta = m.dailyWeight - yesterday.morning.dailyWeight;
-    if (delta < -0.4) return `⚖️ Waga spadła o ${Math.abs(delta).toFixed(1)} kg vs wczoraj. Jeśli nie zmieniłeś diety, to woda. Ale sprawdź czy jesz wystarczająco — cel to masa, nie spadek.`;
-    if (delta > 0.5) return `⚖️ Waga +${delta.toFixed(1)} kg vs wczoraj. Normalne wahanie (woda, sód, jedzenie w jelitach). Nie panikuj, patrzymy na trend tygodniowy.`;
+    if (delta < -0.4) return `⚖️ Waga spadła o ${Math.abs(delta).toFixed(1)} kg vs wczoraj. Jeśli nie zmieniłeś diety, to woda. Sprawdź czy jesz wystarczająco.`;
+    if (delta > 0.5) return `⚖️ Waga +${delta.toFixed(1)} kg vs wczoraj. Normalne wahanie (woda, sód). Patrzymy na trend.`;
   }
 
-  // --- GOTOWOŚĆ ---
   const readiness = calculateReadiness();
   if (readiness != null) {
-    if (readiness >= 85) return `🎯 Gotowość ${readiness}% — full stack. Dziś możesz trenować mocniej i dodać do planu jeden trudniejszy element. Wykorzystaj dzień.`;
-    if (readiness >= 70) return `✅ Gotowość ${readiness}% — solidna. Trenuj normalnie, ale bez bicia rekordów. Regeneracja jest na dobrym poziomie.`;
-    if (readiness >= 50) return `⚠️ Gotowość ${readiness}% — umiarkowana. Dziś lżejszy trening, priorytet sen i reset szczęki. Nie forsuj, to się nie opłaca.`;
-    if (readiness >= 30) return `🟠 Gotowość ${readiness}% — niska. Rozważ tryb regeneracji. Spacer, mobility, oddech. Trening odpuść albo zrób bardzo lekki.`;
-    return `🔴 Gotowość ${readiness}% — bardzo niska. Dziś TYLKO regeneracja. Włącz tryb regeneracji, sen priorytet. Twoje ciało mówi: stop.`;
+    if (readiness >= 85) return `🎯 Gotowość ${readiness}% — full stack. Możesz trenować mocniej.`;
+    if (readiness >= 70) return `✅ Gotowość ${readiness}% — solidna. Trenuj normalnie.`;
+    if (readiness >= 50) return `⚠️ Gotowość ${readiness}% — umiarkowana. Dziś lżejszy trening.`;
+    if (readiness >= 30) return `🟠 Gotowość ${readiness}% — niska. Rozważ tryb regeneracji.`;
+    return `🔴 Gotowość ${readiness}% — bardzo niska. Tylko regeneracja.`;
   }
 
-  // --- WEEKEND / PONIEDZIAŁEK / NIEDZIELA ---
-  if (ctx.dayOfWeek === 1 && ctx.timeOfDay === "morning") return `📅 Poniedziałek — nowy tydzień. Zaplanuj 3 rzeczy: 1) sen każdej nocy, 2) trening 3x, 3) mowa codziennie. Małe kroki, duże efekty.`;
-  if (ctx.dayOfWeek === 0 && ctx.timeOfDay === "evening") return `🌅 Niedziela wieczór — tydzień domknięty. Zrób szybkie podsumowanie: co poszło dobrze, co poprawić. Jutro nowy start z czystą kartą.`;
-  if (ctx.dayOfWeek === 5 && ctx.timeOfDay === "evening") return `🎉 Piątek — koniec tygodnia pracy. Nagradzaj się, ale alkohol w rozsądku. Jutro sobota, nie trać całego dnia na kaca.`;
+  if (ctx.dayOfWeek === 1 && ctx.timeOfDay === "morning") return `📅 Poniedziałek — nowy tydzień. Zaplanuj: sen, trening, mowa.`;
+  if (ctx.dayOfWeek === 0 && ctx.timeOfDay === "evening") return `🌅 Niedziela wieczór — tydzień domknięty. Co poszło dobrze, co poprawić.`;
+  if (ctx.dayOfWeek === 5 && ctx.timeOfDay === "evening") return `🎉 Piątek — nagradzaj się, ale alkohol w rozsądku.`;
 
-  // --- OGÓLNY FALLBACK ---
-  const pctText = pct === 100 ? "100% zadań — perfekcyjny dzień, gratulacje." : pct >= 50 ? `Zrobione ${pct}% planu — solidnie.` : `Tylko ${pct}% zadań — jest rezerwa.`;
+  const pctText = pct === 100 ? "100% zadań — perfekcyjny dzień." : pct >= 50 ? `Zrobione ${pct}% planu — solidnie.` : `Tylko ${pct}% zadań — jest rezerwa.`;
 
-  if (ctx.timeOfDay === "morning") return `☀️ Dzień dobry. ${pctText} Priorytet na dziś: sen, trening, mowa. Trzymaj rytm, ${USER_NAME}.`;
-  if (ctx.timeOfDay === "evening") return `🌙 Wieczór — ${pctText} Domknij dzień raportem wieczornym i idź spać wcześniej. Sen to jutrzejsza forma.`;
-  return `📊 ${pctText} Kontynuuj plan dnia, pamiętaj o mowie, twarzy i postawie. Konsekwencja to Twoja przewaga.`;
+  if (ctx.timeOfDay === "morning") return `☀️ Dzień dobry. ${pctText} Priorytet: sen, trening, mowa.`;
+  if (ctx.timeOfDay === "evening") return `🌙 Wieczór — ${pctText} Domknij dzień raportem wieczornym.`;
+  return `📊 ${pctText} Kontynuuj plan dnia.`;
 }
 
 async function loadBrief(force = false) {
   const trigger = "main";
-  const cacheAge = 3 * 60 * 60 * 1000; // 3h
+  const cacheAge = 3 * 60 * 60 * 1000;
   if (!force) {
     const cached = getCachedBrief(trigger, cacheAge);
-    if (cached) {
-      document.getElementById("brief-text").textContent = cached;
-      return cached;
-    }
+    if (cached) { document.getElementById("brief-text").textContent = cached; return cached; }
   }
   const text = await generateTrainerBrief();
   setCachedBrief(trigger, text);
@@ -1583,12 +1763,10 @@ async function loadBrief(force = false) {
   return text;
 }
 
-async function autoRefreshBrief(trigger) {
-  // Czyszczę cache i pobieram na nowo
+async function autoRefreshBrief() {
   const text = await generateTrainerBrief();
   setCachedBrief("main", text);
   document.getElementById("brief-text").textContent = text;
-  // Animacja
   const el = document.getElementById("brief-text");
   el.style.animation = "none";
   requestAnimationFrame(() => { el.style.animation = "rise 0.35s ease both"; });
@@ -1611,10 +1789,7 @@ async function renderWeekOfLife() {
 
   document.getElementById("week-of-life-content").innerHTML = `
     <div class="weekoflive-card">
-      <div class="text-center mb-5">
-        <div class="text-xs font-bold text-mint tracking-widest mb-1">TYDZIEŃ Z ŻYCIA</div>
-        <div class="text-2xl font-extrabold">${new Date().toLocaleDateString("pl-PL", { day: "numeric", month: "long" })}</div>
-      </div>
+      <div class="text-center mb-5"><div class="text-xs font-bold text-mint tracking-widest mb-1">TYDZIEŃ Z ŻYCIA</div><div class="text-2xl font-extrabold">${new Date().toLocaleDateString("pl-PL", { day: "numeric", month: "long" })}</div></div>
       <div class="grid grid-cols-2 gap-3 mb-4">
         <div class="rounded-2xl p-3 bg-white/5"><div class="text-[10px] text-neutral-400 font-bold tracking-widest">STREAK</div><div class="text-2xl font-extrabold text-gold">${streak} <span class="text-sm text-neutral-400">dni</span></div></div>
         <div class="rounded-2xl p-3 bg-white/5"><div class="text-[10px] text-neutral-400 font-bold tracking-widest">WYKONANIE</div><div class="text-2xl font-extrabold text-mint">${avgPct}%</div></div>
@@ -1631,7 +1806,7 @@ async function renderWeekOfLife() {
 }
 
 // ============================================================================
-// REKORDY OSOBISTE
+// REKORDY + PORÓWNANIE
 // ============================================================================
 async function renderPersonalRecords() {
   const days = await collectAllDays();
@@ -1644,74 +1819,58 @@ async function renderPersonalRecords() {
       if (d.completedPct === 100 && consec) cur++;
       else if (d.completedPct === 100) cur = 1;
       else cur = 0;
-      best = Math.max(best, cur);
-      prev = d.date;
+      best = Math.max(best, cur); prev = d.date;
     });
     return best;
   })();
-  const minRhr = Math.min(...days.map((d) => d.morning?.rhr).filter((r) => r != null), 999) || null;
+  const rhrs = days.map((d) => d.morning?.rhr).filter((r) => r != null);
+  const minRhr = rhrs.length ? Math.min(...rhrs) : null;
 
   const records = [
     { icon: "😴", label: "Najdłuższy sen", value: maxSleep > 0 ? `${maxSleep.toFixed(1)}h` : "—" },
     { icon: "🚶", label: "Rekord kroków", value: maxSteps > 0 ? `${maxSteps}` : "—" },
     { icon: "🔥", label: "Najdłuższy streak", value: `${maxStreak} dni` },
-    { icon: "💓", label: "Najniższe RHR", value: minRhr && minRhr < 999 ? `${minRhr} bpm` : "—" },
+    { icon: "💓", label: "Najniższe RHR", value: minRhr != null ? `${minRhr} bpm` : "—" },
   ];
-
   document.getElementById("personal-records").innerHTML = records.map((r) => `
-    <div class="record-card">
-      <div class="text-lg mb-1">${r.icon}</div>
-      <div class="text-xl font-extrabold">${r.value}</div>
-      <div class="text-[10px] text-neutral-400 font-semibold mt-0.5">${r.label}</div>
-    </div>`).join("");
+    <div class="record-card"><div class="text-lg mb-1">${r.icon}</div><div class="text-xl font-extrabold">${r.value}</div><div class="text-[10px] text-neutral-400 font-semibold mt-0.5">${r.label}</div></div>`).join("");
 }
 
-// ============================================================================
-// PORÓWNANIE MIESIĘCZNE
-// ============================================================================
 async function renderMonthlyComparison() {
   const allDays = await collectAllDays();
   const now = new Date();
   const thisMonthStart = new Date(now.getFullYear(), now.getMonth(), 1);
   const lastMonthStart = new Date(now.getFullYear(), now.getMonth() - 1, 1);
   const lastMonthEnd = new Date(now.getFullYear(), now.getMonth(), 0);
-
   const thisM = allDays.filter((d) => new Date(d.date) >= thisMonthStart);
   const lastM = allDays.filter((d) => new Date(d.date) >= lastMonthStart && new Date(d.date) <= lastMonthEnd);
 
   if (thisM.length < 3 || lastM.length < 3) {
-    document.getElementById("monthly-comparison").innerHTML = `<p class="text-xs text-neutral-400 font-medium">Za mało danych do porównania — potrzebujesz co najmniej 3 dni w każdym miesiącu.</p>`;
+    document.getElementById("monthly-comparison").innerHTML = `<p class="text-xs text-neutral-400 font-medium">Za mało danych — potrzebujesz 3+ dni w każdym miesiącu.</p>`;
     return;
   }
-
   const metrics = [
-    { key: "completedPct", label: "Wykonanie zadań", unit: "%", get: (d) => d.completedPct, higher: true },
-    { key: "sleepTotal", label: "Sen", unit: "h", get: (d) => d.morning?.sleepTotal, higher: true },
-    { key: "rhr", label: "RHR", unit: " bpm", get: (d) => d.morning?.rhr, higher: false },
-    { key: "stress", label: "Stres", unit: "/100", get: (d) => d.evening?.stress, higher: false },
-    { key: "steps", label: "Kroki", unit: "", get: (d) => d.evening?.steps, higher: true },
+    { key: "completedPct", label: "Wykonanie", unit: "%", get: (d) => d.completedPct, h: true },
+    { key: "sleepTotal", label: "Sen", unit: "h", get: (d) => d.morning?.sleepTotal, h: true },
+    { key: "rhr", label: "RHR", unit: " bpm", get: (d) => d.morning?.rhr, h: false },
+    { key: "stress", label: "Stres", unit: "/100", get: (d) => d.evening?.stress, h: false },
+    { key: "steps", label: "Kroki", unit: "", get: (d) => d.evening?.steps, h: true },
   ];
-
   const rows = metrics.map((m) => {
     const a = average(thisM.map(m.get).filter((v) => v != null));
     const b = average(lastM.map(m.get).filter((v) => v != null));
     if (a == null || b == null) return null;
-    const diff = a - b;
-    const improved = m.higher ? diff > 0 : diff < 0;
+    const diff = a - b, improved = m.h ? diff > 0 : diff < 0;
     const arrow = diff === 0 ? "→" : diff > 0 ? "↑" : "↓";
     const color = diff === 0 ? "text-neutral-400" : improved ? "text-mint" : "text-rose";
     const fmt = (v) => m.key === "steps" ? Math.round(v) : v.toFixed(1);
-    return `<div class="flex items-center justify-between glass rounded-2xl px-4 py-2.5">
-      <span class="text-xs font-bold text-neutral-300">${m.label}:</span>
-      <span class="text-xs font-extrabold ${color}">${fmt(a)}${m.unit} ${arrow} <span class="text-neutral-500 font-semibold">(był ${fmt(b)}${m.unit})</span></span>
-    </div>`;
+    return `<div class="flex items-center justify-between glass rounded-2xl px-4 py-2.5"><span class="text-xs font-bold text-neutral-300">${m.label}:</span><span class="text-xs font-extrabold ${color}">${fmt(a)}${m.unit} ${arrow} <span class="text-neutral-500 font-semibold">(był ${fmt(b)}${m.unit})</span></span></div>`;
   }).filter(Boolean);
-
   document.getElementById("monthly-comparison").innerHTML = rows.length ? rows.join("") : `<p class="text-xs text-neutral-400">Za mało wspólnych danych.</p>`;
 }
 
 // ============================================================================
-// KALENDARZ + DAY DETAIL
+// KALENDARZ
 // ============================================================================
 let calViewDate = new Date(todayObj.getFullYear(), todayObj.getMonth(), 1);
 const MONTH_NAMES_PL = ["Styczeń","Luty","Marzec","Kwiecień","Maj","Czerwiec","Lipiec","Sierpień","Wrzesień","Październik","Listopad","Grudzień"];
@@ -1748,57 +1907,38 @@ async function showDayDetail(key) {
   const dateObj = new Date(y, mo - 1, dd);
   document.getElementById("day-detail-title").textContent = dateObj.toLocaleDateString("pl-PL", { day: "numeric", month: "long", year: "numeric" });
   const c = document.getElementById("day-detail-content");
-  if (!doc) {
-    c.innerHTML = `<p class="text-sm text-neutral-400">Brak zapisanych danych dla tego dnia.</p>`;
-    openModal("modal-day-detail"); return;
-  }
+  if (!doc) { c.innerHTML = `<p class="text-sm text-neutral-400">Brak zapisanych danych.</p>`; openModal("modal-day-detail"); return; }
   const t = doc.tasks || [];
   const m = doc.morning || {};
   const e = doc.evening || {};
   const tasksHtml = t.map((x) => `<div class="flex items-center gap-2 text-xs"><span class="${x.done ? "text-mint" : "text-neutral-500"}">${x.done ? "✓" : "○"}</span><span class="${x.done ? "text-neutral-200" : "text-neutral-500"}">${x.label}</span></div>`).join("");
-
   c.innerHTML = `
-    <div class="flex items-center gap-3 mb-4">
-      <div class="text-3xl font-extrabold ${doc.completedPct === 100 ? "text-mint" : doc.completedPct >= 50 ? "text-gold" : "text-rose"}">${doc.completedPct ?? 0}%</div>
-      <div class="text-xs text-neutral-400 font-semibold">wykonanie dnia</div>
-    </div>
-    <div class="glass rounded-3xl p-4 mb-3">
-      <div class="text-[10px] text-neutral-400 font-bold mb-2 tracking-widest">ZADANIA</div>
-      <div class="space-y-1.5">${tasksHtml || '<span class="text-xs text-neutral-500">brak</span>'}</div>
-    </div>
-    <div class="glass rounded-3xl p-4 mb-3">
-      <div class="text-[10px] text-neutral-400 font-bold mb-2 tracking-widest">SEN</div>
-      <div class="grid grid-cols-2 gap-2 text-xs text-neutral-200 font-medium">
-        <div>🌙 Sen: <span class="font-bold">${m.sleepTotal ?? "—"} h</span></div>
-        <div>🧠 Deep: <span class="font-bold">${m.sleepDeep ?? "—"} h</span></div>
-        <div>💭 REM: <span class="font-bold">${m.sleepRem ?? "—"} h</span></div>
-        <div>⏰ Pobudki: <span class="font-bold">${m.sleepWakes ?? "—"}</span></div>
-        <div>💓 RHR: <span class="font-bold">${m.rhr ?? "—"} bpm</span></div>
-        <div>⚖️ Waga: <span class="font-bold">${m.dailyWeight ?? m.weeklyWeight ?? "—"} kg</span></div>
-        <div>😬 Szczęka: <span class="font-bold">${m.jawTension ?? "—"}/10</span></div>
-        <div>😊 Nastrój: <span class="font-bold">${m.moodMorning ?? "—"}/10</span></div>
-      </div>
-    </div>
-    <div class="glass rounded-3xl p-4 mb-3">
-      <div class="text-[10px] text-neutral-400 font-bold mb-2 tracking-widest">DZIEŃ</div>
-      <div class="grid grid-cols-2 gap-2 text-xs text-neutral-200 font-medium">
-        <div>🚶 Kroki: <span class="font-bold">${e.steps ?? "—"}</span></div>
-        <div>💓 Tętno: <span class="font-bold">${e.hrDay ?? "—"} bpm</span></div>
-        <div>🫁 SpO2: <span class="font-bold">${e.spo2 ?? "—"}%</span></div>
-        <div>🧘 Stres: <span class="font-bold">${e.stress ?? "—"}/100</span></div>
-        <div>🔥 RPE: <span class="font-bold">${e.rpe ?? "—"}/10</span></div>
-        <div>📱 Screen: <span class="font-bold">${e.screenTime ?? "—"} min</span></div>
-        <div>😊 Nastrój: <span class="font-bold">${e.moodEvening ?? "—"}/10</span></div>
-        ${e.bikeDistance != null ? `<div>🚴 Rower: <span class="font-bold">${e.bikeDistance} km</span></div>` : ""}
-      </div>
-    </div>
+    <div class="flex items-center gap-3 mb-4"><div class="text-3xl font-extrabold ${doc.completedPct === 100 ? "text-mint" : doc.completedPct >= 50 ? "text-gold" : "text-rose"}">${doc.completedPct ?? 0}%</div><div class="text-xs text-neutral-400 font-semibold">wykonanie dnia</div></div>
+    <div class="glass rounded-3xl p-4 mb-3"><div class="text-[10px] text-neutral-400 font-bold mb-2 tracking-widest">ZADANIA</div><div class="space-y-1.5">${tasksHtml || '<span class="text-xs text-neutral-500">brak</span>'}</div></div>
+    <div class="glass rounded-3xl p-4 mb-3"><div class="text-[10px] text-neutral-400 font-bold mb-2 tracking-widest">SEN</div><div class="grid grid-cols-2 gap-2 text-xs text-neutral-200 font-medium">
+      <div>🌙 Sen: <span class="font-bold">${m.sleepTotal ?? "—"} h</span></div>
+      <div>🧠 Deep: <span class="font-bold">${m.sleepDeep ?? "—"} h</span></div>
+      <div>💭 REM: <span class="font-bold">${m.sleepRem ?? "—"} h</span></div>
+      <div>💓 RHR: <span class="font-bold">${m.rhr ?? "—"} bpm</span></div>
+      <div>⚖️ Waga: <span class="font-bold">${m.dailyWeight ?? m.weeklyWeight ?? "—"} kg</span></div>
+      <div>😬 Szczęka: <span class="font-bold">${m.jawTension ?? "—"}/10</span></div>
+      <div>😊 Nastrój: <span class="font-bold">${m.moodMorning ?? "—"}/10</span></div>
+    </div></div>
+    <div class="glass rounded-3xl p-4 mb-3"><div class="text-[10px] text-neutral-400 font-bold mb-2 tracking-widest">DZIEŃ</div><div class="grid grid-cols-2 gap-2 text-xs text-neutral-200 font-medium">
+      <div>🚶 Kroki: <span class="font-bold">${e.steps ?? "—"}</span></div>
+      <div>💓 Tętno: <span class="font-bold">${e.hrDay ?? "—"} bpm</span></div>
+      <div>🫁 SpO2: <span class="font-bold">${e.spo2 ?? "—"}%</span></div>
+      <div>🧘 Stres: <span class="font-bold">${e.stress ?? "—"}/100</span></div>
+      <div>🔥 RPE: <span class="font-bold">${e.rpe ?? "—"}/10</span></div>
+      <div>📱 Screen: <span class="font-bold">${e.screenTime ?? "—"} min</span></div>
+      <div>😊 Nastrój: <span class="font-bold">${e.moodEvening ?? "—"}/10</span></div>
+      ${e.bikeDistance != null ? `<div>🚴 Rower: <span class="font-bold">${e.bikeDistance} km</span></div>` : ""}
+    </div></div>
     ${doc.note ? `<div class="glass rounded-3xl p-4 mb-3"><div class="text-[10px] text-neutral-400 font-bold mb-2 tracking-widest">NOTATKA</div><p class="text-xs text-neutral-200 font-medium italic">"${escapeHtml(doc.note)}"</p></div>` : ""}
     ${doc.aiVerdict ? `<div class="glass rounded-3xl p-4 mb-3 border border-peach/20"><div class="text-[10px] text-peach font-bold mb-2 tracking-widest">RADA TRENERA</div><p class="text-xs text-neutral-200 font-medium leading-relaxed">${escapeHtml(doc.aiVerdict)}</p></div>` : ""}
   `;
   openModal("modal-day-detail");
 }
-
-function escapeHtml(s) { const d = document.createElement("div"); d.textContent = s; return d.innerHTML; }
 
 // ============================================================================
 // CHALLENGE
@@ -1811,7 +1951,6 @@ const CHALLENGES = [
   { id: "twarz30", name: "✨ Looksmaxing 30 dni", check: (d) => d.tasks?.find((t) => t.id === "twarz" && t.done), max: 30 },
   { id: "steps30", name: "🚶 8000 kroków 30 dni", check: (d) => (d.evening?.steps ?? 0) >= 8000, max: 30 },
 ];
-
 function getChallenge() {
   const id = localStorage.getItem("regim:challenge");
   return CHALLENGES.find((c) => c.id === id) || null;
@@ -1822,28 +1961,20 @@ async function renderChallenge() {
   const countEl = document.getElementById("challenge-count");
   const bar = document.getElementById("challenge-bar");
   const tip = document.getElementById("challenge-tip");
-  if (!ch) {
-    nameEl.textContent = "Nie wybrano";
-    countEl.textContent = "0/30";
-    bar.style.width = "0%";
-    tip.textContent = "Wybierz challenge — np. sen 8h przez 30 dni.";
-    return;
-  }
+  if (!ch) { nameEl.textContent = "Nie wybrano"; countEl.textContent = "0/30"; bar.style.width = "0%"; tip.textContent = "Wybierz challenge — np. sen 8h przez 30 dni."; return; }
   const days = await loadLastNDays(ch.max);
   const passed = days.filter(ch.check).length;
   nameEl.textContent = ch.name;
   countEl.textContent = `${passed}/${ch.max}`;
   bar.style.width = `${(passed / ch.max) * 100}%`;
-  if (passed >= ch.max) tip.textContent = "🏆 Challenge ukończony! Szacunek.";
-  else tip.textContent = `Zostało ${ch.max - passed} dni. Trzymaj rytm.`;
+  if (passed >= ch.max) tip.textContent = "🏆 Challenge ukończony!";
+  else tip.textContent = `Zostało ${ch.max - passed} dni.`;
 }
-
 async function renderChallengeOptions() {
   const current = localStorage.getItem("regim:challenge");
   document.getElementById("challenge-options").innerHTML = CHALLENGES.map((c) => `
     <button data-challenge="${c.id}" class="challenge-option w-full py-3 px-4 glass rounded-2xl text-left font-bold text-sm flex items-center justify-between active:scale-98 transition ${current === c.id ? "border-mint border-2" : ""}">
-      <span>${c.name}</span>
-      ${current === c.id ? '<i class="fa-solid fa-check text-mint"></i>' : ""}
+      <span>${c.name}</span>${current === c.id ? '<i class="fa-solid fa-check text-mint"></i>' : ""}
     </button>`).join("");
   document.querySelectorAll(".challenge-option").forEach((b) => {
     b.onclick = () => {
@@ -1856,60 +1987,58 @@ async function renderChallengeOptions() {
 }
 
 // ============================================================================
-// SŁOWNICZEK + HELP
+// SŁOWNICZEK / HELP
 // ============================================================================
 const GLOSSARY = [
-  { icon: "💓", term: "RHR (Resting Heart Rate)", desc: "Tętno spoczynkowe mierzone rano, zaraz po przebudzeniu, jeszcze przed wstaniem z łóżka. Norma 50-70 bpm. Wzrost o 5+ bpm dzień do dnia = sygnał przemęczenia, stresu lub nadchodzącej choroby." },
-  { icon: "🔥", term: "RPE (Rate of Perceived Exertion)", desc: "Subiektywna skala ciężkości treningu 1-10. 1 = bardzo lekko (spacer), 5 = umiarkowanie, 8 = bardzo ciężko, 10 = maksymalny wysiłek. Dla przedtrenowanego: trzymaj większość treningów na 6-7." },
-  { icon: "🫁", term: "SpO2", desc: "Saturacja krwi, czyli wysycenie tlenem. Norma 95-100%. Poniżej 94% to sygnał problemu z oddychaniem lub krążeniem." },
-  { icon: "🌙", term: "Sen głęboki (Deep sleep)", desc: "Faza snu odpowiedzialna za regenerację fizyczną — mięśnie, hormony (testosteron, hormon wzrostu), układ odpornościowy. Powinno być 15-25% całego snu." },
-  { icon: "💭", term: "REM", desc: "Faza snu z szybkimi ruchami gałek ocznych — regeneracja mózgu, pamięci, przetwarzanie emocji. Powinno być 20-25% całego snu. Za mało REM = gorsze samopoczucie psychiczne." },
-  { icon: "⚡", term: "Gotowość (Readiness)", desc: "Wskaźnik 0-100% pokazujący jak bardzo Twój organizm jest gotowy na wysiłek. Liczony z snu, głębokiego snu, RHR, stresu i napięcia szczęki. 80%+ = pełna gotowość. 40% = obniżona. Poniżej 40% = tylko regeneracja." },
-  { icon: "🔄", term: "Deload", desc: "Tydzień lżejszego treningu (połowa serii, 60% intensywności). Zalecany co 4-6 tygodni lub przy 3 dniach z RPE 8+. To nie słabość — to strategia, która chroni przed przetrenowaniem." },
-  { icon: "❄️", term: "Streak Freeze", desc: "1 raz na tydzień możesz zamrozić swój streak — na wypadek choroby, wyjazdu, gorszego dnia. Streak nie resetuje się, ale też nie rośnie." },
-  { icon: "🎯", term: "Streak", desc: "Liczba dni z rzędu ze 100% wykonaniem zadań. Resetuje się gdy nie dowieziesz pełnego planu (chyba że użyjesz Streak Freeze)." },
-  { icon: "📊", term: "BMI (Body Mass Index)", desc: "Wskaźnik masy ciała = waga (kg) / wzrost (m)². Norma 18.5-25. Poniżej 18.5 = niedowaga (buduj masę). Powyżej 25 = nadwaga." },
-  { icon: "😬", term: "Napięcie szczęki", desc: "Skala 1-10 mierząca jak bardzo napięte są Twoje mięśnie żwacze rano. 1-3 = rozluźniona, 4-6 = umiarkowanie, 7-10 = mocno napięta, prawdopodobnie bruksizm w nocy." },
-  { icon: "🚴", term: "Rower — dystans", desc: "W dni rowerowe zapisz ile kilometrów przejechałeś. Cel: ~7 km, tempo spokojne, wytrzymałościowe." },
-  { icon: "💊", term: "Tran z dorsza", desc: "Naturalny suplement — olej z wątroby dorsza islandzkiego. Źródło witaminy D, A i omega-3. Bierz razem z D3, do posiłku z tłuszczem." },
-  { icon: "🌿", term: "Tryb regeneracji", desc: "Dzień bez treningu — spacer 30-45 min, mobility 10 min, oddech 5 min. Zalecany po 5+ dniach bez pełnego OFF, przy niskim readiness lub po intensywnym tygodniu." },
-  { icon: "🏖️", term: "Tryb wakacji", desc: "Luźniejsze zasady — nie karci Cię za brak raportów, cele są minimalne. Na wyjazdach, urlopach, wycieczkach." },
-  { icon: "🤒", term: "Tryb choroby", desc: "Aktywny gdy jesteś chory. Zero treningu, priorytet: sen, nawodnienie, jedzenie, regeneracja. Wróć do planu jak poczujesz się lepiej." },
+  { icon: "💓", term: "RHR (Resting Heart Rate)", desc: "Tętno spoczynkowe mierzone rano. Norma 50-70 bpm. Wzrost o 5+ bpm dzień do dnia = przemęczenie, stres lub choroba." },
+  { icon: "🔥", term: "RPE (Rate of Perceived Exertion)", desc: "Subiektywna skala ciężkości treningu 1-10. Dla przedtrenowanego: trzymaj większość na 6-7." },
+  { icon: "🫁", term: "SpO2", desc: "Saturacja krwi. Norma 95-100%. Poniżej 94% to sygnał problemu." },
+  { icon: "🌙", term: "Sen głęboki (Deep)", desc: "Regeneracja fizyczna — mięśnie, hormony, odporność. Powinno być 15-25% snu." },
+  { icon: "💭", term: "REM", desc: "Regeneracja mózgu, pamięci, emocji. Powinno być 20-25% snu." },
+  { icon: "⚡", term: "Gotowość (Readiness)", desc: "0-100%. Liczony z snu, deep, RHR, stresu, napięcia szczęki. 80%+ = pełna. Poniżej 40% = regeneracja." },
+  { icon: "🔄", term: "Deload", desc: "Tydzień lżejszego treningu. Zalecany co 4-6 tygodni lub przy 3 dniach RPE 8+." },
+  { icon: "❄️", term: "Streak Freeze", desc: "1 raz na tydzień możesz zamrozić streak — na wypadek choroby, wyjazdu." },
+  { icon: "🎯", term: "Streak", desc: "Liczba dni z rzędu ze 100% wykonaniem zadań. Resetuje gdy nie dowieziesz pełnego planu." },
+  { icon: "📊", term: "BMI", desc: "Waga (kg) / wzrost (m)². Norma 18.5-25. Poniżej = niedowaga, powyżej = nadwaga." },
+  { icon: "😬", term: "Napięcie szczęki", desc: "1-10 rano. 1-3 rozluźniona, 4-6 umiarkowane, 7-10 mocno napięta (bruksizm)." },
+  { icon: "🚴", term: "Rower — dystans", desc: "W dni rowerowe zapisz km. Cel: ~7 km spokojnym tempem." },
+  { icon: "💊", term: "Tran z dorsza", desc: "Olej z wątroby dorsza islandzkiego. Źródło witaminy D, A i omega-3. Bierz z D3, do posiłku z tłuszczem." },
+  { icon: "🌿", term: "Tryb regeneracji", desc: "Dzień bez treningu — spacer 30-45 min, mobility 10 min, oddech 5 min." },
+  { icon: "🏖️", term: "Tryb wakacji", desc: "Luźniejsze zasady. Cele minimalne. Na wyjazdach, urlopach." },
+  { icon: "🤒", term: "Tryb choroby", desc: "Aktywny gdy chory. Zero treningu, priorytet: sen, nawodnienie, regeneracja." },
 ];
-
 const HELP_CONTENT = {
-  rhr: { icon: "fa-heart-pulse", title: "💓 RHR rano", text: "Tętno spoczynkowe mierzone rano, zaraz po przebudzeniu, jeszcze przed wstaniem z łóżka. Twoje ciało w pełni odpoczęte pokazuje realny stan regeneracji układu nerwowego.", values: [
+  rhr: { icon: "fa-heart-pulse", title: "💓 RHR rano", text: "Tętno spoczynkowe mierzone rano, zaraz po przebudzeniu, przed wstaniem. Pokazuje realny stan regeneracji.", values: [
     { label: "Poniżej 50 bpm", value: "Świetna regeneracja" },
     { label: "50-62 bpm", value: "Dobra norma" },
     { label: "62-70 bpm", value: "Umiarkowana" },
-    { label: "Powyżej 70 bpm", value: "Wysoko — sprawdź czy nie przemęczony" },
+    { label: "Powyżej 70 bpm", value: "Wysoko — sprawdź przemęczenie" },
   ]},
-  rpe: { icon: "fa-fire", title: "🔥 RPE", text: "Rate of Perceived Exertion — subiektywna skala ciężkości treningu 1-10. Mówi jak bardzo trening Cię zmęczył, nie ile podniosłeś.", values: [
-    { label: "1-3", value: "Bardzo lekko (spacer, rozgrzewka)" },
-    { label: "4-6", value: "Umiarkowanie (normalny trening)" },
-    { label: "7-8", value: "Ciężko (blisko maksa)" },
-    { label: "9-10", value: "Maksymalnie (rekord, do wyczerpania)" },
+  rpe: { icon: "fa-fire", title: "🔥 RPE", text: "Rate of Perceived Exertion — subiektywna skala ciężkości 1-10.", values: [
+    { label: "1-3", value: "Bardzo lekko" },
+    { label: "4-6", value: "Umiarkowanie" },
+    { label: "7-8", value: "Ciężko" },
+    { label: "9-10", value: "Maksymalnie" },
   ]},
-  spo2: { icon: "fa-lungs", title: "🫁 SpO2", text: "Saturacja krwi — wysycenie tlenem. Mierzy jak dobrze organizm transportuje tlen.", values: [
+  spo2: { icon: "fa-lungs", title: "🫁 SpO2", text: "Saturacja krwi — wysycenie tlenem.", values: [
     { label: "97-100%", value: "Doskonale" },
     { label: "95-96%", value: "W normie" },
-    { label: "93-94%", value: "Lekko poniżej — sprawdź" },
+    { label: "93-94%", value: "Lekko poniżej" },
     { label: "Poniżej 93%", value: "Skonsultuj z lekarzem" },
   ]},
-  stress: { icon: "fa-heart-pulse", title: "🧘 Stres", text: "Poziom stresu z zegarka. Pokazuje obciążenie układu nerwowego w ciągu dnia.", values: [
+  stress: { icon: "fa-heart-pulse", title: "🧘 Stres", text: "Poziom stresu z zegarka.", values: [
     { label: "0-35", value: "Niski (dobry)" },
     { label: "36-55", value: "Umiarkowany" },
     { label: "56-70", value: "Wysoki" },
     { label: "Powyżej 70", value: "Bardzo wysoki — priorytet regeneracja" },
   ]},
-  readiness: { icon: "fa-gauge-high", title: "🎯 Gotowość dnia", text: "Wskaźnik 0-100% mówiący jak gotowy jesteś na wysiłek. Liczony z snu, głębokiego snu, RHR, stresu i napięcia szczęki.", values: [
-    { label: "80-100%", value: "Pełna gotowość — możesz cisnąć" },
+  readiness: { icon: "fa-gauge-high", title: "🎯 Gotowość dnia", text: "Wskaźnik 0-100% mówiący jak gotowy jesteś na wysiłek.", values: [
+    { label: "80-100%", value: "Pełna gotowość" },
     { label: "60-79%", value: "Solidna — trenuj normalnie" },
     { label: "40-59%", value: "Obniżona — lżejszy trening" },
     { label: "0-39%", value: "Niska — tylko regeneracja" },
   ]},
 };
-
 function showHelp(key) {
   const h = HELP_CONTENT[key];
   if (!h) return;
@@ -1917,67 +2046,43 @@ function showHelp(key) {
   document.getElementById("help-title").textContent = h.title;
   document.getElementById("help-text").textContent = h.text;
   document.getElementById("help-values").innerHTML = h.values.map((v) => `
-    <div class="flex items-center justify-between glass rounded-2xl px-4 py-2.5">
-      <span class="text-xs font-extrabold text-mint">${v.label}</span>
-      <span class="text-xs font-medium text-neutral-300">${v.value}</span>
-    </div>`).join("");
+    <div class="flex items-center justify-between glass rounded-2xl px-4 py-2.5"><span class="text-xs font-extrabold text-mint">${v.label}</span><span class="text-xs font-medium text-neutral-300">${v.value}</span></div>`).join("");
   openModal("modal-help");
 }
-
 function renderGlossary() {
   document.getElementById("glossary-content").innerHTML = GLOSSARY.map((g) => `
-    <div class="glass rounded-3xl p-4">
-      <div class="flex items-center gap-2 mb-2"><span class="text-lg">${g.icon}</span><span class="font-bold text-sm">${g.term}</span></div>
-      <p class="text-xs text-neutral-300 leading-relaxed font-medium">${g.desc}</p>
-    </div>`).join("");
+    <div class="glass rounded-3xl p-4"><div class="flex items-center gap-2 mb-2"><span class="text-lg">${g.icon}</span><span class="font-bold text-sm">${g.term}</span></div><p class="text-xs text-neutral-300 leading-relaxed font-medium">${g.desc}</p></div>`).join("");
 }
 
 // ============================================================================
 // ONBOARDING
 // ============================================================================
 const ONBOARDING_STEPS = [
-  { icon: "👋", title: "Witaj w REGIM", text: "To Twój system codziennej regeneracji i wzrostu. Pokażę Ci w 5 krokach jak z tego korzystać." },
-  { icon: "📊", title: "Ekran Dziś", text: "Tu widzisz gotowość dnia, brief Trenera i zadania do odhaczenia. Odhaczaj rano tabletkę, w ciągu dnia trening i looksmaxing, wieczorem reset szczęki." },
-  { icon: "🌙", title: "Raporty ze smartwatcha", text: "Rano wpisujesz dane snu — czas, głęboki, REM, RHB. Wieczorem kroki, stres, RPE, nastrój. Im więcej danych, tym mądrzejsza analiza Trenera." },
-  { icon: "🏋️", title: "Trener Personalny", text: "W zakładce Trener generujesz analizę dnia. W Ustawieniach ustaw wzrost, cel wagowy i auto-motyw. Brief na górze ekranu Dziś aktualizuje się sam." },
+  { icon: "👋", title: "Witaj w REGIM", text: "Twój system codziennej regeneracji i wzrostu. 5 kroków." },
+  { icon: "📊", title: "Ekran Dziś", text: "Gotowość dnia, brief Trenera, zadania do odhaczenia." },
+  { icon: "🌙", title: "Raporty ze smartwatcha", text: "Rano sen, wieczorem kroki i stres. Im więcej danych, tym mądrzejsza analiza." },
+  { icon: "☁️", title: "Synchronizacja", text: "Kliknij 👤 żeby zalogować się Google. Dane zsynchronizują się między urządzeniami przez Firestore." },
   { icon: "🚀", title: "Zaczynamy", text: "Cel: w grudniu być inną osobą. Konsekwencja > intensywność. Powodzenia, Karol!" },
 ];
 let onbStep = 0;
-
 function renderOnboarding() {
   const s = ONBOARDING_STEPS[onbStep];
-  document.getElementById("onb-content").innerHTML = `
-    <div class="text-5xl mb-4">${s.icon}</div>
-    <h3 class="font-extrabold text-2xl mb-3">${s.title}</h3>
-    <p class="text-sm text-neutral-300 leading-relaxed font-medium">${s.text}</p>
-  `;
-  document.getElementById("onb-dots").innerHTML = ONBOARDING_STEPS.map((_, i) =>
-    `<div class="h-2 rounded-full transition-all ${i === onbStep ? "w-6 bg-gradient-to-r from-mint to-lilac" : "w-2 bg-white/20"}"></div>`
-  ).join("");
+  document.getElementById("onb-content").innerHTML = `<div class="text-5xl mb-4">${s.icon}</div><h3 class="font-extrabold text-2xl mb-3">${s.title}</h3><p class="text-sm text-neutral-300 leading-relaxed font-medium">${s.text}</p>`;
+  document.getElementById("onb-dots").innerHTML = ONBOARDING_STEPS.map((_, i) => `<div class="h-2 rounded-full transition-all ${i === onbStep ? "w-6 bg-gradient-to-r from-mint to-lilac" : "w-2 bg-white/20"}"></div>`).join("");
   document.getElementById("onb-next").textContent = onbStep === ONBOARDING_STEPS.length - 1 ? "Zaczynamy!" : "Dalej";
 }
-
-function showOnboarding() {
-  onbStep = 0;
-  renderOnboarding();
-  document.getElementById("modal-onboarding").classList.remove("hidden");
-}
-function hideOnboarding() {
-  localStorage.setItem("regim:onboarded", "1");
-  document.getElementById("modal-onboarding").classList.add("hidden");
-}
+function showOnboarding() { onbStep = 0; renderOnboarding(); document.getElementById("modal-onboarding").classList.remove("hidden"); }
+function hideOnboarding() { localStorage.setItem("regim:onboarded", "1"); document.getElementById("modal-onboarding").classList.add("hidden"); }
 
 // ============================================================================
-// AUDIO (Web Speech API)
+// AUDIO
 // ============================================================================
 function speakText(text) {
-  if (!("speechSynthesis" in window)) { showToast("Twoja przeglądarka nie obsługuje audio"); return; }
+  if (!("speechSynthesis" in window)) { showToast("Brak wsparcia audio"); return; }
   try {
     window.speechSynthesis.cancel();
     const u = new SpeechSynthesisUtterance(text);
-    u.lang = "pl-PL";
-    u.rate = 1.05;
-    u.pitch = 1.0;
+    u.lang = "pl-PL"; u.rate = 1.05; u.pitch = 1.0;
     window.speechSynthesis.speak(u);
   } catch (e) { console.warn(e); }
 }
@@ -1993,14 +2098,11 @@ document.querySelectorAll("[data-check]").forEach((btn) => {
     if (!task) return;
     if (btn.classList.contains("modal-check-btn")) task.done = true;
     else task.done = !task.done;
-    renderCheckStates();
-    renderProgress();
+    renderCheckStates(); renderProgress();
     await persistToday();
     if (task.done) {
-      vibrate(30);
-      playSound("done");
-      showToast("Zaliczone ✓");
-      if (calcCompletionPct() === 100) { setTimeout(() => { fireConfetti(); vibrate([40, 60, 40, 60, 80]); }, 250); }
+      vibrate(30); playSound("done"); showToast("Zaliczone ✓");
+      if (calcCompletionPct() === 100) setTimeout(() => { fireConfetti(); vibrate([40, 60, 40, 60, 80]); }, 250);
     }
   });
 });
@@ -2032,10 +2134,8 @@ document.getElementById("btn-settings")?.addEventListener("click", () => openMod
 document.getElementById("btn-glossary")?.addEventListener("click", () => openModal("modal-glossary"));
 document.getElementById("btn-open-breathing")?.addEventListener("click", () => { closeAllModals(); setTimeout(() => openModal("modal-breathing"), 200); });
 
-// Help buttons
 document.querySelectorAll(".help-btn").forEach((b) => b.addEventListener("click", (e) => { e.stopPropagation(); showHelp(b.dataset.help); }));
 
-// Food chips
 document.querySelectorAll(".food-chip").forEach((c) => {
   c.addEventListener("click", async () => {
     const f = c.dataset.food; c.classList.toggle("active");
@@ -2045,7 +2145,6 @@ document.querySelectorAll(".food-chip").forEach((c) => {
   });
 });
 
-// Mood chips
 document.querySelectorAll(".mood-chip").forEach((c) => {
   c.addEventListener("click", () => {
     const t = c.dataset.tag; c.classList.toggle("active");
@@ -2054,7 +2153,6 @@ document.querySelectorAll(".mood-chip").forEach((c) => {
   });
 });
 
-// Day tags
 document.querySelectorAll(".tag-chip").forEach((c) => {
   c.addEventListener("click", () => {
     const t = c.dataset.tag; c.classList.toggle("active");
@@ -2063,26 +2161,23 @@ document.querySelectorAll(".tag-chip").forEach((c) => {
   });
 });
 
-// Sliders
 document.getElementById("input-jaw-tension")?.addEventListener("input", (e) => { document.getElementById("jaw-tension-value").textContent = e.target.value; });
 document.getElementById("input-mood-morning")?.addEventListener("input", (e) => { document.getElementById("mood-morning-value").textContent = e.target.value; });
 document.getElementById("input-mood-evening")?.addEventListener("input", (e) => { document.getElementById("mood-evening-value").textContent = e.target.value; });
 
-// Note
-document.getElementById("input-note")?.addEventListener("input", async (e) => {
+document.getElementById("input-note")?.addEventListener("input", (e) => {
   state.note = e.target.value;
   clearTimeout(window.__noteDebounce);
   window.__noteDebounce = setTimeout(async () => { await persistToday(); }, 800);
 });
 
-// Habits
 ["habit-water-salt", "habit-cold-shower", "habit-walk-meal"].forEach((id) => {
   const el = document.getElementById(id);
+  if (!el) return;
   const key = id === "habit-water-salt" ? "waterSalt" : id === "habit-cold-shower" ? "coldShower" : "walkMeal";
   el.addEventListener("change", async () => { state.habits[key] = el.checked; await persistToday(); });
 });
 
-// Tabs
 document.querySelectorAll(".tab-btn").forEach((btn) => {
   btn.addEventListener("click", () => {
     document.querySelectorAll(".tab-btn").forEach((b) => { b.classList.remove("bg-gradient-to-br", "from-mint", "to-lilac", "text-ink"); b.classList.add("text-neutral-400"); });
@@ -2094,7 +2189,6 @@ document.querySelectorAll(".tab-btn").forEach((btn) => {
   });
 });
 
-// Report toggle
 document.querySelectorAll(".report-btn").forEach((btn) => {
   btn.addEventListener("click", () => {
     document.querySelectorAll(".report-btn").forEach((b) => { b.classList.remove("bg-gradient-to-br", "from-peach", "to-gold", "from-lilac", "to-mint", "text-ink"); b.classList.add("text-neutral-400"); });
@@ -2106,7 +2200,6 @@ document.querySelectorAll(".report-btn").forEach((btn) => {
   });
 });
 
-// Range toggle
 document.querySelectorAll(".range-btn").forEach((btn) => {
   btn.addEventListener("click", () => {
     document.querySelectorAll(".range-btn").forEach((b) => { b.classList.remove("bg-gradient-to-br", "from-mint", "to-lilac", "text-ink"); b.classList.add("text-neutral-400"); });
@@ -2116,7 +2209,6 @@ document.querySelectorAll(".range-btn").forEach((btn) => {
   });
 });
 
-// Tryby specjalne
 document.getElementById("mode-normal").addEventListener("click", () => setMode("normal"));
 document.getElementById("mode-sick").addEventListener("click", () => setMode("sick"));
 document.getElementById("mode-vacation").addEventListener("click", () => setMode("vacation"));
@@ -2130,16 +2222,20 @@ async function setMode(mode) {
   await persistToday();
   showToast(mode === "normal" ? "Tryb normalny" : mode === "sick" ? "Tryb choroby 🤒" : mode === "vacation" ? "Tryb wakacji 🏖️" : "Tryb regeneracji 🌿");
 }
-
 function updateModeButtons() {
   const modes = ["normal", "sick", "vacation", "recovery"];
   modes.forEach((m) => {
     const b = document.getElementById(`mode-${m}`);
-    b.className = `special-mode whitespace-nowrap ${state.specialMode === m ? (m === "sick" ? "on-sick" : m === "vacation" ? "on-vacation" : m === "recovery" ? "on-sick" : "on-sick") : "off"}`;
+    if (!b) return;
+    if (state.specialMode === m) {
+      if (m === "sick") b.className = "special-mode on-sick whitespace-nowrap";
+      else if (m === "vacation") b.className = "special-mode on-vacation whitespace-nowrap";
+      else if (m === "recovery") b.className = "special-mode on-recovery whitespace-nowrap";
+      else b.className = "special-mode on-sick whitespace-nowrap";
+    } else b.className = "special-mode off whitespace-nowrap";
   });
 }
 
-// Streak freeze
 document.getElementById("btn-freeze-use").addEventListener("click", async () => {
   if (!canUseFreeze()) { showToast("Już użyłeś w tym tygodniu"); return; }
   useFreeze();
@@ -2149,27 +2245,19 @@ document.getElementById("btn-freeze-use").addEventListener("click", async () => 
   showToast("❄️ Streak zamrożony");
 });
 
-// Challenge edit
 document.getElementById("btn-challenge-edit").addEventListener("click", () => openModal("modal-challenge"));
 document.getElementById("btn-challenge-clear").addEventListener("click", async () => {
   localStorage.removeItem("regim:challenge");
-  renderChallenge();
-  closeAllModals();
-  showToast("Challenge usunięty");
+  renderChallenge(); closeAllModals(); showToast("Challenge usunięty");
 });
 
-// Audio brief
-document.getElementById("btn-speak-brief").addEventListener("click", () => {
-  const text = document.getElementById("brief-text").textContent;
-  speakText(text);
-});
+document.getElementById("btn-speak-brief").addEventListener("click", () => speakText(document.getElementById("brief-text").textContent));
 document.getElementById("btn-refresh-brief").addEventListener("click", async () => {
   document.getElementById("brief-text").textContent = "Odświeżam...";
-  await autoRefreshBrief("manual");
+  await autoRefreshBrief();
   showToast("Brief odświeżony ✓");
 });
 
-// Onboarding
 document.getElementById("onb-next").addEventListener("click", () => {
   onbStep++;
   if (onbStep >= ONBOARDING_STEPS.length) { hideOnboarding(); return; }
@@ -2350,6 +2438,7 @@ function populateSettings() {
   document.getElementById("input-auto-theme").checked = s.autoTheme;
   document.getElementById("input-voice-on").checked = s.voiceOn;
   renderBMI();
+  updateAuthUI(window.__fb?.auth?.currentUser || null);
 }
 document.getElementById("btn-settings-save").addEventListener("click", () => {
   const s = {
@@ -2358,19 +2447,12 @@ document.getElementById("btn-settings-save").addEventListener("click", () => {
     autoTheme: document.getElementById("input-auto-theme").checked,
     voiceOn: document.getElementById("input-voice-on").checked,
   };
-  saveSettings(s);
-  applyAutoTheme();
-  renderGoal();
-  renderBMI();
-  showToast("Ustawienia zapisane ✓");
-  closeAllModals();
+  saveSettings(s); applyAutoTheme(); renderGoal(); renderBMI();
+  showToast("Ustawienia zapisane ✓"); closeAllModals();
 });
-
-// Recovery
 document.getElementById("btn-recovery-day").addEventListener("click", () => openModal("modal-recovery"));
 document.getElementById("btn-recovery-confirm").addEventListener("click", async () => { await setMode("recovery"); });
 
-// Goal
 document.getElementById("btn-goal-edit").addEventListener("click", () => {
   const w = document.getElementById("goal-edit-wrapper");
   w.classList.toggle("hidden");
@@ -2385,8 +2467,55 @@ document.getElementById("btn-goal-save").addEventListener("click", () => {
   } else showToast("Podaj sensowną wartość");
 });
 
-// Week of life
 document.getElementById("btn-week-of-life").addEventListener("click", () => { localStorage.setItem("regim:used-wol", "1"); renderWeekOfLife(); });
+
+// ============================================================================
+// CEL + BMI + SMART GOALS
+// ============================================================================
+async function renderGoal() {
+  const settings = getSettings();
+  const days = await loadLastNDays(30);
+  const lastWeight = [...days].reverse().find((d) => d.morning?.dailyWeight != null);
+  const current = lastWeight?.morning?.dailyWeight ?? null;
+  document.getElementById("goal-current").textContent = current != null ? `${current} kg` : "—";
+  document.getElementById("goal-target").textContent = `${settings.goalWeight.toFixed(1)} kg`;
+  const goalText = document.getElementById("goal-progress-text");
+  const bar = document.getElementById("goal-bar");
+  if (current == null) { goalText.textContent = "Wpisz wagę, żeby zobaczyć progres."; bar.style.width = "0%"; return; }
+  const diff = settings.goalWeight - current;
+  if (Math.abs(diff) < 0.3) { goalText.textContent = `🏆 Cel osiągnięty!`; bar.style.width = "100%"; }
+  else if (diff > 0) {
+    goalText.textContent = `📈 Do celu: ${diff.toFixed(1)} kg. Przy tempie +0.25 kg/tyg to ~${Math.ceil(diff / 0.25)} tyg.`;
+    const start = 45;
+    bar.style.width = `${Math.min(100, Math.max(0, ((current - start) / (settings.goalWeight - start)) * 100))}%`;
+  } else { goalText.textContent = `📉 Jesteś ${Math.abs(diff).toFixed(1)} kg powyżej celu.`; bar.style.width = "100%"; }
+}
+
+async function renderBMI() {
+  const settings = getSettings();
+  const el = document.getElementById("settings-bmi");
+  const labelEl = document.getElementById("settings-bmi-label");
+  const days = await loadLastNDays(30);
+  const last = [...days].reverse().find((d) => d.morning?.dailyWeight != null);
+  const w = last?.morning?.dailyWeight;
+  if (w == null) { el.textContent = "—"; labelEl.textContent = "Wpisz wagę i wzrost"; return; }
+  const bmi = calcBMI(w, settings.height);
+  el.textContent = bmi.toFixed(1);
+  labelEl.textContent = bmiLabel(bmi);
+}
+
+async function renderSmartGoals() {
+  const days = await loadLastNDays(60);
+  const sleep8 = days.filter((d) => (d.morning?.sleepTotal ?? 0) >= 8).length;
+  const speechDone = days.filter((d) => d.tasks?.find((t) => t.id === "mowa" && t.done)).length;
+  const jawDone = days.filter((d) => d.tasks?.find((t) => t.id === "reset" && t.done)).length;
+  document.getElementById("smart-sleep-count").textContent = `${Math.min(sleep8, 30)}/30`;
+  document.getElementById("smart-speech-count").textContent = `${Math.min(speechDone, 21)}/21`;
+  document.getElementById("smart-jaw-count").textContent = `${Math.min(jawDone, 21)}/21`;
+  document.getElementById("smart-sleep-bar").style.width = `${Math.min(100, (sleep8 / 30) * 100)}%`;
+  document.getElementById("smart-speech-bar").style.width = `${Math.min(100, (speechDone / 21) * 100)}%`;
+  document.getElementById("smart-jaw-bar").style.width = `${Math.min(100, (jawDone / 21) * 100)}%`;
+}
 
 // ============================================================================
 // FORMULARZE
@@ -2416,7 +2545,7 @@ document.getElementById("form-morning").addEventListener("submit", async (e) => 
   await saveDayDoc({ ...existing, morning });
   showToast("Raport poranny zapisany ✓");
   renderImprovementTips(); renderReadiness(); renderGoal(); renderCharts(); checkRecoveryNeeds();
-  await autoRefreshBrief("morning");
+  await autoRefreshBrief();
 });
 
 document.getElementById("form-evening").addEventListener("submit", async (e) => {
@@ -2437,7 +2566,7 @@ document.getElementById("form-evening").addEventListener("submit", async (e) => 
   await saveDayDoc({ ...existing, evening });
   showToast("Podsumowanie zapisane ✓");
   renderImprovementTips(); renderReadiness(); renderCharts(); checkRecoveryNeeds();
-  await autoRefreshBrief("evening");
+  await autoRefreshBrief();
 });
 
 // ============================================================================
@@ -2449,7 +2578,6 @@ async function renderCharts() {
   const n = state.chartRange;
   const days = await loadLastNDays(n);
   const labels = days.map((d) => { const [, m, day] = d.date.split("-"); return `${day}.${m}`; });
-
   const baseOptions = {
     responsive: true, plugins: { legend: { display: false } },
     scales: {
@@ -2457,10 +2585,9 @@ async function renderCharts() {
       y: { ticks: { color: "#8b8397", font: { family: "Poppins", size: 10, weight: "600" } }, grid: { color: "rgba(255,255,255,.05)" } },
     },
   };
-
-  const weightValues = days.map((d) => d.morning?.dailyWeight ?? d.morning?.weeklyWeight ?? null);
+  const w = days.map((d) => d.morning?.dailyWeight ?? d.morning?.weeklyWeight ?? null);
   if (weightChart) weightChart.destroy();
-  weightChart = new Chart(document.getElementById("chart-weight"), { type: "line", data: { labels, datasets: [{ data: weightValues, borderColor: "#fbbf24", backgroundColor: "rgba(251,191,36,.12)", pointBackgroundColor: "#fbbf24", pointBorderColor: "#0f0c1d", pointRadius: 4, borderWidth: 3, tension: .4, fill: true, spanGaps: true }] }, options: baseOptions });
+  weightChart = new Chart(document.getElementById("chart-weight"), { type: "line", data: { labels, datasets: [{ data: w, borderColor: "#fbbf24", backgroundColor: "rgba(251,191,36,.12)", pointBackgroundColor: "#fbbf24", pointBorderColor: "#0f0c1d", pointRadius: 4, borderWidth: 3, tension: .4, fill: true, spanGaps: true }] }, options: baseOptions });
 
   const deep = days.map((d) => d.morning?.sleepDeep ?? null);
   const rem = days.map((d) => d.morning?.sleepRem ?? null);
@@ -2490,7 +2617,7 @@ async function renderCharts() {
 }
 
 // ============================================================================
-// RADA TRENERA (przycisk)
+// AI / TRENER
 // ============================================================================
 document.getElementById("btn-analyze-ai").addEventListener("click", async () => {
   const label = document.getElementById("ai-btn-label");
@@ -2523,7 +2650,6 @@ async function renderMentorHistory() {
 }
 document.getElementById("btn-history-refresh").addEventListener("click", renderMentorHistory);
 
-// GLOW UP
 async function renderGlowUp() {
   const content = document.getElementById("glowup-content");
   const thisW = await loadDaysRange(7, 0);
@@ -2551,7 +2677,7 @@ async function renderGlowUp() {
 document.getElementById("btn-glowup-refresh").addEventListener("click", renderGlowUp);
 
 // ============================================================================
-// PWA / NOTIF / PUSH / THEME / CYTATY
+// PWA / NOTIF / THEME / CYTATY
 // ============================================================================
 let deferredInstallPrompt = null;
 window.addEventListener("beforeinstallprompt", (e) => {
@@ -2577,13 +2703,6 @@ function scheduleLocalReminders() {
     if (hh === 8 && mm === 0 && !(existing?.morning)) fireNotification("Dzień dobry! ☀️", "Czas na raport snu.");
     if (hh === 14 && mm === 0 && !(existing?.morning)) fireNotification("⚠️ Brak raportu porannego", "Wypełnij sen z zegarka.");
     if (hh === 20 && mm === 0 && !(existing?.evening)) fireNotification("Podsumowanie 🌙", "Wpisz kroki, stres, RPE, nastrój.");
-    if (hh === 20 && mm === 0 && now.getDay() === 0) {
-      // Niedziela - auto weekly
-      setTimeout(async () => {
-        const days = await loadLastNDays(7);
-        if (days.length >= 3) showToast("📊 Tygodniowe podsumowanie czeka w Postępach");
-      }, 5000);
-    }
   }, 60000);
 }
 function fireNotification(title, body) {
@@ -2606,7 +2725,6 @@ if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => { navigator.serviceWorker.register("./sw.js").catch((e) => console.warn("SW nieudany", e)); });
 }
 
-// Theme
 function applyTheme(t) {
   const i = document.getElementById("theme-icon");
   if (t === "light") { document.documentElement.classList.add("light-theme"); i.className = "fa-solid fa-sun"; }
@@ -2641,15 +2759,9 @@ const DAILY_QUOTES = [
 ];
 function renderDailyQuote() {
   const idx = dayIndexSinceEpoch(new Date()) % DAILY_QUOTES.length;
-  document.getElementById("daily-quote").textContent = DAILY_QUOTES[idx];
-}
-setInterval(() => {
   const el = document.getElementById("daily-quote");
-  if (!el) return;
-  const r = Math.floor(Math.random() * DAILY_QUOTES.length);
-  el.style.animation = "none";
-  requestAnimationFrame(() => { el.textContent = DAILY_QUOTES[r]; el.style.animation = ""; });
-}, 12000);
+  if (el) el.textContent = DAILY_QUOTES[idx];
+}
 
 function vibrate(p) { if (navigator.vibrate) try { navigator.vibrate(p); } catch (e) {} }
 
@@ -2679,7 +2791,6 @@ function fireConfetti() {
   tick();
 }
 
-// EKSPORT
 function downloadFile(fn, c, m) {
   const b = new Blob([c], { type: m }); const u = URL.createObjectURL(b);
   const a = document.createElement("a"); a.href = u; a.download = fn;
@@ -2702,7 +2813,6 @@ document.getElementById("btn-export").addEventListener("click", async () => {
 document.getElementById("cal-prev").addEventListener("click", () => { calViewDate.setMonth(calViewDate.getMonth() - 1); renderCalendar(); });
 document.getElementById("cal-next").addEventListener("click", () => { calViewDate.setMonth(calViewDate.getMonth() + 1); renderCalendar(); });
 
-// ODZNAKI
 const BADGES = [
   { id: "streak3", icon: "fa-fire", label: "3 dni streak", check: (c) => c.streak >= 3 },
   { id: "streak7", icon: "fa-fire-flame-curved", label: "7 dni streak", check: (c) => c.streak >= 7 },
@@ -2714,10 +2824,9 @@ const BADGES = [
   { id: "cold7", icon: "fa-snowflake", label: "7× zimny", check: (c) => c.cold >= 7 },
   { id: "perfect", icon: "fa-star", label: "Idealny dzień", check: (c) => c.perfect },
   { id: "recovery3", icon: "fa-leaf", label: "3× recovery", check: (c) => c.recovery >= 3 },
-  { id: "1rm", icon: "fa-calculator", label: "1RM użyte", check: () => localStorage.getItem("regim:used-1rm") === "1" },
+  { id: "cloud", icon: "fa-cloud", label: "Sync w chmurze", check: () => isCloud() },
   { id: "wol", icon: "fa-camera", label: "Week of life", check: () => localStorage.getItem("regim:used-wol") === "1" },
 ];
-
 async function renderBadges() {
   const all = await collectAllDays();
   const streak = parseInt(document.getElementById("streak-count").textContent) || 0;
@@ -2796,9 +2905,85 @@ async function renderCorrelation() {
 }
 
 // ============================================================================
+// RELOAD (po zmianie użytkownika)
+// ============================================================================
+async function reloadEverything() {
+  const existing = await loadDayDoc(todayKey);
+  if (existing?.tasks?.length) {
+    state.tasks = existing.tasks;
+    state.foodChecked = existing.foodChecked || [];
+    state.morning = existing.morning || {};
+    state.evening = existing.evening || {};
+    state.moodTagsMorning = existing.moodTagsMorning || [];
+    state.dayTags = existing.dayTags || [];
+    state.habits = existing.habits || { waterSalt: false, coldShower: false, walkMeal: false };
+    state.note = existing.note || "";
+    state.specialMode = existing.specialMode || (existing.recoveryMode ? "recovery" : "normal");
+    state.recoveryMode = existing.recoveryMode || false;
+    await renderAllFromState();
+  } else {
+    location.reload();
+  }
+}
+
+async function renderAllFromState() {
+  renderCheckStates(); renderProgress(); renderReadiness(); renderImprovementTips();
+  updateModeButtons(); setupTreningCard();
+  await refreshStreak(); checkRecoveryNeeds();
+  renderGoal(); renderChallenge();
+  // Wypełnij formularze
+  const m = state.morning;
+  if (m.sleepTotal != null) document.getElementById("input-sleep-total").value = m.sleepTotal;
+  if (m.sleepDeep != null) document.getElementById("input-sleep-deep").value = m.sleepDeep;
+  if (m.sleepRem != null) document.getElementById("input-sleep-rem").value = m.sleepRem;
+  if (m.sleepLight != null) document.getElementById("input-sleep-light").value = m.sleepLight;
+  if (m.sleepWakes != null) document.getElementById("input-sleep-wakes").value = m.sleepWakes;
+  if (m.sleepHr != null) document.getElementById("input-sleep-hr").value = m.sleepHr;
+  if (m.rhr != null) document.getElementById("input-rhr").value = m.rhr;
+  if (m.dailyWeight != null) document.getElementById("input-weight-daily").value = m.dailyWeight;
+  if (m.jawTension != null) { document.getElementById("input-jaw-tension").value = m.jawTension; document.getElementById("jaw-tension-value").textContent = m.jawTension; }
+  if (m.moodMorning != null) { document.getElementById("input-mood-morning").value = m.moodMorning; document.getElementById("mood-morning-value").textContent = m.moodMorning; }
+  if (sunday && m.weeklyWeight != null) document.getElementById("input-weight-weekly").value = m.weeklyWeight;
+  if (m.tabletkaTime) document.getElementById("input-tabletka-time").value = m.tabletkaTime;
+  const e = state.evening;
+  if (e.steps != null) document.getElementById("input-steps").value = e.steps;
+  if (e.hrDay != null) document.getElementById("input-hr-day").value = e.hrDay;
+  if (e.spo2 != null) document.getElementById("input-spo2").value = e.spo2;
+  if (e.stress != null) document.getElementById("input-stress").value = e.stress;
+  if (e.rpe != null) document.getElementById("input-rpe").value = e.rpe;
+  if (e.screenTime != null) document.getElementById("input-screen-time").value = e.screenTime;
+  if (e.moodEvening != null) { document.getElementById("input-mood-evening").value = e.moodEvening; document.getElementById("mood-evening-value").textContent = e.moodEvening; }
+  if (e.weightEvening != null) document.getElementById("input-weight-evening").value = e.weightEvening;
+  if (e.bikeDistance != null) document.getElementById("input-bike-distance").value = e.bikeDistance;
+  if (state.note) document.getElementById("input-note").value = state.note;
+  // Chips
+  document.querySelectorAll(".food-chip").forEach((c) => c.classList.remove("active"));
+  state.foodChecked.forEach((f) => { const c = document.querySelector(`.food-chip[data-food="${f}"]`); if (c) c.classList.add("active"); });
+  document.querySelectorAll(".mood-chip").forEach((c) => c.classList.remove("active"));
+  state.moodTagsMorning.forEach((t) => { const c = document.querySelector(`.mood-chip[data-tag="${t}"]`); if (c) c.classList.add("active"); });
+  document.querySelectorAll(".tag-chip").forEach((c) => c.classList.remove("active"));
+  state.dayTags.forEach((t) => { const c = document.querySelector(`.tag-chip[data-tag="${t}"]`); if (c) c.classList.add("active"); });
+  // Habits
+  document.getElementById("habit-water-salt").checked = state.habits.waterSalt;
+  document.getElementById("habit-cold-shower").checked = state.habits.coldShower;
+  document.getElementById("habit-walk-meal").checked = state.habits.walkMeal;
+}
+
+// ============================================================================
 // BOOTSTRAP
 // ============================================================================
 async function bootApp() {
+  if (booted && currentUser?.uid !== "local") {
+    // Re-render po zmianie usera
+    document.getElementById("header-greeting").textContent = `Cześć, ${USER_NAME} 👋`;
+    updateSyncUI();
+    await reloadEverything();
+    await loadBrief(false);
+    return;
+  }
+  booted = true;
+
+  document.getElementById("header-greeting").textContent = `Cześć, ${USER_NAME} 👋`;
   setupTreningCard();
   renderDailyQuote();
   applyAutoTheme();
@@ -2828,90 +3013,42 @@ async function bootApp() {
     await saveDayDoc({ date: todayKey, tasks: state.tasks, completedPct: 0, foodChecked: [] });
   }
 
-  renderCheckStates();
-  renderProgress();
-  renderReadiness();
-  renderImprovementTips();
-  updateModeButtons();
-  await refreshStreak();
-  checkRecoveryNeeds();
-  renderGoal();
-  renderChallenge();
+  await renderAllFromState();
 
-  // Freeze card visibility
   if (canUseFreeze() && !checkFreezeUsed()) document.getElementById("freeze-card").classList.remove("hidden");
   else document.getElementById("freeze-card").classList.add("hidden");
   if (checkFreezeUsed()) document.getElementById("freeze-indicator").classList.remove("hidden");
-
-  // Food chips
-  document.querySelectorAll(".food-chip").forEach((c) => c.classList.remove("active"));
-  state.foodChecked.forEach((f) => { const c = document.querySelector(`.food-chip[data-food="${f}"]`); if (c) c.classList.add("active"); });
-
-  // Mood chips
-  state.moodTagsMorning.forEach((t) => { const c = document.querySelector(`.mood-chip[data-tag="${t}"]`); if (c) c.classList.add("active"); });
-
-  // Day tags
-  state.dayTags.forEach((t) => { const c = document.querySelector(`.tag-chip[data-tag="${t}"]`); if (c) c.classList.add("active"); });
-
-  // Habits
-  document.getElementById("habit-water-salt").checked = state.habits.waterSalt;
-  document.getElementById("habit-cold-shower").checked = state.habits.coldShower;
-  document.getElementById("habit-walk-meal").checked = state.habits.walkMeal;
-
-  // Note
-  document.getElementById("input-note").value = state.note;
 
   if (existing?.aiVerdict) {
     document.getElementById("mentor-verdict-box").classList.remove("hidden");
     document.getElementById("mentor-verdict-text").textContent = existing.aiVerdict;
   }
 
-  // Wypełnij pola
-  if (existing?.morning) {
-    const m = existing.morning;
-    if (m.sleepTotal != null) document.getElementById("input-sleep-total").value = m.sleepTotal;
-    if (m.sleepDeep != null) document.getElementById("input-sleep-deep").value = m.sleepDeep;
-    if (m.sleepRem != null) document.getElementById("input-sleep-rem").value = m.sleepRem;
-    if (m.sleepLight != null) document.getElementById("input-sleep-light").value = m.sleepLight;
-    if (m.sleepWakes != null) document.getElementById("input-sleep-wakes").value = m.sleepWakes;
-    if (m.sleepHr != null) document.getElementById("input-sleep-hr").value = m.sleepHr;
-    if (m.rhr != null) document.getElementById("input-rhr").value = m.rhr;
-    if (m.dailyWeight != null) document.getElementById("input-weight-daily").value = m.dailyWeight;
-    if (m.jawTension != null) { document.getElementById("input-jaw-tension").value = m.jawTension; document.getElementById("jaw-tension-value").textContent = m.jawTension; }
-    if (m.moodMorning != null) { document.getElementById("input-mood-morning").value = m.moodMorning; document.getElementById("mood-morning-value").textContent = m.moodMorning; }
-    if (sunday && m.weeklyWeight != null) document.getElementById("input-weight-weekly").value = m.weeklyWeight;
-    if (m.tabletkaTime) document.getElementById("input-tabletka-time").value = m.tabletkaTime;
-  }
-  if (existing?.evening) {
-    const e = existing.evening;
-    if (e.steps != null) document.getElementById("input-steps").value = e.steps;
-    if (e.hrDay != null) document.getElementById("input-hr-day").value = e.hrDay;
-    if (e.spo2 != null) document.getElementById("input-spo2").value = e.spo2;
-    if (e.stress != null) document.getElementById("input-stress").value = e.stress;
-    if (e.rpe != null) document.getElementById("input-rpe").value = e.rpe;
-    if (e.screenTime != null) document.getElementById("input-screen-time").value = e.screenTime;
-    if (e.moodEvening != null) { document.getElementById("input-mood-evening").value = e.moodEvening; document.getElementById("mood-evening-value").textContent = e.moodEvening; }
-    if (e.weightEvening != null) document.getElementById("input-weight-evening").value = e.weightEvening;
-    if (e.bikeDistance != null) document.getElementById("input-bike-distance").value = e.bikeDistance;
-  }
-
-  // AUTO BRIEF
   await loadBrief(false);
 
-  // Auto-speak jeśli włączone (tylko rano, tylko raz dziennie)
   const s = getSettings();
   const todaySpoke = localStorage.getItem(`regim:spoke:${todayKey}`);
   if (s.voiceOn && !todaySpoke && new Date().getHours() < 10) {
     setTimeout(() => { speakText(document.getElementById("brief-text").textContent); localStorage.setItem(`regim:spoke:${todayKey}`, "1"); }, 1500);
   }
 
-  // Onboarding pierwszy raz
   if (!localStorage.getItem("regim:onboarded")) {
     setTimeout(showOnboarding, 800);
   }
 }
 
-initFirebase().then(() => { if (!firebaseReady) bootApp(); });
+// ============================================================================
+// START
+// ============================================================================
+initFirebase().then(() => {
+  // Jak Firebase padł — odpal lokalnie
+  if (!firebaseReady) {
+    authResolved = true;
+    updateSyncUI();
+    bootApp();
+  }
+  // W przeciwnym razie czekamy na onAuthStateChanged (wywoła bootApp)
+});
 </script>
 </body>
 </html>
