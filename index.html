@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>REGIM / LevelUp</title>
-<meta name="description" content="Codzienny system regeneracji, treningu i mowy.">
+<meta name="description" content="Codzienny system regeneracji, skincare i wzrostu.">
 <meta name="theme-color" content="#1a1530">
 <link rel="manifest" href="manifest.json">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2222%22 fill=%22%231a1530%22/><text x=%2250%22 y=%2270%22 font-size=%2258%22 text-anchor=%22middle%22 fill=%22%235eead4%22 font-family=%22Arial%22 font-weight=%22900%22>L</text></svg>">
@@ -36,9 +36,7 @@ h1,h2,h3,.font-extrabold,.font-bold{letter-spacing:-.02em}
 .ring-pulse{animation:ring-pulse 2.4s infinite}
 input[type="number"]::-webkit-outer-spin-button,input[type="number"]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
 input[type="number"]{-moz-appearance:textfield}
-.tab-underline{transition:all .3s cubic-bezier(.16,1,.3,1)}
 .progress-fill{transition:width .6s cubic-bezier(.16,1,.3,1)}
-.timer-ring{transition:stroke-dashoffset 1s linear}
 .modal-backdrop{background:rgba(10,8,20,.72);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
 @keyframes modal-pop{from{opacity:0;transform:translateY(24px) scale(.97)}to{opacity:1;transform:translateY(0) scale(1)}}
 .modal-pop{animation:modal-pop .3s cubic-bezier(.16,1,.3,1) both}
@@ -91,6 +89,9 @@ html.light-theme .history-item{border-left-color:rgba(30,26,53,.12)}
 #sync-status.offline{background:rgba(251,113,133,.15);color:#fb7185}
 #sync-status.syncing{background:rgba(251,191,36,.15);color:#fbbf24}
 #sync-status.synced{background:rgba(94,234,212,.15);color:#5eead4}
+.ascend-item{display:flex;align-items:center;gap:10px;padding:10px 12px;background:rgba(255,255,255,.03);border-radius:16px;border:1px solid rgba(255,255,255,.06);transition:all .2s;cursor:pointer}
+.ascend-item:hover{border-color:rgba(94,234,212,.3);background:rgba(94,234,212,.04)}
+.ascend-item.done{background:linear-gradient(135deg,rgba(94,234,212,.15),rgba(196,181,253,.1));border-color:rgba(94,234,212,.4)}
 </style>
 </head>
 <body class="text-neutral-100 font-sans min-h-screen pb-28">
@@ -115,7 +116,7 @@ html.light-theme .history-item{border-left-color:rgba(30,26,53,.12)}
         <span id="freeze-indicator" class="hidden text-[10px] text-mint font-bold">❄️</span>
       </div>
       <div id="user-badge" class="hidden glass rounded-full px-3 py-1.5 text-[11px] font-bold text-mint max-w-[100px] truncate"></div>
-      <button id="btn-signin" class="glass rounded-full w-9 h-9 flex items-center justify-center text-neutral-400 hover:text-mint transition" title="Zaloguj się (Google)">
+      <button id="btn-signin" class="glass rounded-full w-9 h-9 flex items-center justify-center text-neutral-400 hover:text-mint transition" title="Zaloguj (Google)">
         <i class="fa-solid fa-user"></i>
       </button>
       <button id="btn-glossary" class="glass rounded-full w-9 h-9 flex items-center justify-center text-neutral-400 hover:text-lilac transition" title="Słowniczek">
@@ -158,7 +159,7 @@ html.light-theme .history-item{border-left-color:rgba(30,26,53,.12)}
     <div class="flex items-center justify-between mb-3">
       <div>
         <div class="text-2xl font-extrabold" id="progress-headline">Zaczynajmy 💪</div>
-        <div class="text-xs text-neutral-400 font-semibold" id="progress-sub">0 z 7 zadań na dziś</div>
+        <div class="text-xs text-neutral-400 font-semibold" id="progress-sub">0 z 8 zadań na dziś</div>
       </div>
       <div class="relative w-16 h-16 flex-shrink-0">
         <svg class="w-16 h-16 -rotate-90" viewBox="0 0 64 64">
@@ -217,7 +218,7 @@ html.light-theme .history-item{border-left-color:rgba(30,26,53,.12)}
 
   <nav class="flex glass rounded-full p-1.5 mb-5 gap-1">
     <button data-tab="dashboard" class="tab-btn tab-underline flex-1 py-2.5 rounded-full text-xs sm:text-sm font-bold bg-gradient-to-br from-mint to-lilac text-ink"><i class="fa-solid fa-house mr-1"></i>Dziś</button>
-    <button data-tab="mowa" class="tab-btn tab-underline flex-1 py-2.5 rounded-full text-xs sm:text-sm font-bold text-neutral-400"><i class="fa-solid fa-comment-dots mr-1"></i>Mowa</button>
+    <button data-tab="ascend" class="tab-btn tab-underline flex-1 py-2.5 rounded-full text-xs sm:text-sm font-bold text-neutral-400"><i class="fa-solid fa-arrow-up mr-1"></i>Ascend</button>
     <button data-tab="postepy" class="tab-btn tab-underline flex-1 py-2.5 rounded-full text-xs sm:text-sm font-bold text-neutral-400"><i class="fa-solid fa-chart-simple mr-1"></i>Postępy</button>
     <button data-tab="mentor" class="tab-btn tab-underline flex-1 py-2.5 rounded-full text-xs sm:text-sm font-bold text-neutral-400"><i class="fa-solid fa-dumbbell mr-1"></i>Trener</button>
   </nav>
@@ -335,7 +336,7 @@ html.light-theme .history-item{border-left-color:rgba(30,26,53,.12)}
         </div>
         <div class="col-span-2 block">
           <span class="text-[11px] text-lilac ml-1 font-bold"><i class="fa-solid fa-note-sticky mr-1"></i>Notatka dnia:</span>
-          <textarea id="input-note" rows="2" placeholder="np. dziś ciężki dzień w pracy, mało czasu, ale sen siadł..." class="w-full mt-1 bg-white/5 border border-white/10 rounded-2xl px-3 py-2.5 text-neutral-100 font-medium text-sm focus:outline-none focus:border-lilac transition resize-none"></textarea>
+          <textarea id="input-note" rows="2" placeholder="np. dziś ciężki dzień w pracy, mało czasu..." class="w-full mt-1 bg-white/5 border border-white/10 rounded-2xl px-3 py-2.5 text-neutral-100 font-medium text-sm focus:outline-none focus:border-lilac transition resize-none"></textarea>
           <div class="text-[10px] text-neutral-500 font-medium mt-1">Trener wykryje słowa kluczowe i dostosuje radę.</div>
         </div>
         <div class="col-span-2 block">
@@ -399,18 +400,26 @@ html.light-theme .history-item{border-left-color:rgba(30,26,53,.12)}
       </div>
     </div>
 
-    <div class="glass rounded-4xl overflow-hidden shadow-soft card-tap transition cursor-pointer" data-card="mowa" data-modal="modal-mowa">
+    <div class="glass rounded-4xl overflow-hidden shadow-soft card-tap transition cursor-pointer" data-card="skincare-rano" data-modal="modal-skincare-rano">
       <div class="p-5 flex items-center gap-4">
-        <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-lilac/25 to-mint/25 flex items-center justify-center flex-shrink-0"><i class="fa-solid fa-comment-dots text-lilac text-2xl"></i></div>
-        <div class="flex-1 min-w-0"><div class="font-bold text-base">🗣️ Trening mowy</div><div class="text-xs text-neutral-400 font-semibold">5 min — mechaniczne R, bruksizm</div></div>
-        <button data-check="mowa" class="check-btn w-9 h-9 rounded-full border-2 border-white/15 flex items-center justify-center flex-shrink-0 transition"><i class="fa-solid fa-check text-xs opacity-0 transition"></i></button>
+        <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-mint/25 to-peach/25 flex items-center justify-center flex-shrink-0"><i class="fa-solid fa-droplet text-mint text-2xl"></i></div>
+        <div class="flex-1 min-w-0"><div class="font-bold text-base">💧 Skincare rano</div><div class="text-xs text-neutral-400 font-semibold">Acnederm + płyn + płyn do trądzików</div></div>
+        <button data-check="skincare-rano" class="check-btn w-9 h-9 rounded-full border-2 border-white/15 flex items-center justify-center flex-shrink-0 transition"><i class="fa-solid fa-check text-xs opacity-0 transition"></i></button>
+      </div>
+    </div>
+
+    <div class="glass rounded-4xl overflow-hidden shadow-soft card-tap transition cursor-pointer" data-card="skincare-wieczor" data-modal="modal-skincare-wieczor">
+      <div class="p-5 flex items-center gap-4">
+        <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-lilac/25 to-gold/25 flex items-center justify-center flex-shrink-0"><i class="fa-solid fa-sparkles text-lilac text-2xl"></i></div>
+        <div class="flex-1 min-w-0"><div class="font-bold text-base">✨ Skincare wieczór</div><div class="text-xs text-neutral-400 font-semibold">Magia Egipska + płyn do twarzy</div></div>
+        <button data-check="skincare-wieczor" class="check-btn w-9 h-9 rounded-full border-2 border-white/15 flex items-center justify-center flex-shrink-0 transition"><i class="fa-solid fa-check text-xs opacity-0 transition"></i></button>
       </div>
     </div>
 
     <div class="glass rounded-4xl overflow-hidden shadow-soft card-tap transition cursor-pointer" data-card="twarz" data-modal="modal-twarz">
       <div class="p-5 flex items-center gap-4">
         <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-lilac/25 to-peach/25 flex items-center justify-center flex-shrink-0"><i class="fa-solid fa-face-smile text-lilac text-2xl"></i></div>
-        <div class="flex-1 min-w-0"><div class="font-bold text-base">✨ Looksmaxing — twarz</div><div class="text-xs text-neutral-400 font-semibold">Oczy, masaż, napięcie mięśni, szczęka</div></div>
+        <div class="flex-1 min-w-0"><div class="font-bold text-base">✨ Looksmaxing — twarz</div><div class="text-xs text-neutral-400 font-semibold">Oczy, masaż, napięcie mięśni</div></div>
         <button data-check="twarz" class="check-btn w-9 h-9 rounded-full border-2 border-white/15 flex items-center justify-center flex-shrink-0 transition"><i class="fa-solid fa-check text-xs opacity-0 transition"></i></button>
       </div>
     </div>
@@ -426,15 +435,23 @@ html.light-theme .history-item{border-left-color:rgba(30,26,53,.12)}
     <div id="nail-card" class="hidden glass rounded-4xl overflow-hidden shadow-soft card-tap transition cursor-pointer" data-card="paznokcie" data-modal="modal-paznokcie">
       <div class="p-5 flex items-center gap-4">
         <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-lilac/25 to-rose/25 flex items-center justify-center flex-shrink-0"><i class="fa-solid fa-hand-sparkles text-lilac text-2xl"></i></div>
-        <div class="flex-1 min-w-0"><div class="font-bold text-base">💅 Check paznokci (co 2 tyg)</div><div class="text-xs text-neutral-400 font-semibold">Sprawdź, obetnij jeśli trzeba</div></div>
+        <div class="flex-1 min-w-0"><div class="font-bold text-base">💅 Check paznokci</div><div class="text-xs text-neutral-400 font-semibold">Długość, zadziory, płytka, nawilżenie</div></div>
         <button data-check="paznokcie" class="check-btn w-9 h-9 rounded-full border-2 border-white/15 flex items-center justify-center flex-shrink-0 transition"><i class="fa-solid fa-check text-xs opacity-0 transition"></i></button>
+      </div>
+    </div>
+
+    <div id="hair-card" class="hidden glass rounded-4xl overflow-hidden shadow-soft card-tap transition cursor-pointer" data-card="wlosy" data-modal="modal-wlosy">
+      <div class="p-5 flex items-center gap-4">
+        <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-gold/25 to-peach/25 flex items-center justify-center flex-shrink-0"><i class="fa-solid fa-scissors text-gold text-2xl"></i></div>
+        <div class="flex-1 min-w-0"><div class="font-bold text-base">💇 Włosy — maska / odżywka</div><div class="text-xs text-neutral-400 font-semibold">Regeneracja, nawilżenie, masaż skóry</div></div>
+        <button data-check="wlosy" class="check-btn w-9 h-9 rounded-full border-2 border-white/15 flex items-center justify-center flex-shrink-0 transition"><i class="fa-solid fa-check text-xs opacity-0 transition"></i></button>
       </div>
     </div>
 
     <div class="glass rounded-4xl overflow-hidden shadow-soft card-tap transition cursor-pointer" data-card="reset" data-modal="modal-reset">
       <div class="p-5 flex items-center gap-4">
         <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-rose/25 to-lilac/25 flex items-center justify-center flex-shrink-0"><i class="fa-solid fa-face-tired text-rose text-2xl"></i></div>
-        <div class="flex-1 min-w-0"><div class="font-bold text-base">🌙 Reset szczęki przed snem</div><div class="text-xs text-neutral-400 font-semibold">2 min + oddech 4-7-8</div></div>
+        <div class="flex-1 min-w-0"><div class="font-bold text-base">🌙 Reset szczęki przed snem</div><div class="text-xs text-neutral-400 font-semibold">Masaż żwaczy + oddech 4-7-8</div></div>
         <button data-check="reset" class="check-btn w-9 h-9 rounded-full border-2 border-white/15 flex items-center justify-center flex-shrink-0 transition"><i class="fa-solid fa-check text-xs opacity-0 transition"></i></button>
       </div>
     </div>
@@ -446,27 +463,44 @@ html.light-theme .history-item{border-left-color:rgba(30,26,53,.12)}
 
   </section>
 
-  <section id="tab-mowa" class="tab-panel hidden space-y-5">
-    <div class="glass rounded-4xl p-6 shadow-soft text-center">
-      <div id="speech-phase-label" class="text-sm text-neutral-400 font-semibold mb-1">Gotowy, kiedy chcesz</div>
-      <div id="speech-phase-name" class="font-extrabold text-xl mb-6">Trening mowy — 5 min</div>
-      <div class="relative w-56 h-56 mx-auto mb-6">
-        <svg class="w-56 h-56 -rotate-90" viewBox="0 0 200 200">
-          <circle cx="100" cy="100" r="88" fill="none" stroke="rgba(255,255,255,.06)" stroke-width="12"/>
-          <circle id="speech-ring" cx="100" cy="100" r="88" fill="none" stroke="url(#speechGrad)" stroke-width="12" stroke-linecap="round" stroke-dasharray="552.9" stroke-dashoffset="552.9" class="timer-ring"/>
-          <defs><linearGradient id="speechGrad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#5eead4"/><stop offset="100%" stop-color="#c4b5fd"/></linearGradient></defs>
-        </svg>
-        <div class="absolute inset-0 flex flex-col items-center justify-center"><div id="speech-timer" class="font-extrabold text-5xl tabular-nums">05:00</div><div id="speech-icon" class="text-3xl mt-2">😌</div></div>
+  <section id="tab-ascend" class="tab-panel hidden space-y-4">
+    <div class="glass rounded-4xl p-5 shadow-warm">
+      <div class="flex items-center gap-2 mb-2"><i class="fa-solid fa-arrow-up text-mint"></i><span class="font-bold text-base">🚀 Ascend</span></div>
+      <p class="text-xs text-neutral-400 font-medium leading-snug">Codzienne nawyki, które w skali miesięcy robią największą różnicę w wyglądzie. Check codziennie — doliczają się do streaka.</p>
+      <div class="mt-3 flex items-center gap-3">
+        <div class="text-2xl font-extrabold text-mint" id="ascend-pct">0%</div>
+        <div class="flex-1">
+          <div class="h-2 bg-white/5 rounded-full overflow-hidden"><div id="ascend-bar" class="progress-fill h-full rounded-full bg-gradient-to-r from-mint to-lilac" style="width:0%"></div></div>
+          <div class="text-[10px] text-neutral-400 font-semibold mt-1" id="ascend-count">0 z 0 dzisiaj</div>
+        </div>
       </div>
-      <div class="flex justify-center gap-2 mb-6"><div id="phase-dot-1" class="h-2 w-10 rounded-full bg-white/10 transition"></div><div id="phase-dot-2" class="h-2 w-10 rounded-full bg-white/10 transition"></div><div id="phase-dot-3" class="h-2 w-10 rounded-full bg-white/10 transition"></div></div>
-      <button id="speech-start-btn" class="w-full py-4 bg-gradient-to-br from-mint to-lilac text-ink font-extrabold rounded-full text-lg active:scale-95 transition shadow-glow"><i class="fa-solid fa-play mr-2"></i>Zaczynamy</button>
-      <button id="speech-stop-btn" class="hidden w-full py-3.5 mt-2 glass rounded-full text-neutral-300 font-bold active:scale-95 transition">Przerwij</button>
     </div>
-    <div class="glass rounded-4xl p-5 space-y-4 shadow-soft">
-      <div class="flex items-start gap-3"><div class="w-9 h-9 rounded-xl bg-mint/15 flex items-center justify-center flex-shrink-0 text-mint font-extrabold text-sm">1</div><div><div class="font-bold text-sm">Masaż żwaczy — 1 min</div><div class="text-xs text-neutral-400 font-medium">Rozluźnienie bruksizmu</div></div></div>
-      <div class="flex items-start gap-3"><div class="w-9 h-9 rounded-xl bg-lilac/15 flex items-center justify-center flex-shrink-0 text-lilac font-extrabold text-sm">2</div><div><div class="font-bold text-sm">Uderzenia T-D — 2 min</div><div class="text-xs text-neutral-400 font-medium">Czubek języka o wałek dziąsłowy</div></div></div>
-      <div class="flex items-start gap-3"><div class="w-9 h-9 rounded-xl bg-peach/15 flex items-center justify-center flex-shrink-0 text-peach font-extrabold text-sm">3</div><div><div class="font-bold text-sm">Słowa: TDAWA, DOWED, DUDY, TDA — 2 min</div><div class="text-xs text-neutral-400 font-medium">Przenosisz technikę na realną mowę</div></div></div>
+
+    <div class="glass rounded-4xl p-4 shadow-soft">
+      <div class="flex items-center gap-2 mb-3"><i class="fa-solid fa-moon text-lilac"></i><span class="font-bold text-sm">😴 Sen i regeneracja</span></div>
+      <div class="space-y-2" id="ascend-sleep"></div>
     </div>
+
+    <div class="glass rounded-4xl p-4 shadow-soft">
+      <div class="flex items-center gap-2 mb-3"><i class="fa-solid fa-utensils text-peach"></i><span class="font-bold text-sm">🍽️ Jedzenie i nawodnienie</span></div>
+      <div class="space-y-2" id="ascend-food"></div>
+    </div>
+
+    <div class="glass rounded-4xl p-4 shadow-soft">
+      <div class="flex items-center gap-2 mb-3"><i class="fa-solid fa-user-tie text-mint"></i><span class="font-bold text-sm">🧍 Postawa i twarz</span></div>
+      <div class="space-y-2" id="ascend-face"></div>
+    </div>
+
+    <div class="glass rounded-4xl p-4 shadow-soft">
+      <div class="flex items-center gap-2 mb-3"><i class="fa-solid fa-leaf text-lilac"></i><span class="font-bold text-sm">🧘 Głowa i stres</span></div>
+      <div class="space-y-2" id="ascend-mind"></div>
+    </div>
+
+    <div class="glass rounded-4xl p-4 shadow-soft">
+      <div class="flex items-center gap-2 mb-3"><i class="fa-solid fa-shirt text-gold"></i><span class="font-bold text-sm">🧴 Higiena i detale</span></div>
+      <div class="space-y-2" id="ascend-hygiene"></div>
+    </div>
+
   </section>
 
   <section id="tab-postepy" class="tab-panel hidden space-y-5">
@@ -511,8 +545,9 @@ html.light-theme .history-item{border-left-color:rgba(30,26,53,.12)}
       <div class="flex items-center gap-2 mb-3"><i class="fa-solid fa-list-check text-lilac"></i><span class="font-bold text-sm">Cele SMART</span></div>
       <div class="space-y-2.5">
         <div class="glass rounded-2xl p-3"><div class="flex items-center justify-between mb-1.5"><span class="text-xs font-bold">😴 Sen 8h</span><span id="smart-sleep-count" class="text-[11px] font-extrabold text-mint">0/30</span></div><div class="h-1.5 bg-white/5 rounded-full overflow-hidden"><div id="smart-sleep-bar" class="progress-fill h-full bg-mint rounded-full" style="width:0%"></div></div></div>
-        <div class="glass rounded-2xl p-3"><div class="flex items-center justify-between mb-1.5"><span class="text-xs font-bold">🗣️ Mowa codziennie</span><span id="smart-speech-count" class="text-[11px] font-extrabold text-lilac">0/21</span></div><div class="h-1.5 bg-white/5 rounded-full overflow-hidden"><div id="smart-speech-bar" class="progress-fill h-full bg-lilac rounded-full" style="width:0%"></div></div></div>
-        <div class="glass rounded-2xl p-3"><div class="flex items-center justify-between mb-1.5"><span class="text-xs font-bold">🧘 Reset szczęki przed snem</span><span id="smart-jaw-count" class="text-[11px] font-extrabold text-peach">0/21</span></div><div class="h-1.5 bg-white/5 rounded-full overflow-hidden"><div id="smart-jaw-bar" class="progress-fill h-full bg-peach rounded-full" style="width:0%"></div></div></div>
+        <div class="glass rounded-2xl p-3"><div class="flex items-center justify-between mb-1.5"><span class="text-xs font-bold">💧 Skincare rano</span><span id="smart-skincare-am-count" class="text-[11px] font-extrabold text-lilac">0/21</span></div><div class="h-1.5 bg-white/5 rounded-full overflow-hidden"><div id="smart-skincare-am-bar" class="progress-fill h-full bg-lilac rounded-full" style="width:0%"></div></div></div>
+        <div class="glass rounded-2xl p-3"><div class="flex items-center justify-between mb-1.5"><span class="text-xs font-bold">✨ Skincare wieczór</span><span id="smart-skincare-pm-count" class="text-[11px] font-extrabold text-peach">0/21</span></div><div class="h-1.5 bg-white/5 rounded-full overflow-hidden"><div id="smart-skincare-pm-bar" class="progress-fill h-full bg-peach rounded-full" style="width:0%"></div></div></div>
+        <div class="glass rounded-2xl p-3"><div class="flex items-center justify-between mb-1.5"><span class="text-xs font-bold">🧘 Reset szczęki przed snem</span><span id="smart-jaw-count" class="text-[11px] font-extrabold text-mint">0/21</span></div><div class="h-1.5 bg-white/5 rounded-full overflow-hidden"><div id="smart-jaw-bar" class="progress-fill h-full bg-mint rounded-full" style="width:0%"></div></div></div>
       </div>
     </div>
 
@@ -568,6 +603,12 @@ html.light-theme .history-item{border-left-color:rgba(30,26,53,.12)}
       <div id="glowup-content" class="space-y-2"><p class="text-sm text-neutral-400 font-medium">Kliknij "Odśwież", żeby porównać ostatnie 7 dni z poprzednimi 7.</p></div>
     </div>
 
+    <div class="glass rounded-4xl p-5 shadow-soft border border-lilac/20">
+      <div class="flex items-center gap-2 mb-3"><i class="fa-solid fa-arrow-up text-lilac"></i><span class="font-bold text-sm text-lilac">🚀 Propozycje Ascend</span></div>
+      <p class="text-xs text-neutral-400 font-medium mb-3">Rzeczy warte rozważenia — dodaj do swoich nawyków kiedy poczujesz się gotowy.</p>
+      <div id="ascend-suggestions" class="space-y-2"></div>
+    </div>
+
     <div class="flex glass rounded-full p-1">
       <button data-range="7" class="range-btn segmented flex-1 py-2 rounded-full text-xs font-bold bg-gradient-to-br from-mint to-lilac text-ink">7 dni</button>
       <button data-range="30" class="range-btn segmented flex-1 py-2 rounded-full text-xs font-bold text-neutral-400">30 dni</button>
@@ -577,37 +618,34 @@ html.light-theme .history-item{border-left-color:rgba(30,26,53,.12)}
     <div class="glass rounded-4xl p-4 shadow-soft">
       <div class="flex items-center justify-between mb-3"><div class="flex items-center gap-2 text-sm font-bold text-neutral-300"><i class="fa-solid fa-scale-balanced text-gold"></i>Waga</div><button id="btn-1rm" class="text-[11px] font-bold text-gold glass rounded-full px-3 py-1"><i class="fa-solid fa-calculator mr-1"></i>1RM</button></div>
       <canvas id="chart-weight" height="140"></canvas>
-      <div class="text-[10px] text-neutral-500 font-semibold mt-2 text-center">📖 Trend z 30 dni jest ważny, nie pojedynczy pomiar. Wahania ±0.5 kg dziennie to normalne.</div>
+      <div class="text-[10px] text-neutral-500 font-semibold mt-2 text-center">📖 Trend z 30 dni jest ważny, nie pojedynczy pomiar.</div>
     </div>
 
     <div class="glass rounded-4xl p-4 shadow-soft">
       <div class="flex items-center gap-2 mb-3 text-sm font-bold text-neutral-300"><i class="fa-solid fa-moon text-lilac"></i>😴 Sen — głęboki / REM</div>
       <canvas id="chart-sleep" height="140"></canvas>
-      <div class="text-[10px] text-neutral-500 font-semibold mt-2 text-center">📖 Deep sen = regeneracja fizyczna, REM = mózg i pamięć. Oba poniżej normy = słaba regeneracja.</div>
+      <div class="text-[10px] text-neutral-500 font-semibold mt-2 text-center">📖 Deep sen = regeneracja fizyczna, REM = mózg.</div>
     </div>
 
     <div class="glass rounded-4xl p-4 shadow-soft">
-      <div class="flex items-center gap-2 mb-3 text-sm font-bold text-neutral-300"><i class="fa-solid fa-heart-pulse text-mint"></i>💓 RHR rano — trend</div>
+      <div class="flex items-center gap-2 mb-3 text-sm font-bold text-neutral-300"><i class="fa-solid fa-heart-pulse text-mint"></i>💓 RHR rano</div>
       <canvas id="chart-rhr" height="140"></canvas>
-      <div class="text-[10px] text-neutral-500 font-semibold mt-2 text-center">📖 Wzrost RHR o 5+ bpm dzień do dnia = sygnał przemęczenia, stresu lub choroby.</div>
+      <div class="text-[10px] text-neutral-500 font-semibold mt-2 text-center">📖 Wzrost RHR o 5+ bpm = sygnał przemęczenia.</div>
     </div>
 
     <div class="glass rounded-4xl p-4 shadow-soft">
       <div class="flex items-center gap-2 mb-3 text-sm font-bold text-neutral-300"><i class="fa-solid fa-shoe-prints text-peach"></i>🚶 Kroki</div>
       <canvas id="chart-steps" height="140"></canvas>
-      <div class="text-[10px] text-neutral-500 font-semibold mt-2 text-center">📖 Poniżej 4000 = siedzący. 8000+ = aktywny. 12000+ = bardzo aktywny.</div>
     </div>
 
     <div class="glass rounded-4xl p-4 shadow-soft">
       <div class="flex items-center gap-2 mb-3 text-sm font-bold text-neutral-300"><i class="fa-solid fa-heart-pulse text-rose"></i>💓 Stres</div>
       <canvas id="chart-stress" height="140"></canvas>
-      <div class="text-[10px] text-neutral-500 font-semibold mt-2 text-center">📖 0-35 niski (dobry), 36-60 umiarkowany, 60+ wysoki (priorytet regeneracja).</div>
     </div>
 
     <div class="glass rounded-4xl p-4 shadow-soft">
-      <div class="flex items-center gap-2 mb-3 text-sm font-bold text-neutral-300"><i class="fa-solid fa-face-smile text-peach"></i>😊 Nastrój (rano / wieczór)</div>
+      <div class="flex items-center gap-2 mb-3 text-sm font-bold text-neutral-300"><i class="fa-solid fa-face-smile text-peach"></i>😊 Nastrój</div>
       <canvas id="chart-mood" height="140"></canvas>
-      <div class="text-[10px] text-neutral-500 font-semibold mt-2 text-center">📖 Duże wahania między rano a wieczorem = nieodpowiednia regeneracja w ciągu dnia.</div>
     </div>
 
     <div id="correlation-box" class="hidden glass rounded-4xl p-5 shadow-soft border border-lilac/20">
@@ -625,12 +663,14 @@ html.light-theme .history-item{border-left-color:rgba(30,26,53,.12)}
 
 <div id="toast" class="hidden fixed bottom-6 left-1/2 -translate-x-1/2 z-50 glass rounded-full px-5 py-3 text-sm font-bold shadow-soft rise"></div>
 
+<!-- ============ MODALE ============ -->
+
 <div id="modal-tabletka" class="modal-wrap hidden fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-5">
   <div class="modal-backdrop absolute inset-0" data-close-modal></div>
   <div class="modal-pop relative glass rounded-t-4xl sm:rounded-4xl w-full sm:max-w-md p-6 shadow-soft max-h-[85vh] overflow-y-auto">
     <div class="flex items-start justify-between mb-4"><div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-gold/25 to-peach/25 flex items-center justify-center"><i class="fa-solid fa-pills text-gold text-2xl"></i></div><button data-close-modal class="w-9 h-9 rounded-full glass flex items-center justify-center text-neutral-400"><i class="fa-solid fa-xmark"></i></button></div>
     <h3 class="font-extrabold text-xl mb-3">💊 D3 + Tran z dorsza</h3>
-    <div class="glass rounded-3xl p-4 mb-3 flex items-start gap-3"><i class="fa-solid fa-fish text-mint mt-0.5"></i><p class="text-sm text-neutral-200 leading-relaxed font-medium"><strong>Tran z wątroby dorsza islandzkiego</strong> to naturalne źródło witaminy D, A i omega-3. Łącz z D3 rano, do posiłku z tłuszczem.</p></div>
+    <div class="glass rounded-3xl p-4 mb-3 flex items-start gap-3"><i class="fa-solid fa-fish text-mint mt-0.5"></i><p class="text-sm text-neutral-200 leading-relaxed font-medium"><strong>Tran z wątroby dorsza islandzkiego</strong> — źródło witaminy D, A i omega-3. Łącz z D3 rano, do posiłku z tłuszczem.</p></div>
     <button data-check="tabletka" data-close-modal class="modal-check-btn w-full py-3.5 rounded-full bg-gradient-to-br from-gold to-peach text-ink font-extrabold active:scale-95 transition"><i class="fa-solid fa-check mr-1.5"></i>Wziąłem</button>
   </div>
 </div>
@@ -664,18 +704,47 @@ html.light-theme .history-item{border-left-color:rgba(30,26,53,.12)}
   </div>
 </div>
 
-<div id="modal-mowa" class="modal-wrap hidden fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-5">
+<div id="modal-skincare-rano" class="modal-wrap hidden fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-5">
   <div class="modal-backdrop absolute inset-0" data-close-modal></div>
   <div class="modal-pop relative glass rounded-t-4xl sm:rounded-4xl w-full sm:max-w-md p-6 shadow-soft max-h-[85vh] overflow-y-auto">
-    <div class="flex items-start justify-between mb-4"><div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-lilac/25 to-mint/25 flex items-center justify-center"><i class="fa-solid fa-comment-dots text-lilac text-2xl"></i></div><button data-close-modal class="w-9 h-9 rounded-full glass flex items-center justify-center text-neutral-400"><i class="fa-solid fa-xmark"></i></button></div>
-    <h3 class="font-extrabold text-xl mb-1">🗣️ Trening mowy — 5 min</h3>
-    <p class="text-xs text-neutral-400 font-semibold mb-4">Skrócona wersja</p>
+    <div class="flex items-start justify-between mb-4"><div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-mint/25 to-peach/25 flex items-center justify-center"><i class="fa-solid fa-droplet text-mint text-2xl"></i></div><button data-close-modal class="w-9 h-9 rounded-full glass flex items-center justify-center text-neutral-400"><i class="fa-solid fa-xmark"></i></button></div>
+    <h3 class="font-extrabold text-xl mb-1">💧 Skincare rano</h3>
+    <p class="text-xs text-neutral-400 font-semibold mb-5">Kolejność stosowania</p>
     <div class="space-y-3 mb-5">
-      <div class="glass rounded-3xl p-4 flex items-start gap-3"><div class="w-8 h-8 rounded-xl bg-mint/15 flex items-center justify-center flex-shrink-0 text-mint font-extrabold text-xs">1</div><div><div class="font-bold text-sm mb-0.5">Masaż żwaczy (1 min)</div><p class="text-xs text-neutral-300 font-medium leading-relaxed">Okrężne ruchy na mięśniach żwaczy.</p></div></div>
-      <div class="glass rounded-3xl p-4 flex items-start gap-3"><div class="w-8 h-8 rounded-xl bg-lilac/15 flex items-center justify-center flex-shrink-0 text-lilac font-extrabold text-xs">2</div><div><div class="font-bold text-sm mb-0.5">T-D (2 min)</div><p class="text-xs text-neutral-300 font-medium leading-relaxed">T-T-T, D-D-D — czubek języka o wałek.</p></div></div>
-      <div class="glass rounded-3xl p-4 flex items-start gap-3"><div class="w-8 h-8 rounded-xl bg-peach/15 flex items-center justify-center flex-shrink-0 text-peach font-extrabold text-xs">3</div><div><div class="font-bold text-sm mb-0.5">Słowa (2 min)</div><p class="text-xs text-neutral-300 font-medium leading-relaxed">TDAWA, DOWED, DUDY, TDA.</p></div></div>
+      <div class="glass rounded-3xl p-4 flex items-start gap-3">
+        <div class="w-8 h-8 rounded-xl bg-mint/15 flex items-center justify-center flex-shrink-0 text-mint font-extrabold text-xs">1</div>
+        <div><div class="font-bold text-sm mb-0.5">Płyn do twarzy — oczyszczenie</div><p class="text-xs text-neutral-300 font-medium leading-relaxed">Umyj twarz letnią wodą + płyn. Delikatnie, bez tarcia. Osusz czystym ręcznikiem.</p></div>
+      </div>
+      <div class="glass rounded-3xl p-4 flex items-start gap-3">
+        <div class="w-8 h-8 rounded-xl bg-lilac/15 flex items-center justify-center flex-shrink-0 text-lilac font-extrabold text-xs">2</div>
+        <div><div class="font-bold text-sm mb-0.5">Płyn do trądzików — punktowo</div><p class="text-xs text-neutral-300 font-medium leading-relaxed">Nałóż na miejsca z wypryskami lub tłustą strefę T. Zostaw do wchłonięcia 30s.</p></div>
+      </div>
+      <div class="glass rounded-3xl p-4 flex items-start gap-3">
+        <div class="w-8 h-8 rounded-xl bg-peach/15 flex items-center justify-center flex-shrink-0 text-peach font-extrabold text-xs">3</div>
+        <div><div class="font-bold text-sm mb-0.5">Acnederm — na całą twarz</div><p class="text-xs text-neutral-300 font-medium leading-relaxed">Cienka warstwa na całą twarz, omijaj okolice oczu. Wchłania się 1-2 min.</p></div>
+      </div>
     </div>
-    <button id="btn-goto-speech-tab" data-close-modal class="w-full py-3.5 rounded-full bg-gradient-to-br from-lilac to-mint text-ink font-extrabold active:scale-95 transition"><i class="fa-solid fa-stopwatch mr-1.5"></i>Otwórz timer</button>
+    <button data-check="skincare-rano" data-close-modal class="modal-check-btn w-full py-3.5 rounded-full bg-gradient-to-br from-mint to-peach text-ink font-extrabold active:scale-95 transition"><i class="fa-solid fa-check mr-1.5"></i>Zrobione</button>
+  </div>
+</div>
+
+<div id="modal-skincare-wieczor" class="modal-wrap hidden fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-5">
+  <div class="modal-backdrop absolute inset-0" data-close-modal></div>
+  <div class="modal-pop relative glass rounded-t-4xl sm:rounded-4xl w-full sm:max-w-md p-6 shadow-soft max-h-[85vh] overflow-y-auto">
+    <div class="flex items-start justify-between mb-4"><div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-lilac/25 to-gold/25 flex items-center justify-center"><i class="fa-solid fa-sparkles text-lilac text-2xl"></i></div><button data-close-modal class="w-9 h-9 rounded-full glass flex items-center justify-center text-neutral-400"><i class="fa-solid fa-xmark"></i></button></div>
+    <h3 class="font-extrabold text-xl mb-1">✨ Skincare wieczór</h3>
+    <p class="text-xs text-neutral-400 font-semibold mb-5">Kolejność stosowania</p>
+    <div class="space-y-3 mb-5">
+      <div class="glass rounded-3xl p-4 flex items-start gap-3">
+        <div class="w-8 h-8 rounded-xl bg-lilac/15 flex items-center justify-center flex-shrink-0 text-lilac font-extrabold text-xs">1</div>
+        <div><div class="font-bold text-sm mb-0.5">Płyn do twarzy — oczyszczenie</div><p class="text-xs text-neutral-300 font-medium leading-relaxed">Zmyj cały dzień, pot, sebum, zanieczyszczenia. Letnia woda, delikatny ruch.</p></div>
+      </div>
+      <div class="glass rounded-3xl p-4 flex items-start gap-3">
+        <div class="w-8 h-8 rounded-xl bg-gold/15 flex items-center justify-center flex-shrink-0 text-gold font-extrabold text-xs">2</div>
+        <div><div class="font-bold text-sm mb-0.5">Magia Egipska — maska / kuracja</div><p class="text-xs text-neutral-300 font-medium leading-relaxed">Nałóż cienką warstwę na twarz. Zostaw na 10-15 min (lub zgodnie z instrukcją), spłucz letnią wodą.</p></div>
+      </div>
+    </div>
+    <button data-check="skincare-wieczor" data-close-modal class="modal-check-btn w-full py-3.5 rounded-full bg-gradient-to-br from-lilac to-gold text-ink font-extrabold active:scale-95 transition"><i class="fa-solid fa-check mr-1.5"></i>Zrobione</button>
   </div>
 </div>
 
@@ -686,11 +755,11 @@ html.light-theme .history-item{border-left-color:rgba(30,26,53,.12)}
     <h3 class="font-extrabold text-xl mb-1">✨ Looksmaxing — twarz</h3>
     <p class="text-xs text-neutral-400 font-semibold mb-4">Rutyna 8 min</p>
     <div class="space-y-3 mb-5">
-      <div class="glass rounded-3xl p-4 flex items-start gap-3"><div class="w-8 h-8 rounded-xl bg-mint/15 flex items-center justify-center flex-shrink-0 text-mint font-extrabold text-xs">1</div><div><div class="font-bold text-sm mb-0.5">Rozciąganie oczu — 2 min 👁️</div><p class="text-xs text-neutral-300 font-medium leading-relaxed">Rozciągnij skórę wokół oczu, patrz w 4 strony.</p></div></div>
-      <div class="glass rounded-3xl p-4 flex items-start gap-3"><div class="w-8 h-8 rounded-xl bg-lilac/15 flex items-center justify-center flex-shrink-0 text-lilac font-extrabold text-xs">2</div><div><div class="font-bold text-sm mb-0.5">Masaż twarzy — 2 min 🤲</div><p class="text-xs text-neutral-300 font-medium leading-relaxed">Okrężne ruchy na policzkach, czole, brodzie.</p></div></div>
+      <div class="glass rounded-3xl p-4 flex items-start gap-3"><div class="w-8 h-8 rounded-xl bg-mint/15 flex items-center justify-center flex-shrink-0 text-mint font-extrabold text-xs">1</div><div><div class="font-bold text-sm mb-0.5">Rozciąganie oczu — 2 min 👁️</div><p class="text-xs text-neutral-300 font-medium leading-relaxed">Rozciągnij skórę wokół oczu, patrz w 4 strony — po 5s.</p></div></div>
+      <div class="glass rounded-3xl p-4 flex items-start gap-3"><div class="w-8 h-8 rounded-xl bg-lilac/15 flex items-center justify-center flex-shrink-0 text-lilac font-extrabold text-xs">2</div><div><div class="font-bold text-sm mb-0.5">Masaż twarzy — 2 min 🤲</div><p class="text-xs text-neutral-300 font-medium leading-relaxed">Okrężne ruchy na policzkach, czole, brodzie. Punktowo między brwiami.</p></div></div>
       <div class="glass rounded-3xl p-4 flex items-start gap-3"><div class="w-8 h-8 rounded-xl bg-peach/15 flex items-center justify-center flex-shrink-0 text-peach font-extrabold text-xs">3</div><div><div class="font-bold text-sm mb-0.5">Napięcie mięśni — 3 min 💪</div><p class="text-xs text-neutral-300 font-medium leading-relaxed">Nadymaj policzki, unoś brwi, marszcz czoło.</p></div></div>
       <div class="glass rounded-3xl p-4 flex items-start gap-3"><div class="w-8 h-8 rounded-xl bg-gold/15 flex items-center justify-center flex-shrink-0 text-gold font-extrabold text-xs">4</div><div><div class="font-bold text-sm mb-0.5">Relaks szczęki — 1 min 😮‍💨</div><p class="text-xs text-neutral-300 font-medium leading-relaxed">Otwórz szeroko 3s, zamknij. 10 razy.</p></div></div>
-      <div class="glass rounded-3xl p-4 flex items-start gap-3"><div class="w-8 h-8 rounded-xl bg-mint/15 flex items-center justify-center flex-shrink-0 text-mint font-extrabold text-xs">5</div><div><div class="font-bold text-sm mb-0.5">Kontrola wyrazu — 30s 🪞</div><p class="text-xs text-neutral-300 font-medium leading-relaxed">Lustro, sprawdź szczękę i brwi.</p></div></div>
+      <div class="glass rounded-3xl p-4 flex items-start gap-3"><div class="w-8 h-8 rounded-xl bg-mint/15 flex items-center justify-center flex-shrink-0 text-mint font-extrabold text-xs">5</div><div><div class="font-bold text-sm mb-0.5">Kontrola wyrazu — 30s 🪞</div><p class="text-xs text-neutral-300 font-medium leading-relaxed">Lustro — sprawdź szczękę i brwi.</p></div></div>
     </div>
     <button data-check="twarz" data-close-modal class="modal-check-btn w-full py-3.5 rounded-full bg-gradient-to-br from-lilac to-peach text-ink font-extrabold active:scale-95 transition"><i class="fa-solid fa-check mr-1.5"></i>Zrobiłem rutynę</button>
   </div>
@@ -716,8 +785,26 @@ html.light-theme .history-item{border-left-color:rgba(30,26,53,.12)}
   <div class="modal-pop relative glass rounded-t-4xl sm:rounded-4xl w-full sm:max-w-md p-6 shadow-soft max-h-[85vh] overflow-y-auto">
     <div class="flex items-start justify-between mb-4"><div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-lilac/25 to-rose/25 flex items-center justify-center"><i class="fa-solid fa-hand-sparkles text-lilac text-2xl"></i></div><button data-close-modal class="w-9 h-9 rounded-full glass flex items-center justify-center text-neutral-400"><i class="fa-solid fa-xmark"></i></button></div>
     <h3 class="font-extrabold text-xl mb-3">💅 Check paznokci</h3>
-    <div class="glass rounded-3xl p-4 mb-5 flex items-start gap-3"><i class="fa-solid fa-lightbulb text-lilac mt-0.5"></i><p class="text-sm text-neutral-200 leading-relaxed font-medium">Co 2 tygodnie: sprawdź długość, zadziory, płytkę. Obetnij równo i prosto.</p></div>
+    <div class="space-y-3 mb-5">
+      <div class="glass rounded-3xl p-4 flex items-start gap-3"><div class="w-8 h-8 rounded-xl bg-lilac/15 flex items-center justify-center flex-shrink-0 text-lilac font-extrabold text-xs">1</div><div><div class="font-bold text-sm mb-0.5">Długość</div><p class="text-xs text-neutral-300 font-medium leading-relaxed">Obetnij równo, na prosto. Nie za krótko — chrząstka podpaznokciowa ma być widoczna 1-2 mm.</p></div></div>
+      <div class="glass rounded-3xl p-4 flex items-start gap-3"><div class="w-8 h-8 rounded-xl bg-mint/15 flex items-center justify-center flex-shrink-0 text-mint font-extrabold text-xs">2</div><div><div class="font-bold text-sm mb-0.5">Zadziory i skórki</div><p class="text-xs text-neutral-300 font-medium leading-relaxed">Usuń zadziory, nawilż skórki. Nie odgryzaj — to infekcja w drodze.</p></div></div>
+      <div class="glass rounded-3xl p-4 flex items-start gap-3"><div class="w-8 h-8 rounded-xl bg-peach/15 flex items-center justify-center flex-shrink-0 text-peach font-extrabold text-xs">3</div><div><div class="font-bold text-sm mb-0.5">Płytka paznokcia</div><p class="text-xs text-neutral-300 font-medium leading-relaxed">Sprawdź: przebarwienia, zmiany, wgłębienia. Coś dziwnego = idź do dermatologa.</p></div></div>
+    </div>
     <button data-check="paznokcie" data-close-modal class="modal-check-btn w-full py-3.5 rounded-full bg-gradient-to-br from-lilac to-rose text-ink font-extrabold active:scale-95 transition"><i class="fa-solid fa-check mr-1.5"></i>Sprawdzone</button>
+  </div>
+</div>
+
+<div id="modal-wlosy" class="modal-wrap hidden fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-5">
+  <div class="modal-backdrop absolute inset-0" data-close-modal></div>
+  <div class="modal-pop relative glass rounded-t-4xl sm:rounded-4xl w-full sm:max-w-md p-6 shadow-soft max-h-[85vh] overflow-y-auto">
+    <div class="flex items-start justify-between mb-4"><div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-gold/25 to-peach/25 flex items-center justify-center"><i class="fa-solid fa-scissors text-gold text-2xl"></i></div><button data-close-modal class="w-9 h-9 rounded-full glass flex items-center justify-center text-neutral-400"><i class="fa-solid fa-xmark"></i></button></div>
+    <h3 class="font-extrabold text-xl mb-3">💇 Maska / odżywka do włosów</h3>
+    <div class="space-y-3 mb-5">
+      <div class="glass rounded-3xl p-4 flex items-start gap-3"><div class="w-8 h-8 rounded-xl bg-gold/15 flex items-center justify-center flex-shrink-0 text-gold font-extrabold text-xs">1</div><div><div class="font-bold text-sm mb-0.5">Mycie</div><p class="text-xs text-neutral-300 font-medium leading-relaxed">Umyj włosy szamponem, spłucz letnią wodą. Ciepła woda otwiera łuski — lepsze wchłanianie maski.</p></div></div>
+      <div class="glass rounded-3xl p-4 flex items-start gap-3"><div class="w-8 h-8 rounded-xl bg-peach/15 flex items-center justify-center flex-shrink-0 text-peach font-extrabold text-xs">2</div><div><div class="font-bold text-sm mb-0.5">Maska / odżywka</div><p class="text-xs text-neutral-300 font-medium leading-relaxed">Nałóż na wilgotne włosy, omijaj skórę głowy. Zostaw 5-15 min (zgodnie z produktem). Spłucz chłodną wodą.</p></div></div>
+      <div class="glass rounded-3xl p-4 flex items-start gap-3"><div class="w-8 h-8 rounded-xl bg-mint/15 flex items-center justify-center flex-shrink-0 text-mint font-extrabold text-xs">3</div><div><div class="font-bold text-sm mb-0.5">Masaż skóry głowy</div><p class="text-xs text-neutral-300 font-medium leading-relaxed">2 min opuszkami palców przy myciu. Krążenie + gęstość włosów.</p></div></div>
+    </div>
+    <button data-check="wlosy" data-close-modal class="modal-check-btn w-full py-3.5 rounded-full bg-gradient-to-br from-gold to-peach text-ink font-extrabold active:scale-95 transition"><i class="fa-solid fa-check mr-1.5"></i>Zrobione</button>
   </div>
 </div>
 
@@ -726,8 +813,11 @@ html.light-theme .history-item{border-left-color:rgba(30,26,53,.12)}
   <div class="modal-pop relative glass rounded-t-4xl sm:rounded-4xl w-full sm:max-w-md p-6 shadow-soft max-h-[85vh] overflow-y-auto">
     <div class="flex items-start justify-between mb-4"><div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-rose/25 to-lilac/25 flex items-center justify-center"><i class="fa-solid fa-face-tired text-rose text-2xl"></i></div><button data-close-modal class="w-9 h-9 rounded-full glass flex items-center justify-center text-neutral-400"><i class="fa-solid fa-xmark"></i></button></div>
     <h3 class="font-extrabold text-xl mb-3">🌙 Reset szczęki + oddech</h3>
-    <div class="glass rounded-3xl p-4 mb-4 flex items-start gap-3"><i class="fa-solid fa-lightbulb text-rose mt-0.5"></i><p class="text-sm text-neutral-200 leading-relaxed font-medium">2 min masaż żwaczy + pozycja języka. Potem 3 min oddechu 4-7-8.</p></div>
-    <button id="btn-open-breathing" class="w-full py-3 rounded-full glass font-extrabold text-mint active:scale-95 transition border border-mint/20 mb-3"><i class="fa-solid fa-wind mr-1.5"></i>Otwórz timer oddechowy</button>
+    <div class="space-y-3 mb-4">
+      <div class="glass rounded-3xl p-4 flex items-start gap-3"><div class="w-8 h-8 rounded-xl bg-rose/15 flex items-center justify-center flex-shrink-0 text-rose font-extrabold text-xs">1</div><div><div class="font-bold text-sm mb-0.5">Masaż żwaczy (2 min)</div><p class="text-xs text-neutral-300 font-medium leading-relaxed">Okrężne ruchy opuszkami palców na mięśniach żwaczy (po bokach szczęki). Rozluźnienie po całym dniu.</p></div></div>
+      <div class="glass rounded-3xl p-4 flex items-start gap-3"><div class="w-8 h-8 rounded-xl bg-lilac/15 flex items-center justify-center flex-shrink-0 text-lilac font-extrabold text-xs">2</div><div><div class="font-bold text-sm mb-0.5">Pozycja języka</div><p class="text-xs text-neutral-300 font-medium leading-relaxed">Oprzyj czubek języka na podniebieniu tuż za górnymi zębami. Rozluźnij usta i szczękę.</p></div></div>
+    </div>
+    <button id="btn-open-breathing" class="w-full py-3 rounded-full glass font-extrabold text-mint active:scale-95 transition border border-mint/20 mb-3"><i class="fa-solid fa-wind mr-1.5"></i>Otwórz timer oddechowy 4-7-8</button>
     <button data-check="reset" data-close-modal class="modal-check-btn w-full py-3.5 rounded-full bg-gradient-to-br from-rose to-lilac text-ink font-extrabold active:scale-95 transition"><i class="fa-solid fa-check mr-1.5"></i>Zrobione</button>
   </div>
 </div>
@@ -872,7 +962,7 @@ let booted = false;
 let migrateDone = false;
 
 // ============================================================================
-// FIREBASE CONFIG
+// FIREBASE
 // ============================================================================
 const firebaseConfig = {
   apiKey: "AIzaSyChzU-QWJ_lyE7kLePHCvYltIayMZuXlL8",
@@ -886,12 +976,11 @@ const firebaseConfig = {
 const VAPID_KEY = "TWOJ_VAPID_KEY";
 
 // ============================================================================
-// SYNC STATUS UI
+// SYNC UI
 // ============================================================================
 function setSyncStatus(mode, label) {
   const el = document.getElementById("sync-status");
-  const lbl = document.getElementById("sync-label");
-  if (!el || !lbl) return;
+  if (!el) return;
   el.className = mode;
   const icons = { offline: "fa-cloud", syncing: "fa-cloud-arrow-up", synced: "fa-cloud-check" };
   el.innerHTML = `<i class="fa-solid ${icons[mode] || "fa-cloud"}"></i><span id="sync-label">${label}</span>`;
@@ -940,6 +1029,7 @@ function dateKey(date) {
 }
 function isMonday(d) { return d.getDay() === 1; }
 function isSunday(d) { return d.getDay() === 0; }
+function isSaturday(d) { return d.getDay() === 6; }
 function dayIndexSinceEpoch(d) { return Math.floor(d.getTime() / 86400000); }
 function average(arr) { return arr.length ? arr.reduce((a, b) => a + b, 0) / arr.length : null; }
 function escapeHtml(s) { const d = document.createElement("div"); d.textContent = s || ""; return d.innerHTML; }
@@ -954,25 +1044,20 @@ function showToast(msg) {
 }
 
 // ============================================================================
-// WARSTWA DANYCH (Firestore + localStorage fallback)
+// WARSTWA DANYCH
 // ============================================================================
 function localKey(key, uid) { return `regim:${uid || currentUser?.uid || "local"}:${key}`; }
 function isCloud() { return firebaseReady && window.__fb && currentUser?.uid && currentUser.uid !== "local"; }
 
 async function saveDayDoc(d) {
-  // Zawsze zapisuj lokalnie (offline-first)
   localStorage.setItem(localKey(d.date), JSON.stringify(d));
-
   if (!isCloud()) { updateSyncUI(); return; }
-
-  // Jeśli chmura — zapisz też
   syncInProgress = true; updateSyncUI();
   try {
     const { fsMod, db } = window.__fb;
     await fsMod.setDoc(fsMod.doc(db, "users", currentUser.uid, "days", d.date), d, { merge: true });
-    console.log("✅ Firestore zapis:", d.date);
   } catch (e) {
-    console.error("❌ Firestore save error:", e);
+    console.error("Firestore save error:", e);
     showToast("Błąd chmury — zapisano lokalnie");
   } finally {
     syncInProgress = false; updateSyncUI();
@@ -980,26 +1065,19 @@ async function saveDayDoc(d) {
 }
 
 async function loadDayDoc(dateStr) {
-  // Zawsze najpierw lokalnie (szybkie)
   const rawLocal = localStorage.getItem(localKey(dateStr));
   const localDoc = rawLocal ? JSON.parse(rawLocal) : null;
-
-  // Jak jesteśmy w chmurze, pobierz z Firestore i zwróć "bogatszą" wersję
   if (isCloud()) {
     try {
       const { fsMod, db } = window.__fb;
       const snap = await fsMod.getDoc(fsMod.doc(db, "users", currentUser.uid, "days", dateStr));
       if (snap.exists()) {
         const cloudDoc = snap.data();
-        // Merge: cloud + local (cloud wygrywa dla pól zapisanych w cloud)
         const merged = { ...(localDoc || {}), ...cloudDoc };
-        // Zapisz z powrotem lokalnie dla szybkiego dostępu
         localStorage.setItem(localKey(dateStr), JSON.stringify(merged));
         return merged;
       }
-    } catch (e) {
-      console.warn("Firestore load error:", e);
-    }
+    } catch (e) { console.warn("Firestore load error:", e); }
   }
   return localDoc;
 }
@@ -1012,8 +1090,6 @@ async function loadLastNDays(n) {
     d.setDate(d.getDate() - i);
     dates.push(dateKey(d));
   }
-
-  // Zbierz z chmury jeśli jesteśmy zalogowani
   let cloudDocs = {};
   if (isCloud()) {
     try {
@@ -1026,11 +1102,8 @@ async function loadLastNDays(n) {
       );
       const snaps = await fsMod.getDocs(q);
       snaps.forEach((s) => { cloudDocs[s.id] = s.data(); });
-    } catch (e) {
-      console.warn("Firestore loadLastNDays error:", e);
-    }
+    } catch (e) { console.warn("loadLastNDays error:", e); }
   }
-
   const docs = [];
   for (const dk of dates) {
     const localRaw = localStorage.getItem(localKey(dk));
@@ -1044,29 +1117,20 @@ async function loadLastNDays(n) {
 
 async function collectAllDays() {
   const results = {};
-  // 1) wszystko z lokalnego
   const today = new Date();
   for (let i = 0; i < 365; i++) {
     const d = new Date(today);
     d.setDate(d.getDate() - i);
     const dk = dateKey(d);
     const raw = localStorage.getItem(localKey(dk));
-    if (raw) {
-      try { const parsed = JSON.parse(raw); results[dk] = parsed; } catch (e) {}
-    }
+    if (raw) { try { results[dk] = JSON.parse(raw); } catch (e) {} }
   }
-  // 2) wszystko z chmury
   if (isCloud()) {
     try {
       const { fsMod, db } = window.__fb;
       const snaps = await fsMod.getDocs(fsMod.collection(db, "users", currentUser.uid, "days"));
-      snaps.forEach((s) => {
-        const cloudDoc = s.data();
-        results[s.id] = { ...(results[s.id] || {}), ...cloudDoc };
-      });
-    } catch (e) {
-      console.warn("collectAllDays cloud error:", e);
-    }
+      snaps.forEach((s) => { results[s.id] = { ...(results[s.id] || {}), ...s.data() }; });
+    } catch (e) { console.warn("collectAllDays error:", e); }
   }
   return Object.values(results).sort((a, b) => (a.date || "").localeCompare(b.date || ""));
 }
@@ -1084,23 +1148,17 @@ async function loadDaysRange(n, offset) {
 }
 
 // ============================================================================
-// MIGRACJA — lokalne dane → Firestore przy pierwszym logowaniu
+// MIGRACJA
 // ============================================================================
 async function migrateLocalToCloud() {
   if (migrateDone || !isCloud()) return;
   migrateDone = true;
-
-  // Sprawdź czy w Firestore już są dane — jeśli tak, nie nadpisuj
   try {
     const { fsMod, db } = window.__fb;
     const metaRef = fsMod.doc(db, "users", currentUser.uid, "meta", "migration");
     const metaSnap = await fsMod.getDoc(metaRef);
-    if (metaSnap.exists() && metaSnap.data().done) {
-      console.log("Migracja już zrobiona wcześniej — pomijam");
-      return;
-    }
+    if (metaSnap.exists() && metaSnap.data().done) return;
 
-    // Zbierz wszystkie lokalne dni (klucze regim:local:YYYY-MM-DD)
     const localDays = [];
     for (let i = 0; i < localStorage.length; i++) {
       const k = localStorage.key(i);
@@ -1112,19 +1170,14 @@ async function migrateLocalToCloud() {
         if (parsed) localDays.push(parsed);
       } catch (e) {}
     }
-
     if (localDays.length === 0) {
       await fsMod.setDoc(metaRef, { done: true, at: Date.now(), count: 0 });
       return;
     }
-
     showToast(`Migracja ${localDays.length} dni do chmury...`);
     syncInProgress = true; updateSyncUI();
-
-    // Batch upload
     const chunks = [];
     for (let i = 0; i < localDays.length; i += 400) chunks.push(localDays.slice(i, i + 400));
-
     for (const chunk of chunks) {
       const batch = fsMod.writeBatch(db);
       chunk.forEach((day) => {
@@ -1133,13 +1186,10 @@ async function migrateLocalToCloud() {
       });
       await batch.commit();
     }
-
     await fsMod.setDoc(metaRef, { done: true, at: Date.now(), count: localDays.length });
-    showToast(`✅ Zmigrowano ${localDays.length} dni do chmury`);
-    console.log(`Migracja zakończona: ${localDays.length} dni`);
+    showToast(`✅ Zmigrowano ${localDays.length} dni`);
   } catch (e) {
     console.error("Błąd migracji:", e);
-    showToast("Błąd migracji — spróbuj ponownie");
   } finally {
     syncInProgress = false; updateSyncUI();
   }
@@ -1153,7 +1203,6 @@ function updateAuthUI(user) {
   const signinBtn = document.getElementById("btn-signin");
   const accountInfo = document.getElementById("settings-account");
   if (!badge || !signinBtn) return;
-
   if (user) {
     const name = user.displayName || user.email?.split("@")[0] || user.uid.slice(0, 8);
     badge.textContent = name;
@@ -1162,7 +1211,7 @@ function updateAuthUI(user) {
     signinBtn.innerHTML = '<i class="fa-solid fa-right-from-bracket"></i>';
     signinBtn.classList.remove("text-neutral-400");
     signinBtn.classList.add("text-mint");
-    if (accountInfo) accountInfo.innerHTML = `✅ Zalogowany: <strong>${escapeHtml(name)}</strong><br>Email: ${escapeHtml(user.email || "—")}<br>UID: <span class="font-mono text-[10px]">${user.uid.slice(0, 12)}...</span>`;
+    if (accountInfo) accountInfo.innerHTML = `✅ Zalogowany: <strong>${escapeHtml(name)}</strong><br>Email: ${escapeHtml(user.email || "—")}`;
   } else {
     badge.classList.add("hidden");
     signinBtn.title = "Zaloguj się (Google)";
@@ -1174,7 +1223,7 @@ function updateAuthUI(user) {
 }
 
 // ============================================================================
-// INIT FIREBASE + AUTH
+// INIT FIREBASE
 // ============================================================================
 async function initFirebase() {
   try {
@@ -1186,37 +1235,28 @@ async function initFirebase() {
     const auth = authMod.getAuth(app);
     const db = fsMod.getFirestore(app);
 
-    // Persist auth między sesjami (nie pyta za każdym razem)
-    try {
-      await authMod.setPersistence(auth, authMod.browserLocalPersistence);
-    } catch (e) { /* nie zawsze działa */ }
+    try { await authMod.setPersistence(auth, authMod.browserLocalPersistence); } catch (e) {}
 
     firebaseReady = true;
     window.__fb = { authMod, fsMod, db, auth, app };
 
-    // Listener auth
     authMod.onAuthStateChanged(auth, async (user) => {
       const wasLocal = !currentUser || currentUser.uid === "local";
       currentUser = user || { uid: "local" };
       updateAuthUI(user);
       updateSyncUI();
 
-      // Migracja przy pierwszym logowaniu
       if (user && wasLocal) {
         await migrateLocalToCloud();
       }
-
-      // Boot lub re-boot
       if (!authResolved || !booted) {
         authResolved = true;
         await bootApp();
       } else {
-        // Re-login: przeładuj dane
         await reloadEverything();
       }
     });
 
-    // Klik na logowanie / wylogowanie
     document.getElementById("btn-signin").addEventListener("click", async () => {
       const user = auth.currentUser;
       if (user) {
@@ -1236,19 +1276,13 @@ async function initFirebase() {
         if (e.code === "auth/popup-blocked" || e.code === "auth/popup-closed-by-user") {
           showToast("Popup zablokowany — spróbuj ponownie");
         } else {
-          try {
-            await authMod.signInAnonymously(auth);
-            showToast("Zalogowano anonimowo");
-          } catch (e2) {
-            showToast("Błąd logowania");
-            console.error(e2);
-          }
+          try { await authMod.signInAnonymously(auth); showToast("Zalogowano anonimowo"); }
+          catch (e2) { showToast("Błąd logowania"); }
         }
       }
     });
-
   } catch (e) {
-    console.warn("Firebase init error — tryb lokalny:", e);
+    console.warn("Firebase init error:", e);
     firebaseReady = false;
     authResolved = true;
     updateSyncUI();
@@ -1262,15 +1296,16 @@ const todayObj = new Date();
 const todayKey = dateKey(todayObj);
 const monday = isMonday(todayObj);
 const sunday = isSunday(todayObj);
+const saturday = isSaturday(todayObj);
 const isBikeDay = !monday && (dayIndexSinceEpoch(todayObj) % 3 === 0);
-const nailCheckDay = (dayIndexSinceEpoch(todayObj) % 14 === 0);
 
 const state = {
   tasks: [
     { id: "tabletka", label: "D3 + Tran z dorsza", done: false },
     { id: "jedzenie", label: "Zdrowe jedzenie", done: false },
     { id: "trening", label: monday ? "Basen 1,5h" : (isBikeDay ? "Trasa 7 km rower" : "Kalistenika"), done: false },
-    { id: "mowa", label: "Trening mowy", done: false },
+    { id: "skincare-rano", label: "Skincare rano", done: false },
+    { id: "skincare-wieczor", label: "Skincare wieczór", done: false },
     { id: "twarz", label: "Looksmaxing twarz", done: false },
     { id: "postawa", label: "Postawa szyi i barków", done: false },
     { id: "reset", label: "Reset szczęki przed snem", done: false },
@@ -1281,6 +1316,7 @@ const state = {
   moodTagsMorning: [],
   dayTags: [],
   habits: { waterSalt: false, coldShower: false, walkMeal: false },
+  ascend: {}, // { [ascendId]: true/false }
   note: "",
   specialMode: "normal",
   recoveryMode: false,
@@ -1288,9 +1324,111 @@ const state = {
   lastMilestoneShown: null,
 };
 
-function calcCompletionPct() {
-  const done = state.tasks.filter((t) => t.done).length;
-  return Math.round((done / state.tasks.length) * 100);
+// ============================================================================
+// ASCEND — lista nawyków
+// ============================================================================
+const ASCEND_ITEMS = [
+  // Sen i regeneracja
+  { id: "sleep-back", cat: "sleep", icon: "😴", label: "Sen na plecach", hint: "Nie na boku — mniej odgnieceń i asymetrii twarzy" },
+  { id: "dark-room", cat: "sleep", icon: "🌑", label: "Całkowita ciemność w sypialni", hint: "Deep sleep + melatonina" },
+  { id: "no-screen-bed", cat: "sleep", icon: "📵", label: "Bez ekranu w łóżku", hint: "1h przed snem telefon off" },
+  { id: "cold-room", cat: "sleep", icon: "🥶", label: "Chłodna sypialnia (18-19°C)", hint: "Lepszy deep sleep" },
+  // Jedzenie i nawodnienie
+  { id: "nose-breath", cat: "food", icon: "👃", label: "Oddech przez nos zawsze", hint: "Wpływa na rozwój szczęki i profil" },
+  { id: "no-sugar", cat: "food", icon: "🍬", label: "Zero cukru / fast food", hint: "Skóra, opuchlizna, energia" },
+  { id: "low-salt-pm", cat: "food", icon: "🧂", label: "Redukcja soli wieczorem", hint: "Mniejsza opuchlizna rano" },
+  { id: "no-alcohol", cat: "food", icon: "🍺", label: "Zero alkoholu", hint: "Skóra, sen, woda w twarzy" },
+  { id: "eat-window", cat: "food", icon: "⏰", label: "Nie jeść 3h przed snem", hint: "Lepszy sen głęboki" },
+  { id: "caffeine-cutoff", cat: "food", icon: "☕", label: "Kofeina tylko do 14:00", hint: "Nie psuje snu" },
+  { id: "water-3l", cat: "food", icon: "💧", label: "2-3L wody dziennie", hint: "Nawodnienie skóry i mózgu" },
+  // Postawa i twarz
+  { id: "mewing", cat: "face", icon: "👅", label: "Mewing (pozycja języka)", hint: "Język na podniebieniu, kontroluj" },
+  { id: "chin-tuck", cat: "face", icon: "🦒", label: "Chin tuck", hint: "Wzmacnia linię żuchwy" },
+  { id: "no-touch-face", cat: "face", icon: "🤲", label: "Nie dotykać twarzy rękami", hint: "Mniej wyprysków, mniej bakterii" },
+  { id: "cold-face", cat: "face", icon: "🧊", label: "Cold face plunge 2 min", hint: "Zimna woda rano — obrzęk, krążenie" },
+  { id: "no-hot-water", cat: "face", icon: "🚫", label: "Brak gorącej wody na twarz", hint: "Rozszerza naczynia, niszczy barierę" },
+  { id: "posture-check", cat: "face", icon: "🧍", label: "Self check postawy 3× dziennie", hint: "Barki cofnięte, broda równolegle" },
+  // Głowa i stres
+  { id: "sun-morning", cat: "mind", icon: "☀️", label: "10 min słońca rano", hint: "Rytm dobowy, witamina D, nastrój" },
+  { id: "no-blue-light", cat: "mind", icon: "🕶️", label: "Tryb nocny / blue light off wieczorem", hint: "Melatonina" },
+  { id: "breathing", cat: "mind", icon: "🫁", label: "5 min oddechu 4-7-8", hint: "Kortyzol w dół" },
+  { id: "walk-10", cat: "mind", icon: "🚶", label: "10 min spaceru dziennie", hint: "Ruch bazowy, nie trening" },
+  // Higiena i detale
+  { id: "clean-pillow", cat: "hygiene", icon: "🛏️", label: "Świeża poszewka (co 2-3 dni)", hint: "Mniej bakterii na twarzy" },
+  { id: "nose-trim", cat: "hygiene", icon: "👃", label: "Trymer nosa co tydzień", hint: "Detal, który robi różnicę" },
+  { id: "lip-balm", cat: "hygiene", icon: "👄", label: "Balsam do ust 2× dziennie", hint: "Suche usta = najprostszy glow-up" },
+  { id: "nail-weekly", cat: "hygiene", icon: "💅", label: "Paznokcie co tydzień", hint: "Niedziela — długość, zadziory, płytka" },
+  { id: "clean-teeth", cat: "hygiene", icon: "🦷", label: "Nitkowanie + płukanka", hint: "Uśmiech i bruksizm" },
+];
+
+const ASCEND_CATS = {
+  sleep: "😴 Sen i regeneracja",
+  food: "🍽️ Jedzenie i nawodnienie",
+  face: "🧍 Postawa i twarz",
+  mind: "🧘 Głowa i stres",
+  hygiene: "🧴 Higiena i detale",
+};
+
+function calcAscendPct() {
+  const total = ASCEND_ITEMS.length;
+  const done = ASCEND_ITEMS.filter((i) => state.ascend[i.id]).length;
+  return { done, total, pct: total ? Math.round((done / total) * 100) : 0 };
+}
+
+function renderAscend() {
+  const cats = ["sleep", "food", "face", "mind", "hygiene"];
+  cats.forEach((cat) => {
+    const container = document.getElementById(`ascend-${cat}`);
+    if (!container) return;
+    const items = ASCEND_ITEMS.filter((i) => i.cat === cat);
+    container.innerHTML = items.map((i) => `
+      <div class="ascend-item ${state.ascend[i.id] ? "done" : ""}" data-ascend="${i.id}">
+        <div class="w-8 h-8 rounded-xl ${state.ascend[i.id] ? "bg-mint/30" : "bg-white/5"} flex items-center justify-center flex-shrink-0 text-lg">${i.icon}</div>
+        <div class="flex-1 min-w-0">
+          <div class="text-sm font-bold">${i.label}</div>
+          <div class="text-[10px] text-neutral-400 font-medium">${i.hint}</div>
+        </div>
+        <div class="w-5 h-5 rounded-full border-2 ${state.ascend[i.id] ? "border-mint bg-mint" : "border-white/15"} flex items-center justify-center flex-shrink-0">
+          ${state.ascend[i.id] ? '<i class="fa-solid fa-check text-[10px] text-ink"></i>' : ""}
+        </div>
+      </div>`).join("");
+    container.querySelectorAll("[data-ascend]").forEach((el) => {
+      el.addEventListener("click", async () => {
+        const id = el.dataset.ascend;
+        state.ascend[id] = !state.ascend[id];
+        vibrate(20);
+        if (state.ascend[id]) playSound("done");
+        renderAscend();
+        await persistToday();
+      });
+    });
+  });
+  const { done, total, pct } = calcAscendPct();
+  document.getElementById("ascend-pct").textContent = `${pct}%`;
+  document.getElementById("ascend-bar").style.width = `${pct}%`;
+  document.getElementById("ascend-count").textContent = `${done} z ${total} dzisiaj`;
+}
+
+function renderAscendSuggestions() {
+  const suggestions = [
+    { icon: "🧴", text: "Dodaj krem nawilżający na noc (po Magii Egipskiej) — bariera skórna się regeneruje." },
+    { icon: "🧴", text: "Krem pod oczy — cienie i worki. Wieczorem lub rano." },
+    { icon: "🔬", text: "Niacynamid / kwas hialuronowy — wygładzenie, rozjaśnienie." },
+    { icon: "🪒", text: "Trymer do brwi i uszu — co 1-2 tyg. Detale robią różnicę." },
+    { icon: "🦷", text: "Wybielanie zębów — pasta wybielająca 2× w tyg lub paski." },
+    { icon: "🛏️", text: "Poszewka z jedwabiu — mniej tarcia, mniej wyprysków." },
+    { icon: "🧊", text: "Cold face plunge — 2 min w zimnej wodzie rano, obrzęk schodzi." },
+    { icon: "💧", text: "Serum na noc z retinolem — 2× w tyg start, potem więcej." },
+    { icon: "🥗", text: "Omega-3 w diecie (ryby, orzechy) — skóra i mózg." },
+    { icon: "🏋️", text: "Trening mięśni twarzy — nasilony, 15 min kilka razy w tyg." },
+    { icon: "😎", text: "SPF 30+ codziennie, nawet zimą — podstawa anti-aging." },
+    { icon: "💤", text: "Maska na oczy na sen — lepszy deep sleep." },
+  ];
+  document.getElementById("ascend-suggestions").innerHTML = suggestions.map((s) => `
+    <div class="ascend-item" style="cursor:default">
+      <div class="w-8 h-8 rounded-xl bg-white/5 flex items-center justify-center flex-shrink-0 text-lg">${s.icon}</div>
+      <div class="flex-1 min-w-0"><div class="text-xs text-neutral-200 font-medium leading-snug">${s.text}</div></div>
+    </div>`).join("");
 }
 
 // ============================================================================
@@ -1351,21 +1489,12 @@ function setupTreningCard() {
   const title = document.getElementById("trening-title");
   const sub = document.getElementById("trening-sub");
   if (!icon) return;
-  if (state.specialMode === "sick") {
-    icon.className = "fa-solid fa-bed-pulse text-rose text-2xl";
-    title.textContent = "🤒 Tryb choroby"; sub.textContent = "Odpoczynek, nawodnienie, sen"; return;
-  }
-  if (state.specialMode === "vacation") {
-    icon.className = "fa-solid fa-umbrella-beach text-gold text-2xl";
-    title.textContent = "🏖️ Wakacje"; sub.textContent = "Luz — spacer wystarczy"; return;
-  }
-  if (state.specialMode === "recovery") {
-    icon.className = "fa-solid fa-leaf text-rose text-2xl";
-    title.textContent = "🌿 Tryb regeneracji"; sub.textContent = "Spacer + mobility + oddech"; return;
-  }
+  if (state.specialMode === "sick") { icon.className = "fa-solid fa-bed-pulse text-rose text-2xl"; title.textContent = "🤒 Tryb choroby"; sub.textContent = "Odpoczynek"; return; }
+  if (state.specialMode === "vacation") { icon.className = "fa-solid fa-umbrella-beach text-gold text-2xl"; title.textContent = "🏖️ Wakacje"; sub.textContent = "Luz"; return; }
+  if (state.specialMode === "recovery") { icon.className = "fa-solid fa-leaf text-rose text-2xl"; title.textContent = "🌿 Regeneracja"; sub.textContent = "Spacer + mobility"; return; }
   if (monday) { icon.className = "fa-solid fa-person-swimming text-mint text-2xl"; title.textContent = "🏊 Basen — 1,5h"; sub.textContent = "Poniedziałek to dzień na wodę"; }
   else if (isBikeDay) { icon.className = "fa-solid fa-person-biking text-mint text-2xl"; title.textContent = "🚴 Trasa 7 km — rower"; sub.textContent = "Co 3 dni zmiana bodźca"; }
-  else { icon.className = "fa-solid fa-dumbbell text-mint text-2xl"; title.textContent = "💪 Kalistenika (ulga)"; sub.textContent = "2 serie • 10-12 powt • regeneracja"; }
+  else { icon.className = "fa-solid fa-dumbbell text-mint text-2xl"; title.textContent = "💪 Kalistenika (ulga)"; sub.textContent = "2 serie • 10-12 powt"; }
 }
 
 const CALISTHENICS_PLAN = [
@@ -1448,7 +1577,7 @@ async function checkRecoveryNeeds() {
 
   const last3Sleep = withData.slice(-3).map((d) => d.morning?.sleepTotal).filter((s) => s != null);
   if (last3Sleep.length === 3 && last3Sleep.every((s) => s < 6.5)) {
-    document.getElementById("deload-text").textContent = `3 dni z rzędu z niedoborem snu. Kumulujesz dług senny — priorytet 8h+.`;
+    document.getElementById("deload-text").textContent = `3 dni z rzędu z niedoborem snu. Kumulujesz dług senny.`;
     document.getElementById("deload-banner").classList.remove("hidden");
   }
 }
@@ -1494,12 +1623,17 @@ function renderProgress() {
   else h.textContent = `Zaczynajmy, ${USER_NAME} 💪`;
 }
 
+function calcCompletionPct() {
+  const done = state.tasks.filter((t) => t.done).length;
+  return Math.round((done / state.tasks.length) * 100);
+}
+
 async function persistToday() {
   const existing = (await loadDayDoc(todayKey)) || {};
   const dayData = {
     ...existing, date: todayKey, tasks: state.tasks, completedPct: calcCompletionPct(),
     foodChecked: state.foodChecked, habits: state.habits, recoveryMode: state.recoveryMode,
-    specialMode: state.specialMode, note: state.note,
+    specialMode: state.specialMode, note: state.note, ascend: state.ascend,
     morning: { ...(existing.morning || {}), ...state.morning },
     evening: { ...(existing.evening || {}), ...state.evening },
     moodTagsMorning: state.moodTagsMorning, dayTags: state.dayTags,
@@ -1539,7 +1673,7 @@ async function computeStreakUpTo(dateStr) {
 }
 
 // ============================================================================
-// STREAK FREEZE
+// FREEZE + MILESTONE
 // ============================================================================
 function checkFreezeUsed() {
   const thisWeek = Math.floor(dayIndexSinceEpoch(new Date()) / 7);
@@ -1554,9 +1688,6 @@ function useFreeze() {
   localStorage.setItem("regim:freeze-week", String(thisWeek));
 }
 
-// ============================================================================
-// MILESTONES
-// ============================================================================
 async function checkMilestone() {
   const streak = parseInt(document.getElementById("streak-count").textContent) || 0;
   const milestones = [7, 14, 21, 30, 60, 90, 100, 180, 365];
@@ -1568,10 +1699,10 @@ async function checkMilestone() {
   const messages = {
     7: "Tydzień z rzędu. Twoje ciało zaczyna to czuć.",
     14: "Dwa tygodnie. Większość ludzi się poddaje w tym momencie.",
-    21: "21 dni = próg nawyku. Twoje ciało już to pamięta.",
+    21: "21 dni = próg nawyku.",
     30: "Miesiąc! To nie eksperyment, to Twoje życie.",
     60: "Dwa miesiące. Jesteś inną osobą niż na starcie.",
-    90: "Kwartał! 90% ludzi nie dolatuje tutaj. Ty dolatujesz.",
+    90: "Kwartał! 90% ludzi nie dolatuje tutaj.",
     100: "Sto dni. Legendarny wynik.",
     180: "Pół roku. To nie streak, to styl życia.",
     365: "Rok. Zmieniłeś się z człowieka w maszynę.",
@@ -1586,12 +1717,12 @@ async function checkMilestone() {
 // KEYWORDS
 // ============================================================================
 const KEYWORDS = {
-  sick: ["chory", "choroba", "gorączka", "przeziębienie", "katar", "kaszel", "grypa", "ból głowy", "migrena", "osłabiony", "rozbity", "niedobrze", "mdli"],
-  alcohol: ["piwo", "wódka", "alkohol", "impreza", "kac", "wino", "drink", "pub", "klub", "popiłem", "popiłam"],
-  stress: ["stres", "stresu", "stresujący", "deadline", "egzamin", "sprawdzian", "kolokwium", "szef", "kłótnia", "kłopot", "problem", "zawalony", "presja"],
-  travel: ["podróż", "wyjazd", "samolot", "pociąg", "lotnisko", "wakacje", "urlop", "hotel"],
-  happy: ["dobry", "świetny", "super", "radosny", "wesoły", "szczęśliwy", "udany", "wygrałem", "wygrałam", "zadowolony"],
-  tired: ["zmęczony", "wyczerpany", "padnięty", "senny", "bez siły", "opary", "ledwo żyję"],
+  sick: ["chory","choroba","gorączka","przeziębienie","katar","kaszel","grypa","ból głowy","migrena","osłabiony","rozbity","niedobrze","mdli"],
+  alcohol: ["piwo","wódka","alkohol","impreza","kac","wino","drink","pub","klub","popiłem","popiłam"],
+  stress: ["stres","stresu","stresujący","deadline","egzamin","sprawdzian","kolokwium","szef","kłótnia","kłopot","problem","zawalony","presja"],
+  travel: ["podróż","wyjazd","samolot","pociąg","lotnisko","wakacje","urlop","hotel"],
+  happy: ["dobry","świetny","super","radosny","wesoły","szczęśliwy","udany","wygrałem","wygrałam","zadowolony"],
+  tired: ["zmęczony","wyczerpany","padnięty","senny","bez siły","opary","ledwo żyję"],
 };
 function detectKeywords(text) {
   if (!text) return [];
@@ -1615,7 +1746,6 @@ function renderImprovementTips() {
   if (state.specialMode === "sick") tips.push({ icon: "🤒", text: "Tryb choroby. Priorytet: sen, nawodnienie, zero treningu." });
   if (state.specialMode === "vacation") tips.push({ icon: "🏖️", text: "Wakacje — luz." });
   if (state.specialMode === "recovery") tips.push({ icon: "🌿", text: "Tryb regeneracji — spacer + mobility." });
-
   if (kws.includes("sick")) tips.push({ icon: "🤒", text: "Choroba w notatce — priorytet zdrowie." });
   if (kws.includes("alcohol")) tips.push({ icon: "🍺", text: "Alkohol w notatce — dużo wody." });
   if (kws.includes("stress")) tips.push({ icon: "😰", text: "Stres w notatce — 5 min oddechu 4-7-8." });
@@ -1635,18 +1765,24 @@ function renderImprovementTips() {
   if (e.rpe != null && e.rpe >= 8) tips.push({ icon: "🔥", text: `RPE ${e.rpe}/10 — następny trening lżejszy.` });
   if (e.screenTime != null && e.screenTime > 240) tips.push({ icon: "📱", text: `Screen time ${e.screenTime} min — ogranicz wieczorem.` });
 
+  const asc = calcAscendPct();
+  if (asc.done < asc.total) tips.push({ icon: "🚀", text: `Ascend: ${asc.done}/${asc.total} — zostało ${asc.total - asc.done}.` });
+  else tips.push({ icon: "🏆", text: "Ascend 100% — full stack dzisiaj!" });
+
   const done = state.tasks.filter((t) => t.done).length;
-  if (done < state.tasks.length) tips.push({ icon: "⚡", text: `Zostało ${state.tasks.length - done} zadań.` });
+  if (done < state.tasks.length) tips.push({ icon: "⚡", text: `Zostało ${state.tasks.length - done} zadań dnia.` });
   else tips.push({ icon: "🏆", text: "Wszystkie zadania dnia zaliczone!" });
 
   const tw = state.tasks.find((t) => t.id === "twarz");
   if (tw && !tw.done) tips.push({ icon: "✨", text: "Looksmaxing jeszcze nie zrobiony." });
   const pt = state.tasks.find((t) => t.id === "postawa");
   if (pt && !pt.done) tips.push({ icon: "🧍", text: "Postawa szyi i barków — 3 min." });
+  const sr = state.tasks.find((t) => t.id === "skincare-rano");
+  if (sr && !sr.done && new Date().getHours() >= 10) tips.push({ icon: "💧", text: "Skincare rano jeszcze nie zrobione." });
+  const sw = state.tasks.find((t) => t.id === "skincare-wieczor");
+  if (sw && !sw.done && new Date().getHours() >= 20) tips.push({ icon: "✨", text: "Skincare wieczór — czas na Magię Egipską." });
 
   if (m.dailyWeight != null) tips.push({ icon: "⚖️", text: `Waga: ${m.dailyWeight} kg — patrzymy na trend.` });
-
-  if (tips.length === 0) tips.push({ icon: "💪", text: "Uzupełnij raporty." });
 
   document.getElementById("improvement-tips").innerHTML = tips.map((t) =>
     `<div class="flex items-start gap-2.5 glass rounded-2xl px-3 py-2.5"><span class="text-base leading-none mt-0.5">${t.icon}</span><span class="text-xs text-neutral-200 font-medium">${t.text}</span></div>`
@@ -1660,11 +1796,8 @@ function getBriefCacheKey(trigger) { return `regim:brief:${todayKey}:${trigger}`
 function getCachedBrief(trigger, maxAgeMs) {
   const raw = localStorage.getItem(getBriefCacheKey(trigger));
   if (!raw) return null;
-  try {
-    const c = JSON.parse(raw);
-    if (Date.now() - c.ts > maxAgeMs) return null;
-    return c.text;
-  } catch { return null; }
+  try { const c = JSON.parse(raw); if (Date.now() - c.ts > maxAgeMs) return null; return c.text; }
+  catch { return null; }
 }
 function setCachedBrief(trigger, text) {
   localStorage.setItem(getBriefCacheKey(trigger), JSON.stringify({ text, ts: Date.now() }));
@@ -1687,47 +1820,49 @@ async function generateTrainerBrief() {
   const m = state.morning || today.morning || {};
   const e = state.evening || today.evening || {};
   const pct = calcCompletionPct();
+  const asc = calcAscendPct();
   const kws = detectKeywords(state.note || today.note || "");
   const streak = parseInt(document.getElementById("streak-count").textContent) || 0;
   const yesterday = days[days.length - 2] || {};
   const last7 = days.slice(-7);
 
-  if (state.specialMode === "sick") return "🤒 Widzę że jesteś w trybie choroby. Dziś zero treningu, dużo wody, sen. Twój organizm walczy — nie przeszkadzaj mu.";
-  if (state.specialMode === "vacation") return "🏖️ Wakacje — luz. Spacer i sen wystarczą. Odpoczynek jest częścią planu.";
-  if (state.specialMode === "recovery") return "🌿 Tryb regeneracji aktywny. Spacer 30-45 min, mobility 10 min, oddech 4-7-8 przez 5 min.";
+  if (state.specialMode === "sick") return "🤒 Tryb choroby. Zero treningu, dużo wody, sen. Organizm walczy — nie przeszkadzaj mu.";
+  if (state.specialMode === "vacation") return "🏖️ Wakacje — luz. Spacer i sen wystarczą.";
+  if (state.specialMode === "recovery") return "🌿 Tryb regeneracji. Spacer, mobility, oddech 4-7-8.";
 
-  if ([7, 14, 21, 30, 60, 90, 100].includes(streak)) return `🏆 Masz ${streak} dni streak! To nie przypadek — to system. Zasłużyłeś na chwilę dumy.`;
+  if ([7, 14, 21, 30, 60, 90, 100].includes(streak)) return `🏆 Masz ${streak} dni streak! To nie przypadek — to system.`;
 
-  if (ctx.timeOfDay === "morning" && m.sleepTotal == null) return `☀️ Dzień dobry, ${USER_NAME}. Zanim zaczniesz dzień, wrzuć dane snu z zegarka — to fundament wszystkich decyzji na dziś.`;
-  if (ctx.timeOfDay === "afternoon" && m.sleepTotal == null && ctx.h >= 14) return `⚠️ Minęło już południe, a nie wypełniłeś raportu porannego. Wpisz teraz.`;
-  if (ctx.timeOfDay === "evening" && e.stress == null && ctx.h >= 19) return `🌙 Wieczór — czas domknąć dzień. Wpisz kroki, stres, nastrój i RPE. Zajmie Ci to 30 sekund.`;
+  if (ctx.timeOfDay === "morning" && m.sleepTotal == null) return `☀️ Dzień dobry, ${USER_NAME}. Wrzuć dane snu z zegarka — fundament decyzji na dziś.`;
+  if (ctx.timeOfDay === "afternoon" && m.sleepTotal == null && ctx.h >= 14) return `⚠️ Minęło południe, brak raportu porannego. Wpisz teraz.`;
+  if (ctx.timeOfDay === "evening" && e.stress == null && ctx.h >= 19) return `🌙 Wieczór — domknij dzień raportem. 30 sekund.`;
+  if (ctx.timeOfDay === "evening" && e.stress != null && asc.pct < 50) return `🌙 Ascend tylko ${asc.pct}% dzisiaj. Dorzuć 2-3 nawyki przed snem — szybko nadrobisz.`;
 
-  if (kws.includes("sick")) return `🤒 Widzę w notatce że jesteś chory. Dziś odpuść trening — organizm potrzebuje energii na walkę.`;
-  if (kws.includes("alcohol")) return `🍺 Alkohol w notatce. Dziś woda i elektrolity. Trening odpuść — kac + trening = kontuzja.`;
-  if (kws.includes("stress")) return `😰 Stres w notatce — obniża regenerację. Dziś priorytet: sen, oddech 4-7-8, reset szczęki.`;
+  if (kws.includes("sick")) return `🤒 Choroba w notatce. Odpuść trening — organizm potrzebuje energii na walkę.`;
+  if (kws.includes("alcohol")) return `🍺 Alkohol w notatce. Woda i elektrolity. Trening odpuść.`;
+  if (kws.includes("stress")) return `😰 Stres w notatce — obniża regenerację. Priorytet: sen, oddech 4-7-8.`;
   if (kws.includes("travel")) return `✈️ Podróż — zadbaj o sen mimo zmiany strefy.`;
-  if (kws.includes("tired")) return `😴 Piszesz że jesteś zmęczony. Sprawdź RHR i sen z ostatnich 3 dni.`;
-  if (kws.includes("happy")) return `🌟 Dobry dzień! Wykorzystaj energię na trening i looksmaxing.`;
+  if (kws.includes("tired")) return `😴 Piszesz że jesteś zmęczony. Sprawdź RHR i sen z 3 dni.`;
+  if (kws.includes("happy")) return `🌟 Dobry dzień! Wykorzystaj energię na trening i ascend.`;
 
   if (m.sleepTotal != null) {
-    if (m.sleepTotal < 5) return `😴 Spałeś ledwie ${m.sleepTotal}h. Bardzo mało — dziś ulgowo, priorytet 8h dziś w nocy.`;
-    if (m.sleepTotal < 6.5) return `😴 ${m.sleepTotal}h snu — poniżej progu. Ogranicz intensywność, zaplanuj wcześniej sen.`;
-    if (m.sleepTotal >= 8.5) return `✅ Spałeś ${m.sleepTotal}h — bateria pełna. Możesz dziś cisnąć normalnie.`;
+    if (m.sleepTotal < 5) return `😴 Spałeś ${m.sleepTotal}h — bardzo mało. Dziś ulgowo, priorytet 8h dziś w nocy.`;
+    if (m.sleepTotal < 6.5) return `😴 ${m.sleepTotal}h — poniżej progu. Ogranicz intensywność, wcześniej sen.`;
+    if (m.sleepTotal >= 8.5) return `✅ Spałeś ${m.sleepTotal}h — bateria pełna. Możesz dziś cisnąć.`;
   }
 
-  if (m.rhr != null && m.rhr > 70) return `💓 RHR ${m.rhr} bpm — wysoko. Możliwe przemęczenie lub stres. Dziś lekki trening.`;
-  if (m.rhr != null && m.rhr < 50) return `💓 RHR ${m.rhr} bpm — bardzo nisko, świetna regeneracja. Możesz dziś trenować mocniej.`;
+  if (m.rhr != null && m.rhr > 70) return `💓 RHR ${m.rhr} bpm — wysoko. Możliwe przemęczenie. Dziś lekki trening.`;
+  if (m.rhr != null && m.rhr < 50) return `💓 RHR ${m.rhr} bpm — bardzo nisko, świetna regeneracja.`;
 
   const rpe3 = last7.slice(-3).map((d) => d.evening?.rpe).filter((r) => r != null);
-  if (rpe3.length === 3 && rpe3.every((r) => r >= 8)) return `🔥 3 ostatnie treningi z RPE ≥ 8. Alarm przeciążenia. Zrób tydzień deload.`;
+  if (rpe3.length === 3 && rpe3.every((r) => r >= 8)) return `🔥 3 ostatnie treningi z RPE ≥ 8. Alarm przeciążenia. Zrób deload.`;
 
   const sleep3 = last7.slice(-3).map((d) => d.morning?.sleepTotal).filter((s) => s != null);
-  if (sleep3.length === 3 && sleep3.every((s) => s < 6.5)) return `😴 3 dni z rzędu poniżej 6.5h snu. Kumulujesz dług senny. Dziś kluczowy wieczór.`;
+  if (sleep3.length === 3 && sleep3.every((s) => s < 6.5)) return `😴 3 dni poniżej 6.5h snu. Kumulujesz dług senny. Dziś kluczowy wieczór.`;
 
   if (m.dailyWeight != null && yesterday.morning?.dailyWeight != null) {
     const delta = m.dailyWeight - yesterday.morning.dailyWeight;
-    if (delta < -0.4) return `⚖️ Waga spadła o ${Math.abs(delta).toFixed(1)} kg vs wczoraj. Jeśli nie zmieniłeś diety, to woda. Sprawdź czy jesz wystarczająco.`;
-    if (delta > 0.5) return `⚖️ Waga +${delta.toFixed(1)} kg vs wczoraj. Normalne wahanie (woda, sód). Patrzymy na trend.`;
+    if (delta < -0.4) return `⚖️ Waga spadła o ${Math.abs(delta).toFixed(1)} kg. Sprawdź czy jesz wystarczająco.`;
+    if (delta > 0.5) return `⚖️ Waga +${delta.toFixed(1)} kg. Normalne wahanie. Patrzymy na trend.`;
   }
 
   const readiness = calculateReadiness();
@@ -1739,14 +1874,14 @@ async function generateTrainerBrief() {
     return `🔴 Gotowość ${readiness}% — bardzo niska. Tylko regeneracja.`;
   }
 
-  if (ctx.dayOfWeek === 1 && ctx.timeOfDay === "morning") return `📅 Poniedziałek — nowy tydzień. Zaplanuj: sen, trening, mowa.`;
-  if (ctx.dayOfWeek === 0 && ctx.timeOfDay === "evening") return `🌅 Niedziela wieczór — tydzień domknięty. Co poszło dobrze, co poprawić.`;
-  if (ctx.dayOfWeek === 5 && ctx.timeOfDay === "evening") return `🎉 Piątek — nagradzaj się, ale alkohol w rozsądku.`;
+  if (ctx.dayOfWeek === 1 && ctx.timeOfDay === "morning") return `📅 Poniedziałek — nowy tydzień. Zaplanuj: sen, trening, skincare.`;
+  if (ctx.dayOfWeek === 0 && ctx.timeOfDay === "evening") return `🌅 Niedziela wieczór — tydzień domknięty. Paznokcie, zdjęcie profilu, podsumowanie.`;
+  if (ctx.dayOfWeek === 6 && ctx.timeOfDay === "morning") return `🌞 Sobota — dobry dzień na maskę do włosów i dłuższy trening.`;
 
-  const pctText = pct === 100 ? "100% zadań — perfekcyjny dzień." : pct >= 50 ? `Zrobione ${pct}% planu — solidnie.` : `Tylko ${pct}% zadań — jest rezerwa.`;
+  const pctText = pct === 100 ? "100% zadań — perfekcyjny dzień." : pct >= 50 ? `${pct}% planu — solidnie.` : `${pct}% zadań — jest rezerwa.`;
 
-  if (ctx.timeOfDay === "morning") return `☀️ Dzień dobry. ${pctText} Priorytet: sen, trening, mowa.`;
-  if (ctx.timeOfDay === "evening") return `🌙 Wieczór — ${pctText} Domknij dzień raportem wieczornym.`;
+  if (ctx.timeOfDay === "morning") return `☀️ Dzień dobry. ${pctText} Priorytet: sen, trening, skincare.`;
+  if (ctx.timeOfDay === "evening") return `🌙 Wieczór — ${pctText} Domknij dzień raportem.`;
   return `📊 ${pctText} Kontynuuj plan dnia.`;
 }
 
@@ -1911,10 +2046,13 @@ async function showDayDetail(key) {
   const t = doc.tasks || [];
   const m = doc.morning || {};
   const e = doc.evening || {};
+  const asc = doc.ascend || {};
+  const ascDone = ASCEND_ITEMS.filter((i) => asc[i.id]).length;
   const tasksHtml = t.map((x) => `<div class="flex items-center gap-2 text-xs"><span class="${x.done ? "text-mint" : "text-neutral-500"}">${x.done ? "✓" : "○"}</span><span class="${x.done ? "text-neutral-200" : "text-neutral-500"}">${x.label}</span></div>`).join("");
   c.innerHTML = `
     <div class="flex items-center gap-3 mb-4"><div class="text-3xl font-extrabold ${doc.completedPct === 100 ? "text-mint" : doc.completedPct >= 50 ? "text-gold" : "text-rose"}">${doc.completedPct ?? 0}%</div><div class="text-xs text-neutral-400 font-semibold">wykonanie dnia</div></div>
     <div class="glass rounded-3xl p-4 mb-3"><div class="text-[10px] text-neutral-400 font-bold mb-2 tracking-widest">ZADANIA</div><div class="space-y-1.5">${tasksHtml || '<span class="text-xs text-neutral-500">brak</span>'}</div></div>
+    <div class="glass rounded-3xl p-4 mb-3"><div class="text-[10px] text-neutral-400 font-bold mb-2 tracking-widest">ASCEND</div><div class="text-xs text-neutral-200 font-bold">${ascDone}/${ASCEND_ITEMS.length} nawyków</div></div>
     <div class="glass rounded-3xl p-4 mb-3"><div class="text-[10px] text-neutral-400 font-bold mb-2 tracking-widest">SEN</div><div class="grid grid-cols-2 gap-2 text-xs text-neutral-200 font-medium">
       <div>🌙 Sen: <span class="font-bold">${m.sleepTotal ?? "—"} h</span></div>
       <div>🧠 Deep: <span class="font-bold">${m.sleepDeep ?? "—"} h</span></div>
@@ -1945,7 +2083,8 @@ async function showDayDetail(key) {
 // ============================================================================
 const CHALLENGES = [
   { id: "sleep8", name: "😴 Sen 8h przez 30 dni", check: (d) => (d.morning?.sleepTotal ?? 0) >= 8, max: 30 },
-  { id: "speech30", name: "🗣️ Mowa codziennie 30 dni", check: (d) => d.tasks?.find((t) => t.id === "mowa" && t.done), max: 30 },
+  { id: "skincare-am", name: "💧 Skincare rano 30 dni", check: (d) => d.tasks?.find((t) => t.id === "skincare-rano" && t.done), max: 30 },
+  { id: "skincare-pm", name: "✨ Skincare wieczór 30 dni", check: (d) => d.tasks?.find((t) => t.id === "skincare-wieczor" && t.done), max: 30 },
   { id: "jaw30", name: "🧘 Reset szczęki 30 dni", check: (d) => d.tasks?.find((t) => t.id === "reset" && t.done), max: 30 },
   { id: "cold30", name: "🚿 Zimny prysznic 30 dni", check: (d) => d.habits?.coldShower, max: 30 },
   { id: "twarz30", name: "✨ Looksmaxing 30 dni", check: (d) => d.tasks?.find((t) => t.id === "twarz" && t.done), max: 30 },
@@ -1987,10 +2126,10 @@ async function renderChallengeOptions() {
 }
 
 // ============================================================================
-// SŁOWNICZEK / HELP
+// SŁOWNICZEK
 // ============================================================================
 const GLOSSARY = [
-  { icon: "💓", term: "RHR (Resting Heart Rate)", desc: "Tętno spoczynkowe mierzone rano. Norma 50-70 bpm. Wzrost o 5+ bpm dzień do dnia = przemęczenie, stres lub choroba." },
+  { icon: "💓", term: "RHR (Resting Heart Rate)", desc: "Tętno spoczynkowe mierzone rano. Norma 50-70 bpm. Wzrost o 5+ bpm = przemęczenie, stres lub choroba." },
   { icon: "🔥", term: "RPE (Rate of Perceived Exertion)", desc: "Subiektywna skala ciężkości treningu 1-10. Dla przedtrenowanego: trzymaj większość na 6-7." },
   { icon: "🫁", term: "SpO2", desc: "Saturacja krwi. Norma 95-100%. Poniżej 94% to sygnał problemu." },
   { icon: "🌙", term: "Sen głęboki (Deep)", desc: "Regeneracja fizyczna — mięśnie, hormony, odporność. Powinno być 15-25% snu." },
@@ -1998,45 +2137,35 @@ const GLOSSARY = [
   { icon: "⚡", term: "Gotowość (Readiness)", desc: "0-100%. Liczony z snu, deep, RHR, stresu, napięcia szczęki. 80%+ = pełna. Poniżej 40% = regeneracja." },
   { icon: "🔄", term: "Deload", desc: "Tydzień lżejszego treningu. Zalecany co 4-6 tygodni lub przy 3 dniach RPE 8+." },
   { icon: "❄️", term: "Streak Freeze", desc: "1 raz na tydzień możesz zamrozić streak — na wypadek choroby, wyjazdu." },
-  { icon: "🎯", term: "Streak", desc: "Liczba dni z rzędu ze 100% wykonaniem zadań. Resetuje gdy nie dowieziesz pełnego planu." },
-  { icon: "📊", term: "BMI", desc: "Waga (kg) / wzrost (m)². Norma 18.5-25. Poniżej = niedowaga, powyżej = nadwaga." },
-  { icon: "😬", term: "Napięcie szczęki", desc: "1-10 rano. 1-3 rozluźniona, 4-6 umiarkowane, 7-10 mocno napięta (bruksizm)." },
-  { icon: "🚴", term: "Rower — dystans", desc: "W dni rowerowe zapisz km. Cel: ~7 km spokojnym tempem." },
-  { icon: "💊", term: "Tran z dorsza", desc: "Olej z wątroby dorsza islandzkiego. Źródło witaminy D, A i omega-3. Bierz z D3, do posiłku z tłuszczem." },
-  { icon: "🌿", term: "Tryb regeneracji", desc: "Dzień bez treningu — spacer 30-45 min, mobility 10 min, oddech 5 min." },
-  { icon: "🏖️", term: "Tryb wakacji", desc: "Luźniejsze zasady. Cele minimalne. Na wyjazdach, urlopach." },
-  { icon: "🤒", term: "Tryb choroby", desc: "Aktywny gdy chory. Zero treningu, priorytet: sen, nawodnienie, regeneracja." },
+  { icon: "🎯", term: "Streak", desc: "Liczba dni z rzędu ze 100% wykonaniem zadań." },
+  { icon: "📊", term: "BMI", desc: "Waga (kg) / wzrost (m)². Norma 18.5-25." },
+  { icon: "😬", term: "Napięcie szczęki", desc: "1-10 rano. 1-3 rozluźniona, 7-10 mocno napięta (bruksizm)." },
+  { icon: "🚀", term: "Ascend", desc: "Nawyki codzienne, które w skali miesięcy robią największą różnicę w wyglądzie i głowie. Check codziennie w zakładce Ascend." },
+  { icon: "👅", term: "Mewing", desc: "Pozycja języka na podniebieniu przez większość dnia. Długoterminowo wpływa na linię żuchwy." },
+  { icon: "🦒", term: "Chin tuck", desc: "Cofanie brody do siebie. Wzmacnia mięśnie głębokie szyi, poprawia postawę i linię żuchwy." },
+  { icon: "💧", term: "Skincare rano", desc: "Płyn do twarzy → płyn do trądzików → Acnederm. Kolejność ma znaczenie." },
+  { icon: "✨", term: "Skincare wieczór", desc: "Płyn do twarzy → Magia Egipska. Wieczorem skóra się regeneruje." },
 ];
 const HELP_CONTENT = {
-  rhr: { icon: "fa-heart-pulse", title: "💓 RHR rano", text: "Tętno spoczynkowe mierzone rano, zaraz po przebudzeniu, przed wstaniem. Pokazuje realny stan regeneracji.", values: [
-    { label: "Poniżej 50 bpm", value: "Świetna regeneracja" },
-    { label: "50-62 bpm", value: "Dobra norma" },
-    { label: "62-70 bpm", value: "Umiarkowana" },
-    { label: "Powyżej 70 bpm", value: "Wysoko — sprawdź przemęczenie" },
+  rhr: { icon: "fa-heart-pulse", title: "💓 RHR rano", text: "Tętno spoczynkowe zaraz po przebudzeniu.", values: [
+    { label: "Poniżej 50", value: "Świetna regeneracja" }, { label: "50-62", value: "Dobra norma" },
+    { label: "62-70", value: "Umiarkowana" }, { label: "Powyżej 70", value: "Wysoko — sprawdź przemęczenie" },
   ]},
-  rpe: { icon: "fa-fire", title: "🔥 RPE", text: "Rate of Perceived Exertion — subiektywna skala ciężkości 1-10.", values: [
-    { label: "1-3", value: "Bardzo lekko" },
-    { label: "4-6", value: "Umiarkowanie" },
-    { label: "7-8", value: "Ciężko" },
-    { label: "9-10", value: "Maksymalnie" },
+  rpe: { icon: "fa-fire", title: "🔥 RPE", text: "Skala ciężkości treningu 1-10.", values: [
+    { label: "1-3", value: "Bardzo lekko" }, { label: "4-6", value: "Umiarkowanie" },
+    { label: "7-8", value: "Ciężko" }, { label: "9-10", value: "Maksymalnie" },
   ]},
-  spo2: { icon: "fa-lungs", title: "🫁 SpO2", text: "Saturacja krwi — wysycenie tlenem.", values: [
-    { label: "97-100%", value: "Doskonale" },
-    { label: "95-96%", value: "W normie" },
-    { label: "93-94%", value: "Lekko poniżej" },
-    { label: "Poniżej 93%", value: "Skonsultuj z lekarzem" },
+  spo2: { icon: "fa-lungs", title: "🫁 SpO2", text: "Saturacja krwi.", values: [
+    { label: "97-100%", value: "Doskonale" }, { label: "95-96%", value: "W normie" },
+    { label: "93-94%", value: "Lekko poniżej" }, { label: "Poniżej 93%", value: "Skonsultuj z lekarzem" },
   ]},
   stress: { icon: "fa-heart-pulse", title: "🧘 Stres", text: "Poziom stresu z zegarka.", values: [
-    { label: "0-35", value: "Niski (dobry)" },
-    { label: "36-55", value: "Umiarkowany" },
-    { label: "56-70", value: "Wysoki" },
-    { label: "Powyżej 70", value: "Bardzo wysoki — priorytet regeneracja" },
+    { label: "0-35", value: "Niski" }, { label: "36-55", value: "Umiarkowany" },
+    { label: "56-70", value: "Wysoki" }, { label: "Powyżej 70", value: "Priorytet regeneracja" },
   ]},
-  readiness: { icon: "fa-gauge-high", title: "🎯 Gotowość dnia", text: "Wskaźnik 0-100% mówiący jak gotowy jesteś na wysiłek.", values: [
-    { label: "80-100%", value: "Pełna gotowość" },
-    { label: "60-79%", value: "Solidna — trenuj normalnie" },
-    { label: "40-59%", value: "Obniżona — lżejszy trening" },
-    { label: "0-39%", value: "Niska — tylko regeneracja" },
+  readiness: { icon: "fa-gauge-high", title: "🎯 Gotowość dnia", text: "0-100%. Jak gotowy jesteś na wysiłek.", values: [
+    { label: "80-100%", value: "Pełna gotowość" }, { label: "60-79%", value: "Trenuj normalnie" },
+    { label: "40-59%", value: "Lżejszy trening" }, { label: "0-39%", value: "Tylko regeneracja" },
   ]},
 };
 function showHelp(key) {
@@ -2058,11 +2187,12 @@ function renderGlossary() {
 // ONBOARDING
 // ============================================================================
 const ONBOARDING_STEPS = [
-  { icon: "👋", title: "Witaj w REGIM", text: "Twój system codziennej regeneracji i wzrostu. 5 kroków." },
-  { icon: "📊", title: "Ekran Dziś", text: "Gotowość dnia, brief Trenera, zadania do odhaczenia." },
-  { icon: "🌙", title: "Raporty ze smartwatcha", text: "Rano sen, wieczorem kroki i stres. Im więcej danych, tym mądrzejsza analiza." },
-  { icon: "☁️", title: "Synchronizacja", text: "Kliknij 👤 żeby zalogować się Google. Dane zsynchronizują się między urządzeniami przez Firestore." },
-  { icon: "🚀", title: "Zaczynamy", text: "Cel: w grudniu być inną osobą. Konsekwencja > intensywność. Powodzenia, Karol!" },
+  { icon: "👋", title: "Witaj w REGIM", text: "Twój system codziennej regeneracji, skincare i wzrostu." },
+  { icon: "📊", title: "Ekran Dziś", text: "Gotowość dnia, brief Trenera, zadania dzienne (skincare, trening, twarz, postawa)." },
+  { icon: "🚀", title: "Ascend", text: "Zakładka z nawykami, które w skali miesięcy robią największą różnicę. Check codziennie." },
+  { icon: "🌙", title: "Raporty", text: "Rano sen, wieczorem kroki i stres. Im więcej danych, tym mądrzejsza analiza Trenera." },
+  { icon: "☁️", title: "Synchronizacja", text: "Kliknij 👤 żeby zalogować się Google. Dane zsynchronizują się między urządzeniami." },
+  { icon: "🎯", title: "Cel do grudnia", text: "Być inną osobą. Konsekwencja > intensywność. Powodzenia, Karol!" },
 ];
 let onbStep = 0;
 function renderOnboarding() {
@@ -2084,7 +2214,7 @@ function speakText(text) {
     const u = new SpeechSynthesisUtterance(text);
     u.lang = "pl-PL"; u.rate = 1.05; u.pitch = 1.0;
     window.speechSynthesis.speak(u);
-  } catch (e) { console.warn(e); }
+  } catch (e) {}
 }
 
 // ============================================================================
@@ -2129,7 +2259,6 @@ document.querySelectorAll("[data-close-modal]").forEach((el) => {
 });
 document.querySelectorAll(".modal-check-btn[data-close-modal]").forEach((b) => b.addEventListener("click", () => setTimeout(closeAllModals, 150)));
 
-document.getElementById("btn-goto-speech-tab")?.addEventListener("click", () => { document.querySelector('.tab-btn[data-tab="mowa"]').click(); });
 document.getElementById("btn-settings")?.addEventListener("click", () => openModal("modal-settings"));
 document.getElementById("btn-glossary")?.addEventListener("click", () => openModal("modal-glossary"));
 document.getElementById("btn-open-breathing")?.addEventListener("click", () => { closeAllModals(); setTimeout(() => openModal("modal-breathing"), 200); });
@@ -2144,7 +2273,6 @@ document.querySelectorAll(".food-chip").forEach((c) => {
     await persistToday();
   });
 });
-
 document.querySelectorAll(".mood-chip").forEach((c) => {
   c.addEventListener("click", () => {
     const t = c.dataset.tag; c.classList.toggle("active");
@@ -2152,7 +2280,6 @@ document.querySelectorAll(".mood-chip").forEach((c) => {
     else state.moodTagsMorning.push(t);
   });
 });
-
 document.querySelectorAll(".tag-chip").forEach((c) => {
   c.addEventListener("click", () => {
     const t = c.dataset.tag; c.classList.toggle("active");
@@ -2184,7 +2311,8 @@ document.querySelectorAll(".tab-btn").forEach((btn) => {
     btn.classList.add("bg-gradient-to-br", "from-mint", "to-lilac", "text-ink"); btn.classList.remove("text-neutral-400");
     document.querySelectorAll(".tab-panel").forEach((p) => p.classList.add("hidden"));
     document.getElementById(`tab-${btn.dataset.tab}`).classList.remove("hidden");
-    if (btn.dataset.tab === "mentor") { renderCharts(); renderMentorHistory(); }
+    if (btn.dataset.tab === "mentor") { renderCharts(); renderMentorHistory(); renderAscendSuggestions(); }
+    if (btn.dataset.tab === "ascend") { renderAscend(); }
     if (btn.dataset.tab === "postepy") { renderCalendar(); renderBadges(); renderBestStats(); renderGoal(); renderSmartGoals(); renderPersonalRecords(); renderMonthlyComparison(); }
   });
 });
@@ -2231,7 +2359,7 @@ function updateModeButtons() {
       if (m === "sick") b.className = "special-mode on-sick whitespace-nowrap";
       else if (m === "vacation") b.className = "special-mode on-vacation whitespace-nowrap";
       else if (m === "recovery") b.className = "special-mode on-recovery whitespace-nowrap";
-      else b.className = "special-mode on-sick whitespace-nowrap";
+      else b.className = "special-mode on-recovery whitespace-nowrap";
     } else b.className = "special-mode off whitespace-nowrap";
   });
 }
@@ -2282,100 +2410,14 @@ function playSound(type) {
 }
 
 // ============================================================================
-// MOWA
+// ODDYCHANIE
 // ============================================================================
-const SPEECH_PHASES = [
-  { name: "Masaż żwaczy", seconds: 60, icon: "😌", label: "Faza 1 z 3" },
-  { name: "Uderzenia T-D", seconds: 120, icon: "😤", label: "Faza 2 z 3" },
-  { name: "Słowa: TDAWA, DOWED, DUDY", seconds: 120, icon: "🗣", label: "Faza 3 z 3" },
-];
-const RING_CIRCUMFERENCE = 552.9;
-let speechTimerHandle = null, speechPhaseIdx = 0, speechRemaining = 0, speechAudioCtx = null;
-
-function beep(freq = 880, dur = 250) {
-  try {
-    speechAudioCtx = speechAudioCtx || new (window.AudioContext || window.webkitAudioContext)();
-    const osc = speechAudioCtx.createOscillator(), gain = speechAudioCtx.createGain();
-    osc.frequency.value = freq; osc.type = "sine";
-    gain.gain.setValueAtTime(0.16, speechAudioCtx.currentTime);
-    osc.connect(gain); gain.connect(speechAudioCtx.destination);
-    osc.start(); osc.stop(speechAudioCtx.currentTime + dur / 1000);
-  } catch (e) {}
-}
+let breathTimer = null, breathTotalRemaining = 180;
 function formatMMSS(s) {
   const m = Math.floor(s / 60).toString().padStart(2, "0");
   const ss = Math.floor(s % 60).toString().padStart(2, "0");
   return `${m}:${ss}`;
 }
-function updateSpeechUI() {
-  const phase = SPEECH_PHASES[speechPhaseIdx];
-  document.getElementById("speech-timer").textContent = formatMMSS(speechRemaining);
-  document.getElementById("speech-phase-name").textContent = phase ? phase.name : "Gotowe!";
-  document.getElementById("speech-phase-label").textContent = phase ? phase.label : "Świetna robota";
-  document.getElementById("speech-icon").textContent = phase ? phase.icon : "🎉";
-  const elapsed = phase ? 1 - speechRemaining / phase.seconds : 1;
-  document.getElementById("speech-ring").style.strokeDashoffset = RING_CIRCUMFERENCE - elapsed * RING_CIRCUMFERENCE;
-  for (let i = 0; i < 3; i++) {
-    const dot = document.getElementById(`phase-dot-${i + 1}`);
-    if (i < speechPhaseIdx) dot.className = "h-2 w-10 rounded-full bg-mint transition";
-    else if (i === speechPhaseIdx) dot.className = "h-2 w-10 rounded-full bg-gradient-to-r from-mint to-lilac transition";
-    else dot.className = "h-2 w-10 rounded-full bg-white/10 transition";
-  }
-}
-function startSpeechTraining() {
-  speechPhaseIdx = 0; speechRemaining = SPEECH_PHASES[0].seconds;
-  document.getElementById("speech-start-btn").classList.add("hidden");
-  document.getElementById("speech-stop-btn").classList.remove("hidden");
-  document.getElementById("speech-ring").style.strokeDashoffset = RING_CIRCUMFERENCE;
-  beep(660, 200); updateSpeechUI();
-  clearInterval(speechTimerHandle);
-  speechTimerHandle = setInterval(() => {
-    speechRemaining -= 1;
-    if (speechRemaining < 0) {
-      beep(880, 300); speechPhaseIdx += 1;
-      if (speechPhaseIdx >= SPEECH_PHASES.length) { finishSpeechTraining(); return; }
-      speechRemaining = SPEECH_PHASES[speechPhaseIdx].seconds;
-    }
-    updateSpeechUI();
-  }, 1000);
-}
-async function finishSpeechTraining() {
-  clearInterval(speechTimerHandle);
-  beep(1046, 500); setTimeout(() => beep(1318, 500), 200);
-  vibrate([50, 80, 50, 80, 100]);
-  document.getElementById("speech-phase-name").textContent = "Zrobione!";
-  document.getElementById("speech-phase-label").textContent = "Świetna robota";
-  document.getElementById("speech-icon").textContent = "🎉";
-  document.getElementById("speech-timer").textContent = "00:00";
-  document.getElementById("speech-ring").style.strokeDashoffset = 0;
-  document.getElementById("speech-start-btn").classList.remove("hidden");
-  document.getElementById("speech-stop-btn").classList.add("hidden");
-  const task = state.tasks.find((t) => t.id === "mowa");
-  if (task && !task.done) {
-    task.done = true; renderCheckStates(); renderProgress(); await persistToday();
-    showToast("Trening mowy ✓"); playSound("done");
-    if (calcCompletionPct() === 100) setTimeout(fireConfetti, 250);
-  }
-}
-function stopSpeechTraining() {
-  clearInterval(speechTimerHandle);
-  speechPhaseIdx = 0; speechRemaining = 0;
-  document.getElementById("speech-phase-name").textContent = "Trening mowy — 5 min";
-  document.getElementById("speech-phase-label").textContent = "Przerwano";
-  document.getElementById("speech-icon").textContent = "😌";
-  document.getElementById("speech-timer").textContent = "05:00";
-  document.getElementById("speech-ring").style.strokeDashoffset = RING_CIRCUMFERENCE;
-  document.getElementById("speech-start-btn").classList.remove("hidden");
-  document.getElementById("speech-stop-btn").classList.add("hidden");
-  for (let i = 0; i < 3; i++) document.getElementById(`phase-dot-${i + 1}`).className = "h-2 w-10 rounded-full bg-white/10 transition";
-}
-document.getElementById("speech-start-btn").addEventListener("click", startSpeechTraining);
-document.getElementById("speech-stop-btn").addEventListener("click", stopSpeechTraining);
-
-// ============================================================================
-// ODDYCHANIE
-// ============================================================================
-let breathTimer = null, breathTotalRemaining = 180;
 function runBreathCycle() {
   const circle = document.getElementById("breath-circle");
   const text = document.getElementById("breath-phase-text");
@@ -2424,7 +2466,6 @@ document.getElementById("btn-rm-calculate").addEventListener("click", () => {
   const r = parseInt(document.getElementById("input-rm-reps").value, 10);
   if (!w || !r || r < 1 || r > 15) { showToast("Podaj sensowne wartości (1-15 powt)"); return; }
   document.getElementById("rm-value").textContent = (w * (1 + r / 30)).toFixed(1);
-  localStorage.setItem("regim:used-1rm", "1");
 });
 document.getElementById("btn-1rm").addEventListener("click", () => openModal("modal-1rm"));
 
@@ -2467,10 +2508,10 @@ document.getElementById("btn-goal-save").addEventListener("click", () => {
   } else showToast("Podaj sensowną wartość");
 });
 
-document.getElementById("btn-week-of-life").addEventListener("click", () => { localStorage.setItem("regim:used-wol", "1"); renderWeekOfLife(); });
+document.getElementById("btn-week-of-life").addEventListener("click", () => { renderWeekOfLife(); });
 
 // ============================================================================
-// CEL + BMI + SMART GOALS
+// CEL + BMI + SMART
 // ============================================================================
 async function renderGoal() {
   const settings = getSettings();
@@ -2507,21 +2548,25 @@ async function renderBMI() {
 async function renderSmartGoals() {
   const days = await loadLastNDays(60);
   const sleep8 = days.filter((d) => (d.morning?.sleepTotal ?? 0) >= 8).length;
-  const speechDone = days.filter((d) => d.tasks?.find((t) => t.id === "mowa" && t.done)).length;
-  const jawDone = days.filter((d) => d.tasks?.find((t) => t.id === "reset" && t.done)).length;
+  const skam = days.filter((d) => d.tasks?.find((t) => t.id === "skincare-rano" && t.done)).length;
+  const skpm = days.filter((d) => d.tasks?.find((t) => t.id === "skincare-wieczor" && t.done)).length;
+  const jaw = days.filter((d) => d.tasks?.find((t) => t.id === "reset" && t.done)).length;
   document.getElementById("smart-sleep-count").textContent = `${Math.min(sleep8, 30)}/30`;
-  document.getElementById("smart-speech-count").textContent = `${Math.min(speechDone, 21)}/21`;
-  document.getElementById("smart-jaw-count").textContent = `${Math.min(jawDone, 21)}/21`;
+  document.getElementById("smart-skincare-am-count").textContent = `${Math.min(skam, 21)}/21`;
+  document.getElementById("smart-skincare-pm-count").textContent = `${Math.min(skpm, 21)}/21`;
+  document.getElementById("smart-jaw-count").textContent = `${Math.min(jaw, 21)}/21`;
   document.getElementById("smart-sleep-bar").style.width = `${Math.min(100, (sleep8 / 30) * 100)}%`;
-  document.getElementById("smart-speech-bar").style.width = `${Math.min(100, (speechDone / 21) * 100)}%`;
-  document.getElementById("smart-jaw-bar").style.width = `${Math.min(100, (jawDone / 21) * 100)}%`;
+  document.getElementById("smart-skincare-am-bar").style.width = `${Math.min(100, (skam / 21) * 100)}%`;
+  document.getElementById("smart-skincare-pm-bar").style.width = `${Math.min(100, (skpm / 21) * 100)}%`;
+  document.getElementById("smart-jaw-bar").style.width = `${Math.min(100, (jaw / 21) * 100)}%`;
 }
 
 // ============================================================================
 // FORMULARZE
 // ============================================================================
 if (sunday) document.getElementById("weight-field-wrapper").classList.remove("hidden");
-if (nailCheckDay) document.getElementById("nail-card").classList.remove("hidden");
+if (sunday) document.getElementById("nail-card").classList.remove("hidden");
+if (saturday) document.getElementById("hair-card").classList.remove("hidden");
 if (isBikeDay) document.getElementById("bike-distance-wrapper").classList.remove("hidden");
 
 document.getElementById("form-morning").addEventListener("submit", async (e) => {
@@ -2677,7 +2722,7 @@ async function renderGlowUp() {
 document.getElementById("btn-glowup-refresh").addEventListener("click", renderGlowUp);
 
 // ============================================================================
-// PWA / NOTIF / THEME / CYTATY
+// PWA / NOTIF / THEME
 // ============================================================================
 let deferredInstallPrompt = null;
 window.addEventListener("beforeinstallprompt", (e) => {
@@ -2700,9 +2745,8 @@ function scheduleLocalReminders() {
   setInterval(async () => {
     const now = new Date(); const hh = now.getHours(); const mm = now.getMinutes();
     const existing = await loadDayDoc(dateKey(now));
-    if (hh === 8 && mm === 0 && !(existing?.morning)) fireNotification("Dzień dobry! ☀️", "Czas na raport snu.");
-    if (hh === 14 && mm === 0 && !(existing?.morning)) fireNotification("⚠️ Brak raportu porannego", "Wypełnij sen z zegarka.");
-    if (hh === 20 && mm === 0 && !(existing?.evening)) fireNotification("Podsumowanie 🌙", "Wpisz kroki, stres, RPE, nastrój.");
+    if (hh === 8 && mm === 0 && !(existing?.morning)) fireNotification("Dzień dobry! ☀️", "Czas na raport snu + skincare rano.");
+    if (hh === 20 && mm === 0 && !(existing?.evening)) fireNotification("Podsumowanie 🌙", "Wpisz kroki, stres, nastrój. Skincare wieczór.");
   }, 60000);
 }
 function fireNotification(title, body) {
@@ -2743,19 +2787,19 @@ document.getElementById("btn-theme-toggle").addEventListener("click", () => {
 const DAILY_QUOTES = [
   "🏋️ Regeneracja to też trening. Bez niej nie ma progresu.",
   "😴 Sen to fundament — bez 7-8h nie zbudujesz niczego trwale.",
-  "💓 RHR w normie = organizm gotowy. RHR wysoko = słuchaj go.",
+  "💧 Skincare to nie kobieca rzecz — to element ogólnego wyglądu.",
   "🫁 3 min oddechu 4-7-8 obniża kortyzol mocniej niż myślisz.",
   "🧍 Dobra postawa szyi = mocniejsza linia żuchwy.",
   "✨ Looksmaxing to nie próżność, to świadome budowanie siebie.",
-  "🗣️ 5 min mowy dziennie buduje więcej niż jedna długa sesja.",
+  "👅 Mewing — pozycja języka wpływa na profil w skali miesięcy.",
   "🚶 10 min spaceru po posiłku reguluje glikemię.",
   "🚿 Zimny prysznic rano = czujność na 3h.",
   "💧 Woda z solą rano uzupełnia elektrolity po nocy.",
-  "🎯 Jesteś przedtrenowany — deload to nie porażka, to mądrość.",
+  "🎯 Konsekwencja > intensywność. Zawsze.",
   "💪 Siła rośnie w przerwie, nie w trakcie treningu.",
   "📊 Mierzysz = wiesz. Wiesz = możesz zmienić.",
   "🌿 Jeden dzień regeneracji oszczędza tydzień przestoju.",
-  "🔥 Konsekwencja > intensywność. Zawsze.",
+  "🚀 Ascend: małe kroki, duży efekt w skali miesięcy.",
 ];
 function renderDailyQuote() {
   const idx = dayIndexSinceEpoch(new Date()) % DAILY_QUOTES.length;
@@ -2801,9 +2845,11 @@ document.getElementById("btn-export").addEventListener("click", async () => {
   const days = await collectAllDays();
   if (days.length === 0) { showToast("Brak danych"); return; }
   if (choice) {
-    const headers = ["date", "completedPct", "morning_sleepTotal", "morning_sleepDeep", "morning_sleepRem", "morning_rhr", "morning_dailyWeight", "morning_jawTension", "morning_moodMorning", "evening_steps", "evening_stress", "evening_rpe", "evening_moodEvening", "note", "specialMode"];
+    const headers = ["date", "completedPct", "morning_sleepTotal", "morning_sleepDeep", "morning_sleepRem", "morning_rhr", "morning_dailyWeight", "morning_jawTension", "morning_moodMorning", "evening_steps", "evening_stress", "evening_rpe", "evening_moodEvening", "note", "specialMode", "ascendCount"];
     const rows = days.map((d) => { const m = d.morning || {}, e = d.evening || {};
-      return [d.date, d.completedPct ?? "", m.sleepTotal ?? "", m.sleepDeep ?? "", m.sleepRem ?? "", m.rhr ?? "", m.dailyWeight ?? "", m.jawTension ?? "", m.moodMorning ?? "", e.steps ?? "", e.stress ?? "", e.rpe ?? "", e.moodEvening ?? "", `"${(d.note || "").replace(/"/g, '""')}"`, d.specialMode || ""].join(",");
+      const asc = d.ascend || {};
+      const ascCount = ASCEND_ITEMS.filter((i) => asc[i.id]).length;
+      return [d.date, d.completedPct ?? "", m.sleepTotal ?? "", m.sleepDeep ?? "", m.sleepRem ?? "", m.rhr ?? "", m.dailyWeight ?? "", m.jawTension ?? "", m.moodMorning ?? "", e.steps ?? "", e.stress ?? "", e.rpe ?? "", e.moodEvening ?? "", `"${(d.note || "").replace(/"/g, '""')}"`, d.specialMode || "", ascCount].join(",");
     });
     downloadFile(`regim-export-${todayKey}.csv`, [headers.join(","), ...rows].join("\n"), "text/csv");
   } else downloadFile(`regim-export-${todayKey}.json`, JSON.stringify(days, null, 2), "application/json");
@@ -2817,28 +2863,35 @@ const BADGES = [
   { id: "streak3", icon: "fa-fire", label: "3 dni streak", check: (c) => c.streak >= 3 },
   { id: "streak7", icon: "fa-fire-flame-curved", label: "7 dni streak", check: (c) => c.streak >= 7 },
   { id: "streak30", icon: "fa-crown", label: "30 dni streak", check: (c) => c.streak >= 30 },
-  { id: "speech7", icon: "fa-comment-dots", label: "7× mowa", check: (c) => c.speechCount >= 7 },
+  { id: "skincare7", icon: "fa-droplet", label: "7× skincare", check: (c) => c.skincareCount >= 7 },
   { id: "face7", icon: "fa-face-smile", label: "7× twarz", check: (c) => c.faceCount >= 7 },
   { id: "posture7", icon: "fa-user-tie", label: "7× postawa", check: (c) => c.postureCount >= 7 },
   { id: "sleep7", icon: "fa-moon", label: "7× sen ≥8h", check: (c) => c.goodSleep >= 7 },
-  { id: "cold7", icon: "fa-snowflake", label: "7× zimny", check: (c) => c.cold >= 7 },
+  { id: "ascend50", icon: "fa-arrow-up", label: "Ascend 50%+", check: (c) => c.ascendPct >= 50 },
+  { id: "ascend100", icon: "fa-rocket", label: "Ascend 100%", check: (c) => c.ascend100Count >= 1 },
   { id: "perfect", icon: "fa-star", label: "Idealny dzień", check: (c) => c.perfect },
-  { id: "recovery3", icon: "fa-leaf", label: "3× recovery", check: (c) => c.recovery >= 3 },
   { id: "cloud", icon: "fa-cloud", label: "Sync w chmurze", check: () => isCloud() },
   { id: "wol", icon: "fa-camera", label: "Week of life", check: () => localStorage.getItem("regim:used-wol") === "1" },
 ];
 async function renderBadges() {
   const all = await collectAllDays();
   const streak = parseInt(document.getElementById("streak-count").textContent) || 0;
+  const todayAsc = calcAscendPct();
+  let ascend100Count = 0;
+  all.forEach((d) => {
+    const asc = d.ascend || {};
+    const done = ASCEND_ITEMS.filter((i) => asc[i.id]).length;
+    if (done === ASCEND_ITEMS.length) ascend100Count++;
+  });
   const ctx = {
     streak,
-    speechCount: all.filter((d) => d.tasks?.find((t) => t.id === "mowa" && t.done)).length,
+    skincareCount: all.filter((d) => d.tasks?.find((t) => t.id === "skincare-rano" && t.done)).length,
     faceCount: all.filter((d) => d.tasks?.find((t) => t.id === "twarz" && t.done)).length,
     postureCount: all.filter((d) => d.tasks?.find((t) => t.id === "postawa" && t.done)).length,
     goodSleep: all.filter((d) => (d.morning?.sleepTotal ?? 0) >= 8).length,
-    cold: all.filter((d) => d.habits?.coldShower).length,
+    ascendPct: todayAsc.pct,
+    ascend100Count,
     perfect: all.some((d) => d.completedPct === 100),
-    recovery: all.filter((d) => d.recoveryMode).length,
   };
   document.getElementById("badges-grid").innerHTML = BADGES.map((b) => {
     const u = b.check(ctx);
@@ -2905,7 +2958,7 @@ async function renderCorrelation() {
 }
 
 // ============================================================================
-// RELOAD (po zmianie użytkownika)
+// RELOAD
 // ============================================================================
 async function reloadEverything() {
   const existing = await loadDayDoc(todayKey);
@@ -2917,6 +2970,7 @@ async function reloadEverything() {
     state.moodTagsMorning = existing.moodTagsMorning || [];
     state.dayTags = existing.dayTags || [];
     state.habits = existing.habits || { waterSalt: false, coldShower: false, walkMeal: false };
+    state.ascend = existing.ascend || {};
     state.note = existing.note || "";
     state.specialMode = existing.specialMode || (existing.recoveryMode ? "recovery" : "normal");
     state.recoveryMode = existing.recoveryMode || false;
@@ -2930,8 +2984,7 @@ async function renderAllFromState() {
   renderCheckStates(); renderProgress(); renderReadiness(); renderImprovementTips();
   updateModeButtons(); setupTreningCard();
   await refreshStreak(); checkRecoveryNeeds();
-  renderGoal(); renderChallenge();
-  // Wypełnij formularze
+  renderGoal(); renderChallenge(); renderAscend();
   const m = state.morning;
   if (m.sleepTotal != null) document.getElementById("input-sleep-total").value = m.sleepTotal;
   if (m.sleepDeep != null) document.getElementById("input-sleep-deep").value = m.sleepDeep;
@@ -2956,25 +3009,22 @@ async function renderAllFromState() {
   if (e.weightEvening != null) document.getElementById("input-weight-evening").value = e.weightEvening;
   if (e.bikeDistance != null) document.getElementById("input-bike-distance").value = e.bikeDistance;
   if (state.note) document.getElementById("input-note").value = state.note;
-  // Chips
   document.querySelectorAll(".food-chip").forEach((c) => c.classList.remove("active"));
   state.foodChecked.forEach((f) => { const c = document.querySelector(`.food-chip[data-food="${f}"]`); if (c) c.classList.add("active"); });
   document.querySelectorAll(".mood-chip").forEach((c) => c.classList.remove("active"));
   state.moodTagsMorning.forEach((t) => { const c = document.querySelector(`.mood-chip[data-tag="${t}"]`); if (c) c.classList.add("active"); });
   document.querySelectorAll(".tag-chip").forEach((c) => c.classList.remove("active"));
   state.dayTags.forEach((t) => { const c = document.querySelector(`.tag-chip[data-tag="${t}"]`); if (c) c.classList.add("active"); });
-  // Habits
   document.getElementById("habit-water-salt").checked = state.habits.waterSalt;
   document.getElementById("habit-cold-shower").checked = state.habits.coldShower;
   document.getElementById("habit-walk-meal").checked = state.habits.walkMeal;
 }
 
 // ============================================================================
-// BOOTSTRAP
+// BOOT
 // ============================================================================
 async function bootApp() {
   if (booted && currentUser?.uid !== "local") {
-    // Re-render po zmianie usera
     document.getElementById("header-greeting").textContent = `Cześć, ${USER_NAME} 👋`;
     updateSyncUI();
     await reloadEverything();
@@ -2982,7 +3032,6 @@ async function bootApp() {
     return;
   }
   booted = true;
-
   document.getElementById("header-greeting").textContent = `Cześć, ${USER_NAME} 👋`;
   setupTreningCard();
   renderDailyQuote();
@@ -2992,19 +3041,25 @@ async function bootApp() {
   const existing = await loadDayDoc(todayKey);
   if (existing?.tasks?.length) {
     state.tasks = existing.tasks;
-    const req = ["tabletka", "jedzenie", "trening", "mowa", "twarz", "postawa", "reset"];
+    // Migracja — usuń stare "mowa", dodaj nowe skincare
+    state.tasks = state.tasks.filter((t) => t.id !== "mowa");
+    const req = ["tabletka", "jedzenie", "trening", "skincare-rano", "skincare-wieczor", "twarz", "postawa", "reset"];
+    const labels = { tabletka: "D3 + Tran z dorsza", jedzenie: "Zdrowe jedzenie", trening: "Kalistenika", "skincare-rano": "Skincare rano", "skincare-wieczor": "Skincare wieczór", twarz: "Looksmaxing twarz", postawa: "Postawa szyi i barków", reset: "Reset szczęki przed snem" };
+    // Zachowaj kolejność
+    const ordered = [];
     req.forEach((id) => {
-      if (!state.tasks.find((t) => t.id === id)) {
-        const lbl = { tabletka: "D3 + Tran z dorsza", jedzenie: "Zdrowe jedzenie", trening: "Kalistenika", mowa: "Trening mowy", twarz: "Looksmaxing twarz", postawa: "Postawa szyi i barków", reset: "Reset szczęki przed snem" };
-        state.tasks.push({ id, label: lbl[id], done: false });
-      }
+      const found = state.tasks.find((t) => t.id === id);
+      if (found) ordered.push(found);
+      else ordered.push({ id, label: labels[id], done: false });
     });
+    state.tasks = ordered;
     state.foodChecked = existing.foodChecked || [];
     state.morning = existing.morning || {};
     state.evening = existing.evening || {};
     state.moodTagsMorning = existing.moodTagsMorning || [];
     state.dayTags = existing.dayTags || [];
     state.habits = existing.habits || { waterSalt: false, coldShower: false, walkMeal: false };
+    state.ascend = existing.ascend || {};
     state.note = existing.note || "";
     state.specialMode = existing.specialMode || (existing.recoveryMode ? "recovery" : "normal");
     state.recoveryMode = existing.recoveryMode || false;
@@ -3014,6 +3069,7 @@ async function bootApp() {
   }
 
   await renderAllFromState();
+  renderAscend();
 
   if (canUseFreeze() && !checkFreezeUsed()) document.getElementById("freeze-card").classList.remove("hidden");
   else document.getElementById("freeze-card").classList.add("hidden");
@@ -3041,13 +3097,11 @@ async function bootApp() {
 // START
 // ============================================================================
 initFirebase().then(() => {
-  // Jak Firebase padł — odpal lokalnie
   if (!firebaseReady) {
     authResolved = true;
     updateSyncUI();
     bootApp();
   }
-  // W przeciwnym razie czekamy na onAuthStateChanged (wywoła bootApp)
 });
 </script>
 </body>
