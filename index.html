@@ -41,8 +41,7 @@ input[type="number"]{-moz-appearance:textfield}
 @keyframes modal-pop{from{opacity:0;transform:translateY(24px) scale(.97)}to{opacity:1;transform:translateY(0) scale(1)}}
 .modal-pop{animation:modal-pop .3s cubic-bezier(.16,1,.3,1) both}
 .food-chip{transition:all .2s ease}.food-chip.active{background:linear-gradient(135deg,rgba(94,234,212,.25),rgba(196,181,253,.25));border-color:rgba(94,234,212,.5)}
-.mood-chip,.tag-chip{transition:all .2s ease}
-.mood-chip.active{background:linear-gradient(135deg,rgba(251,191,157,.3),rgba(196,181,253,.3));border-color:rgba(251,191,157,.6)}
+.tag-chip{transition:all .2s ease}
 .tag-chip.active{background:linear-gradient(135deg,rgba(94,234,212,.3),rgba(251,191,157,.3));border-color:rgba(94,234,212,.6)}
 .segmented{transition:all .3s cubic-bezier(.16,1,.3,1)}
 input[type="range"].slider-custom{-webkit-appearance:none;appearance:none;width:100%;height:8px;background:rgba(255,255,255,.08);border-radius:999px;outline:none}
@@ -58,13 +57,10 @@ html.light-theme .border-white\/5{border-color:rgba(30,26,53,.06)}html.light-the
 html.light-theme .bg-white\/5{background-color:rgba(30,26,53,.04)}html.light-theme .bg-white\/10{background-color:rgba(30,26,53,.07)}
 html.light-theme ::-webkit-scrollbar-thumb{background:#6d5fd6}
 html.light-theme .modal-backdrop{background:rgba(120,113,140,.35)}
-html.light-theme input[type="range"].slider-custom{background:rgba(30,26,53,.1)}
 .cal-day{aspect-ratio:1;border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:11px;font-weight:700;position:relative;cursor:pointer}
 .cal-dot{width:6px;height:6px;border-radius:50%;margin-top:2px}
 .badge-card{transition:all .25s ease}.badge-card.locked{opacity:.35;filter:grayscale(1)}.badge-card.unlocked{animation:rise .4s cubic-bezier(.16,1,.3,1) both}
 #confetti-canvas{position:fixed;inset:0;z-index:60;pointer-events:none}
-@keyframes quote-fade{0%{opacity:0;transform:translateY(4px)}10%{opacity:1;transform:translateY(0)}90%{opacity:1}100%{opacity:0;transform:translateY(-4px)}}
-.quote-anim{animation:quote-fade 8s ease-in-out infinite}
 .history-item{border-left:2px solid rgba(255,255,255,.1)}
 html.light-theme .history-item{border-left-color:rgba(30,26,53,.12)}
 .readiness-ring{transition:stroke-dashoffset .8s cubic-bezier(.16,1,.3,1)}
@@ -72,16 +68,13 @@ html.light-theme .history-item{border-left-color:rgba(30,26,53,.12)}
 .deload-glow{animation:deload-glow 2.5s infinite}
 @keyframes milestone-glow{0%,100%{box-shadow:0 0 30px -6px rgba(251,191,36,.5)}50%{box-shadow:0 0 40px -4px rgba(251,191,36,.8)}}
 .milestone-glow{animation:milestone-glow 2s infinite}
-.weekoflive-card{background:linear-gradient(135deg,#1e1a35 0%,#2d2456 100%);border-radius:28px;padding:24px;color:#f7f5fb}
-.help-btn{width:16px;height:16px;border-radius:50%;background:rgba(94,234,212,.15);color:#5eead4;font-size:10px;font-weight:900;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;margin-left:4px;transition:all .2s;border:1px solid rgba(94,234,212,.3)}
-.help-btn:hover{background:rgba(94,234,212,.3);transform:scale(1.1)}
+.help-btn{width:16px;height:16px;border-radius:50%;background:rgba(94,234,212,.15);color:#5eead4;font-size:10px;font-weight:900;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;margin-left:4px;border:1px solid rgba(94,234,212,.3)}
 .record-card{background:linear-gradient(135deg,rgba(251,191,36,.12),rgba(251,191,157,.12));border:1px solid rgba(251,191,36,.3);border-radius:16px;padding:12px}
-#sync-status{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:800;padding:3px 8px;border-radius:999px;transition:all .3s}
+#sync-status{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:800;padding:3px 8px;border-radius:999px}
 #sync-status.offline{background:rgba(251,113,133,.15);color:#fb7185}
 #sync-status.syncing{background:rgba(251,191,36,.15);color:#fbbf24}
 #sync-status.synced{background:rgba(94,234,212,.15);color:#5eead4}
-.ascend-item{display:flex;align-items:center;gap:10px;padding:10px 12px;background:rgba(255,255,255,.03);border-radius:16px;border:1px solid rgba(255,255,255,.06);transition:all .2s;cursor:pointer}
-.ascend-item:hover{border-color:rgba(94,234,212,.3);background:rgba(94,234,212,.04)}
+.ascend-item{display:flex;align-items:center;gap:10px;padding:10px 12px;background:rgba(255,255,255,.03);border-radius:16px;border:1px solid rgba(255,255,255,.06);cursor:pointer}
 .ascend-item.done{background:linear-gradient(135deg,rgba(94,234,212,.15),rgba(196,181,253,.1));border-color:rgba(94,234,212,.4)}
 .warning-card{background:linear-gradient(135deg,rgba(251,113,133,.12),rgba(251,191,36,.08));border:1px solid rgba(251,113,133,.35);border-radius:16px;padding:12px}
 .guide-section{background:rgba(255,255,255,.03);border-radius:20px;border:1px solid rgba(255,255,255,.06);overflow:hidden}
@@ -137,7 +130,7 @@ html.light-theme .history-item{border-left-color:rgba(30,26,53,.12)}
     <div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-mint/30 to-lilac/30 flex items-center justify-center flex-shrink-0"><i class="fa-solid fa-mobile-screen-button text-mint text-lg"></i></div>
     <div class="flex-1 min-w-0"><div class="font-bold text-sm">Miej REGIM zawsze pod ręką</div><div class="text-xs text-neutral-400">Dodaj do ekranu głównego</div></div>
     <button id="btn-install" class="bg-gradient-to-br from-mint to-lilac text-ink font-extrabold text-sm px-4 py-2 rounded-full whitespace-nowrap active:scale-95 transition">Dodaj</button>
-    <button id="btn-install-dismiss" class="text-neutral-500 hover:text-neutral-300 w-6 h-6 flex items-center justify-center flex-shrink-0"><i class="fa-solid fa-xmark"></i></button>
+    <button id="btn-install-dismiss" class="text-neutral-500 w-6 h-6 flex items-center justify-center flex-shrink-0"><i class="fa-solid fa-xmark"></i></button>
   </div>
 </div>
 
@@ -146,7 +139,7 @@ html.light-theme .history-item{border-left-color:rgba(30,26,53,.12)}
     <div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-peach/30 to-gold/30 flex items-center justify-center flex-shrink-0"><i class="fa-solid fa-bell text-peach text-lg"></i></div>
     <div class="flex-1 min-w-0"><div class="font-bold text-sm">Włącz przypomnienia</div><div class="text-xs text-neutral-400">Rano i wieczorem</div></div>
     <button id="btn-notif-enable" class="bg-gradient-to-br from-peach to-gold text-ink font-extrabold text-sm px-4 py-2 rounded-full whitespace-nowrap active:scale-95 transition">Włącz</button>
-    <button id="btn-notif-dismiss" class="text-neutral-500 hover:text-neutral-300 w-6 h-6 flex items-center justify-center flex-shrink-0"><i class="fa-solid fa-xmark"></i></button>
+    <button id="btn-notif-dismiss" class="text-neutral-500 w-6 h-6 flex items-center justify-center flex-shrink-0"><i class="fa-solid fa-xmark"></i></button>
   </div>
 </div>
 
@@ -197,18 +190,18 @@ html.light-theme .history-item{border-left-color:rgba(30,26,53,.12)}
   </div>
 
   <nav class="flex glass rounded-full p-1 mb-5 gap-0.5 overflow-x-auto">
-    <button data-tab="dashboard" class="tab-btn flex-1 py-2 rounded-full text-[11px] font-bold bg-gradient-to-br from-mint to-lilac text-ink whitespace-nowrap">Dziś</button>
-    <button data-tab="ascend" class="tab-btn flex-1 py-2 rounded-full text-[11px] font-bold text-neutral-400 whitespace-nowrap">Ascend</button>
-    <button data-tab="cialo" class="tab-btn flex-1 py-2 rounded-full text-[11px] font-bold text-neutral-400 whitespace-nowrap">Ciało</button>
-    <button data-tab="postepy" class="tab-btn flex-1 py-2 rounded-full text-[11px] font-bold text-neutral-400 whitespace-nowrap">Postępy</button>
-    <button data-tab="poradnik" class="tab-btn flex-1 py-2 rounded-full text-[11px] font-bold text-neutral-400 whitespace-nowrap">Poradnik</button>
-    <button data-tab="mentor" class="tab-btn flex-1 py-2 rounded-full text-[11px] font-bold text-neutral-400 whitespace-nowrap">Trener</button>
+    <button data-tab="dashboard" class="tab-btn flex-1 py-2 rounded-full text-[10px] font-bold bg-gradient-to-br from-mint to-lilac text-ink whitespace-nowrap">Dziś</button>
+    <button data-tab="ascend" class="tab-btn flex-1 py-2 rounded-full text-[10px] font-bold text-neutral-400 whitespace-nowrap">Ascend</button>
+    <button data-tab="cialo" class="tab-btn flex-1 py-2 rounded-full text-[10px] font-bold text-neutral-400 whitespace-nowrap">Ciało</button>
+    <button data-tab="postepy" class="tab-btn flex-1 py-2 rounded-full text-[10px] font-bold text-neutral-400 whitespace-nowrap">Postępy</button>
+    <button data-tab="poradnik" class="tab-btn flex-1 py-2 rounded-full text-[10px] font-bold text-neutral-400 whitespace-nowrap">Poradnik</button>
+    <button data-tab="mentor" class="tab-btn flex-1 py-2 rounded-full text-[10px] font-bold text-neutral-400 whitespace-nowrap">Trener</button>
   </nav>
 
   <!-- ==================== DZIŚ ==================== -->
   <section id="tab-dashboard" class="tab-panel space-y-4">
     <div class="glass rounded-4xl p-5 shadow-soft">
-      <div class="flex items-center gap-2 mb-3"><i class="fa-solid fa-gauge-high text-mint"></i><span class="font-bold text-sm">Gotowość dnia</span><span class="help-btn" data-help="readiness">?</span></div>
+      <div class="flex items-center gap-2 mb-3"><i class="fa-solid fa-gauge-high text-mint"></i><span class="font-bold text-sm">Gotowość dnia</span></div>
       <div class="flex items-center gap-4">
         <div class="relative w-20 h-20 flex-shrink-0">
           <svg class="w-20 h-20 -rotate-90" viewBox="0 0 80 80">
@@ -239,7 +232,6 @@ html.light-theme .history-item{border-left-color:rgba(30,26,53,.12)}
         <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-lilac/25 to-mint/25 flex items-center justify-center flex-shrink-0"><i class="fa-solid fa-watch-fitness text-lilac"></i></div>
         <div class="font-bold text-base">Raport ze smartwatcha</div>
       </div>
-
       <div class="flex glass rounded-full p-1 mb-4">
         <button data-report="morning" class="report-btn segmented flex-1 py-2 rounded-full text-xs font-bold bg-gradient-to-br from-peach to-gold text-ink"><i class="fa-solid fa-sun mr-1"></i>Dzień dobry</button>
         <button data-report="evening" class="report-btn segmented flex-1 py-2 rounded-full text-xs font-bold text-neutral-400"><i class="fa-solid fa-moon mr-1"></i>Podsumowanie dnia</button>
@@ -256,9 +248,9 @@ html.light-theme .history-item{border-left-color:rgba(30,26,53,.12)}
           <input type="number" step="0.01" id="input-sleep-light" placeholder="5.34" class="w-full mt-1 bg-white/5 border border-white/10 rounded-2xl px-3 py-2.5 text-neutral-100 font-semibold focus:outline-none focus:border-mint transition"></label>
         <label class="block"><span class="text-[11px] text-neutral-400 ml-1 font-semibold">Pobudki:</span>
           <input type="number" id="input-sleep-wakes" placeholder="2" class="w-full mt-1 bg-white/5 border border-white/10 rounded-2xl px-3 py-2.5 text-neutral-100 font-semibold focus:outline-none focus:border-mint transition"></label>
-        <label class="block"><span class="text-[11px] text-neutral-400 ml-1 font-semibold">Śr. tętno snu (bpm):</span>
+        <label class="block"><span class="text-[11px] text-neutral-400 ml-1 font-semibold">Śr. tętno snu:</span>
           <input type="number" id="input-sleep-hr" placeholder="58" class="w-full mt-1 bg-white/5 border border-white/10 rounded-2xl px-3 py-2.5 text-neutral-100 font-semibold focus:outline-none focus:border-mint transition"></label>
-        <label class="block"><span class="text-[11px] text-mint ml-1 font-bold"><i class="fa-solid fa-heart-pulse mr-1"></i>RHR rano:<span class="help-btn" data-help="rhr">?</span></span>
+        <label class="block"><span class="text-[11px] text-mint ml-1 font-bold"><i class="fa-solid fa-heart-pulse mr-1"></i>RHR rano:</span>
           <input type="number" id="input-rhr" placeholder="62" class="w-full mt-1 bg-mint/10 border border-mint/30 rounded-2xl px-3 py-2.5 text-neutral-100 font-semibold focus:outline-none focus:border-mint transition"></label>
         <label class="block col-span-2"><span class="text-[11px] text-gold ml-1 font-bold"><i class="fa-solid fa-scale-balanced mr-1"></i>Waga (kg):</span>
           <input type="number" step="0.1" id="input-weight-daily" placeholder="52.5" class="w-full mt-1 bg-gold/10 border border-gold/30 rounded-2xl px-3 py-2.5 text-neutral-100 font-semibold focus:outline-none focus:border-gold transition"></label>
@@ -284,11 +276,11 @@ html.light-theme .history-item{border-left-color:rgba(30,26,53,.12)}
           <input type="number" id="input-steps" placeholder="9000" class="w-full mt-1 bg-white/5 border border-white/10 rounded-2xl px-3 py-2.5 text-neutral-100 font-semibold focus:outline-none focus:border-lilac transition"></label>
         <label class="block"><span class="text-[11px] text-neutral-400 ml-1 font-semibold">Śr. tętno dnia:</span>
           <input type="number" id="input-hr-day" placeholder="78" class="w-full mt-1 bg-white/5 border border-white/10 rounded-2xl px-3 py-2.5 text-neutral-100 font-semibold focus:outline-none focus:border-lilac transition"></label>
-        <label class="block"><span class="text-[11px] text-neutral-400 ml-1 font-semibold">SpO2 (%):<span class="help-btn" data-help="spo2">?</span></span>
+        <label class="block"><span class="text-[11px] text-neutral-400 ml-1 font-semibold">SpO2 (%):</span>
           <input type="number" id="input-spo2" placeholder="97" class="w-full mt-1 bg-white/5 border border-white/10 rounded-2xl px-3 py-2.5 text-neutral-100 font-semibold focus:outline-none focus:border-lilac transition"></label>
-        <label class="block"><span class="text-[11px] text-neutral-400 ml-1 font-semibold">Stres (1-100):<span class="help-btn" data-help="stress">?</span></span>
+        <label class="block"><span class="text-[11px] text-neutral-400 ml-1 font-semibold">Stres (1-100):</span>
           <input type="number" min="1" max="100" id="input-stress" placeholder="35" class="w-full mt-1 bg-white/5 border border-white/10 rounded-2xl px-3 py-2.5 text-neutral-100 font-semibold focus:outline-none focus:border-lilac transition"></label>
-        <label class="block"><span class="text-[11px] text-rose ml-1 font-bold"><i class="fa-solid fa-fire mr-1"></i>RPE treningu:<span class="help-btn" data-help="rpe">?</span></span>
+        <label class="block"><span class="text-[11px] text-rose ml-1 font-bold"><i class="fa-solid fa-fire mr-1"></i>RPE treningu:</span>
           <input type="number" min="1" max="10" id="input-rpe" placeholder="7" class="w-full mt-1 bg-rose/10 border border-rose/30 rounded-2xl px-3 py-2.5 text-neutral-100 font-semibold focus:outline-none focus:border-rose transition"></label>
         <label class="block"><span class="text-[11px] text-neutral-400 ml-1 font-semibold">Screen time (min):</span>
           <input type="number" id="input-screen-time" placeholder="180" class="w-full mt-1 bg-white/5 border border-white/10 rounded-2xl px-3 py-2.5 text-neutral-100 font-semibold focus:outline-none focus:border-lilac transition"></label>
@@ -379,7 +371,7 @@ html.light-theme .history-item{border-left-color:rgba(30,26,53,.12)}
     <div class="glass rounded-4xl overflow-hidden shadow-soft card-tap transition cursor-pointer" data-card="balsam" data-modal="modal-balsam">
       <div class="p-5 flex items-center gap-4">
         <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-peach/25 to-lilac/25 flex items-center justify-center flex-shrink-0"><i class="fa-solid fa-lips text-peach text-2xl"></i></div>
-        <div class="flex-1 min-w-0"><div class="font-bold text-base">👄 Balsam do ust</div><div class="text-xs text-neutral-400 font-semibold">2× dziennie — rano i wieczorem</div></div>
+        <div class="flex-1 min-w-0"><div class="font-bold text-base">👄 Balsam do ust</div><div class="text-xs text-neutral-400 font-semibold">2× dziennie</div></div>
         <button data-check="balsam" class="check-btn w-9 h-9 rounded-full border-2 border-white/15 flex items-center justify-center flex-shrink-0 transition"><i class="fa-solid fa-check text-xs opacity-0 transition"></i></button>
       </div>
     </div>
@@ -434,7 +426,7 @@ html.light-theme .history-item{border-left-color:rgba(30,26,53,.12)}
   <section id="tab-ascend" class="tab-panel hidden space-y-4">
     <div class="glass rounded-4xl p-5 shadow-warm">
       <div class="flex items-center gap-2 mb-2"><i class="fa-solid fa-arrow-up text-mint"></i><span class="font-bold text-base">🚀 Ascend</span></div>
-      <p class="text-xs text-neutral-400 font-medium leading-snug">Codzienne nawyki, które w skali miesięcy robią największą różnicę. Checki zapisują się do historii.</p>
+      <p class="text-xs text-neutral-400 font-medium leading-snug">Nawyki codzienne robiące różnicę w skali miesięcy.</p>
       <div class="mt-3 flex items-center gap-3">
         <div class="text-2xl font-extrabold text-mint" id="ascend-pct">0%</div>
         <div class="flex-1">
@@ -443,138 +435,60 @@ html.light-theme .history-item{border-left-color:rgba(30,26,53,.12)}
         </div>
       </div>
     </div>
-
-    <div class="glass rounded-4xl p-4 shadow-soft">
-      <div class="flex items-center gap-2 mb-3"><i class="fa-solid fa-moon text-lilac"></i><span class="font-bold text-sm">😴 Sen i regeneracja</span></div>
-      <div class="space-y-2" id="ascend-sleep"></div>
-    </div>
-
-    <div class="glass rounded-4xl p-4 shadow-soft">
-      <div class="flex items-center gap-2 mb-3"><i class="fa-solid fa-utensils text-peach"></i><span class="font-bold text-sm">🍽️ Jedzenie i nawodnienie</span></div>
-      <div class="space-y-2" id="ascend-food"></div>
-    </div>
-
-    <div class="glass rounded-4xl p-4 shadow-soft">
-      <div class="flex items-center gap-2 mb-3"><i class="fa-solid fa-user-tie text-mint"></i><span class="font-bold text-sm">🧍 Postawa i twarz</span></div>
-      <div class="space-y-2" id="ascend-face"></div>
-    </div>
-
-    <div class="glass rounded-4xl p-4 shadow-soft">
-      <div class="flex items-center gap-2 mb-3"><i class="fa-solid fa-leaf text-lilac"></i><span class="font-bold text-sm">🧘 Głowa i stres</span></div>
-      <div class="space-y-2" id="ascend-mind"></div>
-    </div>
-
-    <div class="glass rounded-4xl p-4 shadow-soft">
-      <div class="flex items-center gap-2 mb-3"><i class="fa-solid fa-shirt text-gold"></i><span class="font-bold text-sm">🧴 Higiena i detale</span></div>
-      <div class="space-y-2" id="ascend-hygiene"></div>
-    </div>
+    <div class="glass rounded-4xl p-4 shadow-soft"><div class="flex items-center gap-2 mb-3"><i class="fa-solid fa-moon text-lilac"></i><span class="font-bold text-sm">😴 Sen i regeneracja</span></div><div class="space-y-2" id="ascend-sleep"></div></div>
+    <div class="glass rounded-4xl p-4 shadow-soft"><div class="flex items-center gap-2 mb-3"><i class="fa-solid fa-utensils text-peach"></i><span class="font-bold text-sm">🍽️ Jedzenie i nawodnienie</span></div><div class="space-y-2" id="ascend-food"></div></div>
+    <div class="glass rounded-4xl p-4 shadow-soft"><div class="flex items-center gap-2 mb-3"><i class="fa-solid fa-user-tie text-mint"></i><span class="font-bold text-sm">🧍 Postawa i twarz</span></div><div class="space-y-2" id="ascend-face"></div></div>
+    <div class="glass rounded-4xl p-4 shadow-soft"><div class="flex items-center gap-2 mb-3"><i class="fa-solid fa-leaf text-lilac"></i><span class="font-bold text-sm">🧘 Głowa i stres</span></div><div class="space-y-2" id="ascend-mind"></div></div>
+    <div class="glass rounded-4xl p-4 shadow-soft"><div class="flex items-center gap-2 mb-3"><i class="fa-solid fa-shirt text-gold"></i><span class="font-bold text-sm">🧴 Higiena i detale</span></div><div class="space-y-2" id="ascend-hygiene"></div></div>
   </section>
 
   <!-- ==================== CIAŁO ==================== -->
   <section id="tab-cialo" class="tab-panel hidden space-y-4">
-
-    <div class="glass rounded-4xl p-5 shadow-warm">
-      <div class="flex items-center gap-2 mb-3"><i class="fa-solid fa-user text-mint"></i><span class="font-bold text-base">Mój profil</span></div>
-      <div id="profil-card" class="grid grid-cols-2 gap-3"></div>
-    </div>
-
+    <div class="glass rounded-4xl p-5 shadow-warm"><div class="flex items-center gap-2 mb-3"><i class="fa-solid fa-user text-mint"></i><span class="font-bold text-base">Mój profil</span></div><div id="profil-card" class="grid grid-cols-2 gap-3"></div></div>
     <div class="glass rounded-4xl p-5 shadow-warm">
       <div class="flex items-center gap-2 mb-3"><i class="fa-solid fa-ruler-vertical text-mint"></i><span class="font-bold text-base">Kalkulator wzrostu</span></div>
-      <p class="text-xs text-neutral-400 font-medium mb-3">Podaj wzrost rodziców — apka oszacuje Twój prawdopodobny wzrost końcowy.</p>
-      <div id="growth-calc-result" class="glass rounded-3xl p-4 mb-3 text-center">
+      <p class="text-xs text-neutral-400 font-medium mb-3">Podaj wzrost rodziców w Ustawieniach — apka oszacuje Twój wzrost końcowy.</p>
+      <div class="glass rounded-3xl p-4 mb-3 text-center">
         <div class="text-[10px] text-neutral-400 font-bold tracking-widest mb-1">SZACOWANY WZROST KOŃCOWY</div>
         <div class="text-3xl font-extrabold text-mint" id="predicted-height">—</div>
-        <div class="text-xs text-neutral-400 font-medium mt-1" id="predicted-height-range">Uzupełnij wzrost rodziców w Ustawieniach</div>
+        <div class="text-xs text-neutral-400 font-medium mt-1" id="predicted-height-range">Uzupełnij wzrost rodziców</div>
       </div>
       <div id="growth-remaining" class="text-xs text-neutral-300 font-medium leading-relaxed"></div>
     </div>
-
-    <div class="glass rounded-4xl p-5 shadow-warm">
-      <div class="flex items-center gap-2 mb-3"><i class="fa-solid fa-chart-line text-lilac"></i><span class="font-bold text-base">Tracker wzrostu</span></div>
-      <div class="text-xs text-neutral-400 font-medium mb-3">Wpisuj wzrost raz w miesiącu w raporcie porannym.</div>
-      <canvas id="chart-height" height="140"></canvas>
-    </div>
-
-    <div class="glass rounded-4xl p-5 shadow-warm">
-      <div class="flex items-center gap-2 mb-3"><i class="fa-solid fa-clock text-gold"></i><span class="font-bold text-base">Kiedy osiągnę wagę X</span></div>
-      <div id="weight-eta" class="text-sm text-neutral-200 leading-relaxed font-medium">Wpisz wagę w raporcie, żeby zobaczyć ETA do celu.</div>
-    </div>
-
-    <div class="glass rounded-4xl p-5 shadow-warm">
-      <div class="flex items-center gap-2 mb-3"><i class="fa-solid fa-hourglass-half text-peach"></i><span class="font-bold text-base">Wiek biologiczny</span></div>
-      <div id="bio-age" class="text-sm text-neutral-200 leading-relaxed font-medium">Za mało danych.</div>
-    </div>
-
+    <div class="glass rounded-4xl p-5 shadow-warm"><div class="flex items-center gap-2 mb-3"><i class="fa-solid fa-chart-line text-lilac"></i><span class="font-bold text-base">Tracker wzrostu</span></div><div class="text-xs text-neutral-400 font-medium mb-3">Wpisuj wzrost raz w miesiącu w raporcie porannym.</div><canvas id="chart-height" height="140"></canvas></div>
+    <div class="glass rounded-4xl p-5 shadow-warm"><div class="flex items-center gap-2 mb-3"><i class="fa-solid fa-clock text-gold"></i><span class="font-bold text-base">Kiedy osiągnę wagę X</span></div><div id="weight-eta" class="text-sm text-neutral-200 leading-relaxed font-medium">Wpisz wagę w raporcie.</div></div>
+    <div class="glass rounded-4xl p-5 shadow-warm"><div class="flex items-center gap-2 mb-3"><i class="fa-solid fa-hourglass-half text-peach"></i><span class="font-bold text-base">Wiek biologiczny</span></div><div id="bio-age" class="text-sm text-neutral-200 leading-relaxed font-medium">Za mało danych.</div></div>
     <div class="glass rounded-4xl p-5 shadow-warm">
       <div class="flex items-center gap-2 mb-3"><i class="fa-solid fa-person-arrow-up-from-line text-lilac"></i><span class="font-bold text-base">Puberty Check</span></div>
-      <p class="text-xs text-neutral-400 font-medium mb-3">Odpowiedz na 7 pytań. Apka oceni gdzie jesteś w okresie dojrzewania.</p>
+      <p class="text-xs text-neutral-400 font-medium mb-3">Odpowiedz na 7 pytań. Apka oceni gdzie jesteś.</p>
       <div id="puberty-questions" class="space-y-2"></div>
       <button id="btn-puberty-evaluate" class="w-full mt-3 py-3 rounded-full bg-gradient-to-br from-lilac to-mint text-ink font-extrabold active:scale-95 transition">Oceń</button>
       <div id="puberty-result" class="hidden mt-4 glass rounded-3xl p-4"></div>
     </div>
-
-    <div class="glass rounded-4xl p-5 shadow-warm">
-      <div class="flex items-center gap-2 mb-3"><i class="fa-solid fa-list-ol text-mint"></i><span class="font-bold text-base">Tanner Stage — 5 etapów</span></div>
-      <div id="tanner-stages" class="space-y-2"></div>
-    </div>
-
-    <div class="glass rounded-4xl p-5 shadow-warm">
-      <div class="flex items-center gap-2 mb-3"><i class="fa-solid fa-chart-bar text-gold"></i><span class="font-bold text-base">Wzrost a wiek — percentyle</span></div>
-      <p class="text-xs text-neutral-400 font-medium mb-3">Gdzie jesteś na tle rówieśników (dane WHO dla chłopców).</p>
-      <div id="height-percentile"></div>
-    </div>
-
-    <div class="glass rounded-4xl p-5 shadow-warm">
-      <div class="flex items-center gap-2 mb-3"><i class="fa-solid fa-weight-scale text-peach"></i><span class="font-bold text-base">Waga do wzrostu</span></div>
-      <div id="weight-height-table" class="text-sm text-neutral-200 leading-relaxed font-medium"></div>
-    </div>
-
-    <div class="glass rounded-4xl p-5 shadow-warm">
-      <div class="flex items-center gap-2 mb-3"><i class="fa-solid fa-ranking-star text-mint"></i><span class="font-bold text-base">Co wpływa na wzrost</span></div>
-      <div id="growth-factors" class="space-y-2"></div>
-    </div>
-
-    <div class="glass rounded-4xl p-5 shadow-warm">
-      <div class="flex items-center gap-2 mb-3"><i class="fa-solid fa-dumbbell text-rose"></i><span class="font-bold text-base">Progresja siły</span></div>
-      <div id="strength-progression" class="text-sm text-neutral-200 leading-relaxed font-medium"></div>
-    </div>
-
+    <div class="glass rounded-4xl p-5 shadow-warm"><div class="flex items-center gap-2 mb-3"><i class="fa-solid fa-list-ol text-mint"></i><span class="font-bold text-base">Tanner Stage — 5 etapów</span></div><div id="tanner-stages" class="space-y-2"></div></div>
+    <div class="glass rounded-4xl p-5 shadow-warm"><div class="flex items-center gap-2 mb-3"><i class="fa-solid fa-chart-bar text-gold"></i><span class="font-bold text-base">Wzrost a wiek — percentyle</span></div><div id="height-percentile"></div></div>
+    <div class="glass rounded-4xl p-5 shadow-warm"><div class="flex items-center gap-2 mb-3"><i class="fa-solid fa-weight-scale text-peach"></i><span class="font-bold text-base">Waga do wzrostu</span></div><div id="weight-height-table" class="text-sm text-neutral-200 leading-relaxed font-medium"></div></div>
+    <div class="glass rounded-4xl p-5 shadow-warm"><div class="flex items-center gap-2 mb-3"><i class="fa-solid fa-ranking-star text-mint"></i><span class="font-bold text-base">Co wpływa na wzrost</span></div><div id="growth-factors" class="space-y-2"></div></div>
+    <div class="glass rounded-4xl p-5 shadow-warm"><div class="flex items-center gap-2 mb-3"><i class="fa-solid fa-dumbbell text-rose"></i><span class="font-bold text-base">Progresja siły</span></div><div id="strength-progression" class="text-sm text-neutral-200 leading-relaxed font-medium"></div></div>
   </section>
 
   <!-- ==================== POSTĘPY ==================== -->
   <section id="tab-postepy" class="tab-panel hidden space-y-5">
-    <div class="glass rounded-4xl p-5 shadow-warm">
-      <div class="flex items-center gap-2 mb-4"><i class="fa-solid fa-chart-pie text-mint"></i><span class="font-bold text-base">Ostatnie 30 dni</span></div>
-      <div id="last-30-days" class="grid grid-cols-2 gap-3"></div>
-    </div>
-
-    <div class="glass rounded-4xl p-5 shadow-warm">
-      <div class="flex items-center gap-2 mb-4"><i class="fa-solid fa-crown text-gold"></i><span class="font-bold text-sm">Rekordy osobiste</span></div>
-      <div id="personal-records" class="grid grid-cols-2 gap-3"></div>
-    </div>
-
+    <div class="glass rounded-4xl p-5 shadow-warm"><div class="flex items-center gap-2 mb-4"><i class="fa-solid fa-chart-pie text-mint"></i><span class="font-bold text-base">Ostatnie 30 dni</span></div><div id="last-30-days" class="grid grid-cols-2 gap-3"></div></div>
+    <div class="glass rounded-4xl p-5 shadow-warm"><div class="flex items-center gap-2 mb-4"><i class="fa-solid fa-crown text-gold"></i><span class="font-bold text-sm">Rekordy osobiste</span></div><div id="personal-records" class="grid grid-cols-2 gap-3"></div></div>
     <div class="glass rounded-4xl p-5 shadow-warm">
       <div class="flex items-center gap-2 mb-4"><i class="fa-solid fa-trophy text-gold"></i><span class="font-bold text-sm">Najlepszy wynik</span></div>
       <div class="grid grid-cols-2 gap-3">
-        <div class="glass rounded-3xl p-4 text-center"><div class="text-2xl font-extrabold text-gold" id="best-streak-value">0</div><div class="text-[11px] text-neutral-400 font-semibold mt-1">Najdłuższy streak (dni)</div></div>
+        <div class="glass rounded-3xl p-4 text-center"><div class="text-2xl font-extrabold text-gold" id="best-streak-value">0</div><div class="text-[11px] text-neutral-400 font-semibold mt-1">Najdłuższy streak</div></div>
         <div class="glass rounded-3xl p-4 text-center"><div class="text-2xl font-extrabold text-mint" id="best-week-value">0%</div><div class="text-[11px] text-neutral-400 font-semibold mt-1">Najlepszy tydzień</div></div>
       </div>
     </div>
-
+    <div class="glass rounded-4xl p-5 shadow-warm"><div class="flex items-center gap-2 mb-3"><i class="fa-solid fa-code-compare text-lilac"></i><span class="font-bold text-sm">Ten miesiąc vs poprzedni</span></div><div id="monthly-comparison" class="space-y-2"><p class="text-xs text-neutral-400 font-medium">Za mało danych.</p></div></div>
     <div class="glass rounded-4xl p-5 shadow-warm">
-      <div class="flex items-center gap-2 mb-3"><i class="fa-solid fa-code-compare text-lilac"></i><span class="font-bold text-sm">Ten miesiąc vs poprzedni</span></div>
-      <div id="monthly-comparison" class="space-y-2"><p class="text-xs text-neutral-400 font-medium">Za mało danych.</p></div>
-    </div>
-
-    <div class="glass rounded-4xl p-5 shadow-warm">
-      <div class="flex items-center gap-2 mb-3">
-        <i class="fa-solid fa-bullseye text-mint"></i>
-        <span class="font-bold text-sm">Cel wagowy</span>
-        <button id="btn-goal-edit" class="ml-auto text-[11px] font-bold text-neutral-400 glass rounded-full px-3 py-1"><i class="fa-solid fa-gear mr-1"></i>Zmień</button>
-      </div>
+      <div class="flex items-center gap-2 mb-3"><i class="fa-solid fa-bullseye text-mint"></i><span class="font-bold text-sm">Cel wagowy</span><button id="btn-goal-edit" class="ml-auto text-[11px] font-bold text-neutral-400 glass rounded-full px-3 py-1"><i class="fa-solid fa-gear mr-1"></i>Zmień</button></div>
       <div id="goal-display" class="space-y-3">
         <div class="flex items-end justify-between"><div><div class="text-3xl font-extrabold" id="goal-current">—</div><div class="text-[11px] text-neutral-400 font-semibold">aktualna waga</div></div><div class="text-right"><div class="text-2xl font-extrabold text-mint" id="goal-target">55.0 kg</div><div class="text-[11px] text-neutral-400 font-semibold">cel</div></div></div>
-        <div id="goal-progress-text" class="text-xs text-neutral-300 font-medium leading-snug">Wpisz wagę, żeby zobaczyć progres.</div>
+        <div id="goal-progress-text" class="text-xs text-neutral-300 font-medium leading-snug">Wpisz wagę.</div>
         <div class="h-2 bg-white/5 rounded-full overflow-hidden"><div id="goal-bar" class="progress-fill h-full rounded-full bg-gradient-to-r from-mint to-lilac" style="width:0%"></div></div>
       </div>
       <div id="goal-edit-wrapper" class="hidden rise mt-3">
@@ -583,7 +497,6 @@ html.light-theme .history-item{border-left-color:rgba(30,26,53,.12)}
         </label>
       </div>
     </div>
-
     <div class="glass rounded-4xl p-5 shadow-warm">
       <div class="flex items-center gap-2 mb-3"><i class="fa-solid fa-list-check text-lilac"></i><span class="font-bold text-sm">Cele SMART</span></div>
       <div class="space-y-2.5">
@@ -593,18 +506,11 @@ html.light-theme .history-item{border-left-color:rgba(30,26,53,.12)}
         <div class="glass rounded-2xl p-3"><div class="flex items-center justify-between mb-1.5"><span class="text-xs font-bold">🧘 Reset szczęki</span><span id="smart-jaw-count" class="text-[11px] font-extrabold text-mint">0/21</span></div><div class="h-1.5 bg-white/5 rounded-full overflow-hidden"><div id="smart-jaw-bar" class="progress-fill h-full bg-mint rounded-full" style="width:0%"></div></div></div>
       </div>
     </div>
-
-    <div class="glass rounded-4xl p-5 shadow-warm">
-      <div class="flex items-center gap-2 mb-4"><i class="fa-solid fa-road text-mint"></i><span class="font-bold text-base">Moja droga — rok</span></div>
-      <canvas id="chart-year" height="160"></canvas>
-      <div class="text-[10px] text-neutral-500 font-semibold mt-2 text-center">% wykonania zadań dnia przez ostatni rok</div>
-    </div>
-
+    <div class="glass rounded-4xl p-5 shadow-warm"><div class="flex items-center gap-2 mb-4"><i class="fa-solid fa-road text-mint"></i><span class="font-bold text-base">Moja droga — rok</span></div><canvas id="chart-year" height="160"></canvas></div>
     <div class="glass rounded-4xl p-5 shadow-warm">
       <div class="flex items-center justify-between mb-3"><div class="flex items-center gap-2"><i class="fa-solid fa-calendar-week text-peach"></i><span class="font-bold text-sm">Podsumowanie tygodnia</span></div><button id="btn-weekly-summary" class="text-xs font-bold text-mint glass rounded-full px-3 py-1.5"><i class="fa-solid fa-arrows-rotate mr-1"></i>Odśwież</button></div>
       <p id="weekly-summary-text" class="text-sm text-neutral-200 leading-relaxed font-medium">Kliknij "Odśwież".</p>
     </div>
-
     <div class="glass rounded-4xl p-5 shadow-soft">
       <div class="flex items-center justify-between mb-4">
         <button id="cal-prev" class="w-8 h-8 rounded-full glass flex items-center justify-center text-neutral-400 active:scale-90 transition"><i class="fa-solid fa-chevron-left text-xs"></i></button>
@@ -621,11 +527,7 @@ html.light-theme .history-item{border-left-color:rgba(30,26,53,.12)}
         <div class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-white/15"></span>Brak</div>
       </div>
     </div>
-
-    <div class="glass rounded-4xl p-5 shadow-soft">
-      <div class="flex items-center gap-2 mb-4"><i class="fa-solid fa-medal text-gold"></i><span class="font-bold text-sm">Odznaki</span></div>
-      <div id="badges-grid" class="grid grid-cols-3 gap-3"></div>
-    </div>
+    <div class="glass rounded-4xl p-5 shadow-soft"><div class="flex items-center gap-2 mb-4"><i class="fa-solid fa-medal text-gold"></i><span class="font-bold text-sm">Odznaki</span></div><div id="badges-grid" class="grid grid-cols-3 gap-3"></div></div>
   </section>
 
   <!-- ==================== PORADNIK ==================== -->
@@ -635,47 +537,23 @@ html.light-theme .history-item{border-left-color:rgba(30,26,53,.12)}
       <p class="text-xs text-neutral-400 font-medium mb-3">7 sekcji. Kliknij żeby rozwinąć.</p>
       <div id="guide-sections" class="space-y-2"></div>
     </div>
-
     <div class="glass rounded-4xl p-5 shadow-warm">
       <div class="flex items-center gap-2 mb-3"><i class="fa-solid fa-lightbulb text-gold"></i><span class="font-bold text-base">💡 Fiszka dnia</span></div>
-      <div id="fact-of-day" class="glass rounded-3xl p-4">
-        <p class="text-sm text-neutral-200 leading-relaxed font-medium"></p>
-      </div>
+      <div id="fact-of-day" class="glass rounded-3xl p-4"><p class="text-sm text-neutral-200 leading-relaxed font-medium"></p></div>
     </div>
-
     <div class="glass rounded-4xl p-5 shadow-warm">
       <div class="flex items-center gap-2 mb-3"><i class="fa-solid fa-graduation-cap text-lilac"></i><span class="font-bold text-base">📚 Baza wiedzy A-Z</span></div>
-      <p class="text-xs text-neutral-400 font-medium mb-3">Tematy, które realnie zmieniają wygląd i zdrowie.</p>
       <div id="knowledge-base" class="space-y-2"></div>
     </div>
-
     <div class="glass rounded-4xl p-5 shadow-warm">
       <div class="flex items-center gap-2 mb-3"><i class="fa-solid fa-person-arrow-up-from-line text-mint"></i><span class="font-bold text-base">🌱 Co robić w okresie dojrzewania</span></div>
       <div class="space-y-2">
-        <div class="glass rounded-3xl p-4">
-          <div class="font-bold text-sm mb-1">😴 Sen 8-9h</div>
-          <p class="text-xs text-neutral-300 font-medium leading-relaxed">Hormon wzrostu wydziela się w deep sleep. Sen <7h = mniej wzrostu, mniej regeneracji, gorsza skóra.</p>
-        </div>
-        <div class="glass rounded-3xl p-4">
-          <div class="font-bold text-sm mb-1">🥚 Białko 1.6-2.0 g/kg masy</div>
-          <p class="text-xs text-neutral-300 font-medium leading-relaxed">Bez białka nie ma z czego budować mięśni i kości. Jajka, mięso, nabiał, ryby, rośliny strączkowe.</p>
-        </div>
-        <div class="glass rounded-3xl p-4">
-          <div class="font-bold text-sm mb-1">🏊 Basen + skakanie + zwisanie</div>
-          <p class="text-xs text-neutral-300 font-medium leading-relaxed">Rozciągają kręgosłup i stymulują chrząstki wzrostowe. 2-3× w tyg wystarczy.</p>
-        </div>
-        <div class="glass rounded-3xl p-4">
-          <div class="font-bold text-sm mb-1">🍬 Zero cukru i fast foodów</div>
-          <p class="text-xs text-neutral-300 font-medium leading-relaxed">Cukier = skok insuliny = tłumienie hormonu wzrostu. Poza tym — trądzik, opuchlizna, gorszy nastrój.</p>
-        </div>
-        <div class="glass rounded-3xl p-4">
-          <div class="font-bold text-sm mb-1">🧴 Skincare codziennie</div>
-          <p class="text-xs text-neutral-300 font-medium leading-relaxed">W tym wieku skóra najwięcej się zmienia. Płyn rano i wieczorem = mniej wyprysków za rok.</p>
-        </div>
-        <div class="glass rounded-3xl p-4">
-          <div class="font-bold text-sm mb-1">🧍 Postawa</div>
-          <p class="text-xs text-neutral-300 font-medium leading-relaxed">Dobra postawa = +2-3 cm widocznego wzrostu i mocniejsza linia żuchwy.</p>
-        </div>
+        <div class="glass rounded-3xl p-4"><div class="font-bold text-sm mb-1">😴 Sen 8-9h</div><p class="text-xs text-neutral-300 font-medium leading-relaxed">Hormon wzrostu wydziela się w deep sleep. Sen <7h = mniej wzrostu, mniej regeneracji, gorsza skóra.</p></div>
+        <div class="glass rounded-3xl p-4"><div class="font-bold text-sm mb-1">🥚 Białko 1.6-2.0 g/kg</div><p class="text-xs text-neutral-300 font-medium leading-relaxed">Jajka, mięso, ryby, nabiał, strączkowe. Bez białka nie ma z czego budować mięśni i kości.</p></div>
+        <div class="glass rounded-3xl p-4"><div class="font-bold text-sm mb-1">🏊 Basen + skakanie + zwisanie</div><p class="text-xs text-neutral-300 font-medium leading-relaxed">Rozciągają kręgosłup i stymulują chrząstki wzrostowe. 2-3× w tyg wystarczy.</p></div>
+        <div class="glass rounded-3xl p-4"><div class="font-bold text-sm mb-1">🍬 Zero cukru i fast foodów</div><p class="text-xs text-neutral-300 font-medium leading-relaxed">Cukier = skok insuliny = tłumienie hormonu wzrostu. Plus trądzik i opuchlizna.</p></div>
+        <div class="glass rounded-3xl p-4"><div class="font-bold text-sm mb-1">🧴 Skincare codziennie</div><p class="text-xs text-neutral-300 font-medium leading-relaxed">W tym wieku skóra najwięcej się zmienia. Płyn rano i wieczorem = mniej wyprysków za rok.</p></div>
+        <div class="glass rounded-3xl p-4"><div class="font-bold text-sm mb-1">🧍 Postawa</div><p class="text-xs text-neutral-300 font-medium leading-relaxed">Dobra postawa = +2-3 cm widocznego wzrostu i mocniejsza linia żuchwy.</p></div>
       </div>
     </div>
   </section>
@@ -686,58 +564,32 @@ html.light-theme .history-item{border-left-color:rgba(30,26,53,.12)}
       <span id="ai-btn-label"><i class="fa-solid fa-dumbbell mr-1.5"></i>🏋️ Rada Trenera</span>
       <span id="ai-btn-spinner" class="hidden animate-spin h-4 w-4 border-2 border-ink border-t-transparent rounded-full"></span>
     </button>
-
     <div id="ai-result-box" class="hidden glass rounded-4xl p-5 shadow-warm">
       <div class="flex items-center gap-2 mb-2"><i class="fa-solid fa-comment-dots text-peach"></i><span class="font-bold text-sm text-peach">🏋️ Trener mówi:</span></div>
       <p id="ai-result-text" class="text-sm text-neutral-200 leading-relaxed whitespace-pre-line font-medium"></p>
     </div>
-
     <div class="glass rounded-4xl p-5 shadow-soft border border-mint/20">
       <div class="flex items-center justify-between mb-3"><div class="flex items-center gap-2"><i class="fa-solid fa-sparkles text-mint"></i><span class="font-bold text-sm text-mint">✨ Glow Up</span></div><button id="btn-glowup-refresh" class="text-xs font-bold text-mint glass rounded-full px-3 py-1.5"><i class="fa-solid fa-arrows-rotate mr-1"></i>Odśwież</button></div>
       <div id="glowup-content" class="space-y-2"><p class="text-sm text-neutral-400 font-medium">Kliknij "Odśwież".</p></div>
     </div>
-
     <div class="flex glass rounded-full p-1">
       <button data-range="7" class="range-btn segmented flex-1 py-2 rounded-full text-xs font-bold bg-gradient-to-br from-mint to-lilac text-ink">7 dni</button>
       <button data-range="30" class="range-btn segmented flex-1 py-2 rounded-full text-xs font-bold text-neutral-400">30 dni</button>
       <button data-range="90" class="range-btn segmented flex-1 py-2 rounded-full text-xs font-bold text-neutral-400">90 dni</button>
     </div>
-
     <div class="glass rounded-4xl p-4 shadow-soft">
       <div class="flex items-center justify-between mb-3"><div class="flex items-center gap-2 text-sm font-bold text-neutral-300"><i class="fa-solid fa-scale-balanced text-gold"></i>Waga</div><button id="btn-1rm" class="text-[11px] font-bold text-gold glass rounded-full px-3 py-1"><i class="fa-solid fa-calculator mr-1"></i>1RM</button></div>
       <canvas id="chart-weight" height="140"></canvas>
     </div>
-
-    <div class="glass rounded-4xl p-4 shadow-soft">
-      <div class="flex items-center gap-2 mb-3 text-sm font-bold text-neutral-300"><i class="fa-solid fa-moon text-lilac"></i>😴 Sen — głęboki / REM</div>
-      <canvas id="chart-sleep" height="140"></canvas>
-    </div>
-
-    <div class="glass rounded-4xl p-4 shadow-soft">
-      <div class="flex items-center gap-2 mb-3 text-sm font-bold text-neutral-300"><i class="fa-solid fa-heart-pulse text-mint"></i>💓 RHR rano</div>
-      <canvas id="chart-rhr" height="140"></canvas>
-    </div>
-
-    <div class="glass rounded-4xl p-4 shadow-soft">
-      <div class="flex items-center gap-2 mb-3 text-sm font-bold text-neutral-300"><i class="fa-solid fa-shoe-prints text-peach"></i>🚶 Kroki</div>
-      <canvas id="chart-steps" height="140"></canvas>
-    </div>
-
-    <div class="glass rounded-4xl p-4 shadow-soft">
-      <div class="flex items-center gap-2 mb-3 text-sm font-bold text-neutral-300"><i class="fa-solid fa-heart-pulse text-rose"></i>💓 Stres</div>
-      <canvas id="chart-stress" height="140"></canvas>
-    </div>
-
-    <div class="glass rounded-4xl p-4 shadow-soft">
-      <div class="flex items-center gap-2 mb-3 text-sm font-bold text-neutral-300"><i class="fa-solid fa-face-smile text-peach"></i>😊 Nastrój</div>
-      <canvas id="chart-mood" height="140"></canvas>
-    </div>
-
+    <div class="glass rounded-4xl p-4 shadow-soft"><div class="flex items-center gap-2 mb-3 text-sm font-bold text-neutral-300"><i class="fa-solid fa-moon text-lilac"></i>😴 Sen — głęboki / REM</div><canvas id="chart-sleep" height="140"></canvas></div>
+    <div class="glass rounded-4xl p-4 shadow-soft"><div class="flex items-center gap-2 mb-3 text-sm font-bold text-neutral-300"><i class="fa-solid fa-heart-pulse text-mint"></i>💓 RHR rano</div><canvas id="chart-rhr" height="140"></canvas></div>
+    <div class="glass rounded-4xl p-4 shadow-soft"><div class="flex items-center gap-2 mb-3 text-sm font-bold text-neutral-300"><i class="fa-solid fa-shoe-prints text-peach"></i>🚶 Kroki</div><canvas id="chart-steps" height="140"></canvas></div>
+    <div class="glass rounded-4xl p-4 shadow-soft"><div class="flex items-center gap-2 mb-3 text-sm font-bold text-neutral-300"><i class="fa-solid fa-heart-pulse text-rose"></i>💓 Stres</div><canvas id="chart-stress" height="140"></canvas></div>
+    <div class="glass rounded-4xl p-4 shadow-soft"><div class="flex items-center gap-2 mb-3 text-sm font-bold text-neutral-300"><i class="fa-solid fa-face-smile text-peach"></i>😊 Nastrój</div><canvas id="chart-mood" height="140"></canvas></div>
     <div id="correlation-box" class="hidden glass rounded-4xl p-5 shadow-soft border border-lilac/20">
-      <div class="flex items-center gap-2 mb-2"><i class="fa-solid fa-link text-lilac"></i><span class="font-bold text-sm text-lilac">🔗 Korelacja: sen a stres:</span></div>
+      <div class="flex items-center gap-2 mb-2"><i class="fa-solid fa-link text-lilac"></i><span class="font-bold text-sm text-lilac">🔗 Korelacja: sen a stres</span></div>
       <p id="correlation-text" class="text-sm text-neutral-200 leading-relaxed font-medium"></p>
     </div>
-
     <div class="glass rounded-4xl p-5 shadow-soft">
       <div class="flex items-center justify-between mb-3"><div class="flex items-center gap-2"><i class="fa-solid fa-clock-rotate-left text-neutral-400"></i><span class="font-bold text-sm">📜 Historia Trenera</span></div><button id="btn-history-refresh" class="text-xs font-bold text-neutral-400 glass rounded-full px-3 py-1.5"><i class="fa-solid fa-arrows-rotate mr-1"></i>Odśwież</button></div>
       <div id="mentor-history-list" class="space-y-3 max-h-96 overflow-y-auto pr-1"><p class="text-sm text-neutral-500 font-medium">Brak historii.</p></div>
@@ -748,13 +600,13 @@ html.light-theme .history-item{border-left-color:rgba(30,26,53,.12)}
 
 <div id="toast" class="hidden fixed bottom-6 left-1/2 -translate-x-1/2 z-50 glass rounded-full px-5 py-3 text-sm font-bold shadow-soft rise"></div>
 
-<!-- MODALE -->
+<!-- ============ MODALE ============ -->
 <div id="modal-tabletka" class="modal-wrap hidden fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-5">
   <div class="modal-backdrop absolute inset-0" data-close-modal></div>
   <div class="modal-pop relative glass rounded-t-4xl sm:rounded-4xl w-full sm:max-w-md p-6 shadow-soft max-h-[85vh] overflow-y-auto">
     <div class="flex items-start justify-between mb-4"><div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-gold/25 to-peach/25 flex items-center justify-center"><i class="fa-solid fa-pills text-gold text-2xl"></i></div><button data-close-modal class="w-9 h-9 rounded-full glass flex items-center justify-center text-neutral-400"><i class="fa-solid fa-xmark"></i></button></div>
     <h3 class="font-extrabold text-xl mb-3">💊 D3 + Tran z dorsza</h3>
-    <div class="glass rounded-3xl p-4 mb-3 flex items-start gap-3"><i class="fa-solid fa-fish text-mint mt-0.5"></i><p class="text-sm text-neutral-200 leading-relaxed font-medium">Tran z wątroby dorsza islandzkiego — źródło D, A i omega-3. Łącz z D3 rano, do posiłku z tłuszczem.</p></div>
+    <div class="glass rounded-3xl p-4 mb-3"><p class="text-sm text-neutral-200 leading-relaxed font-medium">Tran z wątroby dorsza islandzkiego — źródło D, A i omega-3. Łącz z D3 rano, do posiłku z tłuszczem.</p></div>
     <button data-check="tabletka" data-close-modal class="modal-check-btn w-full py-3.5 rounded-full bg-gradient-to-br from-gold to-peach text-ink font-extrabold active:scale-95 transition"><i class="fa-solid fa-check mr-1.5"></i>Wziąłem</button>
   </div>
 </div>
@@ -795,7 +647,7 @@ html.light-theme .history-item{border-left-color:rgba(30,26,53,.12)}
     <h3 class="font-extrabold text-xl mb-1">💧 Skincare rano</h3>
     <p class="text-xs text-neutral-400 font-semibold mb-5">Kolejność</p>
     <div class="space-y-3 mb-5">
-      <div class="glass rounded-3xl p-4 flex items-start gap-3"><div class="w-8 h-8 rounded-xl bg-mint/15 flex items-center justify-center flex-shrink-0 text-mint font-extrabold text-xs">1</div><div><div class="font-bold text-sm">Płyn do twarzy</div><p class="text-xs text-neutral-300 font-medium leading-relaxed">Umyj letnią wodą. Delikatnie, bez tarcia.</p></div></div>
+      <div class="glass rounded-3xl p-4 flex items-start gap-3"><div class="w-8 h-8 rounded-xl bg-mint/15 flex items-center justify-center flex-shrink-0 text-mint font-extrabold text-xs">1</div><div><div class="font-bold text-sm">Płyn do twarzy</div><p class="text-xs text-neutral-300 font-medium leading-relaxed">Umyj letnią wodą. Delikatnie.</p></div></div>
       <div class="glass rounded-3xl p-4 flex items-start gap-3"><div class="w-8 h-8 rounded-xl bg-lilac/15 flex items-center justify-center flex-shrink-0 text-lilac font-extrabold text-xs">2</div><div><div class="font-bold text-sm">Płyn do trądzików</div><p class="text-xs text-neutral-300 font-medium leading-relaxed">Punktowo na wypryski / strefę T.</p></div></div>
       <div class="glass rounded-3xl p-4 flex items-start gap-3"><div class="w-8 h-8 rounded-xl bg-peach/15 flex items-center justify-center flex-shrink-0 text-peach font-extrabold text-xs">3</div><div><div class="font-bold text-sm">Acnederm</div><p class="text-xs text-neutral-300 font-medium leading-relaxed">Cienka warstwa na całą twarz. Omijaj oczy.</p></div></div>
     </div>
@@ -810,7 +662,7 @@ html.light-theme .history-item{border-left-color:rgba(30,26,53,.12)}
     <h3 class="font-extrabold text-xl mb-1">✨ Skincare wieczór</h3>
     <p class="text-xs text-neutral-400 font-semibold mb-5">Kolejność</p>
     <div class="space-y-3 mb-5">
-      <div class="glass rounded-3xl p-4 flex items-start gap-3"><div class="w-8 h-8 rounded-xl bg-lilac/15 flex items-center justify-center flex-shrink-0 text-lilac font-extrabold text-xs">1</div><div><div class="font-bold text-sm">Płyn do twarzy</div><p class="text-xs text-neutral-300 font-medium leading-relaxed">Zmyj dzień, pot, sebum, zanieczyszczenia.</p></div></div>
+      <div class="glass rounded-3xl p-4 flex items-start gap-3"><div class="w-8 h-8 rounded-xl bg-lilac/15 flex items-center justify-center flex-shrink-0 text-lilac font-extrabold text-xs">1</div><div><div class="font-bold text-sm">Płyn do twarzy</div><p class="text-xs text-neutral-300 font-medium leading-relaxed">Zmyj dzień, pot, sebum.</p></div></div>
       <div class="glass rounded-3xl p-4 flex items-start gap-3"><div class="w-8 h-8 rounded-xl bg-gold/15 flex items-center justify-center flex-shrink-0 text-gold font-extrabold text-xs">2</div><div><div class="font-bold text-sm">Magia Egipska</div><p class="text-xs text-neutral-300 font-medium leading-relaxed">Maska / kuracja. 10-15 min, spłucz letnią wodą.</p></div></div>
     </div>
     <button data-check="skincare-wieczor" data-close-modal class="modal-check-btn w-full py-3.5 rounded-full bg-gradient-to-br from-lilac to-gold text-ink font-extrabold active:scale-95 transition"><i class="fa-solid fa-check mr-1.5"></i>Zrobione</button>
@@ -822,7 +674,7 @@ html.light-theme .history-item{border-left-color:rgba(30,26,53,.12)}
   <div class="modal-pop relative glass rounded-t-4xl sm:rounded-4xl w-full sm:max-w-md p-6 shadow-soft max-h-[85vh] overflow-y-auto">
     <div class="flex items-start justify-between mb-4"><div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-peach/25 to-lilac/25 flex items-center justify-center"><i class="fa-solid fa-lips text-peach text-2xl"></i></div><button data-close-modal class="w-9 h-9 rounded-full glass flex items-center justify-center text-neutral-400"><i class="fa-solid fa-xmark"></i></button></div>
     <h3 class="font-extrabold text-xl mb-3">👄 Balsam do ust</h3>
-    <div class="glass rounded-3xl p-4 mb-5 flex items-start gap-3"><i class="fa-solid fa-lightbulb text-peach mt-0.5"></i><p class="text-sm text-neutral-200 leading-relaxed font-medium">Suche, spierzchnięte usta to najprostsza rzecz do naprawienia. Balsam rano i wieczorem — efekt widoczny w 3-5 dni.</p></div>
+    <div class="glass rounded-3xl p-4 mb-5"><p class="text-sm text-neutral-200 leading-relaxed font-medium">Suche, spierzchnięte usta to najprostsza rzecz do naprawienia. Balsam rano i wieczorem — efekt w 3-5 dni.</p></div>
     <button data-check="balsam" data-close-modal class="modal-check-btn w-full py-3.5 rounded-full bg-gradient-to-br from-peach to-lilac text-ink font-extrabold active:scale-95 transition"><i class="fa-solid fa-check mr-1.5"></i>Nałożony</button>
   </div>
 </div>
@@ -878,7 +730,7 @@ html.light-theme .history-item{border-left-color:rgba(30,26,53,.12)}
     <h3 class="font-extrabold text-xl mb-3">💇 Mycie włosów / odżywka</h3>
     <div class="space-y-3 mb-5">
       <div class="glass rounded-3xl p-4 flex items-start gap-3"><div class="w-8 h-8 rounded-xl bg-gold/15 flex items-center justify-center flex-shrink-0 text-gold font-extrabold text-xs">1</div><div><div class="font-bold text-sm">Mycie</div><p class="text-xs text-neutral-300 font-medium leading-relaxed">Szamponem, spłucz letnią wodą.</p></div></div>
-      <div class="glass rounded-3xl p-4 flex items-start gap-3"><div class="w-8 h-8 rounded-xl bg-peach/15 flex items-center justify-center flex-shrink-0 text-peach font-extrabold text-xs">2</div><div><div class="font-bold text-sm">Odżywka / maska</div><p class="text-xs text-neutral-300 font-medium leading-relaxed">Na wilgotne włosy, omijaj skórę głowy. Spłucz chłodną wodą.</p></div></div>
+      <div class="glass rounded-3xl p-4 flex items-start gap-3"><div class="w-8 h-8 rounded-xl bg-peach/15 flex items-center justify-center flex-shrink-0 text-peach font-extrabold text-xs">2</div><div><div class="font-bold text-sm">Odżywka / maska</div><p class="text-xs text-neutral-300 font-medium leading-relaxed">Na wilgotne włosy, omijaj skórę głowy.</p></div></div>
       <div class="glass rounded-3xl p-4 flex items-start gap-3"><div class="w-8 h-8 rounded-xl bg-mint/15 flex items-center justify-center flex-shrink-0 text-mint font-extrabold text-xs">3</div><div><div class="font-bold text-sm">Masaż skóry głowy</div><p class="text-xs text-neutral-300 font-medium leading-relaxed">2 min opuszkami palców.</p></div></div>
     </div>
     <button data-check="wlosy" data-close-modal class="modal-check-btn w-full py-3.5 rounded-full bg-gradient-to-br from-gold to-peach text-ink font-extrabold active:scale-95 transition"><i class="fa-solid fa-check mr-1.5"></i>Zrobione</button>
@@ -947,21 +799,6 @@ html.light-theme .history-item{border-left-color:rgba(30,26,53,.12)}
   </div>
 </div>
 
-<div id="modal-recovery" class="modal-wrap hidden fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-5">
-  <div class="modal-backdrop absolute inset-0" data-close-modal></div>
-  <div class="modal-pop relative glass rounded-t-4xl sm:rounded-4xl w-full sm:max-w-md p-6 shadow-soft max-h-[85vh] overflow-y-auto">
-    <div class="flex items-start justify-between mb-4"><div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-rose/25 to-lilac/25 flex items-center justify-center"><i class="fa-solid fa-leaf text-rose text-2xl"></i></div><button data-close-modal class="w-9 h-9 rounded-full glass flex items-center justify-center text-neutral-400"><i class="fa-solid fa-xmark"></i></button></div>
-    <h3 class="font-extrabold text-xl mb-3">🌿 Tryb regeneracji</h3>
-    <div class="space-y-3 mb-5">
-      <div class="glass rounded-3xl p-4"><div class="font-bold text-sm mb-1">🚶 Spacer 30-45 min</div></div>
-      <div class="glass rounded-3xl p-4"><div class="font-bold text-sm mb-1">🧘 Mobility 10 min</div></div>
-      <div class="glass rounded-3xl p-4"><div class="font-bold text-sm mb-1">🫁 Oddech 5 min</div></div>
-      <div class="glass rounded-3xl p-4"><div class="font-bold text-sm mb-1">😴 Sen 8-9h</div></div>
-    </div>
-    <button id="btn-recovery-confirm" data-close-modal class="w-full py-3.5 rounded-full bg-gradient-to-br from-rose to-lilac text-ink font-extrabold active:scale-95 transition">Włącz tryb</button>
-  </div>
-</div>
-
 <div id="modal-onboarding" class="modal-wrap hidden fixed inset-0 z-50 flex items-center justify-center p-5">
   <div class="modal-backdrop absolute inset-0"></div>
   <div class="modal-pop relative glass rounded-4xl w-full sm:max-w-md p-6 shadow-soft max-h-[85vh] overflow-y-auto text-center">
@@ -983,20 +820,10 @@ html.light-theme .history-item{border-left-color:rgba(30,26,53,.12)}
   </div>
 </div>
 
-<div id="modal-help" class="modal-wrap hidden fixed inset-0 z-50 flex items-center justify-center p-5">
-  <div class="modal-backdrop absolute inset-0" data-close-modal></div>
-  <div class="modal-pop relative glass rounded-4xl w-full sm:max-w-md p-6 shadow-soft max-h-[85vh] overflow-y-auto">
-    <div class="flex items-start justify-between mb-4"><div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-mint/25 to-lilac/25 flex items-center justify-center"><i id="help-icon" class="fa-solid fa-circle-question text-mint text-2xl"></i></div><button data-close-modal class="w-9 h-9 rounded-full glass flex items-center justify-center text-neutral-400"><i class="fa-solid fa-xmark"></i></button></div>
-    <h3 id="help-title" class="font-extrabold text-xl mb-3">Pomoc</h3>
-    <p id="help-text" class="text-sm text-neutral-200 leading-relaxed font-medium"></p>
-    <div id="help-values" class="mt-4 space-y-2"></div>
-  </div>
-</div>
-
 <div id="modal-knowledge" class="modal-wrap hidden fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-5">
   <div class="modal-backdrop absolute inset-0" data-close-modal></div>
   <div class="modal-pop relative glass rounded-t-4xl sm:rounded-4xl w-full sm:max-w-md p-6 shadow-soft max-h-[85vh] overflow-y-auto">
-    <div class="flex items-start justify-between mb-4"><div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-lilac/25 to-mint/25 flex items-center justify-center"><i id="kb-icon" class="fa-solid fa-graduation-cap text-lilac text-2xl"></i></div><button data-close-modal class="w-9 h-9 rounded-full glass flex items-center justify-center text-neutral-400"><i class="fa-solid fa-xmark"></i></button></div>
+    <div class="flex items-start justify-between mb-4"><div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-lilac/25 to-mint/25 flex items-center justify-center"><i class="fa-solid fa-graduation-cap text-lilac text-2xl"></i></div><button data-close-modal class="w-9 h-9 rounded-full glass flex items-center justify-center text-neutral-400"><i class="fa-solid fa-xmark"></i></button></div>
     <h3 id="kb-title" class="font-extrabold text-xl mb-3">Temat</h3>
     <div id="kb-body" class="text-sm text-neutral-200 leading-relaxed font-medium"></div>
   </div>
@@ -1029,7 +856,6 @@ const USER_NAME = "Karol";
 
 let firebaseReady = false;
 let currentUser = { uid: "local" };
-let fcmMessaging = null;
 let authResolved = false;
 let syncInProgress = false;
 let booted = false;
@@ -1044,13 +870,14 @@ const firebaseConfig = {
   messagingSenderId: "1025631760665",
   appId: "1:1025631760665:web:93c5b62295bd8b0b675588",
 };
-const VAPID_KEY = "TWOJ_VAPID_KEY";
+
+function $(id) { return document.getElementById(id); }
 
 // ============================================================================
 // SYNC UI
 // ============================================================================
 function setSyncStatus(mode, label) {
-  const el = document.getElementById("sync-status");
+  const el = $("sync-status");
   if (!el) return;
   el.className = mode;
   const icons = { offline: "fa-cloud", syncing: "fa-cloud-arrow-up", synced: "fa-cloud-check" };
@@ -1088,7 +915,7 @@ function calcBMI(w, h) { if (!w || !h) return null; return w / ((h / 100) ** 2);
 function bmiLabel(b) {
   if (b == null) return "";
   if (b < 18.5) return "Niedowaga — buduj masę";
-  if (b < 25) return "Norma — trzymaj rytm";
+  if (b < 25) return "Norma";
   if (b < 30) return "Nadwaga";
   return "Otyłość";
 }
@@ -1110,7 +937,7 @@ function average(arr) { return arr.length ? arr.reduce((a, b) => a + b, 0) / arr
 function escapeHtml(s) { const d = document.createElement("div"); d.textContent = s || ""; return d.innerHTML; }
 
 function showToast(msg) {
-  const t = document.getElementById("toast");
+  const t = $("toast");
   if (!t) return;
   t.textContent = msg;
   t.classList.remove("hidden");
@@ -1131,11 +958,8 @@ async function saveDayDoc(d) {
   try {
     const { fsMod, db } = window.__fb;
     await fsMod.setDoc(fsMod.doc(db, "users", currentUser.uid, "days", d.date), d, { merge: true });
-  } catch (e) {
-    console.error("Firestore save error:", e);
-  } finally {
-    syncInProgress = false; updateSyncUI();
-  }
+  } catch (e) { console.error("Save:", e); }
+  finally { syncInProgress = false; updateSyncUI(); }
 }
 
 async function loadDayDoc(dateStr) {
@@ -1266,9 +1090,9 @@ async function migrateLocalToCloud() {
 // AUTH
 // ============================================================================
 function updateAuthUI(user) {
-  const badge = document.getElementById("user-badge");
-  const signinBtn = document.getElementById("btn-signin");
-  const accountInfo = document.getElementById("settings-account");
+  const badge = $("user-badge");
+  const signinBtn = $("btn-signin");
+  const accountInfo = $("settings-account");
   if (!badge || !signinBtn) return;
   if (user) {
     const name = user.displayName || user.email?.split("@")[0] || user.uid.slice(0, 8);
@@ -1309,7 +1133,7 @@ async function initFirebase() {
       else await reloadEverything();
     });
 
-    document.getElementById("btn-signin").addEventListener("click", async () => {
+    $("btn-signin")?.addEventListener("click", async () => {
       const user = auth.currentUser;
       if (user) {
         if (confirm(`Wylogować się z ${user.displayName || user.email}?`)) {
@@ -1355,20 +1179,14 @@ const state = {
   foodChecked: [],
   morning: {},
   evening: {},
-  moodTagsMorning: [],
   dayTags: [],
   habits: { waterSalt: false, coldShower: false, walkMeal: false },
   ascend: {},
   note: "",
-  specialMode: "normal",
-  recoveryMode: false,
   chartRange: 7,
   lastMilestoneShown: null,
 };
 
-// ============================================================================
-// KONDYCJONALNE ZADANIA (paznokcie w nd, wlosy co 2-3 dni, pływanie w pon)
-// ============================================================================
 function applyConditionalTasks() {
   // Paznokcie — niedziela
   if (isSunday(todayObj)) {
@@ -1376,19 +1194,19 @@ function applyConditionalTasks() {
   } else {
     state.tasks = state.tasks.filter(t => t.id !== "paznokcie");
   }
-  // Włosy — sobota, poniedziałek, czwartek (co 2-3 dni)
-  const dayOfWeek = todayObj.getDay();
-  if (dayOfWeek === 1 || dayOfWeek === 4 || dayOfWeek === 6) {
+  // Włosy — pon / czw / sob
+  const d = todayObj.getDay();
+  if (d === 1 || d === 4 || d === 6) {
     if (!state.tasks.find(t => t.id === "wlosy")) state.tasks.push({ id: "wlosy", label: "Mycie włosów / odżywka", done: false });
   } else {
     state.tasks = state.tasks.filter(t => t.id !== "wlosy");
   }
-  // Odśwież etykietę treningu zależnie od dnia
-  const trening = state.tasks.find(t => t.id === "trening");
-  if (trening) {
-    if (monday) trening.label = "Basen 1,5h";
-    else if (isBikeDay) trening.label = "Trasa 7 km rower";
-    else trening.label = "Kalistenika";
+  // Etykieta treningu
+  const tr = state.tasks.find(t => t.id === "trening");
+  if (tr) {
+    if (monday) tr.label = "Basen 1,5h";
+    else if (isBikeDay) tr.label = "Trasa 7 km rower";
+    else tr.label = "Kalistenika";
   }
 }
 
@@ -1401,7 +1219,7 @@ function calcCompletionPct() {
 // ASCEND
 // ============================================================================
 const ASCEND_ITEMS = [
-  { id: "sleep-back", cat: "sleep", icon: "😴", label: "Sen na plecach", hint: "Mniej odgnieceń i asymetrii twarzy" },
+  { id: "sleep-back", cat: "sleep", icon: "😴", label: "Sen na plecach", hint: "Mniej odgnieceń i asymetrii" },
   { id: "dark-room", cat: "sleep", icon: "🌑", label: "Całkowita ciemność", hint: "Deep sleep + melatonina" },
   { id: "no-screen-bed", cat: "sleep", icon: "📵", label: "Bez ekranu w łóżku", hint: "1h przed snem" },
   { id: "cold-room", cat: "sleep", icon: "🥶", label: "Chłodna sypialnia 18-19°C", hint: "Lepszy deep sleep" },
@@ -1424,9 +1242,9 @@ const ASCEND_ITEMS = [
   { id: "breathing", cat: "mind", icon: "🫁", label: "5 min oddechu 4-7-8", hint: "Kortyzol w dół" },
   { id: "walk-10", cat: "mind", icon: "🚶", label: "10 min spaceru dziennie", hint: "Ruch bazowy" },
   { id: "no-scroll-morning", cat: "mind", icon: "📱", label: "Bez telefonu przez 30 min po przebudzeniu", hint: "Umysł startuje spokojnie" },
-  { id: "clean-pillow", cat: "hygiene", icon: "🛏️", label: "Świeża poszewka (co 2-3 dni)", hint: "Mniej bakterii" },
+  { id: "clean-pillow", cat: "hygiene", icon: "🛏️", label: "Świeża poszewka co 2-3 dni", hint: "Mniej bakterii" },
   { id: "nose-trim", cat: "hygiene", icon: "👃", label: "Trymer nosa co tydzień", hint: "Detal, który robi różnicę" },
-  { id: "lip-balm", cat: "hygiene", icon: "👄", label: "Balsam do ust 2× dziennie", hint: "Suche usta = prosty glow-up" },
+  { id: "lip-balm", cat: "hygiene", icon: "👄", label: "Balsam do ust 2× dziennie", hint: "Prosty glow-up" },
   { id: "nail-weekly", cat: "hygiene", icon: "💅", label: "Paznokcie co tydzień", hint: "Niedziela" },
   { id: "clean-teeth", cat: "hygiene", icon: "🦷", label: "Nitkowanie + płukanka", hint: "Uśmiech i bruksizm" },
 ];
@@ -1440,7 +1258,7 @@ function calcAscendPct() {
 function renderAscend() {
   const cats = ["sleep", "food", "face", "mind", "hygiene"];
   cats.forEach((cat) => {
-    const container = document.getElementById(`ascend-${cat}`);
+    const container = $("ascend-" + cat);
     if (!container) return;
     const items = ASCEND_ITEMS.filter((i) => i.cat === cat);
     container.innerHTML = items.map((i) => `
@@ -1466,9 +1284,10 @@ function renderAscend() {
     });
   });
   const { done, total, pct } = calcAscendPct();
-  document.getElementById("ascend-pct").textContent = `${pct}%`;
-  document.getElementById("ascend-bar").style.width = `${pct}%`;
-  document.getElementById("ascend-count").textContent = `${done} z ${total} dzisiaj`;
+  const pctEl = $("ascend-pct"); const barEl = $("ascend-bar"); const cEl = $("ascend-count");
+  if (pctEl) pctEl.textContent = `${pct}%`;
+  if (barEl) barEl.style.width = `${pct}%`;
+  if (cEl) cEl.textContent = `${done} z ${total} dzisiaj`;
 }
 
 // ============================================================================
@@ -1494,10 +1313,11 @@ function calculateReadiness() {
 
 function renderReadiness() {
   const pct = calculateReadiness();
-  const ring = document.getElementById("readiness-ring");
-  const pctEl = document.getElementById("readiness-pct");
-  const labelEl = document.getElementById("readiness-label");
-  const tipEl = document.getElementById("readiness-tip");
+  const ring = $("readiness-ring");
+  const pctEl = $("readiness-pct");
+  const labelEl = $("readiness-label");
+  const tipEl = $("readiness-tip");
+  if (!ring || !pctEl) return;
   const circ = 213.6;
   if (pct == null) {
     pctEl.textContent = "—";
@@ -1511,10 +1331,10 @@ function renderReadiness() {
   ring.style.strokeDashoffset = circ - (pct / 100) * circ;
   pctEl.textContent = `${pct}%`;
   let color, label, tip, cls;
-  if (pct >= 80) { color = "#5eead4"; label = "Pełna gotowość"; tip = "Trenuj normalnie, możesz nawet zwiększyć intensywność."; cls = "text-mint"; }
-  else if (pct >= 60) { color = "#fbbf24"; label = "Umiarkowana"; tip = "Trening normalny, nie forsuj rekordów."; cls = "text-gold"; }
-  else if (pct >= 40) { color = "#fbbf9d"; label = "Obniżona"; tip = "Lżejszy trening, priorytet snu."; cls = "text-peach"; }
-  else { color = "#fb7185"; label = "Niska"; tip = "Dziś regeneracja — spacer, mobility, sen."; cls = "text-rose"; }
+  if (pct >= 80) { color = "#5eead4"; label = "Pełna gotowość"; tip = "Trenuj normalnie."; cls = "text-mint"; }
+  else if (pct >= 60) { color = "#fbbf24"; label = "Umiarkowana"; tip = "Trening normalny."; cls = "text-gold"; }
+  else if (pct >= 40) { color = "#fbbf9d"; label = "Obniżona"; tip = "Lżejszy trening."; cls = "text-peach"; }
+  else { color = "#fb7185"; label = "Niska"; tip = "Dziś regeneracja."; cls = "text-rose"; }
   ring.setAttribute("stroke", color);
   labelEl.textContent = label;
   labelEl.className = `font-extrabold text-base mb-1 ${cls}`;
@@ -1525,16 +1345,13 @@ function renderReadiness() {
 // TRENING
 // ============================================================================
 function setupTreningCard() {
-  const icon = document.getElementById("trening-icon");
-  const title = document.getElementById("trening-title");
-  const sub = document.getElementById("trening-sub");
+  const icon = $("trening-icon");
+  const title = $("trening-title");
+  const sub = $("trening-sub");
   if (!icon) return;
-  if (state.specialMode === "sick") { icon.className = "fa-solid fa-bed-pulse text-rose text-2xl"; title.textContent = "🤒 Tryb choroby"; sub.textContent = "Odpoczynek"; return; }
-  if (state.specialMode === "vacation") { icon.className = "fa-solid fa-umbrella-beach text-gold text-2xl"; title.textContent = "🏖️ Wakacje"; sub.textContent = "Luz"; return; }
-  if (state.specialMode === "recovery") { icon.className = "fa-solid fa-leaf text-rose text-2xl"; title.textContent = "🌿 Regeneracja"; sub.textContent = "Spacer + mobility"; return; }
   if (monday) { icon.className = "fa-solid fa-person-swimming text-mint text-2xl"; title.textContent = "🏊 Basen — 1,5h"; sub.textContent = "Poniedziałek to dzień na wodę"; }
   else if (isBikeDay) { icon.className = "fa-solid fa-person-biking text-mint text-2xl"; title.textContent = "🚴 Trasa 7 km — rower"; sub.textContent = "Co 3 dni zmiana bodźca"; }
-  else { icon.className = "fa-solid fa-dumbbell text-mint text-2xl"; title.textContent = "💪 Kalistenika (ulga)"; sub.textContent = "2 serie • 10-12 powt"; }
+  else { icon.className = "fa-solid fa-dumbbell text-mint text-2xl"; title.textContent = "💪 Kalistenika"; sub.textContent = "2 serie • 10-12 powt"; }
 }
 
 const CALISTHENICS_PLAN = [
@@ -1547,24 +1364,22 @@ const CALISTHENICS_PLAN = [
 ];
 
 function renderTreningModalContent() {
-  const iconEl = document.getElementById("modal-trening-icon");
-  const title = document.getElementById("modal-trening-title");
-  const sub = document.getElementById("modal-trening-sub");
-  const content = document.getElementById("modal-trening-content");
-  if (state.specialMode === "sick") { iconEl.className = "fa-solid fa-bed-pulse text-rose text-2xl"; title.textContent = "🤒 Tryb choroby"; sub.textContent = "Odpoczywasz"; content.innerHTML = `<div class="glass rounded-3xl p-4 border border-rose/20"><p class="text-sm text-neutral-200 font-medium leading-relaxed">Nawodnienie, herbata, sen. Zero treningu.</p></div>`; return; }
-  if (state.specialMode === "vacation") { iconEl.className = "fa-solid fa-umbrella-beach text-gold text-2xl"; title.textContent = "🏖️ Wakacje"; sub.textContent = "Luz"; content.innerHTML = `<div class="glass rounded-3xl p-4 border border-gold/20"><p class="text-sm text-neutral-200 font-medium leading-relaxed">Spacer, zwiedzanie, pływanie.</p></div>`; return; }
-  if (state.specialMode === "recovery") { iconEl.className = "fa-solid fa-leaf text-rose text-2xl"; title.textContent = "🌿 Regeneracja"; sub.textContent = "Dziś nie trenujemy"; content.innerHTML = `<div class="glass rounded-3xl p-4 border border-rose/20"><p class="text-sm text-neutral-200 font-medium leading-relaxed">🚶 Spacer 30-45 min + mobility 10 min + oddech 5 min.</p></div>`; return; }
+  const iconEl = $("modal-trening-icon");
+  const title = $("modal-trening-title");
+  const sub = $("modal-trening-sub");
+  const content = $("modal-trening-content");
+  if (!content) return;
   if (monday) {
     iconEl.className = "fa-solid fa-person-swimming text-mint text-2xl";
     title.textContent = "🏊 Basen — 1,5h"; sub.textContent = "Poniedziałek w wodzie";
-    content.innerHTML = `<div class="glass rounded-3xl p-4 flex items-start gap-3"><i class="fa-solid fa-water text-mint mt-0.5"></i><p class="text-sm text-neutral-200 font-medium leading-relaxed">1,5h pływania, przerwy co 15-20 min. Pływanie rozciąga kręgosłup — idealne dla wzrostu.</p></div>`;
+    content.innerHTML = `<div class="glass rounded-3xl p-4"><p class="text-sm text-neutral-200 font-medium leading-relaxed">1,5h pływania, przerwy co 15-20 min. Pływanie rozciąga kręgosłup — idealne dla wzrostu.</p></div>`;
   } else if (isBikeDay) {
     iconEl.className = "fa-solid fa-person-biking text-mint text-2xl";
     title.textContent = "🚴 Trasa 7 km — rower"; sub.textContent = "Zmiana bodźca co 3 dni";
-    content.innerHTML = `<div class="glass rounded-3xl p-4 flex items-start gap-3"><i class="fa-solid fa-route text-mint mt-0.5"></i><p class="text-sm text-neutral-200 font-medium leading-relaxed">7 km spokojnym tempem. Zapisz dystans w raporcie wieczornym.</p></div>`;
+    content.innerHTML = `<div class="glass rounded-3xl p-4"><p class="text-sm text-neutral-200 font-medium leading-relaxed">7 km spokojnym tempem. Zapisz dystans w raporcie wieczornym.</p></div>`;
   } else {
     iconEl.className = "fa-solid fa-dumbbell text-mint text-2xl";
-    title.textContent = "💪 Kalistenika (wersja ulga)"; sub.textContent = "Zmniejszona objętość";
+    title.textContent = "💪 Kalistenika"; sub.textContent = "Zmniejszona objętość";
     content.innerHTML = CALISTHENICS_PLAN.map((ex) => `
       <div class="glass rounded-3xl p-3.5 flex items-center gap-3">
         <div class="w-9 h-9 rounded-xl bg-${ex.color}/15 flex items-center justify-center flex-shrink-0 text-${ex.color}"><i class="fa-solid ${ex.icon} text-sm"></i></div>
@@ -1575,50 +1390,43 @@ function renderTreningModalContent() {
 }
 
 // ============================================================================
-// DETEKTORY + OSTRZEŻENIA ZDROWOTNE
+// DETEKTORY
 // ============================================================================
 async function checkDeload() {
   const days = await loadLastNDays(14);
   const withData = days.filter((d) => d.morning || d.evening);
   const last3 = withData.slice(-3);
   const rpeDays = last3.filter((d) => (d.evening?.rpe ?? 0) >= 8).length;
-  const deloadBanner = document.getElementById("deload-banner");
+  const banner = $("deload-banner");
+  if (!banner) return;
   if (rpeDays >= 3) {
-    document.getElementById("deload-text").textContent = `3 ostatnie treningi z RPE ≥ 8. Zalecany deload: połowa serii, 60% intensywności.`;
-    deloadBanner.classList.remove("hidden");
-  } else deloadBanner.classList.add("hidden");
+    $("deload-text").textContent = `3 ostatnie treningi z RPE ≥ 8. Zalecany deload: połowa serii, 60% intensywności.`;
+    banner.classList.remove("hidden");
+  } else banner.classList.add("hidden");
 }
 
 async function renderHealthWarnings() {
   const days = await loadLastNDays(7);
   const withData = days.filter((d) => d.morning || d.evening);
   const warnings = [];
-
-  // RHR +5 przez 3 dni
   const rhrs = withData.slice(-4).map((d) => d.morning?.rhr).filter((r) => r != null);
   if (rhrs.length >= 4) {
     const recent = rhrs.slice(-3);
     const baseline = rhrs[0];
     const avg = recent.reduce((a, b) => a + b, 0) / recent.length;
-    if (avg - baseline >= 5) warnings.push({ icon: "💓", title: "RHR wzrosło o 5+ bpm", text: `Średnia z 3 dni (${avg.toFixed(0)}) vs baza (${baseline}). Możliwe przemęczenie, stres lub choroba. Priorytet regeneracji.` });
+    if (avg - baseline >= 5) warnings.push({ icon: "💓", title: "RHR wzrosło o 5+ bpm", text: `Średnia z 3 dni (${avg.toFixed(0)}) vs baza (${baseline}). Możliwe przemęczenie.` });
   }
-
-  // Sen < 6h przez 3 dni
   const sleep3 = withData.slice(-3).map((d) => d.morning?.sleepTotal).filter((s) => s != null);
-  if (sleep3.length === 3 && sleep3.every((s) => s < 6)) warnings.push({ icon: "😴", title: "3 dni poniżej 6h snu", text: "Kumulujesz dług senny. Hormon wzrostu spada, regeneracja leży. Dziś priorytet: sen 8h+." });
-
-  // Waga spada 3 dni z rzędu
+  if (sleep3.length === 3 && sleep3.every((s) => s < 6)) warnings.push({ icon: "😴", title: "3 dni poniżej 6h snu", text: "Kumulujesz dług senny. Dziś priorytet: sen 8h+." });
   const weights = withData.slice(-4).map((d) => d.morning?.dailyWeight).filter((w) => w != null);
   if (weights.length >= 4) {
     const declining = weights.slice(-3).every((w, i) => i === 0 || w < weights[weights.length - 4 + i]);
-    if (declining) warnings.push({ icon: "⚖️", title: "Waga spada 3 dni z rzędu", text: "Sprawdź czy jesz wystarczająco. Cel to masa, nie spadek." });
+    if (declining) warnings.push({ icon: "⚖️", title: "Waga spada 3 dni z rzędu", text: "Sprawdź czy jesz wystarczająco." });
   }
-
-  // Stres > 70 przez 3 dni
   const stress3 = withData.slice(-3).map((d) => d.evening?.stress).filter((s) => s != null);
-  if (stress3.length === 3 && stress3.every((s) => s > 70)) warnings.push({ icon: "🧘", title: "3 dni wysokiego stresu (>70)", text: "Układ nerwowy przeciążony. Włącz tryb regeneracji na 1-2 dni." });
-
-  const box = document.getElementById("health-warnings");
+  if (stress3.length === 3 && stress3.every((s) => s > 70)) warnings.push({ icon: "🧘", title: "3 dni stresu >70", text: "Układ nerwowy przeciążony." });
+  const box = $("health-warnings");
+  if (!box) return;
   if (warnings.length === 0) { box.classList.add("hidden"); return; }
   box.classList.remove("hidden");
   box.innerHTML = warnings.map((w) => `
@@ -1661,26 +1469,28 @@ function renderCheckStates() {
 function renderProgress() {
   const pct = calcCompletionPct();
   const done = state.tasks.filter((t) => t.done).length;
-  document.getElementById("progress-bar").style.width = `${pct}%`;
-  document.getElementById("hero-pct").textContent = `${pct}%`;
-  document.getElementById("progress-sub").textContent = `${done} z ${state.tasks.length} zadań na dziś`;
-  document.getElementById("hero-ring").style.strokeDashoffset = 169.6 - (pct / 100) * 169.6;
-  const h = document.getElementById("progress-headline");
-  if (pct === 100) h.textContent = "Level up! 🚀";
-  else if (pct >= 50) h.textContent = "Dobra robota 🔥";
-  else if (pct > 0) h.textContent = "Ruszyłeś 💪";
-  else h.textContent = `Zaczynajmy, ${USER_NAME} 💪`;
+  const bar = $("progress-bar"); const heroPct = $("hero-pct"); const sub = $("progress-sub"); const ring = $("hero-ring"); const head = $("progress-headline");
+  if (bar) bar.style.width = `${pct}%`;
+  if (heroPct) heroPct.textContent = `${pct}%`;
+  if (sub) sub.textContent = `${done} z ${state.tasks.length} zadań na dziś`;
+  if (ring) ring.style.strokeDashoffset = 169.6 - (pct / 100) * 169.6;
+  if (head) {
+    if (pct === 100) head.textContent = "Level up! 🚀";
+    else if (pct >= 50) head.textContent = "Dobra robota 🔥";
+    else if (pct > 0) head.textContent = "Ruszyłeś 💪";
+    else head.textContent = `Zaczynajmy, ${USER_NAME} 💪`;
+  }
 }
 
 async function persistToday() {
   const existing = (await loadDayDoc(todayKey)) || {};
   const dayData = {
     ...existing, date: todayKey, tasks: state.tasks, completedPct: calcCompletionPct(),
-    foodChecked: state.foodChecked, habits: state.habits, recoveryMode: state.recoveryMode,
-    specialMode: state.specialMode, note: state.note, ascend: state.ascend,
+    foodChecked: state.foodChecked, habits: state.habits,
+    note: state.note, ascend: state.ascend,
     morning: { ...(existing.morning || {}), ...state.morning },
     evening: { ...(existing.evening || {}), ...state.evening },
-    moodTagsMorning: state.moodTagsMorning, dayTags: state.dayTags,
+    dayTags: state.dayTags,
     updatedAt: Date.now(),
   };
   await saveDayDoc(dayData);
@@ -1696,9 +1506,10 @@ async function refreshStreak() {
   const pctToday = today?.completedPct ?? 0;
   const base = await computeStreakUpTo(todayKey);
   const streak = pctToday === 100 ? base + 1 : base;
-  document.getElementById("streak-count").textContent = streak;
-  const pill = document.getElementById("streak-pill");
-  if (streak > 0) pill.classList.add("ring-pulse"); else pill.classList.remove("ring-pulse");
+  const el = $("streak-count");
+  if (el) el.textContent = streak;
+  const pill = $("streak-pill");
+  if (pill) { if (streak > 0) pill.classList.add("ring-pulse"); else pill.classList.remove("ring-pulse"); }
 }
 
 async function computeStreakUpTo(dateStr) {
@@ -1717,22 +1528,23 @@ async function computeStreakUpTo(dateStr) {
 // MILESTONE
 // ============================================================================
 async function checkMilestone() {
-  const streak = parseInt(document.getElementById("streak-count").textContent) || 0;
+  const streak = parseInt($("streak-count")?.textContent) || 0;
   const milestones = [30, 60, 90, 100, 180, 365];
   const hit = milestones.find((m) => streak === m);
   if (!hit || state.lastMilestoneShown === hit) return;
   state.lastMilestoneShown = hit;
-  const banner = document.getElementById("milestone-banner");
-  document.getElementById("milestone-title").textContent = `🎉 ${hit} dni streak!`;
+  const banner = $("milestone-banner");
+  if (!banner) return;
+  $("milestone-title").textContent = `🎉 ${hit} dni streak!`;
   const messages = {
     30: "Miesiąc! To nie eksperyment, to Twoje życie.",
     60: "Dwa miesiące. Jesteś inną osobą niż na starcie.",
     90: "Kwartał! 90% ludzi nie dolatuje tutaj.",
     100: "Sto dni. Legendarny wynik.",
-    180: "Pół roku. To nie streak, to styl życia.",
-    365: "Rok. Zmieniłeś się z człowieka w maszynę.",
+    180: "Pół roku. To styl życia.",
+    365: "Rok. Maszyna.",
   };
-  document.getElementById("milestone-text").textContent = messages[hit] || `${hit} dni z rzędu!`;
+  $("milestone-text").textContent = messages[hit] || `${hit} dni!`;
   banner.classList.remove("hidden");
   setTimeout(() => banner.classList.add("hidden"), 12000);
   fireConfetti();
@@ -1788,40 +1600,35 @@ function renderImprovementTips() {
 
   const asc = calcAscendPct();
   if (asc.done < asc.total) tips.push({ icon: "🚀", text: `Ascend: ${asc.done}/${asc.total} — zostało ${asc.total - asc.done}.` });
-  else tips.push({ icon: "🏆", text: "Ascend 100% — full stack dzisiaj!" });
+  else tips.push({ icon: "🏆", text: "Ascend 100% — full stack!" });
 
   const done = state.tasks.filter((t) => t.done).length;
-  if (done < state.tasks.length) tips.push({ icon: "⚡", text: `Zostało ${state.tasks.length - done} zadań dnia.` });
+  if (done < state.tasks.length) tips.push({ icon: "⚡", text: `Zostało ${state.tasks.length - done} zadań.` });
   else tips.push({ icon: "🏆", text: "Wszystkie zadania dnia zaliczone!" });
 
   if (m.dailyWeight != null) tips.push({ icon: "⚖️", text: `Waga: ${m.dailyWeight} kg — patrzymy na trend.` });
 
-  document.getElementById("improvement-tips").innerHTML = tips.map((t) =>
+  const c = $("improvement-tips");
+  if (c) c.innerHTML = tips.map((t) =>
     `<div class="flex items-start gap-2.5 glass rounded-2xl px-3 py-2.5"><span class="text-base leading-none mt-0.5">${t.icon}</span><span class="text-xs text-neutral-200 font-medium">${t.text}</span></div>`
   ).join("");
 }
 
 // ============================================================================
-// AUTO BRIEF
+// BRIEF
 // ============================================================================
 function getBriefCacheKey() { return `regim:brief:${todayKey}:main`; }
 function getCachedBrief(maxAgeMs) {
   const raw = localStorage.getItem(getBriefCacheKey());
   if (!raw) return null;
-  try { const c = JSON.parse(raw); if (Date.now() - c.ts > maxAgeMs) return null; return c.text; }
-  catch { return null; }
+  try { const c = JSON.parse(raw); if (Date.now() - c.ts > maxAgeMs) return null; return c.text; } catch { return null; }
 }
-function setCachedBrief(text) {
-  localStorage.setItem(getBriefCacheKey(), JSON.stringify({ text, ts: Date.now() }));
-}
+function setCachedBrief(text) { localStorage.setItem(getBriefCacheKey(), JSON.stringify({ text, ts: Date.now() })); }
 function detectContext() {
   const h = new Date().getHours();
   const dayOfWeek = new Date().getDay();
   let timeOfDay;
-  if (h < 10) timeOfDay = "morning";
-  else if (h < 15) timeOfDay = "midday";
-  else if (h < 20) timeOfDay = "afternoon";
-  else timeOfDay = "evening";
+  if (h < 10) timeOfDay = "morning"; else if (h < 15) timeOfDay = "midday"; else if (h < 20) timeOfDay = "afternoon"; else timeOfDay = "evening";
   return { timeOfDay, h, dayOfWeek };
 }
 
@@ -1834,102 +1641,102 @@ async function generateTrainerBrief() {
   const pct = calcCompletionPct();
   const asc = calcAscendPct();
   const kws = detectKeywords(state.note || today.note || "");
-  const streak = parseInt(document.getElementById("streak-count").textContent) || 0;
+  const streak = parseInt($("streak-count")?.textContent) || 0;
   const yesterday = days[days.length - 2] || {};
   const last7 = days.slice(-7);
 
   if ([30, 60, 90, 100, 180, 365].includes(streak)) return `🏆 Masz ${streak} dni streak! To nie przypadek — to system.`;
+  if (ctx.timeOfDay === "morning" && m.sleepTotal == null) return `☀️ Dzień dobry, ${USER_NAME}. Wrzuć dane snu z zegarka.`;
+  if (ctx.timeOfDay === "afternoon" && m.sleepTotal == null && ctx.h >= 14) return `⚠️ Minęło południe, brak raportu porannego.`;
+  if (ctx.timeOfDay === "evening" && e.stress == null && ctx.h >= 19) return `🌙 Wieczór — domknij dzień raportem.`;
 
-  if (ctx.timeOfDay === "morning" && m.sleepTotal == null) return `☀️ Dzień dobry, ${USER_NAME}. Wrzuć dane snu z zegarka — fundament decyzji na dziś.`;
-  if (ctx.timeOfDay === "afternoon" && m.sleepTotal == null && ctx.h >= 14) return `⚠️ Minęło południe, brak raportu porannego. Wpisz teraz.`;
-  if (ctx.timeOfDay === "evening" && e.stress == null && ctx.h >= 19) return `🌙 Wieczór — domknij dzień raportem. 30 sekund.`;
-
-  if (kws.includes("sick")) return `🤒 Choroba w notatce. Odpuść trening — organizm potrzebuje energii na walkę.`;
-  if (kws.includes("alcohol")) return `🍺 Alkohol w notatce. Woda i elektrolity. Trening odpuść.`;
-  if (kws.includes("stress")) return `😰 Stres w notatce — obniża regenerację. Priorytet: sen, oddech 4-7-8.`;
-  if (kws.includes("travel")) return `✈️ Podróż — zadbaj o sen mimo zmiany strefy.`;
-  if (kws.includes("tired")) return `😴 Piszesz że jesteś zmęczony. Sprawdź RHR i sen z 3 dni.`;
-  if (kws.includes("happy")) return `🌟 Dobry dzień! Wykorzystaj energię na trening i ascend.`;
+  if (kws.includes("sick")) return `🤒 Choroba. Odpuść trening.`;
+  if (kws.includes("alcohol")) return `🍺 Alkohol. Woda i elektrolity. Trening odpuść.`;
+  if (kws.includes("stress")) return `😰 Stres — priorytet: sen, oddech 4-7-8.`;
+  if (kws.includes("travel")) return `✈️ Podróż — zadbaj o sen.`;
+  if (kws.includes("tired")) return `😴 Zmęczenie — sprawdź RHR i sen.`;
+  if (kws.includes("happy")) return `🌟 Dobry dzień! Wykorzystaj energię.`;
 
   if (m.sleepTotal != null) {
-    if (m.sleepTotal < 5) return `😴 Spałeś ${m.sleepTotal}h — bardzo mało. Dziś ulgowo, priorytet 8h dziś w nocy.`;
-    if (m.sleepTotal < 6.5) return `😴 ${m.sleepTotal}h — poniżej progu. Ogranicz intensywność, wcześniej sen.`;
-    if (m.sleepTotal >= 8.5) return `✅ Spałeś ${m.sleepTotal}h — bateria pełna. Możesz dziś cisnąć.`;
+    if (m.sleepTotal < 5) return `😴 Spałeś ${m.sleepTotal}h — bardzo mało. Dziś ulgowo.`;
+    if (m.sleepTotal < 6.5) return `😴 ${m.sleepTotal}h — poniżej progu.`;
+    if (m.sleepTotal >= 8.5) return `✅ Spałeś ${m.sleepTotal}h — bateria pełna.`;
   }
 
-  if (m.rhr != null && m.rhr > 70) return `💓 RHR ${m.rhr} bpm — wysoko. Możliwe przemęczenie. Dziś lekki trening.`;
-  if (m.rhr != null && m.rhr < 50) return `💓 RHR ${m.rhr} bpm — bardzo nisko, świetna regeneracja.`;
+  if (m.rhr != null && m.rhr > 70) return `💓 RHR ${m.rhr} bpm — wysoko. Lekki trening.`;
+  if (m.rhr != null && m.rhr < 50) return `💓 RHR ${m.rhr} bpm — świetna regeneracja.`;
 
   const rpe3 = last7.slice(-3).map((d) => d.evening?.rpe).filter((r) => r != null);
-  if (rpe3.length === 3 && rpe3.every((r) => r >= 8)) return `🔥 3 ostatnie treningi z RPE ≥ 8. Alarm przeciążenia. Zrób deload.`;
+  if (rpe3.length === 3 && rpe3.every((r) => r >= 8)) return `🔥 3 treningi z RPE ≥ 8. Deload.`;
 
   const sleep3 = last7.slice(-3).map((d) => d.morning?.sleepTotal).filter((s) => s != null);
-  if (sleep3.length === 3 && sleep3.every((s) => s < 6.5)) return `😴 3 dni poniżej 6.5h snu. Kumulujesz dług senny.`;
+  if (sleep3.length === 3 && sleep3.every((s) => s < 6.5)) return `😴 3 dni poniżej 6.5h snu. Dług senny.`;
 
   if (m.dailyWeight != null && yesterday.morning?.dailyWeight != null) {
     const delta = m.dailyWeight - yesterday.morning.dailyWeight;
-    if (delta < -0.4) return `⚖️ Waga spadła o ${Math.abs(delta).toFixed(1)} kg. Sprawdź czy jesz wystarczająco.`;
-    if (delta > 0.5) return `⚖️ Waga +${delta.toFixed(1)} kg. Normalne wahanie. Patrzymy na trend.`;
+    if (delta < -0.4) return `⚖️ Waga spadła o ${Math.abs(delta).toFixed(1)} kg. Jedz więcej.`;
+    if (delta > 0.5) return `⚖️ Waga +${delta.toFixed(1)} kg. Normalne. Trend ważny.`;
   }
 
   const readiness = calculateReadiness();
   if (readiness != null) {
-    if (readiness >= 85) return `🎯 Gotowość ${readiness}% — full stack. Możesz trenować mocniej.`;
-    if (readiness >= 70) return `✅ Gotowość ${readiness}% — solidna. Trenuj normalnie.`;
-    if (readiness >= 50) return `⚠️ Gotowość ${readiness}% — umiarkowana. Dziś lżejszy trening.`;
-    if (readiness >= 30) return `🟠 Gotowość ${readiness}% — niska. Rozważ tryb regeneracji.`;
+    if (readiness >= 85) return `🎯 Gotowość ${readiness}% — full stack.`;
+    if (readiness >= 70) return `✅ Gotowość ${readiness}% — solidna.`;
+    if (readiness >= 50) return `⚠️ Gotowość ${readiness}% — lżejszy trening.`;
+    if (readiness >= 30) return `🟠 Gotowość ${readiness}% — regeneracja.`;
     return `🔴 Gotowość ${readiness}% — bardzo niska. Tylko regeneracja.`;
   }
 
-  if (ctx.dayOfWeek === 1 && ctx.timeOfDay === "morning") return `📅 Poniedziałek — nowy tydzień. Zaplanuj: sen, trening, skincare.`;
-  if (ctx.dayOfWeek === 0 && ctx.timeOfDay === "evening") return `🌅 Niedziela wieczór — tydzień domknięty. Paznokcie, podsumowanie.`;
-  if (ctx.dayOfWeek === 6 && ctx.timeOfDay === "morning") return `🌞 Sobota — dobry dzień na maskę do włosów i dłuższy trening.`;
-
-  const pctText = pct === 100 ? "100% zadań — perfekcyjny dzień." : pct >= 50 ? `${pct}% planu — solidnie.` : `${pct}% zadań — jest rezerwa.`;
-
-  if (ctx.timeOfDay === "morning") return `☀️ Dzień dobry. ${pctText} Priorytet: sen, trening, skincare.`;
-  if (ctx.timeOfDay === "evening") return `🌙 Wieczór — ${pctText} Domknij dzień raportem.`;
-  return `📊 ${pctText} Kontynuuj plan dnia.`;
+  const pctText = pct === 100 ? "100% zadań — perfekcyjny dzień." : pct >= 50 ? `${pct}% planu — solidnie.` : `${pct}% zadań — rezerwa.`;
+  if (ctx.timeOfDay === "morning") return `☀️ Dzień dobry. ${pctText}`;
+  if (ctx.timeOfDay === "evening") return `🌙 Wieczór — ${pctText} Domknij dzień.`;
+  return `📊 ${pctText} Kontynuuj.`;
 }
 
 async function loadBrief(force = false) {
   const cacheAge = 3 * 60 * 60 * 1000;
+  const el = $("brief-text");
+  if (!el) return;
   if (!force) {
     const cached = getCachedBrief(cacheAge);
-    if (cached) { document.getElementById("brief-text").textContent = cached; return cached; }
+    if (cached) { el.textContent = cached; return cached; }
   }
   const text = await generateTrainerBrief();
   setCachedBrief(text);
-  document.getElementById("brief-text").textContent = text;
+  el.textContent = text;
   return text;
 }
 
 async function autoRefreshBrief() {
   const text = await generateTrainerBrief();
   setCachedBrief(text);
-  document.getElementById("brief-text").textContent = text;
-  const el = document.getElementById("brief-text");
-  el.style.animation = "none";
-  requestAnimationFrame(() => { el.style.animation = "rise 0.35s ease both"; });
+  const el = $("brief-text");
+  if (el) {
+    el.textContent = text;
+    el.style.animation = "none";
+    requestAnimationFrame(() => { el.style.animation = "rise 0.35s ease both"; });
+  }
 }
 
 // ============================================================================
-// CIAŁO — kalkulatory i tabele
+// CIAŁO
 // ============================================================================
 async function renderProfilCard() {
   const s = getSettings();
   const days = await loadLastNDays(30);
-  const lastWeight = [...days].reverse().find((d) => d.morning?.dailyWeight != null);
-  const lastHeight = [...days].reverse().find((d) => d.morning?.dailyHeight != null);
-  const w = lastWeight?.morning?.dailyWeight ?? null;
-  const h = lastHeight?.morning?.dailyHeight ?? s.height;
+  const lastW = [...days].reverse().find((d) => d.morning?.dailyWeight != null);
+  const lastH = [...days].reverse().find((d) => d.morning?.dailyHeight != null);
+  const w = lastW?.morning?.dailyWeight ?? null;
+  const h = lastH?.morning?.dailyHeight ?? s.height;
   const items = [
     { icon: "🎂", label: "Wiek", value: s.age ? `${s.age} lat` : "—" },
     { icon: "📏", label: "Wzrost", value: h ? `${h} cm` : "—" },
     { icon: "⚖️", label: "Waga", value: w ? `${w} kg` : "—" },
     { icon: "🎯", label: "Cel", value: `${s.goalWeight.toFixed(1)} kg` },
   ];
-  document.getElementById("profil-card").innerHTML = items.map((i) => `
+  const c = $("profil-card");
+  if (!c) return;
+  c.innerHTML = items.map((i) => `
     <div class="glass rounded-3xl p-3 text-center">
       <div class="text-lg">${i.icon}</div>
       <div class="text-xl font-extrabold text-mint">${i.value}</div>
@@ -1939,31 +1746,23 @@ async function renderProfilCard() {
 
 function renderGrowthCalculator() {
   const s = getSettings();
-  const resultEl = document.getElementById("predicted-height");
-  const rangeEl = document.getElementById("predicted-height-range");
-  const remainingEl = document.getElementById("growth-remaining");
+  const resultEl = $("predicted-height"); const rangeEl = $("predicted-height-range"); const remainingEl = $("growth-remaining");
+  if (!resultEl) return;
   if (!s.heightDad || !s.heightMom) {
     resultEl.textContent = "—";
     rangeEl.textContent = "Wpisz wzrost rodziców w Ustawieniach";
     remainingEl.textContent = "";
     return;
   }
-  // Midparental height dla chłopców: (wzrost ojca + wzrost matki + 13) / 2
   const mp = (s.heightDad + s.heightMom + 13) / 2;
   resultEl.textContent = `${mp.toFixed(1)} cm`;
   rangeEl.textContent = `Możliwy zakres: ${(mp - 8).toFixed(1)} – ${(mp + 8).toFixed(1)} cm`;
-  // Ostatni wzrost
   const lastHeight = localStorage.getItem("regim:last-height") ? parseFloat(localStorage.getItem("regim:last-height")) : s.height;
   const diff = mp - lastHeight;
-  if (s.age >= 18) {
-    remainingEl.textContent = `Masz ${s.age} lat — wzrost prawdopodobnie już ustabilizowany. Jeśli chcesz wyciągnąć ostatnie cm: sen 8h+, basen, zwisanie na drążku, dobra postawa (wizualnie +2-3 cm).`;
-  } else if (diff > 2) {
-    remainingEl.textContent = `Brakuje Ci ~${diff.toFixed(1)} cm do szacowanego celu. Masz jeszcze ${18 - s.age} lat wzrostu. Kluczowe: sen 8-9h, białko w diecie, basen/skakanie/zwisanie, zero cukru.`;
-  } else if (diff > -2) {
-    remainingEl.textContent = `Jesteś blisko swojego genetycznego pułapu (±2 cm). Reszta zależy od snu, diety i ćwiczeń rozciągających.`;
-  } else {
-    remainingEl.textContent = `Jesteś powyżej szacowanego pułapu — super. Utrzymuj sen i dietę, żeby nie stracić.`;
-  }
+  if (s.age >= 18) remainingEl.textContent = `Masz ${s.age} lat — wzrost prawdopodobnie ustabilizowany. Postawa +2-3 cm wizualnie.`;
+  else if (diff > 2) remainingEl.textContent = `Brakuje ~${diff.toFixed(1)} cm. Masz jeszcze ${18 - s.age} lat wzrostu. Klucz: sen 8-9h, białko, basen, zwisanie.`;
+  else if (diff > -2) remainingEl.textContent = `Jesteś blisko genetycznego pułapu (±2 cm). Reszta zależy od snu, diety i ćwiczeń.`;
+  else remainingEl.textContent = `Powyżej szacowanego pułapu — super. Utrzymuj sen i dietę.`;
 }
 
 async function renderHeightChart() {
@@ -1971,78 +1770,68 @@ async function renderHeightChart() {
   const points = days.filter((d) => d.morning?.dailyHeight != null);
   const labels = points.map((d) => { const [, m, day] = d.date.split("-"); return `${day}.${m}`; });
   const values = points.map((d) => d.morning.dailyHeight);
-  const ctx = document.getElementById("chart-height");
+  const ctx = $("chart-height"); if (!ctx) return;
   if (window.__heightChart) window.__heightChart.destroy();
   window.__heightChart = new Chart(ctx, {
     type: "line",
     data: { labels, datasets: [{ data: values, borderColor: "#5eead4", backgroundColor: "rgba(94,234,212,.12)", pointBackgroundColor: "#5eead4", pointBorderColor: "#0f0c1d", pointRadius: 5, borderWidth: 3, tension: .3, fill: true, spanGaps: true }] },
     options: { responsive: true, plugins: { legend: { display: false } },
-      scales: {
-        x: { ticks: { color: "#8b8397", font: { family: "Poppins", size: 10, weight: "600" } }, grid: { display: false } },
-        y: { ticks: { color: "#8b8397", font: { family: "Poppins", size: 10, weight: "600" } }, grid: { color: "rgba(255,255,255,.05)" } },
-      } },
+      scales: { x: { ticks: { color: "#8b8397", font: { family: "Poppins", size: 10, weight: "600" } }, grid: { display: false } },
+        y: { ticks: { color: "#8b8397", font: { family: "Poppins", size: 10, weight: "600" } }, grid: { color: "rgba(255,255,255,.05)" } } } },
   });
 }
 
 async function renderWeightETA() {
+  const el = $("weight-eta"); if (!el) return;
   const days = await loadLastNDays(30);
   const weights = days.filter((d) => d.morning?.dailyWeight != null);
-  if (weights.length < 3) {
-    document.getElementById("weight-eta").innerHTML = `<p class="text-sm text-neutral-400 font-medium">Za mało danych (potrzeba 3+ wpisów wagi w ostatnich 30 dniach).</p>`;
-    return;
-  }
+  if (weights.length < 3) { el.innerHTML = `<p class="text-sm text-neutral-400 font-medium">Potrzeba 3+ wpisów wagi w ostatnich 30 dniach.</p>`; return; }
   const target = getSettings().goalWeight;
   const first = weights[0].morning.dailyWeight;
   const last = weights[weights.length - 1].morning.dailyWeight;
   const daysDiff = Math.max(1, (new Date(weights[weights.length - 1].date) - new Date(weights[0].date)) / 86400000);
   const rate = (last - first) / daysDiff;
   const remaining = target - last;
-  if (Math.abs(remaining) < 0.3) {
-    document.getElementById("weight-eta").innerHTML = `<p class="text-sm text-mint font-bold">🏆 Cel osiągnięty! Utrzymuj wagę.</p>`;
-    return;
-  }
+  if (Math.abs(remaining) < 0.3) { el.innerHTML = `<p class="text-sm text-mint font-bold">🏆 Cel osiągnięty!</p>`; return; }
   if (rate === 0 || (rate > 0 && remaining < 0) || (rate < 0 && remaining > 0)) {
-    document.getElementById("weight-eta").innerHTML = `<p class="text-sm text-neutral-300 font-medium">Waga się nie rusza w stronę celu. Trend z 30 dni: ${rate > 0 ? "+" : ""}${(rate * 7).toFixed(2)} kg/tyg. ${remaining > 0 ? "Musisz jeść więcej." : "Musisz jeść mniej."}</p>`;
+    el.innerHTML = `<p class="text-sm text-neutral-300 font-medium">Waga nie idzie w stronę celu. Trend: ${rate > 0 ? "+" : ""}${(rate * 7).toFixed(2)} kg/tyg.</p>`;
     return;
   }
   const daysToGoal = Math.round(remaining / rate);
   const etaDate = new Date();
   etaDate.setDate(etaDate.getDate() + daysToGoal);
   const dateStr = etaDate.toLocaleDateString("pl-PL", { day: "numeric", month: "long", year: "numeric" });
-  document.getElementById("weight-eta").innerHTML = `
+  el.innerHTML = `
     <div class="text-sm text-neutral-200 font-medium leading-relaxed">
-      📈 Aktualne tempo: <strong>${rate > 0 ? "+" : ""}${(rate * 7).toFixed(2)} kg/tyg</strong><br>
-      🎯 Do celu (${target.toFixed(1)} kg): <strong>${Math.abs(remaining).toFixed(1)} kg</strong><br>
+      📈 Tempo: <strong>${rate > 0 ? "+" : ""}${(rate * 7).toFixed(2)} kg/tyg</strong><br>
+      🎯 Do celu: <strong>${Math.abs(remaining).toFixed(1)} kg</strong><br>
       ⏱️ ETA: <strong class="text-mint">${dateStr}</strong> (~${daysToGoal} dni)
     </div>`;
 }
 
 function renderBioAge() {
+  const el = $("bio-age"); if (!el) return;
   const m = state.morning || {};
   const e = state.evening || {};
   const age = getSettings().age || 14;
   let bioAge = age;
-  // Sen
   if (m.sleepTotal != null) {
     if (m.sleepTotal >= 8) bioAge -= 1.5;
     else if (m.sleepTotal >= 7) bioAge -= 0.5;
     else if (m.sleepTotal < 6) bioAge += 2;
     else if (m.sleepTotal < 6.5) bioAge += 1;
   }
-  // RHR
   if (m.rhr != null) {
     if (m.rhr < 55) bioAge -= 1.5;
     else if (m.rhr < 62) bioAge -= 0.5;
     else if (m.rhr > 75) bioAge += 2;
     else if (m.rhr > 70) bioAge += 1;
   }
-  // Stres
   if (e.stress != null) {
     if (e.stress < 30) bioAge -= 1;
     else if (e.stress > 70) bioAge += 1.5;
     else if (e.stress > 55) bioAge += 0.5;
   }
-  // Kroki
   if (e.steps != null) {
     if (e.steps >= 10000) bioAge -= 0.5;
     else if (e.steps < 3000) bioAge += 1;
@@ -2050,13 +1839,13 @@ function renderBioAge() {
   const diff = bioAge - age;
   const label = diff < -1 ? "Młodszy niż metrykalnie" : diff > 1 ? "Starszy niż metrykalnie" : "Wiek biologiczny = metrykalny";
   const color = diff < -1 ? "text-mint" : diff > 1 ? "text-rose" : "text-gold";
-  document.getElementById("bio-age").innerHTML = `
+  el.innerHTML = `
     <div class="flex items-baseline gap-2 mb-2">
       <span class="text-3xl font-extrabold ${color}">${bioAge.toFixed(1)}</span>
-      <span class="text-xs text-neutral-400 font-semibold">lat (biologiczny)</span>
+      <span class="text-xs text-neutral-400 font-semibold">lat biologicznych</span>
       <span class="text-xs text-neutral-500 font-semibold ml-auto">metrykalny: ${age}</span>
     </div>
-    <p class="text-xs text-neutral-300 font-medium leading-relaxed">${label}. ${diff < -1 ? "Twoje nawyki działają — utrzymuj." : diff > 1 ? "Popraw sen i obniż stres — to największe dźwignie." : "Solidnie. Małe zmiany w śnie podniosą wynik."}</p>`;
+    <p class="text-xs text-neutral-300 font-medium leading-relaxed">${label}.</p>`;
 }
 
 const PUBERTY_QUESTIONS = [
@@ -2066,12 +1855,12 @@ const PUBERTY_QUESTIONS = [
   { id: "body_hair", text: "Owłosienie pod pachami / na ciele" },
   { id: "acne", text: "Trądzik / wypryski na twarzy" },
   { id: "morning_erections", text: "Poranne erekcje" },
-  { id: "muscle", text: "Zauważalny przyrost masy mięśniowej" },
+  { id: "muscle", text: "Przyrost masy mięśniowej" },
 ];
 
 function renderPubertyQuestions() {
-  const container = document.getElementById("puberty-questions");
-  container.innerHTML = PUBERTY_QUESTIONS.map((q) => `
+  const c = $("puberty-questions"); if (!c) return;
+  c.innerHTML = PUBERTY_QUESTIONS.map((q) => `
     <label class="flex items-center gap-3 glass rounded-2xl px-3 py-2.5 cursor-pointer">
       <input type="checkbox" id="pq-${q.id}" class="w-5 h-5 rounded-md accent-mint flex-shrink-0">
       <span class="text-sm font-medium flex-1">${q.text}</span>
@@ -2079,14 +1868,15 @@ function renderPubertyQuestions() {
 }
 
 function renderTannerStages() {
+  const c = $("tanner-stages"); if (!c) return;
   const stages = [
-    { n: 1, label: "Etap 1 — przed okresem", desc: "Brak owłosienia łonowego, głos dziecięcy, brak skoku wzrostu." },
-    { n: 2, label: "Etap 2 — początek", desc: "Pojedyncze włosy łonowe, jądra się powiększają, pierwszy skok wzrostu. Zwykle 11-12 lat." },
-    { n: 3, label: "Etap 3 — środek", desc: "Więcej owłosienia, zmiana głosu zaczyna, skok wzrostu w pełni. Zwykle 13-14 lat." },
-    { n: 4, label: "Etap 4 — szczyt", desc: "Owłosienie dojrzałe, głos niższy, wąs. Wzrost zwalnia. Zwykle 14-16 lat." },
-    { n: 5, label: "Etap 5 — dorosłość", desc: "Włosy jak u dorosłego, broda. Wzrost ustabilizowany. Zwykle 16-18 lat." },
+    { n: 1, label: "Etap 1 — przed okresem", desc: "Brak owłosienia łonowego, głos dziecięcy." },
+    { n: 2, label: "Etap 2 — początek", desc: "Pojedyncze włosy łonowe, pierwszy skok wzrostu. Zwykle 11-12 lat." },
+    { n: 3, label: "Etap 3 — środek", desc: "Więcej owłosienia, zmiana głosu zaczyna. Zwykle 13-14 lat." },
+    { n: 4, label: "Etap 4 — szczyt", desc: "Owłosienie dojrzałe, głos niższy. Wzrost zwalnia. 14-16 lat." },
+    { n: 5, label: "Etap 5 — dorosłość", desc: "Włosy jak u dorosłego, broda. Wzrost ustabilizowany. 16-18 lat." },
   ];
-  document.getElementById("tanner-stages").innerHTML = stages.map((s) => `
+  c.innerHTML = stages.map((s) => `
     <div class="glass rounded-3xl p-4">
       <div class="font-bold text-sm mb-1">${s.label}</div>
       <p class="text-xs text-neutral-300 font-medium leading-relaxed">${s.desc}</p>
@@ -2094,11 +1884,9 @@ function renderTannerStages() {
 }
 
 function renderHeightPercentile() {
-  // WHO percentyle wzrostu dla chłopców (16 lat) — uproszczone
   const s = getSettings();
   const height = s.height;
   const age = s.age;
-  // Bazowa tabela (P3, P25, P50, P75, P97) dla 10-18 lat
   const table = {
     10: [128, 133, 138, 143, 148],
     12: [137, 143, 149, 155, 162],
@@ -2109,20 +1897,17 @@ function renderHeightPercentile() {
   const ages = Object.keys(table).map(Number);
   const ageKey = ages.reduce((a, b) => Math.abs(b - age) < Math.abs(a - age) ? b : a);
   const [p3, p25, p50, p75, p97] = table[ageKey];
-  const target = document.getElementById("height-percentile");
-  if (!height) {
-    target.innerHTML = `<p class="text-sm text-neutral-400 font-medium">Wpisz wzrost w Ustawieniach.</p>`;
-    return;
-  }
+  const target = $("height-percentile"); if (!target) return;
+  if (!height) { target.innerHTML = `<p class="text-sm text-neutral-400 font-medium">Wpisz wzrost.</p>`; return; }
   let percentile = "—";
   if (height < p3) percentile = "poniżej P3";
   else if (height < p25) percentile = "P3-P25";
-  else if (height < p50) percentile = "P25-P50 (niższa połowa)";
-  else if (height < p75) percentile = "P50-P75 (wyższa połowa)";
-  else if (height < p97) percentile = "P75-P97 (wysoki)";
-  else percentile = "powyżej P97 (bardzo wysoki)";
+  else if (height < p50) percentile = "P25-P50";
+  else if (height < p75) percentile = "P50-P75";
+  else if (height < p97) percentile = "P75-P97";
+  else percentile = "powyżej P97";
   target.innerHTML = `
-    <div class="mb-2 text-sm text-neutral-200 font-medium">Twój wzrost (${height} cm) — <strong class="text-mint">${percentile}</strong></div>
+    <div class="mb-2 text-sm text-neutral-200 font-medium">Wzrost ${height} cm — <strong class="text-mint">${percentile}</strong></div>
     <div class="text-xs text-neutral-400 font-medium mb-1">Rozkład w wieku ${ageKey} lat (WHO):</div>
     <div class="grid grid-cols-5 gap-1 text-center text-[10px] font-bold text-neutral-400">
       <div>P3</div><div>P25</div><div>P50</div><div>P75</div><div>P97</div>
@@ -2136,8 +1921,7 @@ function renderHeightPercentile() {
     </div>
     <div class="percentile-bar mt-3">
       <div class="percentile-marker" style="left: ${Math.min(100, Math.max(0, ((height - p3) / (p97 - p3)) * 100))}%"></div>
-    </div>
-    <p class="text-[10px] text-neutral-500 font-medium mt-2">P50 = mediana populacji w tym wieku.</p>`;
+    </div>`;
 }
 
 async function renderWeightHeightTable() {
@@ -2146,32 +1930,32 @@ async function renderWeightHeightTable() {
   const last = [...days].reverse().find((d) => d.morning?.dailyWeight != null);
   const w = last?.morning?.dailyWeight;
   const h = s.height;
-  const target = document.getElementById("weight-height-table");
+  const target = $("weight-height-table"); if (!target) return;
   if (!w || !h) { target.innerHTML = `<p class="text-sm text-neutral-400 font-medium">Wpisz wagę i wzrost.</p>`; return; }
   const bmi = calcBMI(w, h);
-  // Idealna waga dla wzrostu (min-max BMI 18.5-24.9)
   const minW = 18.5 * ((h / 100) ** 2);
   const maxW = 24.9 * ((h / 100) ** 2);
   target.innerHTML = `
     <div class="flex justify-between text-sm mb-2"><span class="text-neutral-400 font-medium">Twoja waga:</span><span class="font-bold">${w} kg</span></div>
     <div class="flex justify-between text-sm mb-2"><span class="text-neutral-400 font-medium">BMI:</span><span class="font-bold text-mint">${bmi.toFixed(1)}</span></div>
     <div class="flex justify-between text-sm mb-2"><span class="text-neutral-400 font-medium">Status:</span><span class="font-bold">${bmiLabel(bmi)}</span></div>
-    <div class="flex justify-between text-sm mb-2"><span class="text-neutral-400 font-medium">Zakres zdrowej wagi dla ${h} cm:</span><span class="font-bold">${minW.toFixed(1)} – ${maxW.toFixed(1)} kg</span></div>
-    <p class="text-xs text-neutral-400 font-medium mt-2">${bmi < 18.5 ? "Jesteś poniżej zdrowego BMI — jedz więcej, buduj masę." : bmi < 25 ? "Jesteś w normie. Kontynuuj plan." : "Powyżej normy — sprawdź czy to mięśnie czy tłuszcz."}</p>`;
+    <div class="flex justify-between text-sm mb-2"><span class="text-neutral-400 font-medium">Zakres zdrowej wagi:</span><span class="font-bold">${minW.toFixed(1)} – ${maxW.toFixed(1)} kg</span></div>
+    <p class="text-xs text-neutral-400 font-medium mt-2">${bmi < 18.5 ? "Poniżej zdrowego BMI — jedz więcej." : bmi < 25 ? "W normie. Kontynuuj plan." : "Powyżej normy."}</p>`;
 }
 
 function renderGrowthFactors() {
+  const c = $("growth-factors"); if (!c) return;
   const factors = [
-    { icon: "🧬", label: "Genetyka", weight: 80, color: "text-rose" },
-    { icon: "😴", label: "Sen 8-9h", weight: 70, color: "text-mint" },
-    { icon: "🥚", label: "Białko i dieta", weight: 65, color: "text-peach" },
-    { icon: "🏊", label: "Ćwiczenia rozciągające", weight: 50, color: "text-lilac" },
-    { icon: "🧍", label: "Postawa", weight: 45, color: "text-gold" },
-    { icon: "🍬", label: "Zero cukru", weight: 40, color: "text-mint" },
-    { icon: "🧘", label: "Niski stres", weight: 35, color: "text-lilac" },
-    { icon: "🚫", label: "Zero używek", weight: 30, color: "text-rose" },
+    { icon: "🧬", label: "Genetyka", weight: 80 },
+    { icon: "😴", label: "Sen 8-9h", weight: 70 },
+    { icon: "🥚", label: "Białko i dieta", weight: 65 },
+    { icon: "🏊", label: "Ćwiczenia rozciągające", weight: 50 },
+    { icon: "🧍", label: "Postawa", weight: 45 },
+    { icon: "🍬", label: "Zero cukru", weight: 40 },
+    { icon: "🧘", label: "Niski stres", weight: 35 },
+    { icon: "🚫", label: "Zero używek", weight: 30 },
   ];
-  document.getElementById("growth-factors").innerHTML = factors.map((f) => `
+  c.innerHTML = factors.map((f) => `
     <div class="flex items-center gap-3 glass rounded-2xl px-3 py-2.5">
       <span class="text-lg">${f.icon}</span>
       <span class="text-xs font-bold flex-1">${f.label}</span>
@@ -2184,12 +1968,12 @@ function renderGrowthFactors() {
 async function renderStrengthProgression() {
   const days = await collectAllDays();
   const workoutDays = days.filter((d) => d.tasks?.find((t) => t.id === "trening" && t.done)).length;
-  const target = document.getElementById("strength-progression");
-  if (workoutDays === 0) { target.innerHTML = `<p class="text-sm text-neutral-400 font-medium">Zacznij odhaczać treningi, żeby zobaczyć progresję.</p>`; return; }
+  const target = $("strength-progression"); if (!target) return;
+  if (workoutDays === 0) { target.innerHTML = `<p class="text-sm text-neutral-400 font-medium">Zacznij odhaczać treningi.</p>`; return; }
   target.innerHTML = `
     <div class="flex justify-between text-sm mb-2"><span class="text-neutral-400 font-medium">Treningi zaliczone:</span><span class="font-bold">${workoutDays}</span></div>
     <div class="flex justify-between text-sm mb-2"><span class="text-neutral-400 font-medium">Średnio / tydzień:</span><span class="font-bold">${(workoutDays / Math.max(1, days.length / 7)).toFixed(1)}</span></div>
-    <p class="text-xs text-neutral-400 font-medium mt-2">Cel: 3-4 treningi/tyg. Regularność > intensywność.</p>`;
+    <p class="text-xs text-neutral-400 font-medium mt-2">Cel: 3-4 treningi/tyg.</p>`;
 }
 
 // ============================================================================
@@ -2213,13 +1997,10 @@ async function renderLast30Days() {
     { icon: "😴", label: "Średni sen", value: avgSleep != null ? `${avgSleep.toFixed(1)}h` : "—", color: "text-lilac" },
     { icon: "🚀", label: "Średni Ascend", value: `${Math.round(ascPct)}%`, color: "text-peach" },
     { icon: "⚖️", label: "Zmiana wagi", value: wChange != null ? `${wChange > 0 ? "+" : ""}${wChange.toFixed(1)} kg` : "—", color: wChange > 0 ? "text-mint" : wChange < 0 ? "text-rose" : "text-neutral-400" },
-    { icon: "🔥", label: "Dni z rzędu 100%", value: (() => {
-      let best = 0, cur = 0;
-      days.forEach((d) => { if (d.completedPct === 100) cur++; else cur = 0; best = Math.max(best, cur); });
-      return best;
-    })(), color: "text-mint" },
+    { icon: "🔥", label: "Dni z rzędu 100%", value: (() => { let best = 0, cur = 0; days.forEach((d) => { if (d.completedPct === 100) cur++; else cur = 0; best = Math.max(best, cur); }); return best; })(), color: "text-mint" },
   ];
-  document.getElementById("last-30-days").innerHTML = items.map((i) => `
+  const c = $("last-30-days"); if (!c) return;
+  c.innerHTML = items.map((i) => `
     <div class="glass rounded-3xl p-3 text-center">
       <div class="text-lg">${i.icon}</div>
       <div class="text-xl font-extrabold ${i.color}">${i.value}</div>
@@ -2231,17 +2012,11 @@ async function renderPersonalRecords() {
   const days = await collectAllDays();
   const maxSleep = Math.max(...days.map((d) => d.morning?.sleepTotal ?? 0), 0);
   const maxSteps = Math.max(...days.map((d) => d.evening?.steps ?? 0), 0);
-  const maxStreak = (() => {
-    let best = 0, cur = 0, prev = null;
-    days.forEach((d) => {
-      const consec = prev ? (new Date(d.date) - new Date(prev)) === 86400000 : true;
-      if (d.completedPct === 100 && consec) cur++;
-      else if (d.completedPct === 100) cur = 1;
-      else cur = 0;
-      best = Math.max(best, cur); prev = d.date;
-    });
-    return best;
-  })();
+  const maxStreak = (() => { let best = 0, cur = 0, prev = null;
+    days.forEach((d) => { const consec = prev ? (new Date(d.date) - new Date(prev)) === 86400000 : true;
+      if (d.completedPct === 100 && consec) cur++; else if (d.completedPct === 100) cur = 1; else cur = 0;
+      best = Math.max(best, cur); prev = d.date; });
+    return best; })();
   const rhrs = days.map((d) => d.morning?.rhr).filter((r) => r != null);
   const minRhr = rhrs.length ? Math.min(...rhrs) : null;
   const records = [
@@ -2250,7 +2025,8 @@ async function renderPersonalRecords() {
     { icon: "🔥", label: "Najdłuższy streak", value: `${maxStreak} dni` },
     { icon: "💓", label: "Najniższe RHR", value: minRhr != null ? `${minRhr} bpm` : "—" },
   ];
-  document.getElementById("personal-records").innerHTML = records.map((r) => `
+  const c = $("personal-records"); if (!c) return;
+  c.innerHTML = records.map((r) => `
     <div class="record-card"><div class="text-lg mb-1">${r.icon}</div><div class="text-xl font-extrabold">${r.value}</div><div class="text-[10px] text-neutral-400 font-semibold mt-0.5">${r.label}</div></div>`).join("");
 }
 
@@ -2262,10 +2038,8 @@ async function renderMonthlyComparison() {
   const lastMonthEnd = new Date(now.getFullYear(), now.getMonth(), 0);
   const thisM = allDays.filter((d) => new Date(d.date) >= thisMonthStart);
   const lastM = allDays.filter((d) => new Date(d.date) >= lastMonthStart && new Date(d.date) <= lastMonthEnd);
-  if (thisM.length < 3 || lastM.length < 3) {
-    document.getElementById("monthly-comparison").innerHTML = `<p class="text-xs text-neutral-400 font-medium">Za mało danych.</p>`;
-    return;
-  }
+  const c = $("monthly-comparison"); if (!c) return;
+  if (thisM.length < 3 || lastM.length < 3) { c.innerHTML = `<p class="text-xs text-neutral-400 font-medium">Za mało danych.</p>`; return; }
   const metrics = [
     { label: "Wykonanie", unit: "%", get: (d) => d.completedPct, h: true },
     { label: "Sen", unit: "h", get: (d) => d.morning?.sleepTotal, h: true },
@@ -2283,26 +2057,21 @@ async function renderMonthlyComparison() {
     const fmt = (v) => m.label === "Kroki" ? Math.round(v) : v.toFixed(1);
     return `<div class="flex items-center justify-between glass rounded-2xl px-4 py-2.5"><span class="text-xs font-bold text-neutral-300">${m.label}:</span><span class="text-xs font-extrabold ${color}">${fmt(a)}${m.unit} ${arrow} <span class="text-neutral-500 font-semibold">(był ${fmt(b)}${m.unit})</span></span></div>`;
   }).filter(Boolean);
-  document.getElementById("monthly-comparison").innerHTML = rows.length ? rows.join("") : `<p class="text-xs text-neutral-400">Za mało wspólnych danych.</p>`;
+  c.innerHTML = rows.length ? rows.join("") : `<p class="text-xs text-neutral-400">Za mało wspólnych danych.</p>`;
 }
 
 async function renderYearChart() {
   const days = await loadLastNDays(365);
-  const labels = days.map((d) => {
-    const [, m, day] = d.date.split("-");
-    return `${day}.${m}`;
-  });
+  const labels = days.map((d) => { const [, m, day] = d.date.split("-"); return `${day}.${m}`; });
   const values = days.map((d) => d.completedPct ?? 0);
-  const ctx = document.getElementById("chart-year");
+  const ctx = $("chart-year"); if (!ctx) return;
   if (window.__yearChart) window.__yearChart.destroy();
   window.__yearChart = new Chart(ctx, {
     type: "bar",
     data: { labels, datasets: [{ data: values, backgroundColor: values.map((v) => v === 100 ? "rgba(94,234,212,.7)" : v >= 50 ? "rgba(251,191,36,.5)" : "rgba(251,113,133,.35)"), borderRadius: 3, maxBarThickness: 8 }] },
     options: { responsive: true, plugins: { legend: { display: false } },
-      scales: {
-        x: { ticks: { color: "#8b8397", font: { family: "Poppins", size: 9, weight: "600" }, maxTicksLimit: 12 }, grid: { display: false } },
-        y: { ticks: { color: "#8b8397", font: { family: "Poppins", size: 10, weight: "600" } }, grid: { color: "rgba(255,255,255,.05)" }, min: 0, max: 100 },
-      } },
+      scales: { x: { ticks: { color: "#8b8397", font: { family: "Poppins", size: 9, weight: "600" }, maxTicksLimit: 12 }, grid: { display: false } },
+        y: { ticks: { color: "#8b8397", font: { family: "Poppins", size: 10, weight: "600" } }, grid: { color: "rgba(255,255,255,.05)" }, min: 0, max: 100 } } },
   });
 }
 
@@ -2311,24 +2080,24 @@ async function renderGoal() {
   const days = await loadLastNDays(30);
   const lastWeight = [...days].reverse().find((d) => d.morning?.dailyWeight != null);
   const current = lastWeight?.morning?.dailyWeight ?? null;
-  document.getElementById("goal-current").textContent = current != null ? `${current} kg` : "—";
-  document.getElementById("goal-target").textContent = `${settings.goalWeight.toFixed(1)} kg`;
-  const goalText = document.getElementById("goal-progress-text");
-  const bar = document.getElementById("goal-bar");
-  if (current == null) { goalText.textContent = "Wpisz wagę, żeby zobaczyć progres."; bar.style.width = "0%"; return; }
+  const cur = $("goal-current"); const tgt = $("goal-target"); const gt = $("goal-progress-text"); const bar = $("goal-bar");
+  if (!cur) return;
+  cur.textContent = current != null ? `${current} kg` : "—";
+  tgt.textContent = `${settings.goalWeight.toFixed(1)} kg`;
+  if (current == null) { gt.textContent = "Wpisz wagę."; bar.style.width = "0%"; return; }
   const diff = settings.goalWeight - current;
-  if (Math.abs(diff) < 0.3) { goalText.textContent = `🏆 Cel osiągnięty!`; bar.style.width = "100%"; }
+  if (Math.abs(diff) < 0.3) { gt.textContent = `🏆 Cel osiągnięty!`; bar.style.width = "100%"; }
   else if (diff > 0) {
-    goalText.textContent = `📈 Do celu: ${diff.toFixed(1)} kg. Przy tempie +0.25 kg/tyg to ~${Math.ceil(diff / 0.25)} tyg.`;
+    gt.textContent = `📈 Do celu: ${diff.toFixed(1)} kg. Przy +0.25 kg/tyg to ~${Math.ceil(diff / 0.25)} tyg.`;
     const start = 45;
     bar.style.width = `${Math.min(100, Math.max(0, ((current - start) / (settings.goalWeight - start)) * 100))}%`;
-  } else { goalText.textContent = `📉 Jesteś ${Math.abs(diff).toFixed(1)} kg powyżej celu.`; bar.style.width = "100%"; }
+  } else { gt.textContent = `📉 Jesteś ${Math.abs(diff).toFixed(1)} kg powyżej celu.`; bar.style.width = "100%"; }
 }
 
 async function renderBMI() {
   const settings = getSettings();
-  const el = document.getElementById("settings-bmi");
-  const labelEl = document.getElementById("settings-bmi-label");
+  const el = $("settings-bmi"); const labelEl = $("settings-bmi-label");
+  if (!el) return;
   const days = await loadLastNDays(30);
   const last = [...days].reverse().find((d) => d.morning?.dailyWeight != null);
   const w = last?.morning?.dailyWeight;
@@ -2344,19 +2113,23 @@ async function renderSmartGoals() {
   const skam = days.filter((d) => d.tasks?.find((t) => t.id === "skincare-rano" && t.done)).length;
   const skpm = days.filter((d) => d.tasks?.find((t) => t.id === "skincare-wieczor" && t.done)).length;
   const jaw = days.filter((d) => d.tasks?.find((t) => t.id === "reset" && t.done)).length;
-  document.getElementById("smart-sleep-count").textContent = `${Math.min(sleep8, 30)}/30`;
-  document.getElementById("smart-skincare-am-count").textContent = `${Math.min(skam, 21)}/21`;
-  document.getElementById("smart-skincare-pm-count").textContent = `${Math.min(skpm, 21)}/21`;
-  document.getElementById("smart-jaw-count").textContent = `${Math.min(jaw, 21)}/21`;
-  document.getElementById("smart-sleep-bar").style.width = `${Math.min(100, (sleep8 / 30) * 100)}%`;
-  document.getElementById("smart-skincare-am-bar").style.width = `${Math.min(100, (skam / 21) * 100)}%`;
-  document.getElementById("smart-skincare-pm-bar").style.width = `${Math.min(100, (skpm / 21) * 100)}%`;
-  document.getElementById("smart-jaw-bar").style.width = `${Math.min(100, (jaw / 21) * 100)}%`;
+  const set = (id, val) => { const e = $(id); if (e) e.textContent = val; };
+  const setW = (id, val) => { const e = $(id); if (e) e.style.width = val; };
+  set("smart-sleep-count", `${Math.min(sleep8, 30)}/30`);
+  set("smart-skincare-am-count", `${Math.min(skam, 21)}/21`);
+  set("smart-skincare-pm-count", `${Math.min(skpm, 21)}/21`);
+  set("smart-jaw-count", `${Math.min(jaw, 21)}/21`);
+  setW("smart-sleep-bar", `${Math.min(100, (sleep8 / 30) * 100)}%`);
+  setW("smart-skincare-am-bar", `${Math.min(100, (skam / 21) * 100)}%`);
+  setW("smart-skincare-pm-bar", `${Math.min(100, (skpm / 21) * 100)}%`);
+  setW("smart-jaw-bar", `${Math.min(100, (jaw / 21) * 100)}%`);
 }
 
 async function renderBestStats() {
   const all = await collectAllDays();
-  if (all.length === 0) { document.getElementById("best-streak-value").textContent = "0"; document.getElementById("best-week-value").textContent = "0%"; return; }
+  const bs = $("best-streak-value"); const bw = $("best-week-value");
+  if (!bs) return;
+  if (all.length === 0) { bs.textContent = "0"; bw.textContent = "0%"; return; }
   let best = 0, cur = 0, prev = null;
   all.forEach((d) => {
     const consec = prev ? (new Date(d.date) - new Date(prev)) === 86400000 : true;
@@ -2368,8 +2141,8 @@ async function renderBestStats() {
   let bestW = 0;
   for (let i = 0; i <= all.length - 7; i++) { const a = average(all.slice(i, i + 7).map((d) => d.completedPct ?? 0)); if (a != null) bestW = Math.max(bestW, a); }
   if (all.length < 7) bestW = Math.round(average(all.map((d) => d.completedPct ?? 0)) || 0);
-  document.getElementById("best-streak-value").textContent = best;
-  document.getElementById("best-week-value").textContent = `${Math.round(bestW)}%`;
+  bs.textContent = best;
+  bw.textContent = `${Math.round(bestW)}%`;
 }
 
 // ============================================================================
@@ -2381,10 +2154,10 @@ const MONTH_NAMES_PL = ["Styczeń","Luty","Marzec","Kwiecień","Maj","Czerwiec",
 async function renderCalendar() {
   const y = calViewDate.getFullYear();
   const m = calViewDate.getMonth();
-  document.getElementById("cal-month-label").textContent = `${MONTH_NAMES_PL[m]} ${y}`;
+  const lbl = $("cal-month-label"); if (lbl) lbl.textContent = `${MONTH_NAMES_PL[m]} ${y}`;
   const daysInMonth = new Date(y, m + 1, 0).getDate();
   const startOffset = (new Date(y, m, 1).getDay() + 6) % 7;
-  const grid = document.getElementById("cal-grid");
+  const grid = $("cal-grid"); if (!grid) return;
   grid.innerHTML = "";
   for (let i = 0; i < startOffset; i++) grid.appendChild(document.createElement("div"));
   for (let day = 1; day <= daysInMonth; day++) {
@@ -2408,15 +2181,15 @@ async function showDayDetail(key) {
   const doc = await loadDayDoc(key);
   const [y, mo, dd] = key.split("-");
   const dateObj = new Date(y, mo - 1, dd);
-  document.getElementById("day-detail-title").textContent = dateObj.toLocaleDateString("pl-PL", { day: "numeric", month: "long", year: "numeric" });
-  const c = document.getElementById("day-detail-content");
+  const t = $("day-detail-title"); if (t) t.textContent = dateObj.toLocaleDateString("pl-PL", { day: "numeric", month: "long", year: "numeric" });
+  const c = $("day-detail-content"); if (!c) return;
   if (!doc) { c.innerHTML = `<p class="text-sm text-neutral-400">Brak danych.</p>`; openModal("modal-day-detail"); return; }
-  const t = doc.tasks || [];
+  const tasks = doc.tasks || [];
   const m = doc.morning || {};
   const e = doc.evening || {};
   const asc = doc.ascend || {};
   const ascDone = ASCEND_ITEMS.filter((i) => asc[i.id]).length;
-  const tasksHtml = t.map((x) => `<div class="flex items-center gap-2 text-xs"><span class="${x.done ? "text-mint" : "text-neutral-500"}">${x.done ? "✓" : "○"}</span><span class="${x.done ? "text-neutral-200" : "text-neutral-500"}">${x.label}</span></div>`).join("");
+  const tasksHtml = tasks.map((x) => `<div class="flex items-center gap-2 text-xs"><span class="${x.done ? "text-mint" : "text-neutral-500"}">${x.done ? "✓" : "○"}</span><span class="${x.done ? "text-neutral-200" : "text-neutral-500"}">${x.label}</span></div>`).join("");
   c.innerHTML = `
     <div class="flex items-center gap-3 mb-4"><div class="text-3xl font-extrabold ${doc.completedPct === 100 ? "text-mint" : doc.completedPct >= 50 ? "text-gold" : "text-rose"}">${doc.completedPct ?? 0}%</div><div class="text-xs text-neutral-400 font-semibold">wykonanie</div></div>
     <div class="glass rounded-3xl p-4 mb-3"><div class="text-[10px] text-neutral-400 font-bold mb-2 tracking-widest">ZADANIA</div><div class="space-y-1.5">${tasksHtml || '<span class="text-xs text-neutral-500">brak</span>'}</div></div>
@@ -2426,10 +2199,8 @@ async function showDayDetail(key) {
       <div>🧠 Deep: <span class="font-bold">${m.sleepDeep ?? "—"} h</span></div>
       <div>💭 REM: <span class="font-bold">${m.sleepRem ?? "—"} h</span></div>
       <div>💓 RHR: <span class="font-bold">${m.rhr ?? "—"} bpm</span></div>
-      <div>⚖️ Waga: <span class="font-bold">${m.dailyWeight ?? m.weeklyWeight ?? "—"} kg</span></div>
+      <div>⚖️ Waga: <span class="font-bold">${m.dailyWeight ?? "—"} kg</span></div>
       <div>📏 Wzrost: <span class="font-bold">${m.dailyHeight ?? "—"} cm</span></div>
-      <div>😬 Szczęka: <span class="font-bold">${m.jawTension ?? "—"}/10</span></div>
-      <div>😊 Nastrój: <span class="font-bold">${m.moodMorning ?? "—"}/10</span></div>
     </div></div>
     <div class="glass rounded-3xl p-4 mb-3"><div class="text-[10px] text-neutral-400 font-bold mb-2 tracking-widest">DZIEŃ</div><div class="grid grid-cols-2 gap-2 text-xs text-neutral-200 font-medium">
       <div>🚶 Kroki: <span class="font-bold">${e.steps ?? "—"}</span></div>
@@ -2449,7 +2220,7 @@ async function showDayDetail(key) {
 // CHALLENGE
 // ============================================================================
 const CHALLENGES = [
-  { id: "sleep8", name: "😴 Sen 8h przez 30 dni", check: (d) => (d.morning?.sleepTotal ?? 0) >= 8, max: 30 },
+  { id: "sleep8", name: "😴 Sen 8h 30 dni", check: (d) => (d.morning?.sleepTotal ?? 0) >= 8, max: 30 },
   { id: "skincare-am", name: "💧 Skincare rano 30 dni", check: (d) => d.tasks?.find((t) => t.id === "skincare-rano" && t.done), max: 30 },
   { id: "skincare-pm", name: "✨ Skincare wieczór 30 dni", check: (d) => d.tasks?.find((t) => t.id === "skincare-wieczor" && t.done), max: 30 },
   { id: "jaw30", name: "🧘 Reset szczęki 30 dni", check: (d) => d.tasks?.find((t) => t.id === "reset" && t.done), max: 30 },
@@ -2463,24 +2234,22 @@ function getChallenge() {
 }
 async function renderChallenge() {
   const ch = getChallenge();
-  const nameEl = document.getElementById("challenge-name");
-  const countEl = document.getElementById("challenge-count");
-  const bar = document.getElementById("challenge-bar");
-  const tip = document.getElementById("challenge-tip");
+  const nameEl = $("challenge-name"); const countEl = $("challenge-count"); const bar = $("challenge-bar"); const tip = $("challenge-tip");
+  if (!nameEl) return;
   if (!ch) { nameEl.textContent = "Nie wybrano"; countEl.textContent = "0/30"; bar.style.width = "0%"; tip.textContent = "Wybierz challenge."; return; }
   const days = await loadLastNDays(ch.max);
   const passed = days.filter(ch.check).length;
   nameEl.textContent = ch.name;
   countEl.textContent = `${passed}/${ch.max}`;
   bar.style.width = `${(passed / ch.max) * 100}%`;
-  if (passed >= ch.max) tip.textContent = "🏆 Ukończony!";
-  else tip.textContent = `Zostało ${ch.max - passed} dni.`;
+  tip.textContent = passed >= ch.max ? "🏆 Ukończony!" : `Zostało ${ch.max - passed} dni.`;
 }
 async function renderChallengeOptions() {
   const current = localStorage.getItem("regim:challenge");
-  document.getElementById("challenge-options").innerHTML = CHALLENGES.map((c) => `
-    <button data-challenge="${c.id}" class="challenge-option w-full py-3 px-4 glass rounded-2xl text-left font-bold text-sm flex items-center justify-between ${current === c.id ? "border-mint border-2" : ""}">
-      <span>${c.name}</span>${current === c.id ? '<i class="fa-solid fa-check text-mint"></i>' : ""}
+  const c = $("challenge-options"); if (!c) return;
+  c.innerHTML = CHALLENGES.map((ch) => `
+    <button data-challenge="${ch.id}" class="challenge-option w-full py-3 px-4 glass rounded-2xl text-left font-bold text-sm flex items-center justify-between ${current === ch.id ? "border-mint border-2" : ""}">
+      <span>${ch.name}</span>${current === ch.id ? '<i class="fa-solid fa-check text-mint"></i>' : ""}
     </button>`).join("");
   document.querySelectorAll(".challenge-option").forEach((b) => {
     b.onclick = () => {
@@ -2492,73 +2261,43 @@ async function renderChallengeOptions() {
 }
 
 // ============================================================================
-// SŁOWNICZEK + HELP + BAZA WIEDZY + PORADNIK
+// SŁOWNICZEK / BAZA WIEDZY / PORADNIK
 // ============================================================================
 const GLOSSARY = [
-  { icon: "💓", term: "RHR", desc: "Tętno spoczynkowe rano. Norma 50-70 bpm. Wzrost o 5+ bpm = przemęczenie." },
+  { icon: "💓", term: "RHR", desc: "Tętno spoczynkowe rano. Norma 50-70 bpm." },
   { icon: "🔥", term: "RPE", desc: "Skala ciężkości treningu 1-10." },
   { icon: "🫁", term: "SpO2", desc: "Saturacja krwi. Norma 95-100%." },
   { icon: "🌙", term: "Deep sleep", desc: "Regeneracja fizyczna. 15-25% snu." },
   { icon: "💭", term: "REM", desc: "Regeneracja mózgu. 20-25% snu." },
   { icon: "⚡", term: "Gotowość", desc: "0-100%. Liczone z snu, RHR, stresu, napięcia szczęki." },
   { icon: "🚀", term: "Ascend", desc: "Nawyki codzienne robiące różnicę w skali miesięcy." },
-  { icon: "📏", term: "Midparental height", desc: "Szacowany wzrost końcowy: (wzrost ojca + matki + 13) / 2." },
+  { icon: "📏", term: "Midparental height", desc: "Szacowany wzrost: (ojciec + matka + 13) / 2." },
   { icon: "🧍", term: "Chin tuck", desc: "Cofanie brody do siebie. Wzmacnia szyję, poprawia linię żuchwy." },
   { icon: "👅", term: "Mewing", desc: "Pozycja języka na podniebieniu przez większość dnia." },
-  { icon: "🌱", term: "Puberty / Tanner", desc: "Skala 5 etapów dojrzewania. Pokazuje gdzie jesteś." },
+  { icon: "🌱", term: "Puberty / Tanner", desc: "Skala 5 etapów dojrzewania." },
 ];
-const HELP_CONTENT = {
-  rhr: { icon: "fa-heart-pulse", title: "💓 RHR", text: "Tętno spoczynkowe rano.", values: [
-    { label: "Poniżej 50", value: "Świetna regeneracja" }, { label: "50-62", value: "Dobra norma" },
-    { label: "62-70", value: "Umiarkowana" }, { label: "Powyżej 70", value: "Wysoko" },
-  ]},
-  rpe: { icon: "fa-fire", title: "🔥 RPE", text: "Skala ciężkości 1-10.", values: [
-    { label: "1-3", value: "Bardzo lekko" }, { label: "4-6", value: "Umiarkowanie" },
-    { label: "7-8", value: "Ciężko" }, { label: "9-10", value: "Maks" },
-  ]},
-  spo2: { icon: "fa-lungs", title: "🫁 SpO2", text: "Saturacja.", values: [
-    { label: "97-100%", value: "Doskonale" }, { label: "95-96%", value: "W normie" },
-    { label: "93-94%", value: "Lekko poniżej" }, { label: "Poniżej 93%", value: "Do lekarza" },
-  ]},
-  stress: { icon: "fa-heart-pulse", title: "🧘 Stres", text: "Poziom stresu.", values: [
-    { label: "0-35", value: "Niski" }, { label: "36-55", value: "Umiarkowany" },
-    { label: "56-70", value: "Wysoki" }, { label: "Powyżej 70", value: "Bardzo wysoki" },
-  ]},
-  readiness: { icon: "fa-gauge-high", title: "🎯 Gotowość", text: "0-100%.", values: [
-    { label: "80-100%", value: "Pełna" }, { label: "60-79%", value: "Solidna" },
-    { label: "40-59%", value: "Obniżona" }, { label: "0-39%", value: "Tylko regeneracja" },
-  ]},
-};
-function showHelp(key) {
-  const h = HELP_CONTENT[key];
-  if (!h) return;
-  document.getElementById("help-icon").className = `fa-solid ${h.icon} text-mint text-2xl`;
-  document.getElementById("help-title").textContent = h.title;
-  document.getElementById("help-text").textContent = h.text;
-  document.getElementById("help-values").innerHTML = h.values.map((v) => `
-    <div class="flex items-center justify-between glass rounded-2xl px-4 py-2.5"><span class="text-xs font-extrabold text-mint">${v.label}</span><span class="text-xs font-medium text-neutral-300">${v.value}</span></div>`).join("");
-  openModal("modal-help");
-}
 function renderGlossary() {
-  document.getElementById("glossary-content").innerHTML = GLOSSARY.map((g) => `
+  const c = $("glossary-content"); if (!c) return;
+  c.innerHTML = GLOSSARY.map((g) => `
     <div class="glass rounded-3xl p-4"><div class="flex items-center gap-2 mb-2"><span class="text-lg">${g.icon}</span><span class="font-bold text-sm">${g.term}</span></div><p class="text-xs text-neutral-300 leading-relaxed font-medium">${g.desc}</p></div>`).join("");
 }
 
 const KNOWLEDGE_BASE = [
   { icon: "😴", title: "Jak spać, żeby rosnąć", body: "Hormon wzrostu wydziela się głównie w deep sleep, między 22:00 a 2:00. Kluczowe: spać 8-9h, iść spać przed 23:00, ciemny i chłodny pokój (18-19°C), bez ekranów 1h przed. Sen na plecach = mniej odgnieceń i asymetrii twarzy." },
-  { icon: "🥚", title: "Ile białka jeść", body: "W okresie dojrzewania 1.6-2.0 g białka na kg masy ciała. Ważysz 50 kg = 80-100 g białka dziennie. Źródła: jajka, mięso, ryby, nabiał, rośliny strączkowe, orzechy. Bez białka nie ma z czego budować mięśni i kości." },
-  { icon: "🏊", title: "Dlaczego basen rozciąga", body: "W wodzie grawitacja działa słabiej, więc kręgosłup rozluźnia się i rozciąga. Pływanie grzbietem i żabką najbardziej. 2-3× w tygodniu po 45-60 min daje efekt w skali miesięcy. Do tego zwisanie na drążku 2 min dziennie." },
-  { icon: "🍬", title: "Co blokuje wzrost", body: "Cukier (skok insuliny tłumi hormon wzrostu), fast food, brak snu, chroniczny stres, alkohol, papierosy, kawa w dużych ilościach. Unikaj też bardzo intensywnego treningu siłowego z ciężarami w wieku 12-15 lat." },
-  { icon: "💧", title: "Skincare — kolejność", body: "Rano: płyn oczyszczający → płyn do trądzików → Acnederm. Wieczór: płyn oczyszczający → Magia Egipska. Zawsze od najlżejszej do najcięższej konsystencji. Nie pomijaj — regularność daje efekty w 3-6 miesięcy." },
-  { icon: "🧍", title: "Postawa = +2-3 cm", body: "Dobra postawa szyi i barków wizualnie dodaje 2-3 cm wzrostu i wzmacnia linię żuchwy. Chin tuck (cofanie brody) + ściąganie łopatek + ćwiczenie przy ścianie. Codziennie 3 min." },
-  { icon: "👅", title: "Mewing — jak działa", body: "Język na podniebieniu przez większość dnia wpływa na rozwój szczęki i profil. Efekt widoczny po miesiącach, nie dniach. Trzymaj czubek języka tuż za górnymi zębami, nie przyciskaj do zębów." },
-  { icon: "☀️", title: "Słońce rano", body: "10-15 min słońca rano ustawia rytm dobowy — lepszy sen w nocy i większa produkcja witaminy D. Oczy muszą zobaczyć światło (nie przez szybę). Bez okularów przeciwsłonecznych." },
-  { icon: "🚿", title: "Zimny prysznic — po co", body: "30-60s zimnej wody rano: czujność na 3h, poprawa krążenia, obniżenie stanu zapalnego. Wieczorem zimna woda na twarz: redukcja obrzęku, zwężenie naczyń, mniej worków pod oczami." },
-  { icon: "🌙", title: "Blue light a sen", body: "Ekrany po 21:00 blokują melatoninę na 1-2h. Tryb nocny lub okulary anti-blue-light pomagają. Lepszy sen = lepszy deep sleep = więcej hormonu wzrostu." },
+  { icon: "🥚", title: "Ile białka jeść", body: "W okresie dojrzewania 1.6-2.0 g białka na kg masy ciała. Ważysz 50 kg = 80-100 g białka dziennie. Źródła: jajka, mięso, ryby, nabiał, strączkowe, orzechy." },
+  { icon: "🏊", title: "Dlaczego basen rozciąga", body: "W wodzie grawitacja działa słabiej, więc kręgosłup rozluźnia się i rozciąga. Pływanie grzbietem i żabką najbardziej. 2-3× w tygodniu po 45-60 min daje efekt w skali miesięcy." },
+  { icon: "🍬", title: "Co blokuje wzrost", body: "Cukier (skok insuliny tłumi hormon wzrostu), fast food, brak snu, chroniczny stres, alkohol, papierosy. Unikaj też bardzo intensywnego treningu siłowego z ciężarami w wieku 12-15 lat." },
+  { icon: "💧", title: "Skincare — kolejność", body: "Rano: płyn oczyszczający → płyn do trądzików → Acnederm. Wieczór: płyn oczyszczający → Magia Egipska. Zawsze od najlżejszej do najcięższej konsystencji." },
+  { icon: "🧍", title: "Postawa = +2-3 cm", body: "Dobra postawa szyi i barków wizualnie dodaje 2-3 cm wzrostu i wzmacnia linię żuchwy. Chin tuck + ściąganie łopatek + ćwiczenie przy ścianie. Codziennie 3 min." },
+  { icon: "👅", title: "Mewing — jak działa", body: "Język na podniebieniu przez większość dnia wpływa na rozwój szczęki i profil. Efekt widoczny po miesiącach. Trzymaj czubek języka tuż za górnymi zębami." },
+  { icon: "☀️", title: "Słońce rano", body: "10-15 min słońca rano ustawia rytm dobowy — lepszy sen w nocy i większa produkcja witaminy D. Oczy muszą zobaczyć światło (nie przez szybę)." },
+  { icon: "🚿", title: "Zimny prysznic — po co", body: "30-60s zimnej wody rano: czujność na 3h, poprawa krążenia, obniżenie stanu zapalnego. Wieczorem zimna woda na twarz: redukcja obrzęku." },
+  { icon: "🌙", title: "Blue light a sen", body: "Ekrany po 21:00 blokują melatoninę na 1-2h. Tryb nocny lub okulary anti-blue-light pomagają. Lepszy sen = lepszy deep sleep." },
 ];
 
 function renderKnowledgeBase() {
-  document.getElementById("knowledge-base").innerHTML = KNOWLEDGE_BASE.map((k, i) => `
+  const c = $("knowledge-base"); if (!c) return;
+  c.innerHTML = KNOWLEDGE_BASE.map((k, i) => `
     <button data-kb="${i}" class="guide-section w-full text-left">
       <div class="guide-header">
         <div class="flex items-center gap-3">
@@ -2571,9 +2310,9 @@ function renderKnowledgeBase() {
   document.querySelectorAll("[data-kb]").forEach((b) => {
     b.onclick = () => {
       const k = KNOWLEDGE_BASE[parseInt(b.dataset.kb, 10)];
-      document.getElementById("kb-icon").className = "fa-solid fa-graduation-cap text-lilac text-2xl";
-      document.getElementById("kb-title").textContent = k.title;
-      document.getElementById("kb-body").textContent = k.body;
+      const t = $("kb-title"); const bd = $("kb-body");
+      if (t) t.textContent = k.title;
+      if (bd) bd.textContent = k.body;
       openModal("modal-knowledge");
     };
   });
@@ -2581,16 +2320,17 @@ function renderKnowledgeBase() {
 
 const GUIDE_SECTIONS = [
   { icon: "😴", title: "Sen — fundament wzrostu", body: "Hormon wzrostu wydziela się w deep sleep (22:00-2:00). Sen <7h = mniej wzrostu, mniej regeneracji, gorsza skóra. Cel: 8-9h, spanie przed 23:00, ciemna i chłodna sypialnia (18-19°C), bez ekranów 1h przed. To najważniejsza rzecz z całej listy." },
-  { icon: "🥚", title: "Jedzenie pod wzrost i masę", body: "Białko 1.6-2.0 g/kg masy dziennie (jajka, mięso, ryby, nabiał, strączkowe). Węglowodany złożone (ryż, ziemniaki, płatki owsiane). Tłuszcze zdrowe (orzechy, oliwa, awokado). Zero cukru i fast foodów — insulina tłumi hormon wzrostu. Jedz 4-5 posiłków dziennie, nie 1-2." },
-  { icon: "🏊", title: "Trening dla wzrostu", body: "Basen (zwłaszcza grzbiet i żabka) 2-3× w tyg. Zwisanie na drążku 2 min dziennie. Skakanie na skakance / w miejscu. Kalistenika (pompki, przysiady, plank) — bez ciężarów w wieku 12-15 lat, bo to hamuje wzrost. Rozciąganie całego ciała 10 min po treningu." },
-  { icon: "🧴", title: "Skóra i twarz", body: "Skincare rano (płyn + płyn do trądzików + Acnederm) i wieczór (płyn + Magia Egipska). Codziennie, nie 'jak pamiętam'. Do tego: cold face plunge rano, nie dotykać twarzy rękami, zmieniać poszewkę co 2-3 dni, balsam do ust. Efekty w skali miesięcy — bądź cierpliwy." },
-  { icon: "🧍", title: "Postawa i sylwetka", body: "Dobra postawa to +2-3 cm wzrostu wizualnie i mocniejsza linia żuchwy. Chin tuck (cofanie brody), ściąganie łopatek, ćwiczenie przy ścianie. 3 min dziennie. Świadomość w ciągu dnia: 3× self-check (barki cofnięte, broda równolegle do podłogi)." },
-  { icon: "🧠", title: "Głowa i pewność siebie", body: "Pewność siebie wynika z realnych osiągnięć, nie z afirmacji. Konsekwencja w małych rzeczach codziennie = fundament. Ćwiczenia oddechowe (4-7-8) obniżają kortyzol. Ogranicz social media, zwłaszcza rano. Czytaj, ucz się, ćwicz — inwestycja w głowę zwraca się bardziej niż w wygląd." },
-  { icon: "🚫", title: "Co Cię spowalnia", body: "Cukier i fast food (insulina, stan zapalny). Brak snu (hormon wzrostu). Chroniczny stres (kortyzol). Alkohol i papierosy (jeśli w ogóle — zero). Niestabilne emocje (kłótnie, dramy). Nadmiar scrollowania (kradnie czas i uwagę). Zidentyfikuj swój największy hamulcowy i go usuń." },
+  { icon: "🥚", title: "Jedzenie pod wzrost i masę", body: "Białko 1.6-2.0 g/kg masy dziennie. Węglowodany złożone. Tłuszcze zdrowe. Zero cukru i fast foodów — insulina tłumi hormon wzrostu. Jedz 4-5 posiłków dziennie, nie 1-2." },
+  { icon: "🏊", title: "Trening dla wzrostu", body: "Basen (zwłaszcza grzbiet i żabka) 2-3× w tyg. Zwisanie na drążku 2 min dziennie. Skakanie na skakance. Kalistenika (pompki, przysiady, plank) — bez ciężarów w wieku 12-15 lat. Rozciąganie całego ciała 10 min po treningu." },
+  { icon: "🧴", title: "Skóra i twarz", body: "Skincare rano (płyn + płyn do trądzików + Acnederm) i wieczór (płyn + Magia Egipska). Codziennie. Do tego: cold face plunge rano, nie dotykać twarzy rękami, zmieniać poszewkę co 2-3 dni, balsam do ust. Efekty w skali miesięcy." },
+  { icon: "🧍", title: "Postawa i sylwetka", body: "Dobra postawa to +2-3 cm wzrostu wizualnie i mocniejsza linia żuchwy. Chin tuck, ściąganie łopatek, ćwiczenie przy ścianie. 3 min dziennie. Świadomość w ciągu dnia: 3× self-check." },
+  { icon: "🧠", title: "Głowa i pewność siebie", body: "Pewność siebie wynika z realnych osiągnięć, nie z afirmacji. Konsekwencja w małych rzeczach codziennie = fundament. Ćwiczenia oddechowe obniżają kortyzol. Ogranicz social media rano." },
+  { icon: "🚫", title: "Co Cię spowalnia", body: "Cukier i fast food. Brak snu. Chroniczny stres. Alkohol i papierosy. Niestabilne emocje. Nadmiar scrollowania. Zidentyfikuj swój największy hamulcowy i go usuń." },
 ];
 
 function renderGuideSections() {
-  document.getElementById("guide-sections").innerHTML = GUIDE_SECTIONS.map((s, i) => `
+  const c = $("guide-sections"); if (!c) return;
+  c.innerHTML = GUIDE_SECTIONS.map((s, i) => `
     <div class="guide-section" data-guide="${i}">
       <div class="guide-header">
         <div class="flex items-center gap-3">
@@ -2616,21 +2356,21 @@ function renderGuideSections() {
 const FACTS_OF_DAY = [
   "Hormon wzrostu wydziela się w 70% w pierwszej fazie deep sleep (22:00-2:00). Spanie po 23:00 kradnie Ci wzrost.",
   "U chłopców skok wzrostu trwa 2-3 lata i dodaje średnio 25-30 cm. Największy przyrost to zwykle 13-15 rok życia.",
-  "Kończyny (nogi, ręce) rosną pierwsze, potem tułów. Dlatego w okresie dojrzewania wyglądasz na 'wyschniętego'.",
+  "Kończyny rosną pierwsze, potem tułów. Dlatego w okresie dojrzewania wyglądasz na 'wyschniętego'.",
   "Pływanie grzbietem rozciąga kręgosłup o 1-3 mm na sesję. Regularnie 2-3× w tyg = realne efekty po roku.",
   "Białko bez snu nie działa. Bez 8h snu Twoje ciało nie ma czasu na użycie aminokwasów do budowy mięśni i kości.",
   "Cukier zjada wzrost. Jeden wysoki skok insuliny tłumi hormon wzrostu na 2-4h.",
   "Wzrost ustabilizuje się ok. 18-20 roku życia (chłopcy). Ostatnie 2-3 cm można wyciągnąć w tym okresie.",
-  "Kręgosłup rano jest o 1-2 cm dłuższy niż wieczorem (bo w nocy się nie ściska). Dlatego mierz się zawsze rano.",
-  "Geny dają 80% wzrostu. Pozostałe 20% = sen, dieta, ćwiczenia, hormony. Nad tym drugim masz pełną kontrolę.",
+  "Kręgosłup rano jest o 1-2 cm dłuższy niż wieczorem. Mierz się zawsze rano.",
+  "Geny dają 80% wzrostu. Pozostałe 20% = sen, dieta, ćwiczenia, hormony.",
   "Chin tuck wzmacnia mięśnie szyi = wizualnie mocniejsza linia żuchwy. Efekt po 3-4 tyg.",
   "Świeża poszewka co 2-3 dni redukuje wypryski o 30-40%. Najprostszy hack na cerę.",
   "10 min słońca rano ustawia melatoninę na cały dzień — lepszy sen w nocy, lepszy nastrój rano.",
 ];
-
 function renderFactOfDay() {
+  const el = $("fact-of-day"); if (!el) return;
   const idx = dayIndexSinceEpoch(new Date()) % FACTS_OF_DAY.length;
-  document.getElementById("fact-of-day").innerHTML = `<p class="text-sm text-neutral-200 leading-relaxed font-medium">${FACTS_OF_DAY[idx]}</p>`;
+  el.innerHTML = `<p class="text-sm text-neutral-200 leading-relaxed font-medium">${FACTS_OF_DAY[idx]}</p>`;
 }
 
 // ============================================================================
@@ -2648,12 +2388,14 @@ const ONBOARDING_STEPS = [
 let onbStep = 0;
 function renderOnboarding() {
   const s = ONBOARDING_STEPS[onbStep];
-  document.getElementById("onb-content").innerHTML = `<div class="text-5xl mb-4">${s.icon}</div><h3 class="font-extrabold text-2xl mb-3">${s.title}</h3><p class="text-sm text-neutral-300 leading-relaxed font-medium">${s.text}</p>`;
-  document.getElementById("onb-dots").innerHTML = ONBOARDING_STEPS.map((_, i) => `<div class="h-2 rounded-full transition-all ${i === onbStep ? "w-6 bg-gradient-to-r from-mint to-lilac" : "w-2 bg-white/20"}"></div>`).join("");
-  document.getElementById("onb-next").textContent = onbStep === ONBOARDING_STEPS.length - 1 ? "Zaczynamy!" : "Dalej";
+  const c = $("onb-content"); if (!c) return;
+  c.innerHTML = `<div class="text-5xl mb-4">${s.icon}</div><h3 class="font-extrabold text-2xl mb-3">${s.title}</h3><p class="text-sm text-neutral-300 leading-relaxed font-medium">${s.text}</p>`;
+  const d = $("onb-dots");
+  if (d) d.innerHTML = ONBOARDING_STEPS.map((_, i) => `<div class="h-2 rounded-full transition-all ${i === onbStep ? "w-6 bg-gradient-to-r from-mint to-lilac" : "w-2 bg-white/20"}"></div>`).join("");
+  const n = $("onb-next"); if (n) n.textContent = onbStep === ONBOARDING_STEPS.length - 1 ? "Zaczynamy!" : "Dalej";
 }
-function showOnboarding() { onbStep = 0; renderOnboarding(); document.getElementById("modal-onboarding").classList.remove("hidden"); }
-function hideOnboarding() { localStorage.setItem("regim:onboarded", "1"); document.getElementById("modal-onboarding").classList.add("hidden"); }
+function showOnboarding() { onbStep = 0; renderOnboarding(); const m = $("modal-onboarding"); if (m) m.classList.remove("hidden"); }
+function hideOnboarding() { localStorage.setItem("regim:onboarded", "1"); const m = $("modal-onboarding"); if (m) m.classList.add("hidden"); }
 
 // ============================================================================
 // INTERAKCJE
@@ -2676,7 +2418,7 @@ document.querySelectorAll("[data-check]").forEach((btn) => {
 });
 
 function openModal(id) {
-  const m = document.getElementById(id);
+  const m = $(id);
   if (!m) return;
   if (id === "modal-trening") renderTreningModalContent();
   if (id === "modal-settings") populateSettings();
@@ -2697,11 +2439,41 @@ document.querySelectorAll("[data-close-modal]").forEach((el) => {
 });
 document.querySelectorAll(".modal-check-btn[data-close-modal]").forEach((b) => b.addEventListener("click", () => setTimeout(closeAllModals, 150)));
 
-document.getElementById("btn-settings").addEventListener("click", () => openModal("modal-settings"));
-document.getElementById("btn-glossary").addEventListener("click", () => openModal("modal-glossary"));
-document.getElementById("btn-open-breathing").addEventListener("click", () => { closeAllModals(); setTimeout(() => openModal("modal-breathing"), 200); });
-
-document.querySelectorAll(".help-btn").forEach((b) => b.addEventListener("click", (e) => { e.stopPropagation(); showHelp(b.dataset.help); }));
+$("btn-settings")?.addEventListener("click", () => openModal("modal-settings"));
+$("btn-glossary")?.addEventListener("click", () => openModal("modal-glossary"));
+$("btn-open-breathing")?.addEventListener("click", () => { closeAllModals(); setTimeout(() => openModal("modal-breathing"), 200); });
+$("btn-refresh-brief")?.addEventListener("click", async () => {
+  const el = $("brief-text");
+  if (el) el.textContent = "Odświeżam...";
+  await autoRefreshBrief();
+  showToast("Brief odświeżony ✓");
+});
+$("btn-challenge-edit")?.addEventListener("click", () => openModal("modal-challenge"));
+$("btn-challenge-clear")?.addEventListener("click", async () => {
+  localStorage.removeItem("regim:challenge");
+  renderChallenge(); closeAllModals(); showToast("Challenge usunięty");
+});
+$("btn-1rm")?.addEventListener("click", () => openModal("modal-1rm"));
+$("btn-rm-calculate")?.addEventListener("click", () => {
+  const w = parseFloat($("input-rm-weight").value);
+  const r = parseInt($("input-rm-reps").value, 10);
+  if (!w || !r || r < 1 || r > 15) { showToast("Podaj sensowne wartości"); return; }
+  $("rm-value").textContent = (w * (1 + r / 30)).toFixed(1);
+});
+$("btn-goal-edit")?.addEventListener("click", () => {
+  const w = $("goal-edit-wrapper");
+  if (!w) return;
+  w.classList.toggle("hidden");
+  if (!w.classList.contains("hidden")) $("input-goal-weight").value = getSettings().goalWeight;
+});
+$("btn-goal-save")?.addEventListener("click", () => {
+  const v = parseFloat($("input-goal-weight").value);
+  if (v && v > 30 && v < 200) {
+    const s = getSettings(); s.goalWeight = v; saveSettings(s);
+    $("goal-edit-wrapper").classList.add("hidden");
+    renderGoal(); showToast("Cel zapisany ✓");
+  } else showToast("Podaj sensowną wartość");
+});
 
 document.querySelectorAll(".food-chip").forEach((c) => {
   c.addEventListener("click", async () => {
@@ -2709,13 +2481,6 @@ document.querySelectorAll(".food-chip").forEach((c) => {
     if (state.foodChecked.includes(f)) state.foodChecked = state.foodChecked.filter((x) => x !== f);
     else state.foodChecked.push(f);
     await persistToday();
-  });
-});
-document.querySelectorAll(".mood-chip").forEach((c) => {
-  c.addEventListener("click", () => {
-    const t = c.dataset.tag; c.classList.toggle("active");
-    if (state.moodTagsMorning.includes(t)) state.moodTagsMorning = state.moodTagsMorning.filter((x) => x !== t);
-    else state.moodTagsMorning.push(t);
   });
 });
 document.querySelectorAll(".tag-chip").forEach((c) => {
@@ -2726,19 +2491,17 @@ document.querySelectorAll(".tag-chip").forEach((c) => {
   });
 });
 
-document.getElementById("input-jaw-tension").addEventListener("input", (e) => { document.getElementById("jaw-tension-value").textContent = e.target.value; });
-document.getElementById("input-mood-morning").addEventListener("input", (e) => { document.getElementById("mood-morning-value").textContent = e.target.value; });
-document.getElementById("input-mood-evening").addEventListener("input", (e) => { document.getElementById("mood-evening-value").textContent = e.target.value; });
-
-document.getElementById("input-note").addEventListener("input", (e) => {
+$("input-jaw-tension")?.addEventListener("input", (e) => { $("jaw-tension-value").textContent = e.target.value; });
+$("input-mood-morning")?.addEventListener("input", (e) => { $("mood-morning-value").textContent = e.target.value; });
+$("input-mood-evening")?.addEventListener("input", (e) => { $("mood-evening-value").textContent = e.target.value; });
+$("input-note")?.addEventListener("input", (e) => {
   state.note = e.target.value;
   clearTimeout(window.__noteDebounce);
   window.__noteDebounce = setTimeout(async () => { await persistToday(); }, 800);
 });
 
 ["habit-water-salt", "habit-cold-shower", "habit-walk-meal"].forEach((id) => {
-  const el = document.getElementById(id);
-  if (!el) return;
+  const el = $(id); if (!el) return;
   const key = id === "habit-water-salt" ? "waterSalt" : id === "habit-cold-shower" ? "coldShower" : "walkMeal";
   el.addEventListener("change", async () => { state.habits[key] = el.checked; await persistToday(); });
 });
@@ -2748,7 +2511,7 @@ document.querySelectorAll(".tab-btn").forEach((btn) => {
     document.querySelectorAll(".tab-btn").forEach((b) => { b.classList.remove("bg-gradient-to-br", "from-mint", "to-lilac", "text-ink"); b.classList.add("text-neutral-400"); });
     btn.classList.add("bg-gradient-to-br", "from-mint", "to-lilac", "text-ink"); btn.classList.remove("text-neutral-400");
     document.querySelectorAll(".tab-panel").forEach((p) => p.classList.add("hidden"));
-    document.getElementById(`tab-${btn.dataset.tab}`).classList.remove("hidden");
+    $(`tab-${btn.dataset.tab}`).classList.remove("hidden");
     if (btn.dataset.tab === "mentor") { renderCharts(); renderMentorHistory(); }
     if (btn.dataset.tab === "ascend") { renderAscend(); }
     if (btn.dataset.tab === "cialo") { renderProfilCard(); renderGrowthCalculator(); renderHeightChart(); renderWeightETA(); renderBioAge(); renderPubertyQuestions(); renderTannerStages(); renderHeightPercentile(); renderWeightHeightTable(); renderGrowthFactors(); renderStrengthProgression(); }
@@ -2764,7 +2527,7 @@ document.querySelectorAll(".report-btn").forEach((btn) => {
     else btn.classList.add("bg-gradient-to-br", "from-lilac", "to-mint", "text-ink");
     btn.classList.remove("text-neutral-400");
     document.querySelectorAll(".report-panel").forEach((p) => p.classList.add("hidden"));
-    document.getElementById(`form-${btn.dataset.report}`).classList.remove("hidden");
+    $(`form-${btn.dataset.report}`).classList.remove("hidden");
   });
 });
 
@@ -2777,40 +2540,25 @@ document.querySelectorAll(".range-btn").forEach((btn) => {
   });
 });
 
-document.getElementById("btn-challenge-edit").addEventListener("click", () => openModal("modal-challenge"));
-document.getElementById("btn-challenge-clear").addEventListener("click", async () => {
-  localStorage.removeItem("regim:challenge");
-  renderChallenge(); closeAllModals(); showToast("Challenge usunięty");
-});
+$("onb-next")?.addEventListener("click", () => { onbStep++; if (onbStep >= ONBOARDING_STEPS.length) { hideOnboarding(); return; } renderOnboarding(); });
+$("onb-skip")?.addEventListener("click", hideOnboarding);
+$("btn-restart-onboarding")?.addEventListener("click", () => { closeAllModals(); setTimeout(showOnboarding, 200); });
 
-document.getElementById("btn-refresh-brief").addEventListener("click", async () => {
-  document.getElementById("brief-text").textContent = "Odświeżam...";
-  await autoRefreshBrief();
-  showToast("Brief odświeżony ✓");
-});
-
-document.getElementById("onb-next").addEventListener("click", () => {
-  onbStep++;
-  if (onbStep >= ONBOARDING_STEPS.length) { hideOnboarding(); return; }
-  renderOnboarding();
-});
-document.getElementById("onb-skip").addEventListener("click", hideOnboarding);
-document.getElementById("btn-restart-onboarding").addEventListener("click", () => { closeAllModals(); setTimeout(showOnboarding, 200); });
-
-// Puberty check
-document.getElementById("btn-puberty-evaluate").addEventListener("click", () => {
-  const checked = PUBERTY_QUESTIONS.filter((q) => document.getElementById(`pq-${q.id}`).checked).length;
-  const result = document.getElementById("puberty-result");
+$("btn-puberty-evaluate")?.addEventListener("click", () => {
+  const checked = PUBERTY_QUESTIONS.filter((q) => $(`pq-${q.id}`)?.checked).length;
+  const result = $("puberty-result");
+  if (!result) return;
   let stage, advice;
-  if (checked <= 1) { stage = "Przed okresem dojrzewania (Tanner 1)"; advice = "Jesteś przed skokiem wzrostu. To dobra wiadomość — masz cały wzrost jeszcze przed sobą. Sen 8-9h, białko, basen. Reszta przyjdzie sama."; }
-  else if (checked <= 3) { stage = "Początek dojrzewania (Tanner 2-3)"; advice = "Jesteś w środku. Skok wzrostu już się zaczął lub zaraz się zacznie. Kluczowy okres — maksymalnie dbaj o sen, dietę, basen. Wzrost jeszcze mocno pójdzie w górę."; }
-  else if (checked <= 5) { stage = "Środek dojrzewania (Tanner 3-4)"; advice = "Szczyt skoku wzrostu. Możesz rosnąć 8-12 cm rocznie. Sen, dieta, basen = maksymalizacja potencjału. Za rok-dwa wzrost zacznie zwalniać."; }
-  else { stage = "Koniec dojrzewania (Tanner 4-5)"; advice = "Większość zmian już za Tobą. Możesz jeszcze wyciągnąć 2-4 cm. Postawa, zwisanie na drążku, sen 8h+ i dieta — to reszta."; }
+  if (checked <= 1) { stage = "Przed okresem dojrzewania (Tanner 1)"; advice = "Jesteś przed skokiem wzrostu. To dobra wiadomość — masz cały wzrost jeszcze przed sobą. Sen 8-9h, białko, basen."; }
+  else if (checked <= 3) { stage = "Początek dojrzewania (Tanner 2-3)"; advice = "Jesteś w środku. Skok wzrostu już się zaczął lub zaraz się zacznie. Kluczowy okres — dbaj o sen, dietę, basen."; }
+  else if (checked <= 5) { stage = "Środek dojrzewania (Tanner 3-4)"; advice = "Szczyt skoku wzrostu. Możesz rosnąć 8-12 cm rocznie. Sen, dieta, basen = maksymalizacja potencjału."; }
+  else { stage = "Koniec dojrzewania (Tanner 4-5)"; advice = "Większość zmian już za Tobą. Możesz jeszcze wyciągnąć 2-4 cm. Postawa, zwisanie na drążku, sen 8h+."; }
   result.classList.remove("hidden");
   result.innerHTML = `
     <div class="text-[10px] text-neutral-400 font-bold tracking-widest mb-1">TWOJA FAZA</div>
     <div class="text-lg font-extrabold text-mint mb-2">${stage}</div>
     <p class="text-xs text-neutral-200 font-medium leading-relaxed">${advice}</p>`;
+  localStorage.setItem("regim:used-puberty", "1");
 });
 
 // ============================================================================
@@ -2837,8 +2585,8 @@ function formatMMSS(s) {
   return `${m}:${ss}`;
 }
 function runBreathCycle() {
-  const circle = document.getElementById("breath-circle");
-  const text = document.getElementById("breath-phase-text");
+  const circle = $("breath-circle"); const text = $("breath-phase-text");
+  if (!circle || !text) return;
   function cycle() {
     text.textContent = "Wdech"; circle.className = "breath-circle inhale mb-5";
     setTimeout(() => {
@@ -2853,105 +2601,81 @@ function runBreathCycle() {
   }
   cycle();
 }
-document.getElementById("btn-breath-start").addEventListener("click", () => {
+$("btn-breath-start")?.addEventListener("click", () => {
   if (breathTimer) return;
   breathTotalRemaining = 180;
-  document.getElementById("breath-timer").textContent = formatMMSS(breathTotalRemaining);
-  document.getElementById("btn-breath-start").classList.add("hidden");
-  document.getElementById("btn-breath-stop").classList.remove("hidden");
+  $("breath-timer").textContent = formatMMSS(breathTotalRemaining);
+  $("btn-breath-start").classList.add("hidden");
+  $("btn-breath-stop").classList.remove("hidden");
   breathTimer = setInterval(() => {
     breathTotalRemaining -= 1;
-    document.getElementById("breath-timer").textContent = formatMMSS(breathTotalRemaining);
+    $("breath-timer").textContent = formatMMSS(breathTotalRemaining);
     if (breathTotalRemaining <= 0) stopBreath();
   }, 1000);
   runBreathCycle();
 });
 function stopBreath() {
   clearInterval(breathTimer); breathTimer = null;
-  document.getElementById("breath-circle").className = "breath-circle mb-5";
-  document.getElementById("breath-phase-text").textContent = "Gotowy";
-  document.getElementById("breath-timer").textContent = "03:00";
-  document.getElementById("btn-breath-start").classList.remove("hidden");
-  document.getElementById("btn-breath-stop").classList.add("hidden");
+  const c = $("breath-circle"); const t = $("breath-phase-text"); const tm = $("breath-timer"); const s = $("btn-breath-start"); const st = $("btn-breath-stop");
+  if (c) c.className = "breath-circle mb-5";
+  if (t) t.textContent = "Gotowy";
+  if (tm) tm.textContent = "03:00";
+  if (s) s.classList.remove("hidden");
+  if (st) st.classList.add("hidden");
 }
-document.getElementById("btn-breath-stop").addEventListener("click", stopBreath);
-
-// ============================================================================
-// 1RM
-// ============================================================================
-document.getElementById("btn-rm-calculate").addEventListener("click", () => {
-  const w = parseFloat(document.getElementById("input-rm-weight").value);
-  const r = parseInt(document.getElementById("input-rm-reps").value, 10);
-  if (!w || !r || r < 1 || r > 15) { showToast("Podaj sensowne wartości"); return; }
-  document.getElementById("rm-value").textContent = (w * (1 + r / 30)).toFixed(1);
-});
-document.getElementById("btn-1rm").addEventListener("click", () => openModal("modal-1rm"));
+$("btn-breath-stop")?.addEventListener("click", stopBreath);
 
 // ============================================================================
 // SETTINGS
 // ============================================================================
 function populateSettings() {
   const s = getSettings();
-  document.getElementById("input-age").value = s.age;
-  document.getElementById("input-height").value = s.height;
-  if (s.heightDad) document.getElementById("input-height-dad").value = s.heightDad;
-  if (s.heightMom) document.getElementById("input-height-mom").value = s.heightMom;
-  document.getElementById("input-goal-weight-settings").value = s.goalWeight;
-  document.getElementById("input-auto-theme").checked = s.autoTheme;
+  $("input-age").value = s.age;
+  $("input-height").value = s.height;
+  if (s.heightDad) $("input-height-dad").value = s.heightDad;
+  if (s.heightMom) $("input-height-mom").value = s.heightMom;
+  $("input-goal-weight-settings").value = s.goalWeight;
+  $("input-auto-theme").checked = s.autoTheme;
   renderBMI();
   updateAuthUI(window.__fb?.auth?.currentUser || null);
 }
-document.getElementById("btn-settings-save").addEventListener("click", () => {
+$("btn-settings-save")?.addEventListener("click", () => {
   const s = {
-    age: parseInt(document.getElementById("input-age").value) || 14,
-    height: parseFloat(document.getElementById("input-height").value) || 170,
-    heightDad: parseFloat(document.getElementById("input-height-dad").value) || null,
-    heightMom: parseFloat(document.getElementById("input-height-mom").value) || null,
-    goalWeight: parseFloat(document.getElementById("input-goal-weight-settings").value) || 55.0,
-    autoTheme: document.getElementById("input-auto-theme").checked,
+    age: parseInt($("input-age").value) || 14,
+    height: parseFloat($("input-height").value) || 170,
+    heightDad: parseFloat($("input-height-dad").value) || null,
+    heightMom: parseFloat($("input-height-mom").value) || null,
+    goalWeight: parseFloat($("input-goal-weight-settings").value) || 55.0,
+    autoTheme: $("input-auto-theme").checked,
   };
   saveSettings(s); applyAutoTheme(); renderGoal(); renderBMI();
   renderGrowthCalculator();
   showToast("Ustawienia zapisane ✓"); closeAllModals();
 });
 
-document.getElementById("btn-goal-edit").addEventListener("click", () => {
-  const w = document.getElementById("goal-edit-wrapper");
-  w.classList.toggle("hidden");
-  if (!w.classList.contains("hidden")) document.getElementById("input-goal-weight").value = getSettings().goalWeight;
-});
-document.getElementById("btn-goal-save").addEventListener("click", () => {
-  const v = parseFloat(document.getElementById("input-goal-weight").value);
-  if (v && v > 30 && v < 200) {
-    const s = getSettings(); s.goalWeight = v; saveSettings(s);
-    document.getElementById("goal-edit-wrapper").classList.add("hidden");
-    renderGoal(); showToast("Cel zapisany ✓");
-  } else showToast("Podaj sensowną wartość");
-});
-
 // ============================================================================
 // FORMULARZE
 // ============================================================================
-if (sunday) document.getElementById("nail-card").classList.remove("hidden");
+if (sunday) $("nail-card")?.classList.remove("hidden");
 const dayOfWeekNum = todayObj.getDay();
-if (dayOfWeekNum === 1 || dayOfWeekNum === 4 || dayOfWeekNum === 6) document.getElementById("hair-card").classList.remove("hidden");
-if (isBikeDay) document.getElementById("bike-distance-wrapper").classList.remove("hidden");
+if (dayOfWeekNum === 1 || dayOfWeekNum === 4 || dayOfWeekNum === 6) $("hair-card")?.classList.remove("hidden");
+if (isBikeDay) $("bike-distance-wrapper")?.classList.remove("hidden");
 
-document.getElementById("form-morning").addEventListener("submit", async (e) => {
+$("form-morning")?.addEventListener("submit", async (e) => {
   e.preventDefault();
   const morning = {
-    sleepTotal: parseFloat(document.getElementById("input-sleep-total").value) || null,
-    sleepDeep: parseFloat(document.getElementById("input-sleep-deep").value) || null,
-    sleepRem: parseFloat(document.getElementById("input-sleep-rem").value) || null,
-    sleepLight: parseFloat(document.getElementById("input-sleep-light").value) || null,
-    sleepWakes: parseInt(document.getElementById("input-sleep-wakes").value) || null,
-    sleepHr: parseInt(document.getElementById("input-sleep-hr").value) || null,
-    rhr: parseInt(document.getElementById("input-rhr").value) || null,
-    dailyWeight: parseFloat(document.getElementById("input-weight-daily").value) || null,
-    dailyHeight: parseFloat(document.getElementById("input-height-daily").value) || null,
-    jawTension: parseInt(document.getElementById("input-jaw-tension").value, 10) || null,
-    moodMorning: parseInt(document.getElementById("input-mood-morning").value, 10) || null,
-    tabletkaTime: document.getElementById("input-tabletka-time").value || null,
+    sleepTotal: parseFloat($("input-sleep-total").value) || null,
+    sleepDeep: parseFloat($("input-sleep-deep").value) || null,
+    sleepRem: parseFloat($("input-sleep-rem").value) || null,
+    sleepLight: parseFloat($("input-sleep-light").value) || null,
+    sleepWakes: parseInt($("input-sleep-wakes").value) || null,
+    sleepHr: parseInt($("input-sleep-hr").value) || null,
+    rhr: parseInt($("input-rhr").value) || null,
+    dailyWeight: parseFloat($("input-weight-daily").value) || null,
+    dailyHeight: parseFloat($("input-height-daily").value) || null,
+    jawTension: parseInt($("input-jaw-tension").value, 10) || null,
+    moodMorning: parseInt($("input-mood-morning").value, 10) || null,
+    tabletkaTime: $("input-tabletka-time").value || null,
   };
   if (morning.dailyHeight) localStorage.setItem("regim:last-height", String(morning.dailyHeight));
   state.morning = morning;
@@ -2962,17 +2686,17 @@ document.getElementById("form-morning").addEventListener("submit", async (e) => 
   await autoRefreshBrief();
 });
 
-document.getElementById("form-evening").addEventListener("submit", async (e) => {
+$("form-evening")?.addEventListener("submit", async (e) => {
   e.preventDefault();
   const evening = {
-    steps: parseInt(document.getElementById("input-steps").value) || null,
-    hrDay: parseInt(document.getElementById("input-hr-day").value) || null,
-    spo2: parseInt(document.getElementById("input-spo2").value) || null,
-    stress: parseInt(document.getElementById("input-stress").value) || null,
-    rpe: parseInt(document.getElementById("input-rpe").value) || null,
-    screenTime: parseInt(document.getElementById("input-screen-time").value) || null,
-    moodEvening: parseInt(document.getElementById("input-mood-evening").value, 10) || null,
-    bikeDistance: isBikeDay ? (parseFloat(document.getElementById("input-bike-distance").value) || null) : null,
+    steps: parseInt($("input-steps").value) || null,
+    hrDay: parseInt($("input-hr-day").value) || null,
+    spo2: parseInt($("input-spo2").value) || null,
+    stress: parseInt($("input-stress").value) || null,
+    rpe: parseInt($("input-rpe").value) || null,
+    screenTime: parseInt($("input-screen-time").value) || null,
+    moodEvening: parseInt($("input-mood-evening").value, 10) || null,
+    bikeDistance: isBikeDay ? (parseFloat($("input-bike-distance").value) || null) : null,
   };
   state.evening = evening;
   const existing = (await loadDayDoc(todayKey)) || { date: todayKey };
@@ -2999,55 +2723,66 @@ async function renderCharts() {
     },
   };
   const w = days.map((d) => d.morning?.dailyWeight ?? null);
-  if (weightChart) weightChart.destroy();
-  weightChart = new Chart(document.getElementById("chart-weight"), { type: "line", data: { labels, datasets: [{ data: w, borderColor: "#fbbf24", backgroundColor: "rgba(251,191,36,.12)", pointBackgroundColor: "#fbbf24", pointBorderColor: "#0f0c1d", pointRadius: 4, borderWidth: 3, tension: .4, fill: true, spanGaps: true }] }, options: baseOptions });
-
+  const wc = $("chart-weight");
+  if (wc) {
+    if (weightChart) weightChart.destroy();
+    weightChart = new Chart(wc, { type: "line", data: { labels, datasets: [{ data: w, borderColor: "#fbbf24", backgroundColor: "rgba(251,191,36,.12)", pointBackgroundColor: "#fbbf24", pointBorderColor: "#0f0c1d", pointRadius: 4, borderWidth: 3, tension: .4, fill: true, spanGaps: true }] }, options: baseOptions });
+  }
   const deep = days.map((d) => d.morning?.sleepDeep ?? null);
   const rem = days.map((d) => d.morning?.sleepRem ?? null);
-  if (sleepChart) sleepChart.destroy();
-  sleepChart = new Chart(document.getElementById("chart-sleep"), { type: "line", data: { labels, datasets: [
-    { label: "Głęboki (h)", data: deep, borderColor: "#5eead4", backgroundColor: "rgba(94,234,212,.12)", pointBackgroundColor: "#5eead4", pointBorderColor: "#0f0c1d", pointRadius: 4, borderWidth: 3, tension: .4, fill: true, spanGaps: true },
-    { label: "REM (h)", data: rem, borderColor: "#c4b5fd", backgroundColor: "rgba(196,181,253,.12)", pointBackgroundColor: "#c4b5fd", pointBorderColor: "#0f0c1d", pointRadius: 4, borderWidth: 3, tension: .4, fill: true, spanGaps: true },
-  ] }, options: { ...baseOptions, plugins: { legend: { display: true, labels: { color: "#c9c5d6", font: { family: "Poppins", size: 11, weight: "700" } } } } } });
-
+  const sc = $("chart-sleep");
+  if (sc) {
+    if (sleepChart) sleepChart.destroy();
+    sleepChart = new Chart(sc, { type: "line", data: { labels, datasets: [
+      { label: "Głęboki (h)", data: deep, borderColor: "#5eead4", backgroundColor: "rgba(94,234,212,.12)", pointBackgroundColor: "#5eead4", pointBorderColor: "#0f0c1d", pointRadius: 4, borderWidth: 3, tension: .4, fill: true, spanGaps: true },
+      { label: "REM (h)", data: rem, borderColor: "#c4b5fd", backgroundColor: "rgba(196,181,253,.12)", pointBackgroundColor: "#c4b5fd", pointBorderColor: "#0f0c1d", pointRadius: 4, borderWidth: 3, tension: .4, fill: true, spanGaps: true },
+    ] }, options: { ...baseOptions, plugins: { legend: { display: true, labels: { color: "#c9c5d6", font: { family: "Poppins", size: 11, weight: "700" } } } } } });
+  }
   const rhrV = days.map((d) => d.morning?.rhr ?? null);
-  if (rhrChart) rhrChart.destroy();
-  rhrChart = new Chart(document.getElementById("chart-rhr"), { type: "line", data: { labels, datasets: [{ data: rhrV, borderColor: "#5eead4", backgroundColor: "rgba(94,234,212,.12)", pointBackgroundColor: "#5eead4", pointBorderColor: "#0f0c1d", pointRadius: 4, borderWidth: 3, tension: .4, fill: true, spanGaps: true }] }, options: baseOptions });
-
-  if (stepsChart) stepsChart.destroy();
-  stepsChart = new Chart(document.getElementById("chart-steps"), { type: "bar", data: { labels, datasets: [{ data: days.map((d) => d.evening?.steps ?? null), backgroundColor: "rgba(251,191,157,.55)", borderRadius: 8, maxBarThickness: 28 }] }, options: baseOptions });
-
-  if (stressChart) stressChart.destroy();
-  stressChart = new Chart(document.getElementById("chart-stress"), { type: "line", data: { labels, datasets: [{ data: days.map((d) => d.evening?.stress ?? null), borderColor: "#fb7185", backgroundColor: "rgba(251,113,133,.12)", pointBackgroundColor: "#fb7185", pointBorderColor: "#0f0c1d", pointRadius: 4, borderWidth: 3, tension: .4, fill: true, spanGaps: true }] }, options: { ...baseOptions, scales: { ...baseOptions.scales, y: { ...baseOptions.scales.y, min: 0, max: 100 } } } });
-
-  if (moodChart) moodChart.destroy();
-  moodChart = new Chart(document.getElementById("chart-mood"), { type: "line", data: { labels, datasets: [
-    { label: "Rano", data: days.map((d) => d.morning?.moodMorning ?? null), borderColor: "#fbbf9d", pointBackgroundColor: "#fbbf9d", pointBorderColor: "#0f0c1d", pointRadius: 4, borderWidth: 3, tension: .4, spanGaps: true },
-    { label: "Wieczór", data: days.map((d) => d.evening?.moodEvening ?? null), borderColor: "#c4b5fd", pointBackgroundColor: "#c4b5fd", pointBorderColor: "#0f0c1d", pointRadius: 4, borderWidth: 3, tension: .4, spanGaps: true },
-  ] }, options: { ...baseOptions, scales: { ...baseOptions.scales, y: { ...baseOptions.scales.y, min: 0, max: 10 } }, plugins: { legend: { display: true, labels: { color: "#c9c5d6", font: { family: "Poppins", size: 11, weight: "700" } } } } } });
-
+  const rc = $("chart-rhr");
+  if (rc) {
+    if (rhrChart) rhrChart.destroy();
+    rhrChart = new Chart(rc, { type: "line", data: { labels, datasets: [{ data: rhrV, borderColor: "#5eead4", backgroundColor: "rgba(94,234,212,.12)", pointBackgroundColor: "#5eead4", pointBorderColor: "#0f0c1d", pointRadius: 4, borderWidth: 3, tension: .4, fill: true, spanGaps: true }] }, options: baseOptions });
+  }
+  const stc = $("chart-steps");
+  if (stc) {
+    if (stepsChart) stepsChart.destroy();
+    stepsChart = new Chart(stc, { type: "bar", data: { labels, datasets: [{ data: days.map((d) => d.evening?.steps ?? null), backgroundColor: "rgba(251,191,157,.55)", borderRadius: 8, maxBarThickness: 28 }] }, options: baseOptions });
+  }
+  const strc = $("chart-stress");
+  if (strc) {
+    if (stressChart) stressChart.destroy();
+    stressChart = new Chart(strc, { type: "line", data: { labels, datasets: [{ data: days.map((d) => d.evening?.stress ?? null), borderColor: "#fb7185", backgroundColor: "rgba(251,113,133,.12)", pointBackgroundColor: "#fb7185", pointBorderColor: "#0f0c1d", pointRadius: 4, borderWidth: 3, tension: .4, fill: true, spanGaps: true }] }, options: { ...baseOptions, scales: { ...baseOptions.scales, y: { ...baseOptions.scales.y, min: 0, max: 100 } } } });
+  }
+  const mc = $("chart-mood");
+  if (mc) {
+    if (moodChart) moodChart.destroy();
+    moodChart = new Chart(mc, { type: "line", data: { labels, datasets: [
+      { label: "Rano", data: days.map((d) => d.morning?.moodMorning ?? null), borderColor: "#fbbf9d", pointBackgroundColor: "#fbbf9d", pointBorderColor: "#0f0c1d", pointRadius: 4, borderWidth: 3, tension: .4, spanGaps: true },
+      { label: "Wieczór", data: days.map((d) => d.evening?.moodEvening ?? null), borderColor: "#c4b5fd", pointBackgroundColor: "#c4b5fd", pointBorderColor: "#0f0c1d", pointRadius: 4, borderWidth: 3, tension: .4, spanGaps: true },
+    ] }, options: { ...baseOptions, scales: { ...baseOptions.scales, y: { ...baseOptions.scales.y, min: 0, max: 10 } }, plugins: { legend: { display: true, labels: { color: "#c9c5d6", font: { family: "Poppins", size: 11, weight: "700" } } } } } });
+  }
   renderCorrelation();
 }
 
-document.getElementById("btn-analyze-ai").addEventListener("click", async () => {
-  const label = document.getElementById("ai-btn-label");
-  const spinner = document.getElementById("ai-btn-spinner");
+$("btn-analyze-ai")?.addEventListener("click", async () => {
+  const label = $("ai-btn-label"); const spinner = $("ai-btn-spinner");
   label.classList.add("opacity-0"); spinner.classList.remove("hidden");
   try {
     const text = await generateTrainerBrief();
     const existing = (await loadDayDoc(todayKey)) || { date: todayKey };
     await saveDayDoc({ ...existing, aiVerdict: text });
-    document.getElementById("ai-result-box").classList.remove("hidden");
-    document.getElementById("ai-result-text").textContent = text;
-    document.getElementById("mentor-verdict-box").classList.remove("hidden");
-    document.getElementById("mentor-verdict-text").textContent = text;
+    $("ai-result-box").classList.remove("hidden");
+    $("ai-result-text").textContent = text;
+    $("mentor-verdict-box").classList.remove("hidden");
+    $("mentor-verdict-text").textContent = text;
     renderMentorHistory();
   } catch (e) { showToast("Błąd"); }
   finally { label.classList.remove("opacity-0"); spinner.classList.add("hidden"); }
 });
 
 async function renderMentorHistory() {
-  const list = document.getElementById("mentor-history-list");
+  const list = $("mentor-history-list"); if (!list) return;
   const days = await loadLastNDays(30);
   const withV = days.filter((d) => d.aiVerdict).sort((a, b) => b.date.localeCompare(a.date));
   if (withV.length === 0) { list.innerHTML = `<p class="text-sm text-neutral-500 font-medium">Brak historii.</p>`; return; }
@@ -3058,10 +2793,10 @@ async function renderMentorHistory() {
     return `<div class="history-item pl-3"><div class="flex items-center gap-2 mb-1"><span class="text-xs font-extrabold">${day}.${m}.${y}</span><span class="text-[11px] font-bold ${c}">${pct}%</span></div><p class="text-xs text-neutral-400 leading-relaxed font-medium">${escapeHtml(d.aiVerdict)}</p></div>`;
   }).join("");
 }
-document.getElementById("btn-history-refresh").addEventListener("click", renderMentorHistory);
+$("btn-history-refresh")?.addEventListener("click", renderMentorHistory);
 
 async function renderGlowUp() {
-  const content = document.getElementById("glowup-content");
+  const content = $("glowup-content"); if (!content) return;
   const thisW = await loadDaysRange(7, 0);
   const lastW = await loadDaysRange(7, 7);
   if (thisW.length === 0 || lastW.length === 0) { content.innerHTML = `<p class="text-sm text-neutral-400 font-medium">Za mało danych.</p>`; return; }
@@ -3084,7 +2819,7 @@ async function renderGlowUp() {
   }).filter(Boolean);
   content.innerHTML = rows.length ? rows.join("") : `<p class="text-sm text-neutral-400 font-medium">Za mało danych.</p>`;
 }
-document.getElementById("btn-glowup-refresh").addEventListener("click", renderGlowUp);
+$("btn-glowup-refresh")?.addEventListener("click", renderGlowUp);
 
 // ============================================================================
 // BADGES
@@ -3106,7 +2841,8 @@ const BADGES = [
 
 async function renderBadges() {
   const all = await collectAllDays();
-  const streak = parseInt(document.getElementById("streak-count").textContent) || 0;
+  const grid = $("badges-grid"); if (!grid) return;
+  const streak = parseInt($("streak-count")?.textContent) || 0;
   const todayAsc = calcAscendPct();
   let ascend100Count = 0;
   all.forEach((d) => {
@@ -3124,7 +2860,7 @@ async function renderBadges() {
     ascend100Count,
     perfect: all.some((d) => d.completedPct === 100),
   };
-  document.getElementById("badges-grid").innerHTML = BADGES.map((b) => {
+  grid.innerHTML = BADGES.map((b) => {
     const u = b.check(ctx);
     return `<div class="badge-card ${u ? "unlocked" : "locked"} glass rounded-2xl p-3 flex flex-col items-center gap-1.5 text-center">
       <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-mint/25 to-lilac/25 flex items-center justify-center"><i class="fa-solid ${b.icon} ${u ? "text-gold" : "text-neutral-500"}"></i></div>
@@ -3144,15 +2880,15 @@ async function generateWeeklySummary() {
   const pct = Math.round(average(days.map((d) => d.completedPct ?? 0)) || 0);
   const lines = [`🏆 ${perfect}/7 dni na 100%, średnia: ${pct}%.`];
   if (aS != null) lines.push(aS < 7 ? `😴 Średni sen ${aS.toFixed(1)}h — poniżej progu.` : `✅ Sen ${aS.toFixed(1)}h — solidnie.`);
-  if (aSt != null) lines.push(aSt > 55 ? `🧘 Stres ${Math.round(aSt)}/100 — podwyższony.` : `😌 Stres nisko (${Math.round(aSt)}/100).`);
+  if (aSt != null) lines.push(aSt > 55 ? `🧘 Stres ${Math.round(aSt)}/100 — podwyższony.` : `😌 Stres nisko.`);
   if (aStp != null) lines.push(`🚶 Średnio ${Math.round(aStp)} kroków.`);
   lines.push(perfect >= 5 ? "🔥 Świetny tydzień." : "🎯 Na przyszły tydzień: jeden konkretny cel.");
   return lines.join(" ");
 }
-document.getElementById("btn-weekly-summary").addEventListener("click", async () => {
-  const b = document.getElementById("btn-weekly-summary");
+$("btn-weekly-summary")?.addEventListener("click", async () => {
+  const b = $("btn-weekly-summary");
   b.disabled = true; b.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-1"></i>...';
-  document.getElementById("weekly-summary-text").textContent = await generateWeeklySummary();
+  $("weekly-summary-text").textContent = await generateWeeklySummary();
   b.disabled = false; b.innerHTML = '<i class="fa-solid fa-arrows-rotate mr-1"></i>Odśwież';
 });
 
@@ -3160,12 +2896,14 @@ async function renderCorrelation() {
   const days = await loadLastNDays(14);
   const low = days.filter((d) => (d.morning?.sleepTotal ?? 99) < 7 && d.evening?.stress != null);
   const high = days.filter((d) => (d.morning?.sleepTotal ?? 0) >= 7.5 && d.evening?.stress != null);
-  if (low.length < 2 || high.length < 2) { document.getElementById("correlation-box").classList.add("hidden"); return; }
+  const box = $("correlation-box"); const txt = $("correlation-text");
+  if (!box || !txt) return;
+  if (low.length < 2 || high.length < 2) { box.classList.add("hidden"); return; }
   const a = average(low.map((d) => d.evening.stress));
   const b = average(high.map((d) => d.evening.stress));
   const diff = Math.round(a - b);
-  document.getElementById("correlation-box").classList.remove("hidden");
-  document.getElementById("correlation-text").textContent = diff > 5
+  box.classList.remove("hidden");
+  txt.textContent = diff > 5
     ? `🔗 Sen <7h = stres wyższy o ${diff} pkt (${Math.round(a)} vs ${Math.round(b)}).`
     : `🔗 Różnica stresu między krótkim i długim snem niewielka (${Math.round(a)} vs ${Math.round(b)}).`;
 }
@@ -3176,17 +2914,17 @@ async function renderCorrelation() {
 let deferredInstallPrompt = null;
 window.addEventListener("beforeinstallprompt", (e) => {
   e.preventDefault(); deferredInstallPrompt = e;
-  if (!localStorage.getItem("regim:install-dismissed")) document.getElementById("install-banner").classList.remove("hidden");
+  if (!localStorage.getItem("regim:install-dismissed")) $("install-banner")?.classList.remove("hidden");
 });
-document.getElementById("btn-install").addEventListener("click", async () => {
+$("btn-install")?.addEventListener("click", async () => {
   if (!deferredInstallPrompt) return;
   deferredInstallPrompt.prompt();
   const { outcome } = await deferredInstallPrompt.userChoice;
   if (outcome === "accepted") showToast("Dodano 🎉");
-  deferredInstallPrompt = null; document.getElementById("install-banner").classList.add("hidden");
+  deferredInstallPrompt = null; $("install-banner")?.classList.add("hidden");
 });
-document.getElementById("btn-install-dismiss").addEventListener("click", () => {
-  document.getElementById("install-banner").classList.add("hidden");
+$("btn-install-dismiss")?.addEventListener("click", () => {
+  $("install-banner")?.classList.add("hidden");
   localStorage.setItem("regim:install-dismissed", "1");
 });
 
@@ -3204,22 +2942,23 @@ function fireNotification(title, body) {
   }
 }
 if ("Notification" in window) {
-  if (Notification.permission === "default" && !localStorage.getItem("regim:notif-dismissed")) document.getElementById("notif-banner").classList.remove("hidden");
+  if (Notification.permission === "default" && !localStorage.getItem("regim:notif-dismissed")) $("notif-banner")?.classList.remove("hidden");
   if (Notification.permission === "granted") scheduleLocalReminders();
 }
-document.getElementById("btn-notif-enable").addEventListener("click", async () => {
+$("btn-notif-enable")?.addEventListener("click", async () => {
   const perm = await Notification.requestPermission();
   if (perm === "granted") { showToast("Powiadomienia włączone 🔔"); scheduleLocalReminders(); }
-  document.getElementById("notif-banner").classList.add("hidden");
+  $("notif-banner")?.classList.add("hidden");
 });
-document.getElementById("btn-notif-dismiss").addEventListener("click", () => { document.getElementById("notif-banner").classList.add("hidden"); localStorage.setItem("regim:notif-dismissed", "1"); });
+$("btn-notif-dismiss")?.addEventListener("click", () => { $("notif-banner")?.classList.add("hidden"); localStorage.setItem("regim:notif-dismissed", "1"); });
 
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => { navigator.serviceWorker.register("./sw.js").catch((e) => console.warn("SW", e)); });
 }
 
 function applyTheme(t) {
-  const i = document.getElementById("theme-icon");
+  const i = $("theme-icon");
+  if (!i) return;
   if (t === "light") { document.documentElement.classList.add("light-theme"); i.className = "fa-solid fa-sun"; }
   else { document.documentElement.classList.remove("light-theme"); i.className = "fa-solid fa-moon"; }
   localStorage.setItem("regim:theme", t);
@@ -3229,14 +2968,14 @@ function applyAutoTheme() {
   const h = new Date().getHours();
   applyTheme((h >= 6 && h < 19) ? "light" : "dark");
 }
-document.getElementById("btn-theme-toggle").addEventListener("click", () => {
+$("btn-theme-toggle")?.addEventListener("click", () => {
   applyTheme(document.documentElement.classList.contains("light-theme") ? "dark" : "light");
 });
 
 function vibrate(p) { if (navigator.vibrate) try { navigator.vibrate(p); } catch (e) {} }
 
 function fireConfetti() {
-  const canvas = document.getElementById("confetti-canvas");
+  const canvas = $("confetti-canvas"); if (!canvas) return;
   const ctx = canvas.getContext("2d");
   canvas.width = window.innerWidth; canvas.height = window.innerHeight;
   const colors = ["#5eead4", "#c4b5fd", "#fbbf9d", "#fbbf24", "#fb7185"];
@@ -3266,26 +3005,24 @@ function downloadFile(fn, c, m) {
   const a = document.createElement("a"); a.href = u; a.download = fn;
   document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(u);
 }
-document.getElementById("btn-export").addEventListener("click", async () => {
+$("btn-export")?.addEventListener("click", async () => {
   const choice = confirm("OK = CSV, Anuluj = JSON");
   const days = await collectAllDays();
   if (days.length === 0) { showToast("Brak danych"); return; }
   if (choice) {
-    const headers = ["date", "completedPct", "morning_sleepTotal", "morning_sleepDeep", "morning_sleepRem", "morning_rhr", "morning_dailyWeight", "morning_dailyHeight", "morning_jawTension", "morning_moodMorning", "evening_steps", "evening_stress", "evening_rpe", "note", "ascendCount"];
+    const headers = ["date", "completedPct", "morning_sleepTotal", "morning_sleepDeep", "morning_sleepRem", "morning_rhr", "morning_dailyWeight", "morning_dailyHeight", "evening_steps", "evening_stress", "evening_rpe", "note", "ascendCount"];
     const rows = days.map((d) => { const m = d.morning || {}, e = d.evening || {};
       const asc = d.ascend || {};
       const ascCount = ASCEND_ITEMS.filter((i) => asc[i.id]).length;
-      return [d.date, d.completedPct ?? "", m.sleepTotal ?? "", m.sleepDeep ?? "", m.sleepRem ?? "", m.rhr ?? "", m.dailyWeight ?? "", m.dailyHeight ?? "", m.jawTension ?? "", m.moodMorning ?? "", e.steps ?? "", e.stress ?? "", e.rpe ?? "", `"${(d.note || "").replace(/"/g, '""')}"`, ascCount].join(",");
+      return [d.date, d.completedPct ?? "", m.sleepTotal ?? "", m.sleepDeep ?? "", m.sleepRem ?? "", m.rhr ?? "", m.dailyWeight ?? "", m.dailyHeight ?? "", e.steps ?? "", e.stress ?? "", e.rpe ?? "", `"${(d.note || "").replace(/"/g, '""')}"`, ascCount].join(",");
     });
     downloadFile(`regim-export-${todayKey}.csv`, [headers.join(","), ...rows].join("\n"), "text/csv");
   } else downloadFile(`regim-export-${todayKey}.json`, JSON.stringify(days, null, 2), "application/json");
   showToast("Eksport gotowy 📁");
 });
 
-document.getElementById("cal-prev").addEventListener("click", () => { calViewDate.setMonth(calViewDate.getMonth() - 1); renderCalendar(); });
-document.getElementById("cal-next").addEventListener("click", () => { calViewDate.setMonth(calViewDate.getMonth() + 1); renderCalendar(); });
-
-document.getElementById("btn-open-breathing");
+$("cal-prev")?.addEventListener("click", () => { calViewDate.setMonth(calViewDate.getMonth() - 1); renderCalendar(); });
+$("cal-next")?.addEventListener("click", () => { calViewDate.setMonth(calViewDate.getMonth() + 1); renderCalendar(); });
 
 // ============================================================================
 // RELOAD
@@ -3297,13 +3034,10 @@ async function reloadEverything() {
     state.foodChecked = existing.foodChecked || [];
     state.morning = existing.morning || {};
     state.evening = existing.evening || {};
-    state.moodTagsMorning = existing.moodTagsMorning || [];
     state.dayTags = existing.dayTags || [];
     state.habits = existing.habits || { waterSalt: false, coldShower: false, walkMeal: false };
     state.ascend = existing.ascend || {};
     state.note = existing.note || "";
-    state.specialMode = existing.specialMode || "normal";
-    state.recoveryMode = existing.recoveryMode || false;
     applyConditionalTasks();
     await renderAllFromState();
   } else {
@@ -3318,37 +3052,35 @@ async function renderAllFromState() {
   await refreshStreak(); checkDeload(); renderHealthWarnings();
   renderGoal(); renderChallenge(); renderAscend();
   const m = state.morning;
-  if (m.sleepTotal != null) document.getElementById("input-sleep-total").value = m.sleepTotal;
-  if (m.sleepDeep != null) document.getElementById("input-sleep-deep").value = m.sleepDeep;
-  if (m.sleepRem != null) document.getElementById("input-sleep-rem").value = m.sleepRem;
-  if (m.sleepLight != null) document.getElementById("input-sleep-light").value = m.sleepLight;
-  if (m.sleepWakes != null) document.getElementById("input-sleep-wakes").value = m.sleepWakes;
-  if (m.sleepHr != null) document.getElementById("input-sleep-hr").value = m.sleepHr;
-  if (m.rhr != null) document.getElementById("input-rhr").value = m.rhr;
-  if (m.dailyWeight != null) document.getElementById("input-weight-daily").value = m.dailyWeight;
-  if (m.dailyHeight != null) document.getElementById("input-height-daily").value = m.dailyHeight;
-  if (m.jawTension != null) { document.getElementById("input-jaw-tension").value = m.jawTension; document.getElementById("jaw-tension-value").textContent = m.jawTension; }
-  if (m.moodMorning != null) { document.getElementById("input-mood-morning").value = m.moodMorning; document.getElementById("mood-morning-value").textContent = m.moodMorning; }
-  if (m.tabletkaTime) document.getElementById("input-tabletka-time").value = m.tabletkaTime;
+  if (m.sleepTotal != null) $("input-sleep-total").value = m.sleepTotal;
+  if (m.sleepDeep != null) $("input-sleep-deep").value = m.sleepDeep;
+  if (m.sleepRem != null) $("input-sleep-rem").value = m.sleepRem;
+  if (m.sleepLight != null) $("input-sleep-light").value = m.sleepLight;
+  if (m.sleepWakes != null) $("input-sleep-wakes").value = m.sleepWakes;
+  if (m.sleepHr != null) $("input-sleep-hr").value = m.sleepHr;
+  if (m.rhr != null) $("input-rhr").value = m.rhr;
+  if (m.dailyWeight != null) $("input-weight-daily").value = m.dailyWeight;
+  if (m.dailyHeight != null) $("input-height-daily").value = m.dailyHeight;
+  if (m.jawTension != null) { $("input-jaw-tension").value = m.jawTension; $("jaw-tension-value").textContent = m.jawTension; }
+  if (m.moodMorning != null) { $("input-mood-morning").value = m.moodMorning; $("mood-morning-value").textContent = m.moodMorning; }
+  if (m.tabletkaTime) $("input-tabletka-time").value = m.tabletkaTime;
   const e = state.evening;
-  if (e.steps != null) document.getElementById("input-steps").value = e.steps;
-  if (e.hrDay != null) document.getElementById("input-hr-day").value = e.hrDay;
-  if (e.spo2 != null) document.getElementById("input-spo2").value = e.spo2;
-  if (e.stress != null) document.getElementById("input-stress").value = e.stress;
-  if (e.rpe != null) document.getElementById("input-rpe").value = e.rpe;
-  if (e.screenTime != null) document.getElementById("input-screen-time").value = e.screenTime;
-  if (e.moodEvening != null) { document.getElementById("input-mood-evening").value = e.moodEvening; document.getElementById("mood-evening-value").textContent = e.moodEvening; }
-  if (e.bikeDistance != null) document.getElementById("input-bike-distance").value = e.bikeDistance;
-  if (state.note) document.getElementById("input-note").value = state.note;
+  if (e.steps != null) $("input-steps").value = e.steps;
+  if (e.hrDay != null) $("input-hr-day").value = e.hrDay;
+  if (e.spo2 != null) $("input-spo2").value = e.spo2;
+  if (e.stress != null) $("input-stress").value = e.stress;
+  if (e.rpe != null) $("input-rpe").value = e.rpe;
+  if (e.screenTime != null) $("input-screen-time").value = e.screenTime;
+  if (e.moodEvening != null) { $("input-mood-evening").value = e.moodEvening; $("mood-evening-value").textContent = e.moodEvening; }
+  if (e.bikeDistance != null) $("input-bike-distance").value = e.bikeDistance;
+  if (state.note) $("input-note").value = state.note;
   document.querySelectorAll(".food-chip").forEach((c) => c.classList.remove("active"));
   state.foodChecked.forEach((f) => { const c = document.querySelector(`.food-chip[data-food="${f}"]`); if (c) c.classList.add("active"); });
-  document.querySelectorAll(".mood-chip").forEach((c) => c.classList.remove("active"));
-  state.moodTagsMorning.forEach((t) => { const c = document.querySelector(`.mood-chip[data-tag="${t}"]`); if (c) c.classList.add("active"); });
   document.querySelectorAll(".tag-chip").forEach((c) => c.classList.remove("active"));
   state.dayTags.forEach((t) => { const c = document.querySelector(`.tag-chip[data-tag="${t}"]`); if (c) c.classList.add("active"); });
-  document.getElementById("habit-water-salt").checked = state.habits.waterSalt;
-  document.getElementById("habit-cold-shower").checked = state.habits.coldShower;
-  document.getElementById("habit-walk-meal").checked = state.habits.walkMeal;
+  $("habit-water-salt").checked = state.habits.waterSalt;
+  $("habit-cold-shower").checked = state.habits.coldShower;
+  $("habit-walk-meal").checked = state.habits.walkMeal;
 }
 
 // ============================================================================
@@ -3356,14 +3088,14 @@ async function renderAllFromState() {
 // ============================================================================
 async function bootApp() {
   if (booted && currentUser?.uid !== "local") {
-    document.getElementById("header-greeting").textContent = `Cześć, ${USER_NAME} 👋`;
+    $("header-greeting").textContent = `Cześć, ${USER_NAME} 👋`;
     updateSyncUI();
     await reloadEverything();
     await loadBrief(false);
     return;
   }
   booted = true;
-  document.getElementById("header-greeting").textContent = `Cześć, ${USER_NAME} 👋`;
+  $("header-greeting").textContent = `Cześć, ${USER_NAME} 👋`;
   setupTreningCard();
   applyAutoTheme();
   setInterval(applyAutoTheme, 60000);
@@ -3371,11 +3103,10 @@ async function bootApp() {
   const existing = await loadDayDoc(todayKey);
   if (existing?.tasks?.length) {
     state.tasks = existing.tasks;
-    // Usuń stare zadania ze starych wersji
+    // migracja
     state.tasks = state.tasks.filter((t) => !["mowa", "paznokcie", "wlosy"].includes(t.id));
-    // Migracja — dodaj nowe
     const req = ["tabletka", "jedzenie", "trening", "skincare-rano", "skincare-wieczor", "balsam", "twarz", "postawa", "reset"];
-    const labels = { tabletka: "D3 + Tran z dorsza", jedzenie: "Zdrowe jedzenie", trening: "Kalistenika", "skincare-rano": "Skincare ranod", "skincare-wieczymor `": "Skbootincare wieczórApp", bals`am: i "Balsam do ust", tw `arz: "Looksmaxing twarzre", postawa: "Postawa szyi i barków", reset: "Reset szczęki przed snem" };
+    const labels = { tabletka: "D3 + Tran z dorsza", jedzenie: "Zdrowe jedzenie", trening: "Kalistenika", "skincare-rano": "Skincare rano", "skincare-wieczor": "Skincare wieczór", balsam: "Balsam do ust", twarz: "Looksmaxing twarz", postawa: "Postawa szyi i barków", reset: "Reset szczęki przed snem" };
     const ordered = [];
     req.forEach((id) => {
       const found = state.tasks.find((t) => t.id === id);
@@ -3386,13 +3117,10 @@ async function bootApp() {
     state.foodChecked = existing.foodChecked || [];
     state.morning = existing.morning || {};
     state.evening = existing.evening || {};
-    state.moodTagsMorning = existing.moodTagsMorning || [];
     state.dayTags = existing.dayTags || [];
     state.habits = existing.habits || { waterSalt: false, coldShower: false, walkMeal: false };
     state.ascend = existing.ascend || {};
     state.note = existing.note || "";
-    state.specialMode = existing.specialMode || "normal";
-    state.recoveryMode = existing.recoveryMode || false;
   } else {
     state.tasks = state.tasks.map((t) => ({ ...t, done: false }));
     await saveDayDoc({ date: todayKey, tasks: state.tasks, completedPct: 0, foodChecked: [] });
@@ -3409,8 +3137,8 @@ async function bootApp() {
   renderKnowledgeBase();
 
   if (existing?.aiVerdict) {
-    document.getElementById("mentor-verdict-box").classList.remove("hidden");
-    document.getElementById("mentor-verdict-text").textContent = existing.aiVerdict;
+    $("mentor-verdict-box").classList.remove("hidden");
+    $("mentor-verdict-text").textContent = existing.aiVerdict;
   }
 
   await loadBrief(false);
