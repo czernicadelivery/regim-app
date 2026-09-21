@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>REGIM / Lock In</title>
-<meta name="description" content="Zimowy Ascend Lock In — regeneracja, masa, wygląd.">
+<meta name="description" content="Zimowy Lock In — masa, wzrost, wygląd.">
 <meta name="theme-color" content="#1a1530">
 <link rel="manifest" href="manifest.json">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2222%22 fill=%22%231a1530%22/><text x=%2250%22 y=%2270%22 font-size=%2258%22 text-anchor=%22middle%22 fill=%22%235eead4%22 font-family=%22Arial%22 font-weight=%22900%22>L</text></svg>">
@@ -16,27 +16,46 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
 <style>
-html,body{background:radial-gradient(ellipse 120% 80% at 50% -10%,#2d2456 0%,#0f0c1d 55%),#0f0c1d;min-height:100%}
+html,body{background:radial-gradient(ellipse 120% 80% at 50% -10%,#2d2456 0%,#0f0c1d 55%),#0f0c1d;min-height:100%;overflow-x:hidden}
 *{-webkit-tap-highlight-color:transparent}
 body{font-weight:500;letter-spacing:-.01em;-webkit-font-smoothing:antialiased}
 h1,h2,h3,.font-extrabold,.font-bold{letter-spacing:-.02em}
-::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:#5eead4;border-radius:10px}
+::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:linear-gradient(180deg,#5eead4,#c4b5fd);border-radius:10px}
 .glass{background:rgba(255,255,255,.045);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border:1px solid rgba(255,255,255,.08)}
 .card-tap:active{transform:scale(.98)}
-@keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
-.rise{animation:rise .35s cubic-bezier(.16,1,.3,1) both}
+@keyframes rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+.rise{animation:rise .45s cubic-bezier(.16,1,.3,1) both}
 @keyframes ring-pulse{0%,100%{box-shadow:0 0 0 0 rgba(94,234,212,.35)}50%{box-shadow:0 0 0 14px rgba(94,234,212,0)}}
 .ring-pulse{animation:ring-pulse 2.4s infinite}
+@keyframes gradient-shift{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
+.animated-gradient{background-size:200% 200%;animation:gradient-shift 8s ease infinite}
+@keyframes pulse-glow{0%,100%{box-shadow:0 0 20px -4px rgba(94,234,212,.4)}50%{box-shadow:0 0 30px 2px rgba(94,234,212,.6)}}
+.pulse-glow{animation:pulse-glow 3s ease-in-out infinite}
+@keyframes shimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}
+.shimmer{background:linear-gradient(90deg,transparent,rgba(255,255,255,.08),transparent);background-size:200% 100%;animation:shimmer 2.5s infinite}
+@keyframes check-bounce{0%{transform:scale(0) rotate(-45deg)}60%{transform:scale(1.25) rotate(0)}100%{transform:scale(1) rotate(0)}}
+.check-done i{animation:check-bounce .45s cubic-bezier(.34,1.56,.64,1)}
+@keyframes task-complete-flash{0%{box-shadow:0 0 0 0 rgba(94,234,212,.6)}100%{box-shadow:0 0 0 24px rgba(94,234,212,0)}}
+.task-flash{animation:task-complete-flash .7s ease-out}
+@keyframes float-up{0%{transform:translateY(0) scale(1);opacity:.7}100%{transform:translateY(-100vh) scale(.5);opacity:0}}
+.particle{position:fixed;width:4px;height:4px;border-radius:50%;bottom:-10px;pointer-events:none;z-index:1;animation:float-up linear infinite}
+@keyframes bounce-soft{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+.bounce-soft{animation:bounce-soft 2s ease-in-out infinite}
+@keyframes rotate-slow{from{transform:rotate(0)}to{transform:rotate(360deg)}}
+.rotate-slow{animation:rotate-slow 20s linear infinite}
+.progress-fill{transition:width .8s cubic-bezier(.16,1,.3,1)}
+.readiness-ring{transition:stroke-dashoffset 1s cubic-bezier(.16,1,.3,1);filter:drop-shadow(0 0 8px rgba(94,234,212,.4))}
+.hero-ring{filter:drop-shadow(0 0 10px rgba(94,234,212,.5))}
 input[type="number"]::-webkit-outer-spin-button,input[type="number"]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
 input[type="number"]{-moz-appearance:textfield}
+input,textarea{transition:all .3s ease}
+input:focus,textarea:focus{transform:scale(1.01)}
 .tab-underline{transition:all .3s cubic-bezier(.16,1,.3,1)}
-.progress-fill{transition:width .6s cubic-bezier(.16,1,.3,1)}
 .timer-ring{transition:stroke-dashoffset 1s linear}
-.modal-backdrop{background:rgba(10,8,20,.72);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
-@keyframes modal-pop{from{opacity:0;transform:translateY(24px) scale(.97)}to{opacity:1;transform:translateY(0) scale(1)}}
-.modal-pop{animation:modal-pop .3s cubic-bezier(.16,1,.3,1) both}
-.food-chip{transition:all .2s ease}.food-chip.active{background:linear-gradient(135deg,rgba(94,234,212,.25),rgba(196,181,253,.25));border-color:rgba(94,234,212,.5)}
-.tag-chip{transition:all .2s ease}
+.modal-backdrop{background:rgba(10,8,20,.72);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+@keyframes modal-pop{from{opacity:0;transform:translateY(28px) scale(.94)}to{opacity:1;transform:translateY(0) scale(1)}}
+.modal-pop{animation:modal-pop .4s cubic-bezier(.16,1,.3,1) both}
+.tag-chip{transition:all .25s cubic-bezier(.16,1,.3,1)}
 .tag-chip.active{background:linear-gradient(135deg,rgba(94,234,212,.3),rgba(251,191,157,.3));border-color:rgba(94,234,212,.6)}
 .segmented{transition:all .3s cubic-bezier(.16,1,.3,1)}
 input[type="range"].slider-custom{-webkit-appearance:none;appearance:none;width:100%;height:8px;background:rgba(255,255,255,.08);border-radius:999px;outline:none}
@@ -52,25 +71,26 @@ html.light-theme .border-white\/5{border-color:rgba(30,26,53,.06)}html.light-the
 html.light-theme .bg-white\/5{background-color:rgba(30,26,53,.04)}html.light-theme .bg-white\/10{background-color:rgba(30,26,53,.07)}
 html.light-theme ::-webkit-scrollbar-thumb{background:#6d5fd6}
 html.light-theme .modal-backdrop{background:rgba(120,113,140,.35)}
-.cal-day{aspect-ratio:1;border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:11px;font-weight:700;position:relative;cursor:pointer}
+.cal-day{aspect-ratio:1;border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:11px;font-weight:700;position:relative;cursor:pointer;transition:all .2s}
+.cal-day:hover{transform:scale(1.08)}
 .cal-dot{width:6px;height:6px;border-radius:50%;margin-top:2px}
 .badge-card{transition:all .25s ease}.badge-card.locked{opacity:.35;filter:grayscale(1)}.badge-card.unlocked{animation:rise .4s cubic-bezier(.16,1,.3,1) both}
 #confetti-canvas{position:fixed;inset:0;z-index:60;pointer-events:none}
 .history-item{border-left:2px solid rgba(255,255,255,.1)}
 html.light-theme .history-item{border-left-color:rgba(30,26,53,.12)}
-.readiness-ring{transition:stroke-dashoffset .8s cubic-bezier(.16,1,.3,1)}
 @keyframes deload-glow{0%,100%{box-shadow:0 0 24px -6px rgba(196,181,253,.4)}50%{box-shadow:0 0 32px -4px rgba(196,181,253,.6)}}
 .deload-glow{animation:deload-glow 2.5s infinite}
 @keyframes milestone-glow{0%,100%{box-shadow:0 0 30px -6px rgba(251,191,36,.5)}50%{box-shadow:0 0 40px -4px rgba(251,191,36,.8)}}
 .milestone-glow{animation:milestone-glow 2s infinite}
 .record-card{background:linear-gradient(135deg,rgba(251,191,36,.12),rgba(251,191,157,.12));border:1px solid rgba(251,191,36,.3);border-radius:16px;padding:12px}
-#sync-status{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:800;padding:3px 8px;border-radius:999px}
+#sync-status{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:800;padding:3px 8px;border-radius:999px;transition:all .3s}
 #sync-status.offline{background:rgba(251,113,133,.15);color:#fb7185}
 #sync-status.syncing{background:rgba(251,191,36,.15);color:#fbbf24}
 #sync-status.synced{background:rgba(94,234,212,.15);color:#5eead4}
 .warning-card{background:linear-gradient(135deg,rgba(251,113,133,.12),rgba(251,191,36,.08));border:1px solid rgba(251,113,133,.35);border-radius:16px;padding:12px}
 .guide-section{background:rgba(255,255,255,.03);border-radius:20px;border:1px solid rgba(255,255,255,.06);overflow:hidden}
-.guide-header{padding:14px 16px;cursor:pointer;display:flex;align-items:center;justify-content:space-between}
+.guide-header{padding:14px 16px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;transition:background .2s}
+.guide-header:hover{background:rgba(255,255,255,.03)}
 .guide-body{padding:0 16px 16px;display:none}
 .guide-section.open .guide-body{display:block}
 .percentile-bar{height:8px;background:rgba(255,255,255,.08);border-radius:999px;position:relative;margin:8px 0}
@@ -78,16 +98,18 @@ html.light-theme .history-item{border-left-color:rgba(30,26,53,.12)}
 .task-item{transition:all .15s ease}.task-item:active{transform:scale(.985)}
 .brief-section{padding:12px 14px;border-radius:16px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);margin-bottom:8px}
 .brief-section-title{font-size:10px;font-weight:900;letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px}
-.kcal-fill{transition:width .6s cubic-bezier(.16,1,.3,1)}
+.rest-timer{font-variant-numeric:tabular-nums}
+.countdown-widget{background:linear-gradient(135deg,rgba(94,234,212,.15),rgba(196,181,253,.15));border:1px solid rgba(94,234,212,.3);border-radius:20px;padding:14px}
 </style>
 </head>
 <body class="text-neutral-100 font-sans min-h-screen pb-28">
 <canvas id="confetti-canvas"></canvas>
+<div id="particles-layer" class="fixed inset-0 pointer-events-none z-0"></div>
 
 <header class="sticky top-0 z-30 px-5 pt-5 pb-3 bg-gradient-to-b from-ink via-ink/95 to-transparent">
   <div class="max-w-lg mx-auto flex items-center justify-between gap-2">
     <div class="flex items-center gap-2.5 flex-shrink-0">
-      <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-mint to-lilac flex items-center justify-center shadow-glow">
+      <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-mint to-lilac animated-gradient flex items-center justify-center shadow-glow">
         <i class="fa-solid fa-bolt text-ink text-lg"></i>
       </div>
       <div>
@@ -102,21 +124,11 @@ html.light-theme .history-item{border-left-color:rgba(30,26,53,.12)}
         <span id="streak-count">0</span>
       </div>
       <div id="user-badge" class="hidden glass rounded-full px-3 py-1.5 text-[11px] font-bold text-mint max-w-[100px] truncate"></div>
-      <button id="btn-signin" class="glass rounded-full w-9 h-9 flex items-center justify-center text-neutral-400 hover:text-mint transition" title="Zaloguj (Google)">
-        <i class="fa-solid fa-user"></i>
-      </button>
-      <button id="btn-glossary" class="glass rounded-full w-9 h-9 flex items-center justify-center text-neutral-400 hover:text-lilac transition" title="Słowniczek">
-        <i class="fa-solid fa-book"></i>
-      </button>
-      <button id="btn-settings" class="glass rounded-full w-9 h-9 flex items-center justify-center text-neutral-400 hover:text-mint transition" title="Ustawienia">
-        <i class="fa-solid fa-gear"></i>
-      </button>
-      <button id="btn-theme-toggle" class="glass rounded-full w-9 h-9 flex items-center justify-center text-neutral-400 hover:text-gold transition">
-        <i class="fa-solid fa-moon" id="theme-icon"></i>
-      </button>
-      <button id="btn-export" class="glass rounded-full w-9 h-9 flex items-center justify-center text-neutral-400 hover:text-mint transition" title="Eksport">
-        <i class="fa-solid fa-download"></i>
-      </button>
+      <button id="btn-signin" class="glass rounded-full w-9 h-9 flex items-center justify-center text-neutral-400 hover:text-mint transition"><i class="fa-solid fa-user"></i></button>
+      <button id="btn-glossary" class="glass rounded-full w-9 h-9 flex items-center justify-center text-neutral-400 hover:text-lilac transition"><i class="fa-solid fa-book"></i></button>
+      <button id="btn-settings" class="glass rounded-full w-9 h-9 flex items-center justify-center text-neutral-400 hover:text-mint transition"><i class="fa-solid fa-gear"></i></button>
+      <button id="btn-theme-toggle" class="glass rounded-full w-9 h-9 flex items-center justify-center text-neutral-400 hover:text-gold transition"><i class="fa-solid fa-moon" id="theme-icon"></i></button>
+      <button id="btn-export" class="glass rounded-full w-9 h-9 flex items-center justify-center text-neutral-400 hover:text-mint transition"><i class="fa-solid fa-download"></i></button>
     </div>
   </div>
 </header>
@@ -139,8 +151,9 @@ html.light-theme .history-item{border-left-color:rgba(30,26,53,.12)}
   </div>
 </div>
 
-<main class="max-w-lg mx-auto px-5">
+<main class="max-w-lg mx-auto px-5 relative z-10">
 
+  <!-- HERO PROGRESS -->
   <section class="rise glass rounded-4xl p-5 mb-5 shadow-soft">
     <div class="flex items-center justify-between mb-3">
       <div>
@@ -148,9 +161,9 @@ html.light-theme .history-item{border-left-color:rgba(30,26,53,.12)}
         <div class="text-xs text-neutral-400 font-semibold" id="progress-sub">0 z 0 zadań</div>
       </div>
       <div class="relative w-16 h-16 flex-shrink-0">
-        <svg class="w-16 h-16 -rotate-90" viewBox="0 0 64 64">
+        <svg class="w-16 h-16 -rotate-90 hero-ring" viewBox="0 0 64 64">
           <circle cx="32" cy="32" r="27" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="7"/>
-          <circle id="hero-ring" cx="32" cy="32" r="27" fill="none" stroke="url(#heroGrad)" stroke-width="7" stroke-linecap="round" stroke-dasharray="169.6" stroke-dashoffset="169.6" style="transition:stroke-dashoffset .6s cubic-bezier(.16,1,.3,1);"/>
+          <circle id="hero-ring" cx="32" cy="32" r="27" fill="none" stroke="url(#heroGrad)" stroke-width="7" stroke-linecap="round" stroke-dasharray="169.6" stroke-dashoffset="169.6"/>
           <defs><linearGradient id="heroGrad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#5eead4"/><stop offset="100%" stop-color="#c4b5fd"/></linearGradient></defs>
         </svg>
         <div class="absolute inset-0 flex items-center justify-center font-extrabold text-sm" id="hero-pct">0%</div>
@@ -159,8 +172,23 @@ html.light-theme .history-item{border-left-color:rgba(30,26,53,.12)}
     <div class="h-2 bg-white/5 rounded-full overflow-hidden"><div id="progress-bar" class="progress-fill h-full rounded-full bg-gradient-to-r from-mint to-lilac" style="width:0%"></div></div>
   </section>
 
+  <!-- COUNTDOWN WIDGET -->
+  <div class="countdown-widget mb-5 rise">
+    <div class="flex items-center justify-between">
+      <div>
+        <div class="text-[10px] text-mint font-extrabold tracking-widest uppercase mb-1">LOCK IN</div>
+        <div class="text-sm font-bold" id="lockin-day">Dzień 1</div>
+      </div>
+      <div class="text-right">
+        <div class="text-[10px] text-neutral-400 font-extrabold tracking-widest uppercase mb-1">DO STYCZNIA</div>
+        <div class="text-sm font-bold text-mint" id="days-to-january">—</div>
+      </div>
+    </div>
+  </div>
+
   <div id="health-warnings" class="hidden mb-4 space-y-2"></div>
 
+  <!-- BRIEF TRENERA -->
   <div class="glass rounded-3xl px-4 py-3 mb-5 overflow-hidden">
     <div class="flex items-center justify-between mb-1.5">
       <div class="flex items-center gap-2">
@@ -168,11 +196,12 @@ html.light-theme .history-item{border-left-color:rgba(30,26,53,.12)}
         <span class="text-[10px] font-extrabold text-mint tracking-widest uppercase">Raport Trenera</span>
         <span class="w-1.5 h-1.5 rounded-full bg-mint animate-pulse"></span>
       </div>
-      <button id="btn-refresh-brief" class="text-neutral-400 hover:text-mint transition text-xs" title="Odśwież"><i class="fa-solid fa-arrows-rotate"></i></button>
+      <button id="btn-refresh-brief" class="text-neutral-400 hover:text-mint transition text-xs"><i class="fa-solid fa-arrows-rotate"></i></button>
     </div>
-    <div id="brief-text" class="text-xs text-neutral-200 leading-snug">Ładuję raport...</div>
+    <div id="brief-text" class="text-xs text-neutral-200 leading-snug">Ładuję...</div>
   </div>
 
+  <!-- CHALLENGE -->
   <div class="glass rounded-4xl p-5 shadow-soft mb-4">
     <div class="flex items-center justify-between mb-3">
       <div class="flex items-center gap-2"><i class="fa-solid fa-flag-checkered text-gold"></i><span class="font-bold text-sm">Challenge 30 dni</span></div>
@@ -185,6 +214,10 @@ html.light-theme .history-item{border-left-color:rgba(30,26,53,.12)}
     </div>
   </div>
 
+  <!-- MODE BANNER -->
+  <div id="mode-banner" class="hidden mb-4"></div>
+
+  <!-- NAV -->
   <nav class="flex glass rounded-full p-1 mb-5 gap-0.5 overflow-x-auto">
     <button data-tab="dashboard" class="tab-btn flex-1 py-2 rounded-full text-[10px] font-bold bg-gradient-to-br from-mint to-lilac text-ink whitespace-nowrap">Dziś</button>
     <button data-tab="cialo" class="tab-btn flex-1 py-2 rounded-full text-[10px] font-bold text-neutral-400 whitespace-nowrap">Ciało</button>
@@ -193,7 +226,7 @@ html.light-theme .history-item{border-left-color:rgba(30,26,53,.12)}
     <button data-tab="mentor" class="tab-btn flex-1 py-2 rounded-full text-[10px] font-bold text-neutral-400 whitespace-nowrap">Trener</button>
   </nav>
 
-  <!-- ==================== DZIŚ ==================== -->
+  <!-- ============ DZIŚ ============ -->
   <section id="tab-dashboard" class="tab-panel space-y-4">
     <div class="glass rounded-4xl p-5 shadow-soft">
       <div class="flex items-center gap-2 mb-3"><i class="fa-solid fa-gauge-high text-mint"></i><span class="font-bold text-sm">Gotowość dnia</span></div>
@@ -212,6 +245,12 @@ html.light-theme .history-item{border-left-color:rgba(30,26,53,.12)}
       </div>
     </div>
 
+    <!-- QUOTE DAY -->
+    <div class="glass rounded-3xl px-4 py-3 shadow-soft flex items-center gap-3">
+      <i class="fa-solid fa-quote-left text-mint text-sm flex-shrink-0"></i>
+      <p id="quote-day" class="text-xs text-neutral-300 font-semibold leading-snug">Ładuję...</p>
+    </div>
+
     <div id="deload-banner" class="hidden rise glass rounded-4xl p-5 border border-lilac/30 deload-glow">
       <div class="flex items-center gap-2 mb-2"><i class="fa-solid fa-rotate-left text-lilac"></i><span class="font-bold text-sm text-lilac">Czas na DELOAD</span></div>
       <p id="deload-text" class="text-sm text-neutral-200 leading-relaxed font-medium"></p>
@@ -222,6 +261,7 @@ html.light-theme .history-item{border-left-color:rgba(30,26,53,.12)}
       <p id="milestone-text" class="text-sm text-neutral-200 leading-relaxed font-medium"></p>
     </div>
 
+    <!-- RAPORT -->
     <div class="glass rounded-4xl p-4 shadow-soft">
       <div class="flex items-center gap-2 mb-3">
         <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-lilac/25 to-mint/25 flex items-center justify-center flex-shrink-0"><i class="fa-solid fa-watch-fitness text-lilac"></i></div>
@@ -232,44 +272,65 @@ html.light-theme .history-item{border-left-color:rgba(30,26,53,.12)}
         <button data-report="evening" class="report-btn segmented flex-1 py-2 rounded-full text-xs font-bold text-neutral-400"><i class="fa-solid fa-moon mr-1"></i>Podsumowanie</button>
       </div>
       <form id="form-morning" class="report-panel grid grid-cols-2 gap-3">
-        <label class="block col-span-2"><span class="text-[11px] text-neutral-400 ml-1 font-semibold">Sen (h):</span>
+        <label class="block col-span-2"><span class="text-[11px] text-neutral-400 ml-1 font-semibold">Czas snu (h):</span>
           <input type="number" step="0.01" id="input-sleep-total" placeholder="8.31" class="w-full mt-1 bg-white/5 border border-white/10 rounded-2xl px-3 py-2.5 text-neutral-100 font-semibold focus:outline-none focus:border-mint transition"></label>
-        <label class="block"><span class="text-[11px] text-neutral-400 ml-1 font-semibold">Deep (h):</span>
+        <label class="block"><span class="text-[11px] text-neutral-400 ml-1 font-semibold">Głęboki sen (h):</span>
           <input type="number" step="0.01" id="input-sleep-deep" placeholder="1.45" class="w-full mt-1 bg-white/5 border border-white/10 rounded-2xl px-3 py-2.5 text-neutral-100 font-semibold focus:outline-none focus:border-mint transition"></label>
         <label class="block"><span class="text-[11px] text-neutral-400 ml-1 font-semibold">REM (h):</span>
           <input type="number" step="0.01" id="input-sleep-rem" placeholder="1.52" class="w-full mt-1 bg-white/5 border border-white/10 rounded-2xl px-3 py-2.5 text-neutral-100 font-semibold focus:outline-none focus:border-mint transition"></label>
-        <label class="block"><span class="text-[11px] text-mint ml-1 font-bold">RHR rano:</span>
+        <label class="block"><span class="text-[11px] text-mint ml-1 font-bold"><i class="fa-solid fa-heart-pulse mr-1"></i>RHR rano:</span>
           <input type="number" id="input-rhr" placeholder="62" class="w-full mt-1 bg-mint/10 border border-mint/30 rounded-2xl px-3 py-2.5 text-neutral-100 font-semibold focus:outline-none focus:border-mint transition"></label>
-        <label class="block"><span class="text-[11px] text-gold ml-1 font-bold">Waga (kg):</span>
+        <label class="block"><span class="text-[11px] text-gold ml-1 font-bold"><i class="fa-solid fa-scale-balanced mr-1"></i>Waga (kg):</span>
           <input type="number" step="0.1" id="input-weight-daily" placeholder="44.4" class="w-full mt-1 bg-gold/10 border border-gold/30 rounded-2xl px-3 py-2.5 text-neutral-100 font-semibold focus:outline-none focus:border-gold transition"></label>
+        <div class="col-span-2 block">
+          <span class="text-[11px] text-peach ml-1 font-bold">Nastrój rano:</span>
+          <div class="mt-2 flex items-center gap-3"><input type="range" min="1" max="10" value="5" id="input-mood-morning" class="slider-custom flex-1"><span id="mood-morning-value" class="text-lg font-extrabold text-peach w-8 text-center">5</span></div>
+          <div class="flex flex-wrap gap-1.5 mt-2" id="mood-tags-morning">
+            <button type="button" data-tag="spokój" class="tag-chip glass rounded-full px-3 py-1 text-[11px] font-bold border border-transparent">😌 spokój</button>
+            <button type="button" data-tag="energia" class="tag-chip glass rounded-full px-3 py-1 text-[11px] font-bold border border-transparent">⚡ energia</button>
+            <button type="button" data-tag="zmęczenie" class="tag-chip glass rounded-full px-3 py-1 text-[11px] font-bold border border-transparent">😴 zmęczenie</button>
+            <button type="button" data-tag="motywacja" class="tag-chip glass rounded-full px-3 py-1 text-[11px] font-bold border border-transparent">🔥 motywacja</button>
+            <button type="button" data-tag="stres" class="tag-chip glass rounded-full px-3 py-1 text-[11px] font-bold border border-transparent">😰 stres</button>
+          </div>
+        </div>
+        <label id="weight-field-wrapper" class="hidden block col-span-2 rise">
+          <span class="text-[11px] text-gold ml-1 font-bold">Niedziela — waga tygodniowa (kg):</span>
+          <input type="number" step="0.1" id="input-weight-weekly" placeholder="52.5" class="w-full mt-1 bg-gold/10 border border-gold/30 rounded-2xl px-3 py-2.5 text-neutral-100 font-semibold focus:outline-none focus:border-gold transition">
+        </label>
         <button type="submit" class="col-span-2 mt-1 py-3 rounded-full bg-gradient-to-br from-peach to-gold text-ink font-extrabold active:scale-95 transition"><i class="fa-solid fa-floppy-disk mr-1.5"></i>Zapisz raport poranny</button>
       </form>
       <form id="form-evening" class="report-panel hidden grid grid-cols-2 gap-3">
         <label class="block"><span class="text-[11px] text-neutral-400 ml-1 font-semibold">Kroki:</span>
           <input type="number" id="input-steps" placeholder="9000" class="w-full mt-1 bg-white/5 border border-white/10 rounded-2xl px-3 py-2.5 text-neutral-100 font-semibold focus:outline-none focus:border-lilac transition"></label>
-        <label class="block"><span class="text-[11px] text-neutral-400 ml-1 font-semibold">Tętno:</span>
+        <label class="block"><span class="text-[11px] text-neutral-400 ml-1 font-semibold">Tętno dnia:</span>
           <input type="number" id="input-hr-day" placeholder="78" class="w-full mt-1 bg-white/5 border border-white/10 rounded-2xl px-3 py-2.5 text-neutral-100 font-semibold focus:outline-none focus:border-lilac transition"></label>
-        <label class="block"><span class="text-[11px] text-rose ml-1 font-bold">RPE:</span>
+        <label class="block"><span class="text-[11px] text-rose ml-1 font-bold">RPE treningu:</span>
           <input type="number" min="1" max="10" id="input-rpe" placeholder="7" class="w-full mt-1 bg-rose/10 border border-rose/30 rounded-2xl px-3 py-2.5 text-neutral-100 font-semibold focus:outline-none focus:border-rose transition"></label>
         <label class="block"><span class="text-[11px] text-neutral-400 ml-1 font-semibold">Stres:</span>
           <input type="number" min="1" max="100" id="input-stress" placeholder="35" class="w-full mt-1 bg-white/5 border border-white/10 rounded-2xl px-3 py-2.5 text-neutral-100 font-semibold focus:outline-none focus:border-lilac transition"></label>
         <div class="col-span-2 block">
-          <span class="text-[11px] text-lilac ml-1 font-bold">Notatka dnia:</span>
-          <textarea id="input-note" rows="2" placeholder="jak było..." class="w-full mt-1 bg-white/5 border border-white/10 rounded-2xl px-3 py-2.5 text-neutral-100 font-medium text-sm focus:outline-none focus:border-lilac transition resize-none"></textarea>
+          <span class="text-[11px] text-peach ml-1 font-bold">Nastrój wieczór:</span>
+          <div class="mt-2 flex items-center gap-3"><input type="range" min="1" max="10" value="5" id="input-mood-evening" class="slider-custom flex-1"><span id="mood-evening-value" class="text-lg font-extrabold text-peach w-8 text-center">5</span></div>
         </div>
-        <button type="submit" class="col-span-2 mt-1 py-3 rounded-full bg-gradient-to-br from-lilac to-mint text-ink font-extrabold active:scale-95 transition"><i class="fa-solid fa-floppy-disk mr-1.5"></i>Zapisz podsumowanie</button>
+        <div class="col-span-2 block">
+          <span class="text-[11px] text-lilac ml-1 font-bold">Notatka dnia:</span>
+          <textarea id="input-note" rows="2" placeholder="np. dziś było ciężko w szkole, ale sen siadł..." class="w-full mt-1 bg-white/5 border border-white/10 rounded-2xl px-3 py-2.5 text-neutral-100 font-medium text-sm focus:outline-none focus:border-lilac transition resize-none"></textarea>
+        </div>
+        <div class="col-span-2 block">
+          <span class="text-[11px] text-lilac ml-1 font-bold">Tagi dnia:</span>
+          <div class="flex flex-wrap gap-1.5 mt-2" id="day-tags">
+            <button type="button" data-tag="szkoła" class="tag-chip glass rounded-full px-3 py-1 text-[11px] font-bold border border-transparent">🏫 szkoła</button>
+            <button type="button" data-tag="nauka" class="tag-chip glass rounded-full px-3 py-1 text-[11px] font-bold border border-transparent">📚 nauka</button>
+            <button type="button" data-tag="stres" class="tag-chip glass rounded-full px-3 py-1 text-[11px] font-bold border border-transparent">😰 stres</button>
+            <button type="button" data-tag="impreza" class="tag-chip glass rounded-full px-3 py-1 text-[11px] font-bold border border-transparent">🎉 impreza</button>
+            <button type="button" data-tag="podróż" class="tag-chip glass rounded-full px-3 py-1 text-[11px] font-bold border border-transparent">✈️ podróż</button>
+            <button type="button" data-tag="choroba" class="tag-chip glass rounded-full px-3 py-1 text-[11px] font-bold border border-transparent">🤒 choroba</button>
+            <button type="button" data-tag="dobry-dzień" class="tag-chip glass rounded-full px-3 py-1 text-[11px] font-bold border border-transparent">🌟 dobry dzień</button>
+            <button type="button" data-tag="słaby-dzień" class="tag-chip glass rounded-full px-3 py-1 text-[11px] font-bold border border-transparent">💔 słaby dzień</button>
+          </div>
+        </div>
+        <button type="submit" class="col-span-2 mt-1 py-3 rounded-full bg-gradient-to-br from-lilac to-mint text-ink font-extrabold active:scale-95 transition"><i class="fa-solid fa-floppy-disk mr-1.5"></i>Zapisz podsumowanie dnia</button>
       </form>
-    </div>
-
-    <div class="glass rounded-4xl p-4 shadow-soft">
-      <div class="flex items-center gap-2 mb-3">
-        <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-peach/25 to-gold/25 flex items-center justify-center flex-shrink-0"><i class="fa-solid fa-drumstick-bite text-peach"></i></div>
-        <div class="font-bold text-base">Białko dziennie</div>
-      </div>
-      <div class="flex items-center gap-4">
-        <div class="text-3xl font-extrabold text-peach" id="protein-target-inline">—</div>
-        <div class="flex-1 text-xs text-neutral-400 font-medium" id="protein-hint-inline">Wpisz wagę, żeby zobaczyć cel białka.</div>
-      </div>
     </div>
 
     <div id="mentor-verdict-box" class="hidden rise glass rounded-4xl p-5 shadow-warm">
@@ -285,7 +346,7 @@ html.light-theme .history-item{border-left-color:rgba(30,26,53,.12)}
     </div>
   </section>
 
-  <!-- ==================== CIAŁO ==================== -->
+  <!-- ============ CIAŁO ============ -->
   <section id="tab-cialo" class="tab-panel hidden space-y-4">
     <div class="glass rounded-4xl p-5 shadow-warm"><div class="flex items-center gap-2 mb-3"><i class="fa-solid fa-user text-mint"></i><span class="font-bold text-base">Mój profil</span></div><div id="profil-card" class="grid grid-cols-2 gap-3"></div></div>
     <div class="glass rounded-4xl p-5 shadow-warm">
@@ -298,7 +359,7 @@ html.light-theme .history-item{border-left-color:rgba(30,26,53,.12)}
     </div>
     <div class="glass rounded-4xl p-5 shadow-warm">
       <div class="flex items-center gap-2 mb-3"><i class="fa-solid fa-ruler-vertical text-mint"></i><span class="font-bold text-base">Kalkulator wzrostu</span></div>
-      <p class="text-xs text-neutral-400 font-medium mb-3">Podaj wzrost rodziców w Ustawieniach — apka oszacuje Twój wzrost końcowy.</p>
+      <p class="text-xs text-neutral-400 font-medium mb-3">Wpisz wzrost rodziców w Ustawieniach.</p>
       <div class="glass rounded-3xl p-4 mb-3 text-center">
         <div class="text-[10px] text-neutral-400 font-bold tracking-widest mb-1">SZACOWANY WZROST KOŃCOWY</div>
         <div class="text-3xl font-extrabold text-mint" id="predicted-height">—</div>
@@ -306,50 +367,25 @@ html.light-theme .history-item{border-left-color:rgba(30,26,53,.12)}
       </div>
       <div id="growth-remaining" class="text-xs text-neutral-300 font-medium leading-relaxed"></div>
     </div>
-    <div class="glass rounded-4xl p-5 shadow-warm">
-      <div class="flex items-center gap-2 mb-3"><i class="fa-solid fa-chart-line text-lilac"></i><span class="font-bold text-base">Tracker wzrostu</span></div>
-      <canvas id="chart-height" height="140"></canvas>
-      <div class="text-[10px] text-neutral-500 font-medium mt-2 text-center">Pomiar pojawia się 1. dnia miesiąca</div>
-    </div>
-    <div class="glass rounded-4xl p-5 shadow-warm">
-      <div class="flex items-center gap-2 mb-3"><i class="fa-solid fa-ruler-horizontal text-peach"></i><span class="font-bold text-base">Obwody ciała (klatka, biceps)</span></div>
-      <canvas id="chart-measures" height="140"></canvas>
-      <div class="text-[10px] text-neutral-500 font-medium mt-2 text-center">Pomiar 1. dnia miesiąca</div>
-    </div>
-    <div class="glass rounded-4xl p-5 shadow-warm">
-      <div class="flex items-center gap-2 mb-3"><i class="fa-solid fa-clock text-gold"></i><span class="font-bold text-base">Kiedy osiągnę wagę X</span></div>
-      <div id="weight-eta" class="text-sm text-neutral-200 leading-relaxed font-medium">Wpisz wagę.</div>
-    </div>
-    <div class="glass rounded-4xl p-5 shadow-warm">
-      <div class="flex items-center gap-2 mb-3"><i class="fa-solid fa-chart-simple text-mint"></i><span class="font-bold text-base">Progres miesięczny</span></div>
-      <div id="monthly-progress" class="text-sm text-neutral-200 leading-relaxed font-medium">Za mało danych.</div>
-    </div>
-    <div class="glass rounded-4xl p-5 shadow-warm">
-      <div class="flex items-center gap-2 mb-3"><i class="fa-solid fa-list-ol text-lilac"></i><span class="font-bold text-base">Tanner Stage — 5 etapów</span></div>
-      <div id="tanner-stages" class="space-y-2"></div>
-    </div>
-    <div class="glass rounded-4xl p-5 shadow-warm">
-      <div class="flex items-center gap-2 mb-3"><i class="fa-solid fa-chart-bar text-gold"></i><span class="font-bold text-base">Wzrost a wiek — percentyle WHO</span></div>
-      <div id="height-percentile"></div>
-    </div>
-    <div class="glass rounded-4xl p-5 shadow-warm">
-      <div class="flex items-center gap-2 mb-3"><i class="fa-solid fa-weight-scale text-peach"></i><span class="font-bold text-base">Waga do wzrostu</span></div>
-      <div id="weight-height-table" class="text-sm text-neutral-200 leading-relaxed font-medium"></div>
-    </div>
-    <div class="glass rounded-4xl p-5 shadow-warm">
-      <div class="flex items-center gap-2 mb-3"><i class="fa-solid fa-ranking-star text-mint"></i><span class="font-bold text-base">Co wpływa na wzrost</span></div>
-      <div id="growth-factors" class="space-y-2"></div>
-    </div>
+    <div class="glass rounded-4xl p-5 shadow-warm"><div class="flex items-center gap-2 mb-3"><i class="fa-solid fa-chart-line text-lilac"></i><span class="font-bold text-base">Tracker wzrostu</span></div><canvas id="chart-height" height="140"></canvas><div class="text-[10px] text-neutral-500 font-medium mt-2 text-center">Pomiar 1. dnia miesiąca</div></div>
+    <div class="glass rounded-4xl p-5 shadow-warm"><div class="flex items-center gap-2 mb-3"><i class="fa-solid fa-ruler-horizontal text-peach"></i><span class="font-bold text-base">Obwody ciała</span></div><canvas id="chart-measures" height="140"></canvas><div class="text-[10px] text-neutral-500 font-medium mt-2 text-center">Klatka / talia / biceps — 1. dnia miesiąca</div></div>
+    <div class="glass rounded-4xl p-5 shadow-warm"><div class="flex items-center gap-2 mb-3"><i class="fa-solid fa-clock text-gold"></i><span class="font-bold text-base">Kiedy osiągnę wagę X</span></div><div id="weight-eta" class="text-sm text-neutral-200 leading-relaxed font-medium">Wpisz wagę.</div></div>
+    <div class="glass rounded-4xl p-5 shadow-warm"><div class="flex items-center gap-2 mb-3"><i class="fa-solid fa-bed text-lilac"></i><span class="font-bold text-base">Dług senny</span></div><div id="sleep-debt" class="text-sm text-neutral-200 leading-relaxed font-medium">Ładuję...</div></div>
+    <div class="glass rounded-4xl p-5 shadow-warm"><div class="flex items-center gap-2 mb-3"><i class="fa-solid fa-fire text-gold"></i><span class="font-bold text-base">Ostatni dzień...</span></div><div id="last-day-tracker" class="space-y-2"></div></div>
+    <div class="glass rounded-4xl p-5 shadow-warm"><div class="flex items-center gap-2 mb-3"><i class="fa-solid fa-dumbbell text-mint"></i><span class="font-bold text-base">Wykres siły — tydzień</span></div><canvas id="chart-strength" height="140"></canvas></div>
+    <div class="glass rounded-4xl p-5 shadow-warm"><div class="flex items-center gap-2 mb-3"><i class="fa-solid fa-chart-bar text-gold"></i><span class="font-bold text-base">Wzrost — percentyle WHO</span></div><div id="height-percentile"></div></div>
+    <div class="glass rounded-4xl p-5 shadow-warm"><div class="flex items-center gap-2 mb-3"><i class="fa-solid fa-weight-scale text-peach"></i><span class="font-bold text-base">Waga do wzrostu</span></div><div id="weight-height-table" class="text-sm text-neutral-200 leading-relaxed font-medium"></div></div>
+    <div class="glass rounded-4xl p-5 shadow-warm"><div class="flex items-center gap-2 mb-3"><i class="fa-solid fa-list-ol text-lilac"></i><span class="font-bold text-base">Tanner Stage</span></div><div id="tanner-stages" class="space-y-2"></div></div>
     <div class="glass rounded-4xl p-5 shadow-warm">
       <div class="flex items-center gap-2 mb-3"><i class="fa-solid fa-person-arrow-up-from-line text-lilac"></i><span class="font-bold text-base">Puberty Check</span></div>
-      <p class="text-xs text-neutral-400 font-medium mb-3">Odpowiedz na 7 pytań. Apka oceni gdzie jesteś.</p>
       <div id="puberty-questions" class="space-y-2"></div>
       <button id="btn-puberty-evaluate" class="w-full mt-3 py-3 rounded-full bg-gradient-to-br from-lilac to-mint text-ink font-extrabold active:scale-95 transition">Oceń</button>
       <div id="puberty-result" class="hidden mt-4 glass rounded-3xl p-4"></div>
     </div>
+    <div class="glass rounded-4xl p-5 shadow-warm"><div class="flex items-center gap-2 mb-3"><i class="fa-solid fa-ranking-star text-mint"></i><span class="font-bold text-base">Co wpływa na wzrost</span></div><div id="growth-factors" class="space-y-2"></div></div>
   </section>
 
-  <!-- ==================== POSTĘPY ==================== -->
+  <!-- ============ POSTĘPY ============ -->
   <section id="tab-postepy" class="tab-panel hidden space-y-5">
     <div class="glass rounded-4xl p-5 shadow-warm"><div class="flex items-center gap-2 mb-4"><i class="fa-solid fa-chart-pie text-mint"></i><span class="font-bold text-base">Ostatnie 30 dni</span></div><div id="last-30-days" class="grid grid-cols-2 gap-3"></div></div>
     <div class="glass rounded-4xl p-5 shadow-warm"><div class="flex items-center gap-2 mb-4"><i class="fa-solid fa-crown text-gold"></i><span class="font-bold text-sm">Rekordy osobiste</span></div><div id="personal-records" class="grid grid-cols-2 gap-3"></div></div>
@@ -361,13 +397,13 @@ html.light-theme .history-item{border-left-color:rgba(30,26,53,.12)}
       </div>
     </div>
     <div class="glass rounded-4xl p-5 shadow-warm">
-      <div class="flex items-center gap-2 mb-3"><i class="fa-solid fa-code-compare text-lilac"></i><span class="font-bold text-sm">Ten miesiąc vs poprzedni</span></div>
-      <div id="monthly-comparison" class="space-y-2"><p class="text-xs text-neutral-400 font-medium">Za mało danych.</p></div>
+      <div class="flex items-center gap-2 mb-3"><i class="fa-solid fa-code-compare text-lilac"></i><span class="font-bold text-sm">Porównanie z sobą z zeszłego miesiąca</span></div>
+      <div id="past-self-comparison" class="space-y-2"><p class="text-xs text-neutral-400">Ładuję...</p></div>
     </div>
     <div class="glass rounded-4xl p-5 shadow-warm">
       <div class="flex items-center gap-2 mb-3"><i class="fa-solid fa-bullseye text-mint"></i><span class="font-bold text-sm">Cel wagowy</span><button id="btn-goal-edit" class="ml-auto text-[11px] font-bold text-neutral-400 glass rounded-full px-3 py-1"><i class="fa-solid fa-gear mr-1"></i>Zmień</button></div>
       <div class="space-y-3">
-        <div class="flex items-end justify-between"><div><div class="text-3xl font-extrabold" id="goal-current">—</div><div class="text-[11px] text-neutral-400 font-semibold">aktualna waga</div></div><div class="text-right"><div class="text-2xl font-extrabold text-mint" id="goal-target">50.0 kg</div><div class="text-[11px] text-neutral-400 font-semibold">cel</div></div></div>
+        <div class="flex items-end justify-between"><div><div class="text-3xl font-extrabold" id="goal-current">—</div><div class="text-[11px] text-neutral-400 font-semibold">aktualna</div></div><div class="text-right"><div class="text-2xl font-extrabold text-mint" id="goal-target">50.0 kg</div><div class="text-[11px] text-neutral-400 font-semibold">cel</div></div></div>
         <div id="goal-progress-text" class="text-xs text-neutral-300 font-medium leading-snug">Wpisz wagę.</div>
         <div class="h-2 bg-white/5 rounded-full overflow-hidden"><div id="goal-bar" class="progress-fill h-full rounded-full bg-gradient-to-r from-mint to-lilac" style="width:0%"></div></div>
       </div>
@@ -385,44 +421,22 @@ html.light-theme .history-item{border-left-color:rgba(30,26,53,.12)}
         <div class="glass rounded-2xl p-3"><div class="flex items-center justify-between mb-1.5"><span class="text-xs font-bold">💊 D3 codziennie</span><span id="smart-d3-count" class="text-[11px] font-extrabold text-peach">0/30</span></div><div class="h-1.5 bg-white/5 rounded-full overflow-hidden"><div id="smart-d3-bar" class="progress-fill h-full bg-peach rounded-full" style="width:0%"></div></div></div>
       </div>
     </div>
-    <div class="glass rounded-4xl p-5 shadow-warm">
-      <div class="flex items-center gap-2 mb-4"><i class="fa-solid fa-road text-mint"></i><span class="font-bold text-base">Moja droga — rok</span></div>
-      <canvas id="chart-year" height="160"></canvas>
-      <div class="text-[10px] text-neutral-500 font-semibold mt-2 text-center">% wykonania zadań dnia</div>
-    </div>
+    <div class="glass rounded-4xl p-5 shadow-warm"><div class="flex items-center gap-2 mb-4"><i class="fa-solid fa-road text-mint"></i><span class="font-bold text-base">Moja droga — rok</span></div><canvas id="chart-year" height="160"></canvas></div>
     <div class="glass rounded-4xl p-5 shadow-warm">
       <div class="flex items-center justify-between mb-3"><div class="flex items-center gap-2"><i class="fa-solid fa-calendar-week text-peach"></i><span class="font-bold text-sm">Podsumowanie tygodnia</span></div><button id="btn-weekly-summary" class="text-xs font-bold text-mint glass rounded-full px-3 py-1.5"><i class="fa-solid fa-arrows-rotate mr-1"></i>Odśwież</button></div>
       <p id="weekly-summary-text" class="text-sm text-neutral-200 leading-relaxed font-medium">Kliknij "Odśwież".</p>
     </div>
-    <div class="glass rounded-4xl p-4 shadow-soft">
-      <div class="flex items-center gap-2 mb-3 text-sm font-bold text-neutral-300"><i class="fa-solid fa-scale-balanced text-gold"></i>Waga — trend</div>
-      <canvas id="chart-weight" height="140"></canvas>
-    </div>
-    <div class="glass rounded-4xl p-4 shadow-soft">
-      <div class="flex items-center gap-2 mb-3 text-sm font-bold text-neutral-300"><i class="fa-solid fa-moon text-lilac"></i>Sen — deep / REM</div>
-      <canvas id="chart-sleep" height="140"></canvas>
-    </div>
-    <div class="glass rounded-4xl p-4 shadow-soft">
-      <div class="flex items-center gap-2 mb-3 text-sm font-bold text-neutral-300"><i class="fa-solid fa-heart-pulse text-mint"></i>RHR rano</div>
-      <canvas id="chart-rhr" height="140"></canvas>
-    </div>
-    <div class="glass rounded-4xl p-4 shadow-soft">
-      <div class="flex items-center gap-2 mb-3 text-sm font-bold text-neutral-300"><i class="fa-solid fa-shoe-prints text-peach"></i>Kroki</div>
-      <canvas id="chart-steps" height="140"></canvas>
-    </div>
-    <div class="glass rounded-4xl p-4 shadow-soft">
-      <div class="flex items-center gap-2 mb-3 text-sm font-bold text-neutral-300"><i class="fa-solid fa-heart-pulse text-rose"></i>Stres</div>
-      <canvas id="chart-stress" height="140"></canvas>
-    </div>
-    <div class="glass rounded-4xl p-4 shadow-soft">
-      <div class="flex items-center gap-2 mb-3 text-sm font-bold text-neutral-300"><i class="fa-solid fa-face-smile text-peach"></i>Nastrój</div>
-      <canvas id="chart-mood" height="140"></canvas>
-    </div>
+    <div class="glass rounded-4xl p-4 shadow-soft"><div class="flex items-center gap-2 mb-3 text-sm font-bold text-neutral-300"><i class="fa-solid fa-scale-balanced text-gold"></i>Waga — trend</div><canvas id="chart-weight" height="140"></canvas></div>
+    <div class="glass rounded-4xl p-4 shadow-soft"><div class="flex items-center gap-2 mb-3 text-sm font-bold text-neutral-300"><i class="fa-solid fa-moon text-lilac"></i>Sen — deep / REM</div><canvas id="chart-sleep" height="140"></canvas></div>
+    <div class="glass rounded-4xl p-4 shadow-soft"><div class="flex items-center gap-2 mb-3 text-sm font-bold text-neutral-300"><i class="fa-solid fa-heart-pulse text-mint"></i>RHR rano</div><canvas id="chart-rhr" height="140"></canvas></div>
+    <div class="glass rounded-4xl p-4 shadow-soft"><div class="flex items-center gap-2 mb-3 text-sm font-bold text-neutral-300"><i class="fa-solid fa-shoe-prints text-peach"></i>Kroki</div><canvas id="chart-steps" height="140"></canvas></div>
+    <div class="glass rounded-4xl p-4 shadow-soft"><div class="flex items-center gap-2 mb-3 text-sm font-bold text-neutral-300"><i class="fa-solid fa-heart-pulse text-rose"></i>Stres</div><canvas id="chart-stress" height="140"></canvas></div>
+    <div class="glass rounded-4xl p-4 shadow-soft"><div class="flex items-center gap-2 mb-3 text-sm font-bold text-neutral-300"><i class="fa-solid fa-face-smile text-peach"></i>Nastrój</div><canvas id="chart-mood" height="140"></canvas></div>
     <div class="glass rounded-4xl p-5 shadow-soft">
       <div class="flex items-center justify-between mb-4">
-        <button id="cal-prev" class="w-8 h-8 rounded-full glass flex items-center justify-center text-neutral-400 active:scale-90 transition"><i class="fa-solid fa-chevron-left text-xs"></i></button>
+        <button id="cal-prev" class="w-8 h-8 rounded-full glass flex items-center justify-center text-neutral-400"><i class="fa-solid fa-chevron-left text-xs"></i></button>
         <div id="cal-month-label" class="font-extrabold text-base"></div>
-        <button id="cal-next" class="w-8 h-8 rounded-full glass flex items-center justify-center text-neutral-400 active:scale-90 transition"><i class="fa-solid fa-chevron-right text-xs"></i></button>
+        <button id="cal-next" class="w-8 h-8 rounded-full glass flex items-center justify-center text-neutral-400"><i class="fa-solid fa-chevron-right text-xs"></i></button>
       </div>
       <div class="grid grid-cols-7 gap-1.5 mb-2 text-center">
         <div class="text-[10px] font-bold text-neutral-500">Pn</div><div class="text-[10px] font-bold text-neutral-500">Wt</div><div class="text-[10px] font-bold text-neutral-500">Śr</div><div class="text-[10px] font-bold text-neutral-500">Cz</div><div class="text-[10px] font-bold text-neutral-500">Pt</div><div class="text-[10px] font-bold text-neutral-500">So</div><div class="text-[10px] font-bold text-neutral-500">Nd</div>
@@ -433,22 +447,23 @@ html.light-theme .history-item{border-left-color:rgba(30,26,53,.12)}
         <div class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-gold"></span>Częściowo</div>
         <div class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-white/15"></span>Brak</div>
       </div>
-      <div class="text-[10px] text-neutral-500 font-medium text-center mt-3">Kliknij dzień, żeby zobaczyć pełny raport</div>
     </div>
     <div class="glass rounded-4xl p-5 shadow-soft"><div class="flex items-center gap-2 mb-4"><i class="fa-solid fa-medal text-gold"></i><span class="font-bold text-sm">Odznaki</span></div><div id="badges-grid" class="grid grid-cols-3 gap-3"></div></div>
   </section>
 
-  <!-- ==================== PORADNIK ==================== -->
+  <!-- ============ PORADNIK ============ -->
   <section id="tab-poradnik" class="tab-panel hidden space-y-4">
     <div class="glass rounded-4xl p-5 shadow-warm">
       <div class="flex items-center gap-2 mb-2"><i class="fa-solid fa-book-open text-mint"></i><span class="font-bold text-base">📖 Jak się zmienić</span></div>
-      <p class="text-xs text-neutral-400 font-medium mb-3">7 sekcji. Kliknij żeby rozwinąć.</p>
       <div id="guide-sections" class="space-y-2"></div>
     </div>
     <div class="glass rounded-4xl p-5 shadow-warm">
-      <div class="flex items-center gap-2 mb-3"><i class="fa-solid fa-utensils text-peach"></i><span class="font-bold text-base">🍽️ Pomysły na posiłki</span></div>
-      <p class="text-xs text-neutral-400 font-medium mb-3">Jak nie masz co jeść — tutaj masz konkretne zestawy.</p>
-      <div id="meal-ideas" class="space-y-2"></div>
+      <div class="flex items-center justify-between mb-3">
+        <div class="flex items-center gap-2"><i class="fa-solid fa-utensils text-peach"></i><span class="font-bold text-base">🍽️ Co zjeść</span></div>
+        <button id="btn-roll-food" class="text-[11px] font-bold text-mint glass rounded-full px-3 py-1.5"><i class="fa-solid fa-dice mr-1"></i>Losuj plan dnia</button>
+      </div>
+      <div id="food-roll" class="hidden mb-3 glass rounded-3xl p-4 border border-mint/20"></div>
+      <div id="meal-ideas" class="space-y-3"></div>
     </div>
     <div class="glass rounded-4xl p-5 shadow-warm">
       <div class="flex items-center gap-2 mb-3"><i class="fa-solid fa-graduation-cap text-lilac"></i><span class="font-bold text-base">📚 Baza wiedzy A-Z</span></div>
@@ -460,7 +475,7 @@ html.light-theme .history-item{border-left-color:rgba(30,26,53,.12)}
     </div>
   </section>
 
-  <!-- ==================== TRENER ==================== -->
+  <!-- ============ TRENER ============ -->
   <section id="tab-mentor" class="tab-panel hidden space-y-5">
     <button id="btn-analyze-ai" class="w-full py-4 bg-gradient-to-br from-peach to-gold text-ink font-extrabold rounded-full text-base active:scale-95 transition shadow-warm flex items-center justify-center gap-2">
       <span id="ai-btn-label"><i class="fa-solid fa-dumbbell mr-1.5"></i>🏋️ Pełna analiza Trenera</span>
@@ -471,13 +486,8 @@ html.light-theme .history-item{border-left-color:rgba(30,26,53,.12)}
       <p id="ai-result-text" class="text-sm text-neutral-200 leading-relaxed whitespace-pre-line font-medium"></p>
     </div>
     <div class="glass rounded-4xl p-5 shadow-soft border border-mint/20">
-      <div class="flex items-center justify-between mb-3"><div class="flex items-center gap-2"><i class="fa-solid fa-sparkles text-mint"></i><span class="font-bold text-sm text-mint">✨ Glow Up — ten tydzień vs poprzedni</span></div><button id="btn-glowup-refresh" class="text-xs font-bold text-mint glass rounded-full px-3 py-1.5"><i class="fa-solid fa-arrows-rotate mr-1"></i>Odśwież</button></div>
+      <div class="flex items-center justify-between mb-3"><div class="flex items-center gap-2"><i class="fa-solid fa-sparkles text-mint"></i><span class="font-bold text-sm text-mint">✨ Glow Up — tydzień vs poprzedni</span></div><button id="btn-glowup-refresh" class="text-xs font-bold text-mint glass rounded-full px-3 py-1.5"><i class="fa-solid fa-arrows-rotate mr-1"></i>Odśwież</button></div>
       <div id="glowup-content" class="space-y-2"><p class="text-sm text-neutral-400 font-medium">Kliknij "Odśwież".</p></div>
-    </div>
-    <div class="flex glass rounded-full p-1">
-      <button data-range="7" class="range-btn segmented flex-1 py-2 rounded-full text-xs font-bold bg-gradient-to-br from-mint to-lilac text-ink">7 dni</button>
-      <button data-range="30" class="range-btn segmented flex-1 py-2 rounded-full text-xs font-bold text-neutral-400">30 dni</button>
-      <button data-range="90" class="range-btn segmented flex-1 py-2 rounded-full text-xs font-bold text-neutral-400">90 dni</button>
     </div>
     <div id="correlation-box" class="hidden glass rounded-4xl p-5 shadow-soft border border-lilac/20">
       <div class="flex items-center gap-2 mb-2"><i class="fa-solid fa-link text-lilac"></i><span class="font-bold text-sm text-lilac">🔗 Korelacja: sen a stres</span></div>
@@ -488,13 +498,11 @@ html.light-theme .history-item{border-left-color:rgba(30,26,53,.12)}
       <div id="mentor-history-list" class="space-y-3 max-h-96 overflow-y-auto pr-1"><p class="text-sm text-neutral-500 font-medium">Brak historii.</p></div>
     </div>
   </section>
-
 </main>
 
 <div id="toast" class="hidden fixed bottom-6 left-1/2 -translate-x-1/2 z-50 glass rounded-full px-5 py-3 text-sm font-bold shadow-soft rise"></div>
 
-<!-- ==================== MODALE ==================== -->
-
+<!-- MODALE -->
 <div id="modal-breathing" class="modal-wrap hidden fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-5">
   <div class="modal-backdrop absolute inset-0" data-close-modal></div>
   <div class="modal-pop relative glass rounded-t-4xl sm:rounded-4xl w-full sm:max-w-md p-6 shadow-soft max-h-[85vh] overflow-y-auto text-center">
@@ -504,7 +512,24 @@ html.light-theme .history-item{border-left-color:rgba(30,26,53,.12)}
     <div id="breath-circle" class="breath-circle mb-5"><div id="breath-phase-text" class="text-3xl font-extrabold text-mint">Gotowy</div></div>
     <div id="breath-timer" class="text-lg font-extrabold text-neutral-400 mb-5">03:00</div>
     <button id="btn-breath-start" class="w-full py-3.5 rounded-full bg-gradient-to-br from-mint to-lilac text-ink font-extrabold active:scale-95 transition mb-2"><i class="fa-solid fa-play mr-2"></i>Start</button>
-    <button id="btn-breath-stop" class="hidden w-full py-3 rounded-full glass font-bold text-neutral-300 active:scale-95 transition">Stop</button>
+    <button id="btn-breath-stop" class="hidden w-full py-3 rounded-full glass font-bold text-neutral-300">Stop</button>
+  </div>
+</div>
+
+<div id="modal-rest" class="modal-wrap hidden fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-5">
+  <div class="modal-backdrop absolute inset-0" data-close-modal></div>
+  <div class="modal-pop relative glass rounded-t-4xl sm:rounded-4xl w-full sm:max-w-md p-6 shadow-soft max-h-[85vh] overflow-y-auto text-center">
+    <div class="flex items-start justify-between mb-4"><div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-peach/25 to-gold/25 flex items-center justify-center mx-auto"><i class="fa-solid fa-clock text-peach text-2xl"></i></div><button data-close-modal class="w-9 h-9 rounded-full glass flex items-center justify-center text-neutral-400"><i class="fa-solid fa-xmark"></i></button></div>
+    <h3 class="font-extrabold text-xl mb-1">⏱️ Przerwa między seriami</h3>
+    <p class="text-xs text-neutral-400 font-semibold mb-5">Wybierz czas</p>
+    <div class="flex gap-2 mb-4">
+      <button data-rest="60" class="rest-time-btn flex-1 py-3 rounded-2xl glass font-bold text-sm">60s</button>
+      <button data-rest="90" class="rest-time-btn flex-1 py-3 rounded-2xl glass font-bold text-sm">90s</button>
+      <button data-rest="120" class="rest-time-btn flex-1 py-3 rounded-2xl glass font-bold text-sm">120s</button>
+    </div>
+    <div id="rest-timer-display" class="text-6xl font-extrabold text-peach rest-timer mb-6">00:00</div>
+    <button id="btn-rest-start" class="w-full py-3.5 rounded-full bg-gradient-to-br from-peach to-gold text-ink font-extrabold mb-2">Start</button>
+    <button id="btn-rest-stop" class="hidden w-full py-3 rounded-full glass font-bold text-neutral-300">Stop</button>
   </div>
 </div>
 
@@ -512,14 +537,13 @@ html.light-theme .history-item{border-left-color:rgba(30,26,53,.12)}
   <div class="modal-backdrop absolute inset-0" data-close-modal></div>
   <div class="modal-pop relative glass rounded-t-4xl sm:rounded-4xl w-full sm:max-w-md p-6 shadow-soft max-h-[85vh] overflow-y-auto">
     <div class="flex items-start justify-between mb-4"><div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-gold/25 to-peach/25 flex items-center justify-center"><i class="fa-solid fa-calculator text-gold text-2xl"></i></div><button data-close-modal class="w-9 h-9 rounded-full glass flex items-center justify-center text-neutral-400"><i class="fa-solid fa-xmark"></i></button></div>
-    <h3 class="font-extrabold text-xl mb-1">🏋️ Kalkulator 1RM</h3>
-    <p class="text-xs text-neutral-400 font-semibold mb-5">Szacowane maksimum (formuła Epleya)</p>
+    <h3 class="font-extrabold text-xl mb-5">🏋️ Kalkulator 1RM</h3>
     <div class="grid grid-cols-2 gap-3 mb-4">
-      <label class="block"><span class="text-[11px] text-neutral-400 ml-1 font-semibold">Ciężar (kg):</span><input type="number" step="0.5" id="input-rm-weight" placeholder="50" class="w-full mt-1 bg-white/5 border border-white/10 rounded-2xl px-3 py-2.5 text-neutral-100 font-semibold focus:outline-none focus:border-gold transition"></label>
-      <label class="block"><span class="text-[11px] text-neutral-400 ml-1 font-semibold">Powtórzenia:</span><input type="number" id="input-rm-reps" placeholder="5" class="w-full mt-1 bg-white/5 border border-white/10 rounded-2xl px-3 py-2.5 text-neutral-100 font-semibold focus:outline-none focus:border-gold transition"></label>
+      <label class="block"><span class="text-[11px] text-neutral-400 ml-1 font-semibold">Ciężar (kg):</span><input type="number" step="0.5" id="input-rm-weight" placeholder="50" class="w-full mt-1 bg-white/5 border border-white/10 rounded-2xl px-3 py-2.5 text-neutral-100 font-semibold"></label>
+      <label class="block"><span class="text-[11px] text-neutral-400 ml-1 font-semibold">Powtórzenia:</span><input type="number" id="input-rm-reps" placeholder="5" class="w-full mt-1 bg-white/5 border border-white/10 rounded-2xl px-3 py-2.5 text-neutral-100 font-semibold"></label>
     </div>
     <div class="glass rounded-3xl p-5 mb-5 text-center"><div class="text-3xl font-extrabold text-gold" id="rm-value">—</div><div class="text-xs text-neutral-400 font-semibold mt-1">szacowane 1RM (kg)</div></div>
-    <button id="btn-rm-calculate" class="w-full py-3.5 rounded-full bg-gradient-to-br from-gold to-peach text-ink font-extrabold active:scale-95 transition"><i class="fa-solid fa-equals mr-1.5"></i>Oblicz</button>
+    <button id="btn-rm-calculate" class="w-full py-3.5 rounded-full bg-gradient-to-br from-gold to-peach text-ink font-extrabold">Oblicz</button>
   </div>
 </div>
 
@@ -529,18 +553,18 @@ html.light-theme .history-item{border-left-color:rgba(30,26,53,.12)}
     <div class="flex items-start justify-between mb-4"><div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-mint/25 to-lilac/25 flex items-center justify-center"><i class="fa-solid fa-gear text-mint text-2xl"></i></div><button data-close-modal class="w-9 h-9 rounded-full glass flex items-center justify-center text-neutral-400"><i class="fa-solid fa-xmark"></i></button></div>
     <h3 class="font-extrabold text-xl mb-5">⚙️ Ustawienia</h3>
     <div class="space-y-4">
-      <label class="block"><span class="text-[11px] text-neutral-400 ml-1 font-semibold">Imię:</span><input type="text" id="input-name" placeholder="Karol" class="w-full mt-1 bg-white/5 border border-white/10 rounded-2xl px-3 py-2.5 text-neutral-100 font-semibold focus:outline-none focus:border-mint transition"></label>
-      <label class="block"><span class="text-[11px] text-neutral-400 ml-1 font-semibold">Wiek:</span><input type="number" id="input-age" placeholder="14" class="w-full mt-1 bg-white/5 border border-white/10 rounded-2xl px-3 py-2.5 text-neutral-100 font-semibold focus:outline-none focus:border-mint transition"></label>
-      <label class="block"><span class="text-[11px] text-neutral-400 ml-1 font-semibold">Wzrost (cm):</span><input type="number" step="0.1" id="input-height" placeholder="166" class="w-full mt-1 bg-white/5 border border-white/10 rounded-2xl px-3 py-2.5 text-neutral-100 font-semibold focus:outline-none focus:border-mint transition"></label>
-      <label class="block"><span class="text-[11px] text-neutral-400 ml-1 font-semibold">Wzrost ojca (cm):</span><input type="number" step="0.1" id="input-height-dad" placeholder="178" class="w-full mt-1 bg-white/5 border border-white/10 rounded-2xl px-3 py-2.5 text-neutral-100 font-semibold focus:outline-none focus:border-mint transition"></label>
-      <label class="block"><span class="text-[11px] text-neutral-400 ml-1 font-semibold">Wzrost matki (cm):</span><input type="number" step="0.1" id="input-height-mom" placeholder="165" class="w-full mt-1 bg-white/5 border border-white/10 rounded-2xl px-3 py-2.5 text-neutral-100 font-semibold focus:outline-none focus:border-mint transition"></label>
-      <label class="block"><span class="text-[11px] text-neutral-400 ml-1 font-semibold">Cel wagowy (kg):</span><input type="number" step="0.1" id="input-goal-weight-settings" placeholder="50.0" class="w-full mt-1 bg-white/5 border border-white/10 rounded-2xl px-3 py-2.5 text-neutral-100 font-semibold focus:outline-none focus:border-mint transition"></label>
+      <label class="block"><span class="text-[11px] text-neutral-400 ml-1 font-semibold">Imię:</span><input type="text" id="input-name" placeholder="Karol" class="w-full mt-1 bg-white/5 border border-white/10 rounded-2xl px-3 py-2.5 text-neutral-100 font-semibold"></label>
+      <label class="block"><span class="text-[11px] text-neutral-400 ml-1 font-semibold">Wiek:</span><input type="number" id="input-age" placeholder="14" class="w-full mt-1 bg-white/5 border border-white/10 rounded-2xl px-3 py-2.5 text-neutral-100 font-semibold"></label>
+      <label class="block"><span class="text-[11px] text-neutral-400 ml-1 font-semibold">Wzrost (cm):</span><input type="number" step="0.1" id="input-height" placeholder="166" class="w-full mt-1 bg-white/5 border border-white/10 rounded-2xl px-3 py-2.5 text-neutral-100 font-semibold"></label>
+      <label class="block"><span class="text-[11px] text-neutral-400 ml-1 font-semibold">Wzrost ojca (cm):</span><input type="number" step="0.1" id="input-height-dad" placeholder="178" class="w-full mt-1 bg-white/5 border border-white/10 rounded-2xl px-3 py-2.5 text-neutral-100 font-semibold"></label>
+      <label class="block"><span class="text-[11px] text-neutral-400 ml-1 font-semibold">Wzrost matki (cm):</span><input type="number" step="0.1" id="input-height-mom" placeholder="165" class="w-full mt-1 bg-white/5 border border-white/10 rounded-2xl px-3 py-2.5 text-neutral-100 font-semibold"></label>
+      <label class="block"><span class="text-[11px] text-neutral-400 ml-1 font-semibold">Cel wagowy (kg):</span><input type="number" step="0.1" id="input-goal-weight-settings" placeholder="50.0" class="w-full mt-1 bg-white/5 border border-white/10 rounded-2xl px-3 py-2.5 text-neutral-100 font-semibold"></label>
       <label class="flex items-center gap-3 cursor-pointer"><input type="checkbox" id="input-auto-theme" class="w-5 h-5 rounded-md accent-mint"><span class="text-sm font-medium flex-1">🌗 Auto-motyw dzień/noc</span></label>
       <div class="glass rounded-3xl p-4"><div class="text-[11px] text-neutral-400 font-bold mb-2">TWOJE BMI</div><div id="settings-bmi" class="text-2xl font-extrabold text-mint">—</div><div id="settings-bmi-label" class="text-xs text-neutral-400 font-medium mt-1">Wpisz wagę</div></div>
       <div class="glass rounded-3xl p-4"><div class="text-[11px] text-neutral-400 font-bold mb-2">KONTO</div><div id="settings-account" class="text-xs text-neutral-300 font-medium">Niezalogowany</div></div>
     </div>
-    <button id="btn-settings-save" class="w-full py-3.5 rounded-full bg-gradient-to-br from-mint to-lilac text-ink font-extrabold active:scale-95 transition mt-5"><i class="fa-solid fa-floppy-disk mr-1.5"></i>Zapisz ustawienia</button>
-    <button id="btn-restart-onboarding" class="w-full py-3 rounded-full glass font-bold text-neutral-300 active:scale-95 transition mt-2 text-sm">Pokaż onboarding</button>
+    <button id="btn-settings-save" class="w-full py-3.5 rounded-full bg-gradient-to-br from-mint to-lilac text-ink font-extrabold mt-5">Zapisz ustawienia</button>
+    <button id="btn-restart-onboarding" class="w-full py-3 rounded-full glass font-bold text-neutral-300 mt-2 text-sm">Pokaż onboarding</button>
   </div>
 </div>
 
@@ -550,8 +574,8 @@ html.light-theme .history-item{border-left-color:rgba(30,26,53,.12)}
     <div id="onb-content"></div>
     <div class="flex items-center justify-center gap-1.5 my-5" id="onb-dots"></div>
     <div class="flex gap-2">
-      <button id="onb-skip" class="flex-1 py-3 rounded-full glass font-bold text-neutral-400 text-sm active:scale-95 transition">Pomiń</button>
-      <button id="onb-next" class="flex-1 py-3 rounded-full bg-gradient-to-br from-mint to-lilac text-ink font-extrabold active:scale-95 transition">Dalej</button>
+      <button id="onb-skip" class="flex-1 py-3 rounded-full glass font-bold text-neutral-400 text-sm">Pomiń</button>
+      <button id="onb-next" class="flex-1 py-3 rounded-full bg-gradient-to-br from-mint to-lilac text-ink font-extrabold">Dalej</button>
     </div>
   </div>
 </div>
@@ -561,8 +585,7 @@ html.light-theme .history-item{border-left-color:rgba(30,26,53,.12)}
   <div class="modal-pop relative glass rounded-t-4xl sm:rounded-4xl w-full sm:max-w-md p-6 shadow-soft max-h-[85vh] overflow-y-auto">
     <div class="flex items-start justify-between mb-4"><div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-lilac/25 to-mint/25 flex items-center justify-center"><i class="fa-solid fa-book text-lilac text-2xl"></i></div><button data-close-modal class="w-9 h-9 rounded-full glass flex items-center justify-center text-neutral-400"><i class="fa-solid fa-xmark"></i></button></div>
     <h3 class="font-extrabold text-xl mb-1">📖 Słowniczek</h3>
-    <p class="text-xs text-neutral-400 font-semibold mb-5">Wszystkie pojęcia używane w REGIM</p>
-    <div id="glossary-content" class="space-y-3"></div>
+    <div id="glossary-content" class="space-y-3 mt-4"></div>
   </div>
 </div>
 
@@ -588,9 +611,9 @@ html.light-theme .history-item{border-left-color:rgba(30,26,53,.12)}
   <div class="modal-backdrop absolute inset-0" data-close-modal></div>
   <div class="modal-pop relative glass rounded-t-4xl sm:rounded-4xl w-full sm:max-w-md p-6 shadow-soft max-h-[85vh] overflow-y-auto">
     <div class="flex items-start justify-between mb-4"><div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-gold/25 to-peach/25 flex items-center justify-center"><i class="fa-solid fa-flag-checkered text-gold text-2xl"></i></div><button data-close-modal class="w-9 h-9 rounded-full glass flex items-center justify-center text-neutral-400"><i class="fa-solid fa-xmark"></i></button></div>
-    <h3 class="font-extrabold text-xl mb-4">🏁 Wybierz challenge 30 dni</h3>
+    <h3 class="font-extrabold text-xl mb-4">🏁 Challenge 30 dni</h3>
     <div class="space-y-2 mb-5" id="challenge-options"></div>
-    <button id="btn-challenge-clear" class="w-full py-3 rounded-full glass font-bold text-neutral-400 text-sm active:scale-95 transition">Usuń aktywny challenge</button>
+    <button id="btn-challenge-clear" class="w-full py-3 rounded-full glass font-bold text-neutral-400 text-sm">Usuń</button>
   </div>
 </div>
 
@@ -600,6 +623,7 @@ html.light-theme .history-item{border-left-color:rgba(30,26,53,.12)}
 // ============================================================================
 let firebaseReady = false, currentUser = { uid: "local" }, authResolved = false, syncInProgress = false, booted = false, migrateDone = false;
 const USER_NAME_DEFAULT = "Karol";
+const LOCKIN_START = localStorage.getItem("regim:lockin-start") || (() => { const d = new Date(); const y = d.getMonth() >= 10 ? d.getFullYear() : d.getFullYear() - 1; return `${y}-11-01`; })();
 
 const firebaseConfig = {
   apiKey: "AIzaSyChzU-QWJ_lyE7kLePHCvYltIayMZuXlL8",
@@ -612,6 +636,9 @@ const firebaseConfig = {
 };
 function $(id) { return document.getElementById(id); }
 
+// ============================================================================
+// SYNC / SETTINGS / HELPERS
+// ============================================================================
 function setSyncStatus(mode, label) {
   const el = $("sync-status"); if (!el) return;
   el.className = mode;
@@ -624,7 +651,6 @@ function updateSyncUI() {
   if (syncInProgress) return setSyncStatus("syncing", "Sync...");
   setSyncStatus("synced", "Chmura");
 }
-
 function getSettings() {
   return {
     name: localStorage.getItem("regim:name") || USER_NAME_DEFAULT,
@@ -634,6 +660,7 @@ function getSettings() {
     heightMom: parseFloat(localStorage.getItem("regim:height-mom")) || null,
     goalWeight: parseFloat(localStorage.getItem("regim:goal-weight")) || 50.0,
     autoTheme: localStorage.getItem("regim:auto-theme") === "1",
+    mode: localStorage.getItem("regim:mode") || "normal",
   };
 }
 function saveSettings(s) {
@@ -658,16 +685,12 @@ function showToast(msg) { const t = $("toast"); if (!t) return; t.textContent = 
 // ============================================================================
 function localKey(key, uid) { return `regim:${uid || currentUser?.uid || "local"}:${key}`; }
 function isCloud() { return firebaseReady && window.__fb && currentUser?.uid && currentUser.uid !== "local"; }
-
 async function saveDayDoc(d) {
   localStorage.setItem(localKey(d.date), JSON.stringify(d));
   if (!isCloud()) { updateSyncUI(); return; }
   syncInProgress = true; updateSyncUI();
-  try {
-    const { fsMod, db } = window.__fb;
-    await fsMod.setDoc(fsMod.doc(db, "users", currentUser.uid, "days", d.date), d, { merge: true });
-  } catch (e) { console.error("Save:", e); }
-  finally { syncInProgress = false; updateSyncUI(); }
+  try { const { fsMod, db } = window.__fb; await fsMod.setDoc(fsMod.doc(db, "users", currentUser.uid, "days", d.date), d, { merge: true }); }
+  catch (e) { console.error(e); } finally { syncInProgress = false; updateSyncUI(); }
 }
 async function loadDayDoc(dateStr) {
   const rawLocal = localStorage.getItem(localKey(dateStr));
@@ -696,7 +719,7 @@ async function loadLastNDays(n) {
       const start = new Date(today); start.setDate(start.getDate() - (n - 1));
       const q = fsMod.query(fsMod.collection(db, "users", currentUser.uid, "days"), fsMod.where("date", ">=", dateKey(start)), fsMod.orderBy("date", "asc"));
       const snaps = await fsMod.getDocs(q);
-      snaps.forEach((s) => { cloudDocs[s.id] = s.data(); });
+      snaps.forEach(s => { cloudDocs[s.id] = s.data(); });
     } catch (e) {}
   }
   const docs = [];
@@ -722,7 +745,7 @@ async function collectAllDays() {
     try {
       const { fsMod, db } = window.__fb;
       const snaps = await fsMod.getDocs(fsMod.collection(db, "users", currentUser.uid, "days"));
-      snaps.forEach((s) => { results[s.id] = { ...(results[s.id] || {}), ...s.data() }; });
+      snaps.forEach(s => { results[s.id] = { ...(results[s.id] || {}), ...s.data() }; });
     } catch (e) {}
   }
   return Object.values(results).sort((a, b) => (a.date || "").localeCompare(b.date || ""));
@@ -738,7 +761,7 @@ async function loadDaysRange(n, offset) {
 }
 
 // ============================================================================
-// MIGRACJA
+// MIGRACJA + AUTH
 // ============================================================================
 async function migrateLocalToCloud() {
   if (migrateDone || !isCloud()) return;
@@ -763,18 +786,13 @@ async function migrateLocalToCloud() {
     for (let i = 0; i < localDays.length; i += 400) chunks.push(localDays.slice(i, i + 400));
     for (const chunk of chunks) {
       const batch = fsMod.writeBatch(db);
-      chunk.forEach((day) => batch.set(fsMod.doc(db, "users", currentUser.uid, "days", day.date), day, { merge: true }));
+      chunk.forEach(day => batch.set(fsMod.doc(db, "users", currentUser.uid, "days", day.date), day, { merge: true }));
       await batch.commit();
     }
     await fsMod.setDoc(metaRef, { done: true, at: Date.now(), count: localDays.length });
     showToast(`✅ Zmigrowano ${localDays.length} dni`);
-  } catch (e) { console.error(e); }
-  finally { syncInProgress = false; updateSyncUI(); }
+  } catch (e) { console.error(e); } finally { syncInProgress = false; updateSyncUI(); }
 }
-
-// ============================================================================
-// AUTH
-// ============================================================================
 function updateAuthUI(user) {
   const badge = $("user-badge"); const signinBtn = $("btn-signin"); const acc = $("settings-account");
   if (!badge || !signinBtn) return;
@@ -822,9 +840,7 @@ async function initFirebase() {
         const provider = new authMod.GoogleAuthProvider();
         provider.setCustomParameters({ prompt: "select_account" });
         await authMod.signInWithPopup(auth, provider);
-      } catch (e) {
-        try { await authMod.signInAnonymously(auth); } catch (e2) { showToast("Błąd logowania"); }
-      }
+      } catch (e) { try { await authMod.signInAnonymously(auth); } catch (e2) { showToast("Błąd logowania"); } }
     });
   } catch (e) { firebaseReady = false; authResolved = true; updateSyncUI(); }
 }
@@ -835,20 +851,134 @@ async function initFirebase() {
 const todayObj = new Date();
 const todayKey = dateKey(todayObj);
 const todayDow = todayObj.getDay();
-const isMonday = todayDow === 1;
-const isSunday = todayDow === 0;
-const isBikeDay = !isMonday && (dayIndexSinceEpoch(todayObj) % 3 === 0);
-const isTrainingDay = !isMonday && !isSunday && !isBikeDay;
 
 const state = {
   tasks: [],
   morning: {},
   evening: {},
   note: "",
+  moodTags: [],
+  dayTags: [],
   chartRange: 7,
   lastMilestoneShown: null,
 };
 
+// ============================================================================
+// KEYWORDS (dużo)
+// ============================================================================
+const KEYWORDS = {
+  sick: ["chory","choroba","gorączka","przeziębienie","katar","kaszel","grypa","ból głowy","migrena","osłabiony","rozbity","niedobrze","mdli","wymioty","boli mnie","źle się czuję","przeziębiony","gorączkuję","osłabienie","niezdrowy","infekcja","zapalenie"],
+  alcohol: ["piwo","wódka","alkohol","impreza","kac","wino","drink","pub","klub","popiłem","napiłem","browar","upity","pijany","bal"],
+  stress: ["stres","stresu","stresujący","deadline","egzamin","sprawdzian","kolokwium","szef","kłótnia","kłopot","problem","zawalony","presja","nerwy","zdenerwowany","panika","niepokój","spięty","napięty"],
+  travel: ["podróż","wyjazd","samolot","pociąg","lotnisko","wakacje","urlop","hotel","wyjechałem","wyjechałam","podróżowałem"],
+  happy: ["dobry","świetny","super","radosny","wesoły","szczęśliwy","udany","wygrałem","wygrałam","zadowolony","euforia","mega","ekstra","zajebiście","świetnie","fantastycznie","genialnie","bosko"],
+  tired: ["zmęczony","wyczerpany","padnięty","senny","bez siły","opary","ledwo żyję","słaby","senność","nie mam siły","wypompowany","zombie"],
+  motivated: ["zmotywowany","energia","moc","power","chce mi się","cisnę","daję radę","w pełni sił","nakręcony","gotowy","pełen energii"],
+  lazy: ["leniwy","nie chciało","nie chce","brak siły","leń","olewam","odpuszczam","nie chce mi się","brak motywacji"],
+  school: ["szkoła","lekcje","klasa","sprawdzian","kartkówka","test","nauczyciel","ocena","jedynka","dwójka","piątka","nauka","zadanie domowe"],
+  family: ["rodzina","mama","tata","brat","siostra","babcia","dziadek","ciocia","wujek"],
+  lonely: ["sam","samotny","smutny","przygnębiony","dołek","depresja","płakałem","smutek","przygnębiająco","ponuro","źle"],
+  success: ["rekord","pobity","poprawa","progres","nowy","najlepszy","osiągnąłem","sukces","udało się","zrobiłem","wygrałem"],
+  injury: ["boli","kontuzja","skręcenie","uraz","kolano","bark","plecy","naderwanie","stłuczenie","zwichnięcie","ból"],
+  love: ["dziewczyna","laska","zakochałem","miłość","serce","romantycznie","randka"],
+  conflict: ["kłótnia","awantura","pokłóciłem","zła","złość","wściekły","wkurzony","irytacja"],
+  cold: ["zimno","mróz","przemarzłem","zmarzłem","chłodno"],
+};
+function detectKeywords(text) {
+  if (!text) return [];
+  const lower = text.toLowerCase();
+  const found = new Set();
+  Object.entries(KEYWORDS).forEach(([cat, words]) => {
+    if (words.some(w => lower.includes(w))) found.add(cat);
+  });
+  return Array.from(found);
+}
+
+// ============================================================================
+// ADAPTACYJNY TRENING
+// ============================================================================
+const BASE_CALISTHENICS = [
+  { id: "pompki", label: "Pompki klasyczne", series: "3×10-12" },
+  { id: "pompki-diament", label: "Pompki diamentowe", series: "3×8" },
+  { id: "pompki-szerokie", label: "Pompki szerokie", series: "3×10" },
+  { id: "przysiady", label: "Przysiady", series: "3×15" },
+  { id: "wykroki", label: "Wykroki chodzone", series: "3×10/noga" },
+  { id: "wznosy-bioder", label: "Wznosy bioder", series: "3×15" },
+  { id: "deska", label: "Deska (plank)", series: "3×45s" },
+  { id: "unoszenie-nog", label: "Unoszenie nóg leżąc", series: "3×12" },
+  { id: "hantle-barki", label: "Hantle — unoszenie bokiem", series: "3×12" },
+  { id: "hantle-nadglowa", label: "Hantle — wyciskanie nad głowę", series: "3×10" },
+  { id: "hantle-biceps", label: "Hantle — uginanie ramion", series: "3×12" },
+];
+const LIGHT_CALISTHENICS = [
+  { id: "pompki", label: "Pompki klasyczne", series: "2×6" },
+  { id: "przysiady", label: "Przysiady", series: "2×10" },
+  { id: "deska", label: "Deska (plank)", series: "2×20s" },
+  { id: "wznosy-bioder", label: "Wznosy bioder", series: "2×10" },
+];
+
+function calculateReadiness() {
+  const m = state.morning || {}; const e = state.evening || {};
+  let score = 0, max = 0;
+  if (m.sleepTotal != null) { max += 45; const s = m.sleepTotal; if (s >= 8) score += 45; else if (s >= 7) score += 35; else if (s >= 6) score += 22; else if (s >= 5) score += 10; }
+  if (m.rhr != null) { max += 30; if (m.rhr < 55) score += 30; else if (m.rhr < 62) score += 24; else if (m.rhr < 68) score += 15; else if (m.rhr < 75) score += 7; }
+  if (e.stress != null) { max += 25; const s = e.stress; if (s < 25) score += 25; else if (s < 40) score += 20; else if (s < 55) score += 12; else if (s < 70) score += 5; }
+  if (max === 0) return null;
+  return Math.round((score / max) * 100);
+}
+
+function getTrainingLevel() {
+  const m = state.morning || {};
+  const sleep = m.sleepTotal;
+  const rhr = m.rhr;
+  const mood = m.moodMorning;
+  const note = (state.note || "").toLowerCase();
+  const kws = detectKeywords(note);
+  const readiness = calculateReadiness();
+
+  if (kws.includes("sick") || kws.includes("injury")) return "recovery";
+  if (sleep != null && sleep < 5) return "recovery";
+  if (rhr != null && rhr > 75) return "recovery";
+  if (readiness != null && readiness < 40) return "recovery";
+
+  if (sleep != null && sleep < 6.5) return "light";
+  if (mood != null && mood <= 3) return "light";
+  if (readiness != null && readiness < 60) return "light";
+
+  if (sleep != null && sleep >= 8 && (mood == null || mood >= 7)) return "full";
+  if (readiness != null && readiness >= 80) return "full";
+  return "normal";
+}
+
+function buildTrainingTask() {
+  const level = getTrainingLevel();
+  const mode = getSettings().mode;
+
+  if (mode === "vacation") return { id: "trening", label: "🏖️ Tryb wakacji", hint: "Luz, żadnych treningów ani raportów", done: false, level: "vacation" };
+  if (mode === "sick") return { id: "trening", label: "🤒 Tryb choroby", hint: "Zero treningu, sen, woda", done: false, level: "sick" };
+
+  if (level === "recovery") {
+    return { id: "trening", label: "🌿 Recovery day", hint: "Sen/RHR złe — dziś tylko regeneracja", done: false, level: "recovery", extra: ["🚶 Spacer 20 min", "🫁 Oddech 4-7-8 (5 min)", "🧘 Rozciąganie 10 min", "💧 Dużo wody"] };
+  }
+
+  if (todayDow === 1) {
+    return { id: "trening", label: "🏊 Basen 1,5h", hint: level === "light" ? "Dziś lżej — 45 min zamiast 1,5h" : "Poniedziałek — dzień na wodę", done: false, level };
+  }
+  if (todayDow === 2 || todayDow === 5) {
+    return { id: "trening", label: "🚴 Rower 7 km", hint: level === "light" ? "Dziś lżej — 4 km spokojnie" : "Stały, spokojny rytm", done: false, level };
+  }
+  if (todayDow === 0) {
+    return { id: "trening", label: "🌅 Dzień wolny", hint: "Regeneracja — spacer opcjonalnie", done: false, level: "off" };
+  }
+  // Kalistenika (śr, czw, sob)
+  if (level === "full") return { id: "trening", label: "💪 Kalistenika + hantle (FULL)", hint: "Pełny plan — sen i RHR idealne", done: false, level: "full", exercises: BASE_CALISTHENICS };
+  if (level === "light") return { id: "trening", label: "💪 Kalistenika (LIGHT)", hint: "Lżejszy plan — mniej serii", done: false, level: "light", exercises: LIGHT_CALISTHENICS };
+  return { id: "trening", label: "💪 Kalistenika + hantle", hint: "Standardowy plan", done: false, level: "normal", exercises: BASE_CALISTHENICS };
+}
+
+// ============================================================================
+// STRUKTURA ZADAŃ
+// ============================================================================
 const TASK_CATEGORIES = [
   { id: "suplementy", icon: "💊", name: "Suplementacja", color: "gold", tasks: [
     { id: "d3", label: "D3 ×2 kapsułki", hint: "Rano, do tłuszczu", done: false },
@@ -858,7 +988,6 @@ const TASK_CATEGORIES = [
   ]},
   { id: "jedzenie", icon: "🍽️", name: "Jedzenie", color: "peach", tasks: [
     { id: "sniadanie", label: "Śniadanie", hint: "Jajecznica + chleb (~450 kcal)", done: false },
-    { id: "szejk", label: "Szejk masowy", hint: "Banan + masło orzechowe + płatki + mleko ~600 kcal", done: false },
     { id: "sniadaniowka", label: "Śniadaniówka w szkole", hint: "Kanapki + orzechy + owoc", done: false },
     { id: "kolacja", label: "Kolacja", hint: "Białko + węgle + warzywa", done: false },
     { id: "przekaska", label: "Przekąska", hint: "Baton proteinowy / orzechy / skyr", done: false },
@@ -867,48 +996,34 @@ const TASK_CATEGORIES = [
   ]},
   { id: "trening", icon: "💪", name: "Trening", color: "mint", tasks: [] },
   { id: "higiena", icon: "🧴", name: "Higiena i skóra", color: "lilac", tasks: [
-    { id: "prysznic", label: "Prysznic", hint: "Rano, letnia woda", done: false },
-    { id: "zeby", label: "Zęby 2× + nitka", hint: "2 min rano i wieczorem", done: false },
-    { id: "skincare-tolpa", label: "Tołpa / Ziaja — twarz", hint: "Umyj twarz żelem", done: false },
-    { id: "skincare-acnederm", label: "Acnederm — punktowo", hint: "Na wypryski i strefę T", done: false },
-    { id: "skincare-cetaphil", label: "Cetaphil — krem nawilżający", hint: "Na całą twarz", done: false },
-    { id: "balsam", label: "Balsam do ust", hint: "2× dziennie", done: false },
-    { id: "fonix", label: "Fonix — higiena uszu", hint: "Kilka kropli rano", done: false },
-    { id: "postawa", label: "Postawa — self-check", hint: "Barki cofnięte, brzuch napięty", done: false },
+    { id: "skincare-tolpa", label: "Tołpa / Ziaja", hint: "Umyj twarz żelem", done: false },
+    { id: "skincare-acnederm", label: "Acnederm", hint: "Punktowo na wypryski", done: false },
+    { id: "skincare-cetaphil", label: "Cetaphil", hint: "Krem nawilżający na całą twarz", done: false },
+    { id: "balsam", label: "Balsam do ust", hint: "Rano i wieczorem", done: false },
+    { id: "fonix", label: "Fonix — higiena uszu", hint: "Kilka kropli", done: false },
   ]},
   { id: "regeneracja", icon: "😴", name: "Regeneracja", color: "lilac", tasks: [
-    { id: "sen", label: "Sen 8-9h", hint: "Kładź się na 8h + 15 min", done: false },
     { id: "telefon-off", label: "Telefon off 1h przed snem", hint: "Odłóż na biurko", done: false },
-  ]},
-  { id: "glowa", icon: "🧠", name: "Głowa", color: "gold", tasks: [
-    { id: "notatka", label: "Notatka dnia", hint: "2-3 zdania wieczorem", done: false },
-    { id: "nauka", label: "Nauka 15 min", hint: "Czytanie, kurs, coś nowego", done: false },
-    { id: "limit-socjali", label: "Limit socjali 1h", hint: "Ustaw w telefonie", done: false },
   ]},
   { id: "pomiary", icon: "📏", name: "Pomiary", color: "mint", tasks: [] },
 ];
 
 function applyConditionalTasks() {
   const treningCat = TASK_CATEGORIES.find(c => c.id === "trening");
-  let treningTask;
-  if (isMonday) treningTask = { id: "trening", label: "🏊 Basen 1,5h", hint: "Poniedziałek — dzień na wodę", done: false };
-  else if (isBikeDay) treningTask = { id: "trening", label: "🚴 Rower 7 km", hint: "Co 3 dni zmiana bodźca", done: false };
-  else if (isSunday) treningTask = { id: "trening", label: "🌅 Dzień wolny", hint: "Odpoczynek — regeneracja", done: false };
-  else treningTask = { id: "trening", label: "💪 Kalistenika + hantle 2 kg", hint: "Pompki, przysiady, hantle, deska", done: false };
-  treningCat.tasks = [treningTask];
+  treningCat.tasks = [buildTrainingTask()];
 
   const pomiaryCat = TASK_CATEGORIES.find(c => c.id === "pomiary");
-  const pomiaryList = [{ id: "waga", label: "Ważenie rano", hint: "Na czczo, bez ubrań", done: false }];
-  if (isSunday) {
+  const pomiaryList = [];
+  if (todayDow === 1 || todayDow === 4 || todayDow === 6) pomiaryList.push({ id: "wlosy", label: "Mycie włosów", hint: "Szampon + odżywka", done: false });
+  if (todayDow === 0) {
     pomiaryList.push({ id: "paznokcie", label: "Paznokcie", hint: "Obetnij, wyrównaj", done: false });
     pomiaryList.push({ id: "poszewka", label: "Świeża poszewka", hint: "Mniej bakterii", done: false });
   }
+  if (todayDow === 0 || todayDow === 3) pomiaryList.push({ id: "zarost", label: "Trymowanie zarostu", hint: "Co 1,5-2 tyg", done: false });
   if (todayObj.getDate() === 1) {
     pomiaryList.push({ id: "wzrost-pomiar", label: "Pomiar wzrostu", hint: "Rano, boso, do ściany", done: false });
     pomiaryList.push({ id: "cm", label: "Pomiar obwodów", hint: "Klatka, talia, biceps", done: false });
   }
-  if (todayDow === 1 || todayDow === 4 || todayDow === 6) pomiaryList.push({ id: "wlosy", label: "Mycie włosów", hint: "Szampon + odżywka", done: false });
-  if (todayDow === 0 || todayDow === 3) pomiaryList.push({ id: "zarost", label: "Trymowanie zarostu", hint: "Co 1,5-2 tyg", done: false });
   pomiaryCat.tasks = pomiaryList;
   state.tasks = TASK_CATEGORIES.flatMap(c => c.tasks).map(t => ({ id: t.id, label: t.label, done: t.done }));
 }
@@ -928,7 +1043,7 @@ function renderTasksByCategory() {
     const colorMap = { gold: "from-gold/25 to-peach/25 text-gold", peach: "from-peach/25 to-rose/25 text-peach", mint: "from-mint/25 to-lilac/25 text-mint", lilac: "from-lilac/25 to-mint/25 text-lilac" };
     const cc = colorMap[cat.color] || "from-mint/25 to-lilac/25 text-mint";
     const fullDone = doneCount === total;
-    return `<div class="glass rounded-4xl p-4 shadow-soft">
+    return `<div class="glass rounded-4xl p-4 shadow-soft rise">
       <div class="flex items-center justify-between mb-3">
         <div class="flex items-center gap-2">
           <div class="w-9 h-9 rounded-xl bg-gradient-to-br ${cc} flex items-center justify-center flex-shrink-0"><span class="text-lg">${cat.icon}</span></div>
@@ -937,13 +1052,18 @@ function renderTasksByCategory() {
         <div class="text-xs font-extrabold ${fullDone ? "text-mint" : "text-neutral-400"}">${doneCount}/${total}</div>
       </div>
       <div class="space-y-1.5">
-        ${cat.tasks.map(t => `<div class="task-item flex items-center gap-3 p-3 rounded-2xl ${t.done ? "bg-gradient-to-r from-mint/10 to-lilac/10 border border-mint/30" : "bg-white/3 border border-white/8"} cursor-pointer" data-task-id="${t.id}">
-          <div class="flex-1 min-w-0">
-            <div class="text-sm font-bold ${t.done ? "text-mint line-through" : "text-neutral-200"}">${t.label}</div>
-            <div class="text-[10px] text-neutral-500 font-medium">${t.hint || ""}</div>
-          </div>
-          <div class="w-6 h-6 rounded-full border-2 flex-shrink-0 flex items-center justify-center ${t.done ? "bg-mint border-mint" : "border-white/20"}">${t.done ? '<i class="fa-solid fa-check text-[10px] text-ink"></i>' : ""}</div>
-        </div>`).join("")}
+        ${cat.tasks.map(t => {
+          const extra = t.extra ? `<div class="mt-2 flex flex-wrap gap-1">${t.extra.map(e => `<span class="text-[9px] glass rounded-full px-2 py-0.5">${e}</span>`).join("")}</div>` : "";
+          const levelBadge = t.level === "full" ? '<span class="text-[9px] font-bold text-mint bg-mint/15 rounded-full px-2 py-0.5 ml-1">FULL</span>' : t.level === "light" ? '<span class="text-[9px] font-bold text-gold bg-gold/15 rounded-full px-2 py-0.5 ml-1">LIGHT</span>' : t.level === "recovery" ? '<span class="text-[9px] font-bold text-rose bg-rose/15 rounded-full px-2 py-0.5 ml-1">RECOVERY</span>' : "";
+          return `<div class="task-item flex items-start gap-3 p-3 rounded-2xl ${t.done ? "bg-gradient-to-r from-mint/10 to-lilac/10 border border-mint/30" : "bg-white/3 border border-white/8"} cursor-pointer" data-task-id="${t.id}">
+            <div class="flex-1 min-w-0">
+              <div class="text-sm font-bold ${t.done ? "text-mint line-through" : "text-neutral-200"}">${t.label}${levelBadge}</div>
+              <div class="text-[10px] text-neutral-500 font-medium">${t.hint || ""}</div>
+              ${extra}
+            </div>
+            <div class="w-6 h-6 rounded-full border-2 flex-shrink-0 flex items-center justify-center ${t.done ? "bg-mint border-mint check-done" : "border-white/20"}">${t.done ? '<i class="fa-solid fa-check text-[10px] text-ink"></i>' : ""}</div>
+          </div>`;
+        }).join("")}
       </div>
     </div>`;
   }).join("");
@@ -956,6 +1076,7 @@ function renderTasksByCategory() {
       task.done = !task.done;
       syncStateFromCategories();
       vibrate(20); if (task.done) playSound("done");
+      if (task.done) el.classList.add("task-flash");
       renderTasksByCategory(); renderProgress();
       await persistToday();
       if (task.done && calcCompletionPct() === 100) setTimeout(() => { fireConfetti(); vibrate([40, 60, 40, 60, 80]); }, 250);
@@ -980,7 +1101,7 @@ function renderProgress() {
 async function persistToday() {
   syncStateFromCategories();
   const existing = (await loadDayDoc(todayKey)) || {};
-  await saveDayDoc({ ...existing, date: todayKey, tasks: state.tasks, completedPct: calcCompletionPct(), note: state.note, morning: { ...(existing.morning || {}), ...state.morning }, evening: { ...(existing.evening || {}), ...state.evening }, updatedAt: Date.now() });
+  await saveDayDoc({ ...existing, date: todayKey, tasks: state.tasks, completedPct: calcCompletionPct(), note: state.note, moodTags: state.moodTags, dayTags: state.dayTags, morning: { ...(existing.morning || {}), ...state.morning }, evening: { ...(existing.evening || {}), ...state.evening }, updatedAt: Date.now() });
   await refreshStreak(); renderImprovementTips(); renderReadiness(); checkDeload(); checkMilestone(); renderHealthWarnings();
 }
 async function refreshStreak() {
@@ -1000,21 +1121,12 @@ async function checkMilestone() {
   state.lastMilestoneShown = hit;
   const banner = $("milestone-banner"); if (!banner) return;
   $("milestone-title").textContent = `🎉 ${hit} dni streak!`;
-  const messages = { 30: "Miesiąc! To nie eksperyment, to Twoje życie.", 60: "Dwa miesiące. Jesteś inną osobą niż na starcie.", 90: "Kwartał! 90% ludzi nie dolatuje tutaj.", 100: "Sto dni. Legendarny wynik.", 180: "Pół roku. To styl życia.", 365: "Rok. Maszyna." };
+  const messages = { 30: "Miesiąc!", 60: "Dwa miesiące!", 90: "Kwartał!", 100: "100 dni!", 180: "Pół roku!", 365: "Rok!" };
   $("milestone-text").textContent = messages[hit] || `${hit} dni!`;
   banner.classList.remove("hidden"); setTimeout(() => banner.classList.add("hidden"), 12000);
   fireConfetti();
 }
 
-function calculateReadiness() {
-  const m = state.morning || {}; const e = state.evening || {};
-  let score = 0, max = 0;
-  if (m.sleepTotal != null) { max += 45; const s = m.sleepTotal; if (s >= 8) score += 45; else if (s >= 7) score += 35; else if (s >= 6) score += 22; else if (s >= 5) score += 10; }
-  if (m.rhr != null) { max += 30; if (m.rhr < 55) score += 30; else if (m.rhr < 62) score += 24; else if (m.rhr < 68) score += 15; else if (m.rhr < 75) score += 7; }
-  if (e.stress != null) { max += 25; const s = e.stress; if (s < 25) score += 25; else if (s < 40) score += 20; else if (s < 55) score += 12; else if (s < 70) score += 5; }
-  if (max === 0) return null;
-  return Math.round((score / max) * 100);
-}
 function renderReadiness() {
   const pct = calculateReadiness();
   const ring = $("readiness-ring"); const pctEl = $("readiness-pct"); const labelEl = $("readiness-label"); const tipEl = $("readiness-tip");
@@ -1024,10 +1136,10 @@ function renderReadiness() {
   ring.style.strokeDashoffset = circ - (pct / 100) * circ;
   pctEl.textContent = `${pct}%`;
   let color, label, tip, cls;
-  if (pct >= 80) { color = "#5eead4"; label = "Pełna gotowość"; tip = "Trenuj mocno."; cls = "text-mint"; }
+  if (pct >= 80) { color = "#5eead4"; label = "Pełna gotowość"; tip = "Trenuj mocno, dziś FULL plan."; cls = "text-mint"; }
   else if (pct >= 60) { color = "#fbbf24"; label = "Umiarkowana"; tip = "Trening normalny."; cls = "text-gold"; }
   else if (pct >= 40) { color = "#fbbf9d"; label = "Obniżona"; tip = "Lżejszy trening."; cls = "text-peach"; }
-  else { color = "#fb7185"; label = "Niska"; tip = "Dziś regeneracja."; cls = "text-rose"; }
+  else { color = "#fb7185"; label = "Niska"; tip = "Dziś recovery."; cls = "text-rose"; }
   ring.setAttribute("stroke", color);
   labelEl.textContent = label; labelEl.className = `font-extrabold text-base mb-1 ${cls}`;
   tipEl.textContent = tip;
@@ -1049,7 +1161,7 @@ async function renderHealthWarnings() {
   const sleep3 = withData.slice(-3).map(d => d.morning?.sleepTotal).filter(s => s != null);
   if (sleep3.length === 3 && sleep3.every(s => s < 6)) warnings.push({ icon: "😴", title: "3 dni <6h snu", text: "Dług senny. Priorytet sen 8h+." });
   const weights = withData.slice(-4).map(d => d.morning?.dailyWeight).filter(w => w != null);
-  if (weights.length >= 4) { const declining = weights.slice(-3).every((w, i) => i === 0 || w < weights[weights.length - 4 + i]); if (declining) warnings.push({ icon: "⚖️", title: "Waga spada 3 dni", text: "Jesz za mało. Dorzuć szejk." }); }
+  if (weights.length >= 4) { const declining = weights.slice(-3).every((w, i) => i === 0 || w < weights[weights.length - 4 + i]); if (declining) warnings.push({ icon: "⚖️", title: "Waga spada 3 dni", text: "Jesz za mało." }); }
   const stress3 = withData.slice(-3).map(d => d.evening?.stress).filter(s => s != null);
   if (stress3.length === 3 && stress3.every(s => s > 70)) warnings.push({ icon: "🧘", title: "3 dni stresu >70", text: "Układ nerwowy przeciążony." });
   const box = $("health-warnings"); if (!box) return;
@@ -1058,24 +1170,47 @@ async function renderHealthWarnings() {
   box.innerHTML = warnings.map(w => `<div class="warning-card rise flex items-start gap-3"><div class="text-2xl">${w.icon}</div><div class="flex-1 min-w-0"><div class="font-bold text-sm text-rose">${w.title}</div><p class="text-xs text-neutral-200 font-medium leading-relaxed mt-1">${w.text}</p></div></div>`).join("");
 }
 
+// ============================================================================
+// INTELIGENTNA RADA (personalizowana)
+// ============================================================================
+function getPersonalQuote() {
+  const m = state.morning || {};
+  const readiness = calculateReadiness();
+  const level = getTrainingLevel();
+  const sleep = m.sleepTotal;
+  const rhr = m.rhr;
+  const mood = m.moodMorning;
+
+  if (level === "recovery") return "🛌 Dziś regeneracja. Sen, woda, oddech. Twój organizm mówi: stop.";
+  if (sleep != null && sleep < 6) return "😴 Krótko spałeś. Dziś nie bij rekordów — chodzi o przetrwanie dnia i dotarcie do wieczora.";
+  if (rhr != null && rhr > 70) return "💓 Wysokie RHR — serce pracuje ciężej niż zwykle. Może stres, może choroba. Obserwuj.";
+  if (mood != null && mood <= 3) return "😔 Słabszy dzień psychicznie. Nie musisz być bohaterem — dokończ zadania i idź spać wcześniej.";
+  if (level === "full") return "🔥 Sen, RHR i nastrój idealne. Dziś możesz pobić rekord. Wykorzystaj to.";
+  if (readiness != null && readiness >= 70) return "✅ Solidna gotowość. Trzymaj rytm — regularność buduje mistrza.";
+  return "🎯 Skup się na jednej rzeczy naraz. Małe kroki, duży efekt.";
+}
+
 function renderImprovementTips() {
   const m = state.morning || {}; const e = state.evening || {};
   const tips = [];
-  const lowerNote = (state.note || "").toLowerCase();
-  if (lowerNote.includes("chory") || lowerNote.includes("gorączka")) tips.push({ icon: "🤒", text: "Choroba — priorytet zdrowie." });
-  if (lowerNote.includes("stres")) tips.push({ icon: "😰", text: "Stres — oddech 4-7-8." });
-  if (lowerNote.includes("zmęczony")) tips.push({ icon: "😴", text: "Zmęczenie — priorytet sen." });
-  if (m.sleepTotal != null && m.sleepTotal < 7) tips.push({ icon: "😴", text: `Wydłuż sen z ${m.sleepTotal}h do 8h.` });
-  if (m.rhr != null && m.rhr > 68) tips.push({ icon: "💓", text: `RHR ${m.rhr} bpm — wysoko.` });
-  if (e.stress != null && e.stress > 60) tips.push({ icon: "🧘", text: `Stres ${e.stress}/100 — oddech.` });
-  if (e.steps != null && e.steps < 5000) tips.push({ icon: "🚶", text: `Tylko ${e.steps} kroków — spacer.` });
+  const kws = detectKeywords(state.note);
+
+  if (kws.includes("sick")) tips.push({ icon: "🤒", text: "Choroba — dziś zero treningu, sen i woda." });
+  if (kws.includes("injury")) tips.push({ icon: "🩹", text: "Kontuzja/ból — odpuść trening, regeneracja." });
+  if (kws.includes("stress") || kws.includes("conflict")) tips.push({ icon: "😰", text: "Stres w notatce — 5 min oddechu 4-7-8 pomoże." });
+  if (kws.includes("tired")) tips.push({ icon: "😴", text: "Zmęczenie — priorytet sen 8h+ dziś w nocy." });
+  if (kws.includes("sad") || kws.includes("lonely")) tips.push({ icon: "💙", text: "Trudne emocje — pogadaj z kimś bliskim, wyjdź z domu." });
+  if (kws.includes("happy") || kws.includes("success")) tips.push({ icon: "🌟", text: "Dobry dzień — zapamiętaj go, wracaj do niego w gorsze dni." });
+  if (kws.includes("motivated")) tips.push({ icon: "🔥", text: "Nakręcenie — wykorzystaj to, weź się za trudne zadanie." });
+  if (kws.includes("alcohol")) tips.push({ icon: "🍺", text: "Alkohol — dużo wody, zero forsowania jutro." });
+  if (m.sleepTotal != null && m.sleepTotal < 7) tips.push({ icon: "😴", text: `Sen ${m.sleepTotal}h — poniżej progu. Idź spać przed 22:30.` });
+  if (m.rhr != null && m.rhr > 68) tips.push({ icon: "💓", text: `RHR ${m.rhr} bpm — wysokie. Sprawdź czy się nie przemęczasz.` });
+  if (e.stress != null && e.stress > 60) tips.push({ icon: "🧘", text: `Stres ${e.stress}/100 — oddech 4-7-8 przed snem.` });
   const done = state.tasks.filter(t => t.done).length;
   if (done < state.tasks.length) tips.push({ icon: "⚡", text: `Zostało ${state.tasks.length - done} zadań.` });
   else tips.push({ icon: "🏆", text: "Wszystko zaliczone — LOCK IN!" });
-  const hasSzejk = state.tasks.find(t => t.id === "szejk" && !t.done);
-  if (hasSzejk) tips.push({ icon: "🥤", text: "Wypij szejk masowy 600 kcal." });
-  const hasWoda = state.tasks.find(t => t.id === "woda" && !t.done);
-  if (hasWoda) tips.push({ icon: "💧", text: "Wypij 2.5L wody (kreatyna)." });
+  if (state.tasks.find(t => t.id === "woda" && !t.done)) tips.push({ icon: "💧", text: "Wypij 2.5L wody (kreatyna)." });
+  if (state.tasks.find(t => t.id === "przekaska" && !t.done)) tips.push({ icon: "🥜", text: "Wrzuć przekąskę — garść orzechów albo baton." });
   const c = $("improvement-tips"); if (!c) return;
   c.innerHTML = tips.map(t => `<div class="flex items-start gap-2.5 glass rounded-2xl px-3 py-2.5"><span class="text-base leading-none mt-0.5">${t.icon}</span><span class="text-xs text-neutral-200 font-medium">${t.text}</span></div>`).join("");
 }
@@ -1083,7 +1218,7 @@ function renderImprovementTips() {
 // ============================================================================
 // BRIEF TRENERA (rozbudowany)
 // ============================================================================
-function getBriefCacheKey() { return `regim:brief:${todayKey}:v5`; }
+function getBriefCacheKey() { return `regim:brief:${todayKey}:v6`; }
 function getCachedBrief(maxAgeMs) { const raw = localStorage.getItem(getBriefCacheKey()); if (!raw) return null; try { const c = JSON.parse(raw); if (Date.now() - c.ts > maxAgeMs) return null; return c.text; } catch { return null; } }
 function setCachedBrief(text) { localStorage.setItem(getBriefCacheKey(), JSON.stringify({ text, ts: Date.now() })); }
 
@@ -1093,71 +1228,53 @@ async function generateTrainerBrief() {
   const streak = parseInt($("streak-count")?.textContent) || 0;
   const days = await loadLastNDays(14);
   const yesterday = days[days.length - 2] || {};
+  const readiness = calculateReadiness();
+  const level = getTrainingLevel();
 
   const doneTasks = state.tasks.filter(t => t.done).length;
   const totalTasks = state.tasks.length;
   const pct = calcCompletionPct();
-
   const missing = state.tasks.filter(t => !t.done).map(t => t.label).slice(0, 3).join(", ");
   const zadania = doneTasks === totalTasks
-    ? `✅ <strong>${doneTasks}/${totalTasks}</strong> — pełny plan dowieziony. Nic nie brakuje.`
+    ? `✅ <strong>${doneTasks}/${totalTasks}</strong> — pełen plan dowieziony.`
     : `<strong>${doneTasks}/${totalTasks}</strong> (${pct}%). Brakuje: <em>${missing}${state.tasks.filter(t => !t.done).length > 3 ? "..." : ""}</em>`;
 
   const goal = settings.goalWeight;
   const lastW = m.dailyWeight || null;
-  const yW = yesterday.morning?.dailyWeight || null;
-  const delta = lastW && yW ? lastW - yW : null;
-  let wagaSec = "";
-  if (lastW) {
-    const toGoal = goal - lastW;
-    wagaSec = `Aktualna: <strong>${lastW} kg</strong>. Do celu (${goal} kg): <strong>${toGoal.toFixed(1)} kg</strong>.`;
-    if (delta != null && Math.abs(delta) > 0.05) wagaSec += delta > 0 ? ` +${delta.toFixed(2)} kg od wczoraj — dobry znak.` : ` ${delta.toFixed(2)} kg — jedz więcej.`;
-    if (toGoal > 0) wagaSec += ` Przy +0.2 kg/tyg to ~${Math.ceil(toGoal / 0.2)} tyg.`;
-  } else wagaSec = `Brak wagi — uzupełnij poranny raport.`;
+  const toGoal = lastW ? (goal - lastW) : null;
+  let wagaSec = lastW ? `Aktualna: <strong>${lastW} kg</strong>. Do celu (${goal} kg): <strong>${toGoal.toFixed(1)} kg</strong>.` : `Brak wagi — uzupełnij raport.`;
 
   const proteinTarget = lastW ? Math.round(lastW * 1.7) : null;
-  let proteinSec = proteinTarget ? `Cel: <strong>${proteinTarget} g białka</strong> dziennie (1.7 g/kg). Źródła: jajka, mięso, ryby, twaróg, Skyr, mleko, szejk.` : "Uzupełnij wagę — pokażę ci cel białka.";
+  const proteinSec = proteinTarget ? `Cel: <strong>${proteinTarget} g białka</strong> (1.7 g/kg).` : "Uzupełnij wagę.";
 
   let senSec = "Brak danych snu.";
   if (m.sleepTotal != null) {
     senSec = `Sen: <strong>${m.sleepTotal}h</strong>`;
     if (m.sleepDeep) senSec += `, deep ${m.sleepDeep}h`;
     senSec += ". ";
-    if (m.sleepTotal < 7) senSec += "Poniżej progu — dziś 8h+ priorytet.";
-    else if (m.sleepTotal >= 8.5) senSec += "Świetnie — bateria pełna.";
+    if (m.sleepTotal < 7) senSec += "Poniżej progu.";
+    else if (m.sleepTotal >= 8.5) senSec += "Świetnie.";
   }
 
-  const treningDone = state.tasks.find(t => t.id === "trening" && t.done);
-  let trenSec = "";
-  if (isMonday) trenSec = treningDone ? "🏊 Basen 1,5h zaliczony." : "🏊 Dziś poniedziałek — basen 1,5h.";
-  else if (isBikeDay) trenSec = treningDone ? "🚴 Rower 7 km zaliczony." : "🚴 Dziś dzień rowerowy — 7 km.";
-  else if (isSunday) trenSec = "🌅 Dziś dzień wolny — regeneracja.";
-  else trenSec = treningDone ? "💪 Trening kalisteniczny + hantle zaliczony." : "💪 Dziś kalistenika + hantle 2 kg.";
-  if (e.rpe != null) trenSec += ` RPE ${e.rpe}/10.`;
-
-  // Kategorie zadań — ile z każdej
-  const catStats = TASK_CATEGORIES.map(cat => {
-    if (!cat.tasks.length) return null;
-    const d = cat.tasks.filter(t => t.done).length;
-    const t = cat.tasks.length;
-    return { icon: cat.icon, name: cat.name, done: d, total: t, full: d === t };
-  }).filter(Boolean);
-  const catHtml = catStats.map(c => `<div class="flex items-center justify-between text-xs"><span>${c.icon} ${c.name}:</span><span class="${c.full ? "text-mint font-extrabold" : "text-neutral-300 font-bold"}">${c.done}/${c.total}</span></div>`).join("");
+  const treningTask = state.tasks.find(t => t.id === "trening");
+  let trenSec = treningTask ? `<strong>${treningTask.label}</strong>. ${treningTask.hint}` : "Brak treningu.";
+  if (level === "full") trenSec += " 🔥 Dziś FULL plan.";
+  else if (level === "light") trenSec += " 🟡 Dziś LIGHT — mniej serii.";
+  else if (level === "recovery") trenSec += " 🔴 Recovery day — regeneracja.";
 
   const pri = [];
   if (m.sleepTotal != null && m.sleepTotal < 7) pri.push("Sen 8h+ dziś w nocy");
   if (doneTasks < totalTasks) pri.push(`Dokończ ${totalTasks - doneTasks} brakujących zadań`);
   if (!lastW) pri.push("Wpisz wagę w raporcie porannym");
-  if (state.tasks.find(t => t.id === "szejk" && !t.done)) pri.push("Wypij szejk masowy 600 kcal");
-  if (state.tasks.find(t => t.id === "woda" && !t.done)) pri.push("Wypij 2.5L wody (kreatyna!)");
+  if (state.tasks.find(t => t.id === "woda" && !t.done)) pri.push("Wypij 2.5L wody (kreatyna)");
   if (pri.length < 3) pri.push(streak > 0 ? `Utrzymaj streak (${streak} dni)` : "Zacznij streak — 100% dziś");
 
-  return `<div class="brief-section"><div class="brief-section-title text-mint">📋 Zadania</div><p class="text-xs text-neutral-200 font-medium leading-relaxed">${zadania}</p><div class="mt-2 space-y-1">${catHtml}</div></div>
+  return `<div class="brief-section"><div class="brief-section-title text-mint">📋 Zadania</div><p class="text-xs text-neutral-200 font-medium leading-relaxed">${zadania}</p></div>
     <div class="brief-section"><div class="brief-section-title text-gold">⚖️ Waga i cel</div><p class="text-xs text-neutral-200 font-medium leading-relaxed">${wagaSec}</p></div>
     <div class="brief-section"><div class="brief-section-title text-peach">🥚 Białko</div><p class="text-xs text-neutral-200 font-medium leading-relaxed">${proteinSec}</p></div>
     <div class="brief-section"><div class="brief-section-title text-lilac">😴 Sen</div><p class="text-xs text-neutral-200 font-medium leading-relaxed">${senSec}</p></div>
     <div class="brief-section"><div class="brief-section-title text-mint">💪 Trening</div><p class="text-xs text-neutral-200 font-medium leading-relaxed">${trenSec}</p></div>
-    <div class="brief-section"><div class="brief-section-title text-rose">🎯 Priorytety na dziś</div><ol class="text-xs text-neutral-200 font-medium leading-relaxed space-y-1 list-decimal ml-4">${pri.slice(0, 3).map(p => `<li>${p}</li>`).join("")}</ol></div>`;
+    <div class="brief-section"><div class="brief-section-title text-rose">🎯 Priorytety</div><ol class="text-xs text-neutral-200 font-medium leading-relaxed space-y-1 list-decimal ml-4">${pri.slice(0, 3).map(p => `<li>${p}</li>`).join("")}</ol></div>`;
 }
 async function loadBrief(force = false) {
   const cacheAge = 3 * 60 * 60 * 1000;
@@ -1187,20 +1304,16 @@ async function renderProfilCard() {
   const c = $("profil-card"); if (!c) return;
   c.innerHTML = items.map(i => `<div class="glass rounded-3xl p-3 text-center"><div class="text-lg">${i.icon}</div><div class="text-xl font-extrabold text-mint">${i.value}</div><div class="text-[10px] text-neutral-400 font-semibold mt-0.5">${i.label}</div></div>`).join("");
 }
-async function renderProteinTargets() {
+async function renderProteinTarget() {
   const days = await loadLastNDays(30);
   const last = [...days].reverse().find(d => d.morning?.dailyWeight != null);
   const w = last?.morning?.dailyWeight;
   const el = $("protein-target"); const hint = $("protein-hint");
-  const elInline = $("protein-target-inline"); const hintInline = $("protein-hint-inline");
-  if (w == null) {
-    if (el) { el.textContent = "—"; hint.textContent = "Wpisz wagę"; }
-    if (elInline) { elInline.textContent = "—"; hintInline.textContent = "Wpisz wagę, żeby zobaczyć cel białka."; }
-    return;
-  }
+  if (!el) return;
+  if (w == null) { el.textContent = "—"; hint.textContent = "Wpisz wagę"; return; }
   const target = Math.round(w * 1.7);
-  if (el) { el.textContent = `${target} g`; hint.textContent = `Przy ${w} kg masy ciała (1.7 g/kg)`; }
-  if (elInline) { elInline.textContent = `${target} g`; hintInline.textContent = `Cel przy ${w} kg masy ciała`; }
+  el.textContent = `${target} g`;
+  hint.textContent = `Przy ${w} kg masy ciała (1.7 g/kg)`;
 }
 function renderGrowthCalculator() {
   const s = getSettings();
@@ -1212,10 +1325,10 @@ function renderGrowthCalculator() {
   rng.textContent = `Zakres: ${(mp - 8).toFixed(1)} – ${(mp + 8).toFixed(1)} cm`;
   const lastH = localStorage.getItem("regim:last-height") ? parseFloat(localStorage.getItem("regim:last-height")) : s.height;
   const diff = mp - lastH;
-  if (s.age >= 18) rem.textContent = `Wzrost prawdopodobnie ustabilizowany. Postawa +2-3 cm wizualnie.`;
-  else if (diff > 2) rem.textContent = `Brakuje ~${diff.toFixed(1)} cm. Masz jeszcze ${18 - s.age} lat wzrostu. Klucz: sen 8-9h, białko, basen.`;
+  if (s.age >= 18) rem.textContent = `Wzrost prawdopodobnie ustabilizowany.`;
+  else if (diff > 2) rem.textContent = `Brakuje ~${diff.toFixed(1)} cm. Masz jeszcze ${18 - s.age} lat wzrostu.`;
   else if (diff > -2) rem.textContent = `Blisko genetycznego pułapu (±2 cm).`;
-  else rem.textContent = `Powyżej szacowanego pułapu — super.`;
+  else rem.textContent = `Powyżej szacowanego pułapu.`;
 }
 async function renderHeightChart() {
   const days = await loadLastNDays(365);
@@ -1234,7 +1347,7 @@ async function renderMeasuresChart() {
   const biceps = points.map(d => d.morning?.biceps ?? null);
   const ctx = $("chart-measures"); if (!ctx) return;
   if (window.__measuresChart) window.__measuresChart.destroy();
-  window.__measuresChart = new Chart(ctx, { type: "line", data: { labels, datasets: [{ label: "Klatka (cm)", data: chest, borderColor: "#5eead4", backgroundColor: "rgba(94,234,212,.12)", pointBackgroundColor: "#5eead4", pointBorderColor: "#0f0c1d", pointRadius: 4, borderWidth: 3, tension: .3, fill: true, spanGaps: true }, { label: "Biceps (cm)", data: biceps, borderColor: "#fbbf24", backgroundColor: "rgba(251,191,36,.12)", pointBackgroundColor: "#fbbf24", pointBorderColor: "#0f0c1d", pointRadius: 4, borderWidth: 3, tension: .3, fill: true, spanGaps: true }] }, options: { responsive: true, plugins: { legend: { display: true, labels: { color: "#c9c5d6", font: { family: "Poppins", size: 11, weight: "700" } } } }, scales: { x: { ticks: { color: "#8b8397", font: { family: "Poppins", size: 10, weight: "600" } }, grid: { display: false } }, y: { ticks: { color: "#8b8397", font: { family: "Poppins", size: 10, weight: "600" } }, grid: { color: "rgba(255,255,255,.05)" } } } } });
+  window.__measuresChart = new Chart(ctx, { type: "line", data: { labels, datasets: [{ label: "Klatka", data: chest, borderColor: "#5eead4", backgroundColor: "rgba(94,234,212,.12)", pointBackgroundColor: "#5eead4", pointBorderColor: "#0f0c1d", pointRadius: 4, borderWidth: 3, tension: .3, fill: true, spanGaps: true }, { label: "Biceps", data: biceps, borderColor: "#fbbf24", backgroundColor: "rgba(251,191,36,.12)", pointBackgroundColor: "#fbbf24", pointBorderColor: "#0f0c1d", pointRadius: 4, borderWidth: 3, tension: .3, fill: true, spanGaps: true }] }, options: { responsive: true, plugins: { legend: { display: true, labels: { color: "#c9c5d6", font: { family: "Poppins", size: 11, weight: "700" } } } }, scales: { x: { ticks: { color: "#8b8397", font: { family: "Poppins", size: 10, weight: "600" } }, grid: { display: false } }, y: { ticks: { color: "#8b8397", font: { family: "Poppins", size: 10, weight: "600" } }, grid: { color: "rgba(255,255,255,.05)" } } } } });
 }
 async function renderWeightETA() {
   const el = $("weight-eta"); if (!el) return;
@@ -1248,25 +1361,55 @@ async function renderWeightETA() {
   const rate = (last - first) / daysDiff;
   const remaining = target - last;
   if (Math.abs(remaining) < 0.3) { el.innerHTML = `<p class="text-sm text-mint font-bold">🏆 Cel osiągnięty!</p>`; return; }
-  if (rate === 0 || (rate > 0 && remaining < 0) || (rate < 0 && remaining > 0)) { el.innerHTML = `<p class="text-sm text-neutral-300 font-medium">Waga nie idzie w stronę celu. Trend: ${rate > 0 ? "+" : ""}${(rate * 7).toFixed(2)} kg/tyg. ${remaining > 0 ? "Jedz więcej." : "Jedz mniej."}</p>`; return; }
+  if (rate === 0 || (rate > 0 && remaining < 0) || (rate < 0 && remaining > 0)) { el.innerHTML = `<p class="text-sm text-neutral-300 font-medium">Waga nie idzie w stronę celu. Trend: ${rate > 0 ? "+" : ""}${(rate * 7).toFixed(2)} kg/tyg.</p>`; return; }
   const daysToGoal = Math.round(remaining / rate);
   const etaDate = new Date(); etaDate.setDate(etaDate.getDate() + daysToGoal);
   const ds = etaDate.toLocaleDateString("pl-PL", { day: "numeric", month: "long", year: "numeric" });
   el.innerHTML = `<div class="text-sm text-neutral-200 font-medium leading-relaxed">📈 Tempo: <strong>${rate > 0 ? "+" : ""}${(rate * 7).toFixed(2)} kg/tyg</strong><br>🎯 Do celu: <strong>${Math.abs(remaining).toFixed(1)} kg</strong><br>⏱️ ETA: <strong class="text-mint">${ds}</strong> (~${daysToGoal} dni)</div>`;
 }
-async function renderMonthlyProgress() {
-  const el = $("monthly-progress"); if (!el) return;
+async function renderSleepDebt() {
+  const el = $("sleep-debt"); if (!el) return;
+  const days = await loadLastNDays(7);
+  const sleeps = days.map(d => d.morning?.sleepTotal).filter(s => s != null);
+  if (sleeps.length === 0) { el.innerHTML = `<p class="text-sm text-neutral-400 font-medium">Brak danych snu.</p>`; return; }
+  const totalNeeded = sleeps.length * 8;
+  const totalActual = sleeps.reduce((a, b) => a + b, 0);
+  const debt = totalActual - totalNeeded;
+  const goodPct = Math.round((sleeps.filter(s => s >= 8).length / sleeps.length) * 100);
+  el.innerHTML = `<div class="flex justify-between text-sm mb-2"><span class="text-neutral-400 font-medium">Bilans 7 dni:</span><span class="font-bold ${debt >= 0 ? "text-mint" : "text-rose"}">${debt >= 0 ? "+" : ""}${debt.toFixed(1)} h</span></div>
+    <div class="flex justify-between text-sm mb-2"><span class="text-neutral-400 font-medium">Dni z 8h+:</span><span class="font-bold text-mint">${goodPct}%</span></div>
+    <p class="text-xs text-neutral-400 font-medium mt-2">${debt < -3 ? "⚠️ Kumulujesz dług senny. Dziś 8h+ obowiązkowo." : debt >= 0 ? "✅ Sen w normie — tak trzymaj." : "Umiarkowany dług. Pilnuj 8h+."}</p>`;
+}
+async function renderLastDayTracker() {
+  const el = $("last-day-tracker"); if (!el) return;
   const all = await collectAllDays();
-  const now = new Date();
-  const thisMonthStart = new Date(now.getFullYear(), now.getMonth(), 1);
-  const thisM = all.filter(d => new Date(d.date) >= thisMonthStart);
-  const weights = thisM.map(d => d.morning?.dailyWeight).filter(w => w != null);
-  if (weights.length < 2) { el.innerHTML = `<p class="text-sm text-neutral-400 font-medium">Za mało danych.</p>`; return; }
-  const start = weights[0]; const end = weights[weights.length - 1];
-  const diff = end - start;
-  el.innerHTML = `<div class="flex justify-between text-sm mb-2"><span class="text-neutral-400 font-medium">Start miesiąca:</span><span class="font-bold">${start.toFixed(1)} kg</span></div>
-    <div class="flex justify-between text-sm mb-2"><span class="text-neutral-400 font-medium">Dziś:</span><span class="font-bold">${end.toFixed(1)} kg</span></div>
-    <div class="flex justify-between text-sm"><span class="text-neutral-400 font-medium">Zmiana:</span><span class="font-bold ${diff > 0 ? "text-mint" : "text-rose"}">${diff > 0 ? "+" : ""}${diff.toFixed(1)} kg</span></div>`;
+  const findLast = (id) => { const sorted = [...all].reverse(); for (const d of sorted) { if (d.tasks?.find(t => t.id === id && t.done)) return d.date; } return null; };
+  const items = [
+    { icon: "🏊", label: "Basen", id: "trening", needle: "Basen" },
+    { icon: "🚴", label: "Rower", id: "trening", needle: "Rower" },
+    { icon: "💪", label: "Kalistenika", id: "trening", needle: "Kalistenika" },
+  ];
+  const rows = items.map(it => {
+    let last = null;
+    const sorted = [...all].reverse();
+    for (const d of sorted) {
+      const tr = d.tasks?.find(t => t.id === "trening" && t.done);
+      if (tr && tr.label && tr.label.includes(it.needle)) { last = d.date; break; }
+    }
+    if (!last) return `<div class="flex justify-between text-xs"><span class="text-neutral-400">${it.icon} ${it.label}:</span><span class="text-neutral-500 font-bold">brak danych</span></div>`;
+    const daysAgo = Math.round((Date.now() - new Date(last).getTime()) / 86400000);
+    const color = daysAgo <= 3 ? "text-mint" : daysAgo <= 7 ? "text-gold" : "text-rose";
+    return `<div class="flex justify-between text-xs"><span class="text-neutral-400">${it.icon} ${it.label}:</span><span class="${color} font-bold">${daysAgo === 0 ? "dziś" : daysAgo + " dni temu"}</span></div>`;
+  });
+  el.innerHTML = rows.join("");
+}
+async function renderStrengthChart() {
+  const days = await loadLastNDays(7);
+  const labels = days.map(d => { const [, m, day] = d.date.split("-"); return `${day}.${m}`; });
+  const values = days.map(d => d.tasks?.find(t => t.id === "trening" && t.done) ? 1 : 0);
+  const ctx = $("chart-strength"); if (!ctx) return;
+  if (window.__strengthChart) window.__strengthChart.destroy();
+  window.__strengthChart = new Chart(ctx, { type: "bar", data: { labels, datasets: [{ data: values, backgroundColor: values.map(v => v === 1 ? "rgba(94,234,212,.7)" : "rgba(251,113,133,.3)"), borderRadius: 8, maxBarThickness: 28 }] }, options: { responsive: true, plugins: { legend: { display: false } }, scales: { x: { ticks: { color: "#8b8397", font: { family: "Poppins", size: 10, weight: "600" } }, grid: { display: false } }, y: { ticks: { color: "#8b8397", font: { family: "Poppins", size: 10, weight: "600" } }, grid: { color: "rgba(255,255,255,.05)" }, min: 0, max: 1.1 } } } });
 }
 const PUBERTY_QUESTIONS = [
   { id: "growth_spurt", text: "Skok wzrostu w ostatnich 12 mies (>5 cm)" },
@@ -1283,7 +1426,7 @@ function renderPubertyQuestions() {
 }
 function renderTannerStages() {
   const c = $("tanner-stages"); if (!c) return;
-  const stages = [{ label: "Etap 1 — przed okresem", desc: "Brak owłosienia łonowego, głos dziecięcy." }, { label: "Etap 2 — początek", desc: "Pojedyncze włosy, pierwszy skok wzrostu. 11-12 lat." }, { label: "Etap 3 — środek", desc: "Więcej owłosienia, zmiana głosu zaczyna. 13-14 lat." }, { label: "Etap 4 — szczyt", desc: "Dojrzałe owłosienie, głos niższy. 14-16 lat." }, { label: "Etap 5 — dorosłość", desc: "Wzrost ustabilizowany. 16-18 lat." }];
+  const stages = [{ label: "Etap 1 — przed", desc: "Brak owłosienia, głos dziecięcy." }, { label: "Etap 2 — początek", desc: "Pierwszy skok wzrostu. 11-12 lat." }, { label: "Etap 3 — środek", desc: "Zmiana głosu. 13-14 lat." }, { label: "Etap 4 — szczyt", desc: "Głos niższy, wzrost zwalnia. 14-16 lat." }, { label: "Etap 5 — dorosłość", desc: "Wzrost ustabilizowany. 16-18 lat." }];
   c.innerHTML = stages.map(s => `<div class="glass rounded-3xl p-4"><div class="font-bold text-sm mb-1">${s.label}</div><p class="text-xs text-neutral-300 font-medium leading-relaxed">${s.desc}</p></div>`).join("");
 }
 function renderHeightPercentile() {
@@ -1360,19 +1503,19 @@ async function renderPersonalRecords() {
   const c = $("personal-records"); if (!c) return;
   c.innerHTML = records.map(r => `<div class="record-card"><div class="text-lg mb-1">${r.icon}</div><div class="text-xl font-extrabold">${r.value}</div><div class="text-[10px] text-neutral-400 font-semibold mt-0.5">${r.label}</div></div>`).join("");
 }
-async function renderMonthlyComparison() {
+async function renderPastSelfComparison() {
+  const c = $("past-self-comparison"); if (!c) return;
   const all = await collectAllDays();
   const now = new Date();
   const thisM = all.filter(d => new Date(d.date) >= new Date(now.getFullYear(), now.getMonth(), 1));
   const lastM = all.filter(d => { const dt = new Date(d.date); return dt >= new Date(now.getFullYear(), now.getMonth() - 1, 1) && dt <= new Date(now.getFullYear(), now.getMonth(), 0); });
-  const c = $("monthly-comparison"); if (!c) return;
-  if (thisM.length < 3 || lastM.length < 3) { c.innerHTML = `<p class="text-xs text-neutral-400 font-medium">Za mało danych.</p>`; return; }
+  if (thisM.length < 3 || lastM.length < 3) { c.innerHTML = `<p class="text-xs text-neutral-400 font-medium">Za mało danych do porównania.</p>`; return; }
   const metrics = [
     { label: "Wykonanie", unit: "%", get: d => d.completedPct, h: true },
     { label: "Sen", unit: "h", get: d => d.morning?.sleepTotal, h: true },
+    { label: "Waga", unit: " kg", get: d => d.morning?.dailyWeight, h: true },
     { label: "RHR", unit: " bpm", get: d => d.morning?.rhr, h: false },
     { label: "Stres", unit: "/100", get: d => d.evening?.stress, h: false },
-    { label: "Waga", unit: " kg", get: d => d.morning?.dailyWeight, h: true },
   ];
   const rows = metrics.map(m => {
     const a = average(thisM.map(m.get).filter(v => v != null));
@@ -1383,7 +1526,7 @@ async function renderMonthlyComparison() {
     const color = diff === 0 ? "text-neutral-400" : improved ? "text-mint" : "text-rose";
     return `<div class="flex items-center justify-between glass rounded-2xl px-4 py-2.5"><span class="text-xs font-bold text-neutral-300">${m.label}:</span><span class="text-xs font-extrabold ${color}">${a.toFixed(1)}${m.unit} ${arrow} <span class="text-neutral-500 font-semibold">(był ${b.toFixed(1)}${m.unit})</span></span></div>`;
   }).filter(Boolean);
-  c.innerHTML = rows.length ? rows.join("") : `<p class="text-xs text-neutral-400">Za mało wspólnych danych.</p>`;
+  c.innerHTML = rows.length ? rows.join("") : `<p class="text-xs text-neutral-400">Brak wspólnych danych.</p>`;
 }
 async function renderGoal() {
   const s = getSettings();
@@ -1440,7 +1583,7 @@ async function renderBestStats() {
 async function generateWeeklySummary() {
   const days = await loadLastNDays(7);
   const w = days.filter(d => d.morning || d.evening);
-  if (w.length === 0) return "Za mało danych z tego tygodnia.";
+  if (w.length === 0) return "Za mało danych.";
   const aS = average(w.map(d => d.morning?.sleepTotal).filter(Boolean));
   const aSt = average(w.map(d => d.evening?.stress).filter(Boolean));
   const perfect = days.filter(d => d.completedPct === 100).length;
@@ -1450,8 +1593,8 @@ async function generateWeeklySummary() {
   const lines = [`🏆 ${perfect}/7 dni na 100%, średnia: ${pct}%.`];
   if (aS != null) lines.push(aS < 7 ? `😴 Średni sen ${aS.toFixed(1)}h — poniżej progu.` : `✅ Sen ${aS.toFixed(1)}h — solidnie.`);
   if (aSt != null) lines.push(aSt > 55 ? `🧘 Stres ${Math.round(aSt)}/100 — podwyższony.` : `😌 Stres nisko.`);
-  if (wChange != null) lines.push(wChange > 0 ? `⚖️ Waga +${wChange.toFixed(2)} kg — idziesz w masę.` : `⚖️ Waga ${wChange.toFixed(2)} kg — sprawdź czy jesz wystarczająco.`);
-  lines.push(perfect >= 5 ? "🔥 Świetny tydzień." : "🎯 Na przyszły tydzień: jeden konkretny cel.");
+  if (wChange != null) lines.push(wChange > 0 ? `⚖️ Waga +${wChange.toFixed(2)} kg — idziesz w masę.` : `⚖️ Waga ${wChange.toFixed(2)} kg.`);
+  lines.push(perfect >= 5 ? "🔥 Świetny tydzień." : "🎯 Na przyszły: jeden konkretny cel.");
   return lines.join(" ");
 }
 
@@ -1478,7 +1621,7 @@ async function renderCharts() {
   const strc = $("chart-stress");
   if (strc) { if (stressChart) stressChart.destroy(); stressChart = new Chart(strc, { type: "line", data: { labels, datasets: [{ data: days.map(d => d.evening?.stress ?? null), borderColor: "#fb7185", backgroundColor: "rgba(251,113,133,.12)", pointBackgroundColor: "#fb7185", pointBorderColor: "#0f0c1d", pointRadius: 4, borderWidth: 3, tension: .4, fill: true, spanGaps: true }] }, options: { ...baseOptions, scales: { ...baseOptions.scales, y: { ...baseOptions.scales.y, min: 0, max: 100 } } } }); }
   const mc = $("chart-mood");
-  if (mc) { if (moodChart) moodChart.destroy(); moodChart = new Chart(mc, { type: "line", data: { labels, datasets: [{ data: days.map(d => d.morning?.mood ?? null), borderColor: "#fbbf9d", backgroundColor: "rgba(251,191,157,.12)", pointBackgroundColor: "#fbbf9d", pointBorderColor: "#0f0c1d", pointRadius: 4, borderWidth: 3, tension: .4, fill: true, spanGaps: true }] }, options: { ...baseOptions, scales: { ...baseOptions.scales, y: { ...baseOptions.scales.y, min: 0, max: 10 } } } }); }
+  if (mc) { if (moodChart) moodChart.destroy(); moodChart = new Chart(mc, { type: "line", data: { labels, datasets: [{ data: days.map(d => d.morning?.moodMorning ?? null), borderColor: "#fbbf9d", backgroundColor: "rgba(251,191,157,.12)", pointBackgroundColor: "#fbbf9d", pointBorderColor: "#0f0c1d", pointRadius: 4, borderWidth: 3, tension: .4, fill: true, spanGaps: true }] }, options: { ...baseOptions, scales: { ...baseOptions.scales, y: { ...baseOptions.scales.y, min: 0, max: 10 } } } }); }
   renderCorrelation();
 }
 async function renderYearChart() {
@@ -1500,7 +1643,7 @@ async function renderCorrelation() {
   const b = average(high.map(d => d.evening.stress));
   const diff = Math.round(a - b);
   box.classList.remove("hidden");
-  txt.textContent = diff > 5 ? `🔗 Sen <7h = stres wyższy o ${diff} pkt (${Math.round(a)} vs ${Math.round(b)}). Sen bezpośrednio obniża stres.` : `🔗 Różnica stresu między krótkim i długim snem niewielka (${Math.round(a)} vs ${Math.round(b)}).`;
+  txt.textContent = diff > 5 ? `🔗 Sen <7h = stres wyższy o ${diff} pkt (${Math.round(a)} vs ${Math.round(b)}).` : `🔗 Różnica niewielka (${Math.round(a)} vs ${Math.round(b)}).`;
 }
 
 // ============================================================================
@@ -1522,12 +1665,11 @@ async function renderGlowUp() {
   const content = $("glowup-content"); if (!content) return;
   const thisW = await loadDaysRange(7, 0);
   const lastW = await loadDaysRange(7, 7);
-  if (thisW.length === 0 || lastW.length === 0) { content.innerHTML = `<p class="text-sm text-neutral-400 font-medium">Za mało danych z dwóch tygodni.</p>`; return; }
+  if (thisW.length === 0 || lastW.length === 0) { content.innerHTML = `<p class="text-sm text-neutral-400 font-medium">Za mało danych.</p>`; return; }
   const metrics = [
     { label: "Wykonanie", unit: "%", get: d => d.completedPct, h: true },
     { label: "Sen", unit: "h", get: d => d.morning?.sleepTotal, h: true },
     { label: "Waga", unit: " kg", get: d => d.morning?.dailyWeight, h: true },
-    { label: "Kroki", unit: "", get: d => d.evening?.steps, h: true },
     { label: "Stres", unit: "/100", get: d => d.evening?.stress, h: false },
     { label: "RHR", unit: " bpm", get: d => d.morning?.rhr, h: false },
   ];
@@ -1538,8 +1680,7 @@ async function renderGlowUp() {
     const diff = a - b, improved = m.h ? diff > 0 : diff < 0;
     const arrow = diff === 0 ? "→" : diff > 0 ? "↑" : "↓";
     const color = diff === 0 ? "text-neutral-400" : improved ? "text-mint" : "text-rose";
-    const fmt = v => m.label === "Kroki" ? Math.round(v) : v.toFixed(1);
-    return `<div class="flex items-center justify-between glass rounded-2xl px-4 py-2.5"><span class="text-xs font-bold text-neutral-300">${m.label}:</span><span class="text-xs font-extrabold ${color}">${fmt(a)}${m.unit} ${arrow} <span class="text-neutral-500 font-semibold">(było ${fmt(b)}${m.unit})</span></span></div>`;
+    return `<div class="flex items-center justify-between glass rounded-2xl px-4 py-2.5"><span class="text-xs font-bold text-neutral-300">${m.label}:</span><span class="text-xs font-extrabold ${color}">${a.toFixed(1)}${m.unit} ${arrow} <span class="text-neutral-500 font-semibold">(było ${b.toFixed(1)}${m.unit})</span></span></div>`;
   }).filter(Boolean);
   content.innerHTML = rows.length ? rows.join("") : `<p class="text-sm text-neutral-400 font-medium">Za mało danych.</p>`;
 }
@@ -1584,20 +1725,21 @@ async function showDayDetail(key) {
   const m = doc.morning || {}; const e = doc.evening || {};
   const tasksHtml = tasks.map(x => `<div class="flex items-center gap-2 text-xs"><span class="${x.done ? "text-mint" : "text-neutral-500"}">${x.done ? "✓" : "○"}</span><span class="${x.done ? "text-neutral-200" : "text-neutral-500"}">${x.label}</span></div>`).join("");
   c.innerHTML = `
-    <div class="flex items-center gap-3 mb-4"><div class="text-3xl font-extrabold ${doc.completedPct === 100 ? "text-mint" : doc.completedPct >= 50 ? "text-gold" : "text-rose"}">${doc.completedPct ?? 0}%</div><div class="text-xs text-neutral-400 font-semibold">wykonanie</div></div>
+    <div class="flex items-center gap-3 mb-4"><div class="text-3xl font-extrabold ${doc.completedPct === 100 ? "text-mint" : doc.completedPct >= 50 ? "text-gold" : "text-rose"}">${doc.completedPct ?? 0}%</div></div>
     <div class="glass rounded-3xl p-4 mb-3"><div class="text-[10px] text-neutral-400 font-bold mb-2 tracking-widest">ZADANIA</div><div class="space-y-1.5 max-h-64 overflow-y-auto">${tasksHtml || '<span class="text-xs text-neutral-500">brak</span>'}</div></div>
     <div class="glass rounded-3xl p-4 mb-3"><div class="text-[10px] text-neutral-400 font-bold mb-2 tracking-widest">SEN</div><div class="grid grid-cols-2 gap-2 text-xs text-neutral-200 font-medium">
       <div>🌙 Sen: <span class="font-bold">${m.sleepTotal ?? "—"} h</span></div>
       <div>🧠 Deep: <span class="font-bold">${m.sleepDeep ?? "—"} h</span></div>
       <div>💭 REM: <span class="font-bold">${m.sleepRem ?? "—"} h</span></div>
-      <div>💓 RHR: <span class="font-bold">${m.rhr ?? "—"} bpm</span></div>
+      <div>💓 RHR: <span class="font-bold">${m.rhr ?? "—"}</span></div>
       <div>⚖️ Waga: <span class="font-bold">${m.dailyWeight ?? "—"} kg</span></div>
+      <div>😊 Nastrój: <span class="font-bold">${m.moodMorning ?? "—"}/10</span></div>
     </div></div>
     <div class="glass rounded-3xl p-4 mb-3"><div class="text-[10px] text-neutral-400 font-bold mb-2 tracking-widest">DZIEŃ</div><div class="grid grid-cols-2 gap-2 text-xs text-neutral-200 font-medium">
       <div>🚶 Kroki: <span class="font-bold">${e.steps ?? "—"}</span></div>
-      <div>💓 Tętno: <span class="font-bold">${e.hrDay ?? "—"} bpm</span></div>
-      <div>🔥 RPE: <span class="font-bold">${e.rpe ?? "—"}/10</span></div>
-      <div>🧘 Stres: <span class="font-bold">${e.stress ?? "—"}/100</span></div>
+      <div>💓 Tętno: <span class="font-bold">${e.hrDay ?? "—"}</span></div>
+      <div>🔥 RPE: <span class="font-bold">${e.rpe ?? "—"}</span></div>
+      <div>🧘 Stres: <span class="font-bold">${e.stress ?? "—"}</span></div>
     </div></div>
     ${doc.note ? `<div class="glass rounded-3xl p-4 mb-3"><div class="text-[10px] text-neutral-400 font-bold mb-2 tracking-widest">NOTATKA</div><p class="text-xs text-neutral-200 font-medium italic">"${escapeHtml(doc.note)}"</p></div>` : ""}
     ${doc.aiVerdict ? `<div class="glass rounded-3xl p-4 mb-3 border border-peach/20"><div class="text-[10px] text-peach font-bold mb-2 tracking-widest">RADA TRENERA</div><p class="text-xs text-neutral-200 font-medium leading-relaxed">${escapeHtml(doc.aiVerdict)}</p></div>` : ""}
@@ -1606,14 +1748,13 @@ async function showDayDetail(key) {
 }
 
 // ============================================================================
-// CHALLENGE
+// CHALLENGE / GLOSSARY / KNOWLEDGE / FOOD
 // ============================================================================
 const CHALLENGES = [
   { id: "sleep8", name: "😴 Sen 8h 30 dni", check: d => (d.morning?.sleepTotal ?? 0) >= 8, max: 30 },
   { id: "waga50", name: "⚖️ Waga 50 kg", check: d => (d.morning?.dailyWeight ?? 0) >= 50, max: 30 },
   { id: "trening30", name: "💪 Trening 30 dni", check: d => d.tasks?.find(t => t.id === "trening" && t.done), max: 30 },
   { id: "d3-30", name: "💊 D3 codziennie", check: d => d.tasks?.find(t => t.id === "d3" && t.done), max: 30 },
-  { id: "szejk30", name: "🥤 Szejk codziennie", check: d => d.tasks?.find(t => t.id === "szejk" && t.done), max: 30 },
   { id: "woda30", name: "💧 Woda 2.5L codziennie", check: d => d.tasks?.find(t => t.id === "woda" && t.done), max: 30 },
 ];
 function getChallenge() { const id = localStorage.getItem("regim:challenge"); return CHALLENGES.find(c => c.id === id) || null; }
@@ -1638,25 +1779,17 @@ async function renderChallengeOptions() {
   });
 }
 
-// ============================================================================
-// SŁOWNICZEK / BAZA WIEDZY / PORADNIK
-// ============================================================================
 const GLOSSARY = [
-  { icon: "💓", term: "RHR", desc: "Tętno spoczynkowe mierzone rano. Norma 50-70 bpm. Wzrost o 5+ bpm = przemęczenie." },
-  { icon: "🔥", term: "RPE", desc: "Skala ciężkości treningu 1-10. 6-7 = trening normalny, 8+ = ciężko." },
-  { icon: "🫁", term: "SpO2", desc: "Saturacja krwi. Norma 95-100%. Poniżej 94% = sygnał problemu." },
-  { icon: "🌙", term: "Deep sleep", desc: "Regeneracja fizyczna — mięśnie, hormony. 15-25% snu." },
-  { icon: "💭", term: "REM", desc: "Regeneracja mózgu, pamięci. 20-25% snu." },
+  { icon: "💓", term: "RHR", desc: "Tętno spoczynkowe rano. Norma 50-70 bpm." },
+  { icon: "🔥", term: "RPE", desc: "Skala ciężkości treningu 1-10." },
+  { icon: "🌙", term: "Deep sleep", desc: "Regeneracja fizyczna. 15-25% snu." },
+  { icon: "💭", term: "REM", desc: "Regeneracja mózgu. 20-25% snu." },
   { icon: "⚡", term: "Gotowość", desc: "0-100%. Liczone z snu, RHR, stresu." },
-  { icon: "📏", term: "Midparental height", desc: "Szacowany wzrost końcowy: (ojciec + matka + 13) / 2." },
-  { icon: "💊", term: "Kreatyna", desc: "3 g dziennie, do wody/szejka. Musi być 2.5L wody." },
+  { icon: "🎯", term: "Adaptacyjny trening", desc: "Apka sama dobiera plan wg snu, RHR i nastroju." },
+  { icon: "📏", term: "Midparental", desc: "Szacowany wzrost: (ojciec + matka + 13) / 2." },
+  { icon: "💊", term: "Kreatyna", desc: "3g dziennie, do wody/szejka. Wymaga 2.5L wody." },
   { icon: "🐟", term: "Tran", desc: "Omega-3, D, A. 2× dziennie po łyżce do tłuszczu." },
-  { icon: "🧬", term: "Tanner Stage", desc: "5 etapów dojrzewania. Pokazuje gdzie jesteś." },
-  { icon: "🎯", term: "Streak", desc: "Liczba dni z rzędu ze 100% wykonaniem wszystkich zadań." },
-  { icon: "🏁", term: "Challenge", desc: "Wyzwanie 30-dniowe (np. sen 8h, trening codziennie)." },
   { icon: "🥤", term: "Szejk masowy", desc: "Banan + masło orzechowe + płatki + mleko + miód. ~600 kcal." },
-  { icon: "🦒", term: "Chin tuck", desc: "Cofanie brody do siebie. Wzmacnia szyję, poprawia linię żuchwy." },
-  { icon: "👅", term: "Mewing", desc: "Pozycja języka na podniebieniu. Wpływa na profil długoterminowo." },
 ];
 function renderGlossary() {
   const c = $("glossary-content"); if (!c) return;
@@ -1664,16 +1797,14 @@ function renderGlossary() {
 }
 
 const KNOWLEDGE_BASE = [
-  { icon: "😴", title: "Jak spać, żeby rosnąć", body: "Hormon wzrostu wydziela się głównie w deep sleep, między 22:00 a 2:00. Kluczowe: 8-9h, iść spać przed 23:00, ciemny i chłodny pokój (18-19°C), bez ekranów 1h przed. Sen na plecach = mniej odgnieceń i asymetrii twarzy." },
+  { icon: "😴", title: "Jak spać, żeby rosnąć", body: "Hormon wzrostu wydziela się głównie w deep sleep, między 22:00 a 2:00. Kluczowe: 8-9h, spanie przed 23:00, ciemny i chłodny pokój (18-19°C), bez ekranów 1h przed. Sen na plecach = mniej asymetrii twarzy." },
   { icon: "🥚", title: "Ile białka jeść", body: "W okresie dojrzewania 1.6-2.0 g białka na kg masy ciała. Ważysz 44 kg = ~75 g białka dziennie. Źródła: jajka, mięso, ryby, nabiał, strączkowe, orzechy." },
-  { icon: "🥤", title: "Szejk masowy — przepis", body: "Banan + 2 łyżki masła orzechowego + 50g płatków owsianych + 300ml mleka + łyżka miodu. ~600 kcal, ~20g białka. Blenduj, pij po szkole. Kluczowy element drogi do 50 kg." },
-  { icon: "💊", title: "Suplementacja — co i kiedy", body: "D3 ×2 kapsułki rano do tłuszczu. Tran 2× dziennie (rano + wieczór) po łyżce do posiłku. Kreatyna 3g o stałej porze do szejka/wody." },
-  { icon: "💧", title: "Woda a kreatyna", body: "Kreatyna zatrzymuje wodę w mięśniach — potrzebujesz 2.5-3L dziennie. Bez tego kreatyna nie działa i mogą być skurcze. Butelka 0.75L × 4." },
-  { icon: "🧍", title: "Postawa = +2-3 cm", body: "Dobra postawa szyi i barków wizualnie dodaje 2-3 cm wzrostu i wzmacnia linię żuchwy. Barki cofnięte, brzuch napięty, broda równolegle do podłogi. Self-check 3× dziennie." },
-  { icon: "🏊", title: "Basen + skakanie + zwisanie", body: "Rozciągają kręgosłup i stymulują chrząstki wzrostowe. 1× w tyg basen (poniedziałek). Zwisanie na drążku 2 min dziennie (jeśli masz). Skakanka 5 min — kardio i koordynacja." },
-  { icon: "🍬", title: "Co blokuje wzrost", body: "Cukier (insulina tłumi hormon wzrostu), fast food, brak snu, chroniczny stres, alkohol, papierosy, energetyki. Zero tego — w ogóle, nie raz na tydzień." },
-  { icon: "💪", title: "Trening z hantlami 2 kg", body: "Hantle 2 kg to idealny start dla 14-latka. Unoszenie bokiem (barki), wyciskanie nad głowę, uginanie ramion (biceps). 3 serie po 10-12. Bezpieczne dla stawów i chrząstek wzrostowych." },
-  { icon: "📏", title: "Pomiary — co i kiedy", body: "Waga: codziennie rano, na czczo. Wzrost: 1. dnia miesiąca, rano boso. Klatka/talia/biceps: 1. dnia miesiąca. Trend z 30 dni > pojedynczy pomiar." },
+  { icon: "💊", title: "Suplementacja", body: "D3 ×2 kapsułki rano do tłuszczu. Tran 2× dziennie po łyżce. Kreatyna 3g o stałej porze do szejka/wody." },
+  { icon: "💧", title: "Woda a kreatyna", body: "Kreatyna zatrzymuje wodę w mięśniach — potrzebujesz 2.5-3L dziennie. Bez tego kreatyna nie działa dobrze." },
+  { icon: "🏊", title: "Basen + rozciąganie", body: "Rozciągają kręgosłup i stymulują chrząstki wzrostowe. Basen raz w tyg (poniedziałek). Rozciąganie po każdym treningu." },
+  { icon: "🍬", title: "Co blokuje wzrost", body: "Cukier, fast food, brak snu, chroniczny stres, alkohol, energetyki. Zero tego w ogóle." },
+  { icon: "💪", title: "Trening z hantlami 2 kg", body: "Hantle 2 kg to idealny start dla 14-latka. Unoszenie bokiem (barki), wyciskanie nad głowę, uginanie ramion (biceps). Bezpieczne dla chrząstek wzrostowych." },
+  { icon: "📏", title: "Pomiary", body: "Waga: codziennie rano, na czczo. Wzrost + obwody: 1. dnia miesiąca. Trend z 30 dni > pojedynczy pomiar." },
 ];
 function renderKnowledgeBase() {
   const c = $("knowledge-base"); if (!c) return;
@@ -1681,21 +1812,20 @@ function renderKnowledgeBase() {
   document.querySelectorAll("[data-kb]").forEach(b => {
     b.onclick = () => {
       const k = KNOWLEDGE_BASE[parseInt(b.dataset.kb, 10)];
-      const t = $("kb-title"); const bd = $("kb-body");
-      if (t) t.textContent = k.title; if (bd) bd.textContent = k.body;
+      if ($("kb-title")) $("kb-title").textContent = k.title;
+      if ($("kb-body")) $("kb-body").textContent = k.body;
       openModal("modal-knowledge");
     };
   });
 }
 
 const GUIDE_SECTIONS = [
-  { icon: "😴", title: "Sen — fundament wzrostu", body: "Hormon wzrostu wydziela się w deep sleep (22:00-2:00). Sen <7h = mniej wzrostu, mniej regeneracji, gorsza skóra. Cel: 8-9h, spanie przed 23:00, ciemna i chłodna sypialnia (18-19°C), bez ekranów 1h przed. Najważniejsza rzecz z całej listy." },
-  { icon: "🍽️", title: "Jedzenie pod masę", body: "Cel: 2800-3000 kcal dziennie, 75-100 g białka. Białko w każdym posiłku. Szejk masowy 600 kcal po szkole — game changer. Zero cukru po 18:00. Jedz 4-5 posiłków, nie 2-3." },
-  { icon: "💪", title: "Trening dla wzrostu i masy", body: "Poniedziałek — basen 1,5h. Co 3 dni — rower 7 km. Reszta dni — kalistenika + hantle 2 kg (pompki, przysiady, deska, hantle). Niedziela wolna. Bez ciężarów powyżej 5 kg. Rozciąganie po każdym treningu." },
-  { icon: "🧴", title: "Skóra i twarz", body: "Tołpa/Ziaja → Acnederm → Cetaphil. Rano i wieczór. Balsam do ust 2×. Fonix na uszy. Zmieniaj poszewkę co tydzień. Nie dotykaj twarzy rękami. Efekty w skali miesięcy." },
-  { icon: "🧍", title: "Postawa i sylwetka", body: "Dobra postawa to +2-3 cm wzrostu wizualnie i mocniejsza linia żuchwy. Barki cofnięte, brzuch napięty, broda równolegle. Self-check 2× dziennie. Świadomość w ciągu dnia." },
-  { icon: "🧠", title: "Głowa i pewność", body: "Pewność wynika z realnych osiągnięć, nie afirmacji. Konsekwencja w małych rzeczach codziennie = fundament. Ogranicz socjale do 1h. Czytaj, ucz się 15 min dziennie." },
-  { icon: "🚫", title: "Co Cię spowalnia", body: "Cukier i fast food. Brak snu. Chroniczny stres. Energetyki. Scrollowanie. Niestabilne emocje. Zidentyfikuj swój największy hamulcowy i go usuń." },
+  { icon: "😴", title: "Sen — fundament wzrostu", body: "Hormon wzrostu wydziela się w deep sleep (22:00-2:00). Sen <7h = mniej wzrostu, mniej regeneracji, gorsza skóra. Cel: 8-9h, przed 23:00, ciemna i chłodna sypialnia (18-19°C), bez ekranów 1h przed." },
+  { icon: "🍽️", title: "Jedzenie pod masę", body: "Cel: 2800-3000 kcal dziennie, 75-100 g białka. Białko w każdym posiłku. Zero cukru po 18:00. Jedz 4-5 posiłków." },
+  { icon: "💪", title: "Trening", body: "Pon — basen 1,5h. Wt + Pt — rower 7 km. Śr + Czw + Sob — kalistenika + hantle. Nd — wolne. Apka adaptuje plan do snu i RHR." },
+  { icon: "🧴", title: "Skóra", body: "Tołpa/Ziaja → Acnederm → Cetaphil. Balsam do ust. Fonix na uszy. Codziennie." },
+  { icon: "🧍", title: "Postawa", body: "Barki cofnięte, brzuch napięty, broda równolegle. Wizualnie +2-3 cm wzrostu." },
+  { icon: "🚫", title: "Co Cię spowalnia", body: "Cukier, fast food, brak snu, stres, energetyki, scrollowanie. Usuń największy hamulcowy." },
 ];
 function renderGuideSections() {
   const c = $("guide-sections"); if (!c) return;
@@ -1709,30 +1839,71 @@ function renderGuideSections() {
   });
 }
 
-const MEAL_IDEAS = [
-  { icon: "🍳", title: "Śniadania (~500-700 kcal)", items: ["Jajecznica 4 jajka na maśle + 3 kromki chleba + awokado", "Owsianka na mleku (100g płatków) + banan + 2 łyżki masła orzechowego + miód", "Naleśniki z twarogiem + dżem + szklanka mleka", "Kanapki z tuńczykiem + majonez + jajko + 2 kromki", "Jajka sadzone 3 szt + ziemniaki z patelni + kiełbasa"] },
-  { icon: "🍝", title: "Obiady (mama gotuje)", items: ["Zjedz całą porcję + dobierz dokładkę jak możesz", "Dorzuć dodatkową kromkę chleba do obiadu", "Po obiedzie — szklanka mleka lub mały szejk"] },
-  { icon: "🥗", title: "Kolacje (~500-700 kcal)", items: ["Twaróg półtłusty 200g + chleb + masło + szczypiorek", "Skyr 200g + płatki + miód + orzechy", "Omlet z 3 jajek + ser żółty + chleb", "Tosty z serem i szynką + jogurt grecki", "Serek wiejski + pieczywo + awokado"] },
-  { icon: "🥜", title: "Przekąski (na +500 kcal)", items: ["Szejk masowy (banan + masło orzechowe + płatki + mleko + miód)", "Garść orzechów włoskich (30g = 200 kcal)", "Baton proteinowy (200-300 kcal)", "Kanapka z masłem orzechowym + banan", "Jogurt grecki 200g + granola + miód", "Kabanos + kromka chleba", "Mleko z kakao (szklanka + 2 łyżki kakao)"] },
+// BAZA POSIŁKÓW
+const FOOD_BREAKFAST = [
+  { n: "Jajecznica 4 jajka na maśle + 3 kromki chleba + awokado", kcal: 650 },
+  { n: "Owsianka na mleku (100g płatków) + banan + 2 łyżki masła orzechowego + miód", kcal: 700 },
+  { n: "Naleśniki z twarogiem + dżem + szklanka mleka", kcal: 620 },
+  { n: "Kanapki z tuńczykiem + majonez + jajko + 2 kromki", kcal: 550 },
+  { n: "Jajka sadzone 3 szt + ziemniaki z patelni + kiełbasa", kcal: 680 },
+  { n: "Omlet z 3 jaj + ser żółty + 2 kromki chleba", kcal: 580 },
+];
+const FOOD_SNACK = [
+  { n: "Garść orzechów włoskich (30g)", kcal: 200 },
+  { n: "Baton proteinowy", kcal: 250 },
+  { n: "Kanapka z masłem orzechowym + banan", kcal: 350 },
+  { n: "Jogurt grecki 200g + granola + miód", kcal: 350 },
+  { n: "Skyr 200g + płatki + miód + orzechy", kcal: 400 },
+  { n: "Kabanos + kromka chleba", kcal: 300 },
+  { n: "Mleko z kakao (szklanka + 2 łyżki kakao)", kcal: 200 },
+  { n: "Twaróg 100g + chleb + szczypiorek", kcal: 300 },
+];
+const FOOD_DINNER = [
+  { n: "Twaróg półtłusty 200g + chleb + masło + szczypiorek", kcal: 550 },
+  { n: "Skyr 200g + płatki + miód + orzechy", kcal: 500 },
+  { n: "Omlet z 3 jaj + ser żółty + chleb", kcal: 550 },
+  { n: "Tosty z serem i szynką + jogurt grecki", kcal: 600 },
+  { n: "Serek wiejski + pieczywo + awokado", kcal: 500 },
+  { n: "Makaron z sosem + mięso + warzywa", kcal: 700 },
 ];
 function renderMealIdeas() {
   const c = $("meal-ideas"); if (!c) return;
-  c.innerHTML = MEAL_IDEAS.map(m => `<div class="glass rounded-3xl p-4"><div class="flex items-center gap-2 mb-2"><span class="text-lg">${m.icon}</span><span class="font-bold text-sm">${m.title}</span></div><ul class="text-xs text-neutral-300 font-medium leading-relaxed space-y-1 list-disc ml-4">${m.items.map(i => `<li>${i}</li>`).join("")}</ul></div>`).join("");
+  c.innerHTML = `
+    <div class="glass rounded-3xl p-4"><div class="flex items-center gap-2 mb-2"><span class="text-lg">🍳</span><span class="font-bold text-sm">Śniadania</span></div><ul class="text-xs text-neutral-300 space-y-1 list-disc ml-4">${FOOD_BREAKFAST.map(i => `<li>${i.n} <span class="text-neutral-500">(~${i.kcal} kcal)</span></li>`).join("")}</ul></div>
+    <div class="glass rounded-3xl p-4"><div class="flex items-center gap-2 mb-2"><span class="text-lg">🍝</span><span class="font-bold text-sm">Obiady</span></div><p class="text-xs text-neutral-300">Mama gotuje — dojedz całą porcję + dokładka jak możesz + kromka chleba do obiadu.</p></div>
+    <div class="glass rounded-3xl p-4"><div class="flex items-center gap-2 mb-2"><span class="text-lg">🥗</span><span class="font-bold text-sm">Kolacje</span></div><ul class="text-xs text-neutral-300 space-y-1 list-disc ml-4">${FOOD_DINNER.map(i => `<li>${i.n} <span class="text-neutral-500">(~${i.kcal} kcal)</span></li>`).join("")}</ul></div>
+    <div class="glass rounded-3xl p-4"><div class="flex items-center gap-2 mb-2"><span class="text-lg">🥜</span><span class="font-bold text-sm">Przekąski</span></div><ul class="text-xs text-neutral-300 space-y-1 list-disc ml-4">${FOOD_SNACK.map(i => `<li>${i.n} <span class="text-neutral-500">(~${i.kcal} kcal)</span></li>`).join("")}</ul></div>
+  `;
+}
+function rollFoodPlan() {
+  const b = FOOD_BREAKFAST[Math.floor(Math.random() * FOOD_BREAKFAST.length)];
+  const s = FOOD_SNACK[Math.floor(Math.random() * FOOD_SNACK.length)];
+  const d = FOOD_DINNER[Math.floor(Math.random() * FOOD_DINNER.length)];
+  const el = $("food-roll"); if (!el) return;
+  el.classList.remove("hidden");
+  el.innerHTML = `
+    <div class="text-[10px] text-mint font-extrabold tracking-widest uppercase mb-2">🎲 PLAN NA DZIŚ</div>
+    <div class="space-y-2 text-xs">
+      <div class="flex justify-between"><span class="text-neutral-300 font-bold">🍳 Śniadanie:</span><span class="text-neutral-200 text-right max-w-[60%]">${b.n}</span></div>
+      <div class="flex justify-between"><span class="text-neutral-300 font-bold">🥜 Przekąska:</span><span class="text-neutral-200 text-right max-w-[60%]">${s.n}</span></div>
+      <div class="flex justify-between"><span class="text-neutral-300 font-bold">🥗 Kolacja:</span><span class="text-neutral-200 text-right max-w-[60%]">${d.n}</span></div>
+      <div class="pt-2 border-t border-white/10 text-neutral-400 font-bold text-center">Razem: ~${b.kcal + s.kcal + d.kcal} kcal</div>
+    </div>`;
 }
 
 const FACTS_OF_DAY = [
-  "Hormon wzrostu wydziela się w 70% w pierwszej fazie deep sleep (22:00-2:00). Spanie po 23:00 kradnie wzrost.",
-  "Skok wzrostu u chłopców trwa 2-3 lata i dodaje 25-30 cm. Największy przyrost to 13-15 rok życia.",
-  "Cukier zjada wzrost. Jeden wysoki skok insuliny tłumi hormon wzrostu na 2-4h.",
+  "Hormon wzrostu wydziela się w 70% w pierwszej fazie deep sleep (22:00-2:00).",
+  "Skok wzrostu u chłopców trwa 2-3 lata i dodaje 25-30 cm.",
+  "Cukier zjada wzrost. Jeden skok insuliny tłumi hormon wzrostu na 2-4h.",
   "Pływanie grzbietem rozciąga kręgosłup o 1-3 mm na sesję.",
   "Białko bez snu nie działa. Bez 8h snu ciało nie ma czasu na budowę mięśni.",
-  "Kręgosłup rano jest o 1-2 cm dłuższy niż wieczorem. Mierz się zawsze rano.",
-  "Szejk masowy 600 kcal dziennie to +4200 kcal/tyg = +0.5 kg masy.",
+  "Kręgosłup rano jest o 1-2 cm dłuższy niż wieczorem.",
+  "Szejk masowy 600 kcal dziennie to +4200 kcal/tyg.",
   "Geny dają 80% wzrostu. Pozostałe 20% = sen, dieta, ćwiczenia.",
   "10 min słońca rano ustawia melatoninę na cały dzień.",
-  "Hantle 2 kg to idealny start dla 14-latka. Bezpieczne dla chrząstek wzrostowych.",
+  "Hantle 2 kg to idealny start dla 14-latka.",
   "Świeża poszewka co 2-3 dni redukuje wypryski o 30-40%.",
-  "Wiek biologiczny można obniżyć samym snem 8h+ i niskim stresem.",
+  "Wiek biologiczny można obniżyć snem 8h+ i niskim stresem.",
 ];
 function renderFactOfDay() {
   const el = $("fact-of-day"); if (!el) return;
@@ -1744,12 +1915,12 @@ function renderFactOfDay() {
 // ONBOARDING
 // ============================================================================
 const ONBOARDING_STEPS = [
-  { icon: "🥶", title: "Zimowy Ascend Lock In", text: "Twój system regeneracji, masy, wyglądu i wzrostu. Cel: 50 kg do końca roku." },
-  { icon: "📋", title: "Zadania w kategoriach", text: "Suplementacja, jedzenie, trening, higiena, regeneracja, głowa, pomiary. ~25 zadań dziennie." },
-  { icon: "💊", title: "Suplementy", text: "D3 ×2, tran rano, tran wieczór, kreatyna 3g. Woda 2.5L minimum (kreatyna!)." },
-  { icon: "🍽️", title: "Jedzenie pod masę", text: "Szejk 600 kcal, białko w każdym posiłku, twaróg przed snem. Cel: 2800-3000 kcal." },
-  { icon: "💪", title: "Trening", text: "Pon — basen 1,5h. Co 3 dni — rower. Reszta dni — kalistenika + hantle 2 kg. Nd wolne." },
-  { icon: "📏", title: "Pomiary", text: "Ważenie codziennie rano. Pomiar cm 1. dnia miesiąca. Tracker wzrostu miesięczny." },
+  { icon: "🥶", title: "Zimowy Lock In", text: "Twój system regeneracji, masy, wyglądu i wzrostu. Cel: 50 kg do końca roku." },
+  { icon: "🧠", title: "Adaptacyjny trening", text: "Apka sama dobiera plan wg snu, RHR i nastroju. Śpisz źle? Lżejszy trening. Sen super? FULL plan." },
+  { icon: "📋", title: "Zadania w kategoriach", text: "Suplementacja, jedzenie, trening, higiena, regeneracja, pomiary. ~15 zadań dziennie." },
+  { icon: "💊", title: "Suplementy", text: "D3 ×2, tran rano, tran wieczór, kreatyna 3g. Woda 2.5L minimum." },
+  { icon: "🍽️", title: "Jedzenie pod masę", text: "Białko w każdym posiłku, przekąska, mleko. Cel: 2800-3000 kcal." },
+  { icon: "📏", title: "Pomiary", text: "Waga codziennie rano. Wzrost i obwody 1. dnia miesiąca." },
   { icon: "☁️", title: "Sync", text: "Kliknij 👤 żeby zalogować Google — dane na wszystkich urządzeniach." },
   { icon: "🎯", title: "Cel", text: "Być inną osobą w styczniu. Konsekwencja > intensywność." },
 ];
@@ -1762,8 +1933,8 @@ function renderOnboarding() {
   if (d) d.innerHTML = ONBOARDING_STEPS.map((_, i) => `<div class="h-2 rounded-full transition-all ${i === onbStep ? "w-6 bg-gradient-to-r from-mint to-lilac" : "w-2 bg-white/20"}"></div>`).join("");
   const n = $("onb-next"); if (n) n.textContent = onbStep === ONBOARDING_STEPS.length - 1 ? "Zaczynamy!" : "Dalej";
 }
-function showOnboarding() { onbStep = 0; renderOnboarding(); const m = $("modal-onboarding"); if (m) m.classList.remove("hidden"); }
-function hideOnboarding() { localStorage.setItem("regim:onboarded", "1"); const m = $("modal-onboarding"); if (m) m.classList.add("hidden"); }
+function showOnboarding() { onbStep = 0; renderOnboarding(); $("modal-onboarding")?.classList.remove("hidden"); }
+function hideOnboarding() { localStorage.setItem("regim:onboarded", "1"); $("modal-onboarding")?.classList.add("hidden"); }
 
 // ============================================================================
 // INTERAKCJE
@@ -1780,12 +1951,13 @@ document.querySelectorAll("[data-close-modal]").forEach(el => el.addEventListene
 $("btn-settings")?.addEventListener("click", () => openModal("modal-settings"));
 $("btn-glossary")?.addEventListener("click", () => openModal("modal-glossary"));
 $("btn-challenge-edit")?.addEventListener("click", () => openModal("modal-challenge"));
-$("btn-challenge-clear")?.addEventListener("click", async () => { localStorage.removeItem("regim:challenge"); renderChallenge(); closeAllModals(); showToast("Usunięty"); });
-$("btn-refresh-brief")?.addEventListener("click", async () => { const el = $("brief-text"); if (el) el.textContent = "Odświeżam..."; await autoRefreshBrief(); showToast("Brief odświeżony ✓"); });
+$("btn-challenge-clear")?.addEventListener("click", () => { localStorage.removeItem("regim:challenge"); renderChallenge(); closeAllModals(); });
+$("btn-refresh-brief")?.addEventListener("click", async () => { const el = $("brief-text"); if (el) el.textContent = "Odświeżam..."; await autoRefreshBrief(); showToast("Brief ✓"); });
+$("btn-roll-food")?.addEventListener("click", rollFoodPlan);
 $("btn-1rm")?.addEventListener("click", () => openModal("modal-1rm"));
 $("btn-rm-calculate")?.addEventListener("click", () => {
   const w = parseFloat($("input-rm-weight").value); const r = parseInt($("input-rm-reps").value, 10);
-  if (!w || !r || r < 1 || r > 15) { showToast("Podaj sensowne wartości"); return; }
+  if (!w || !r || r < 1 || r > 15) return showToast("Podaj sensowne wartości");
   $("rm-value").textContent = (w * (1 + r / 30)).toFixed(1);
 });
 $("btn-goal-edit")?.addEventListener("click", () => { const w = $("goal-edit-wrapper"); if (!w) return; w.classList.toggle("hidden"); if (!w.classList.contains("hidden")) $("input-goal-weight").value = getSettings().goalWeight; });
@@ -1795,15 +1967,20 @@ $("btn-goal-save")?.addEventListener("click", () => {
   else showToast("Podaj sensowną wartość");
 });
 $("input-note")?.addEventListener("input", e => { state.note = e.target.value; clearTimeout(window.__nd); window.__nd = setTimeout(async () => { await persistToday(); }, 800); });
+document.querySelectorAll(".tag-chip").forEach(c => {
+  c.addEventListener("click", () => { c.classList.toggle("active"); });
+});
+$("input-mood-morning")?.addEventListener("input", e => $("mood-morning-value").textContent = e.target.value);
+$("input-mood-evening")?.addEventListener("input", e => $("mood-evening-value").textContent = e.target.value);
 document.querySelectorAll(".tab-btn").forEach(btn => {
   btn.addEventListener("click", () => {
     document.querySelectorAll(".tab-btn").forEach(b => { b.classList.remove("bg-gradient-to-br", "from-mint", "to-lilac", "text-ink"); b.classList.add("text-neutral-400"); });
     btn.classList.add("bg-gradient-to-br", "from-mint", "to-lilac", "text-ink"); btn.classList.remove("text-neutral-400");
     document.querySelectorAll(".tab-panel").forEach(p => p.classList.add("hidden"));
     $(`tab-${btn.dataset.tab}`).classList.remove("hidden");
-    if (btn.dataset.tab === "cialo") { renderProfilCard(); renderProteinTargets(); renderGrowthCalculator(); renderHeightChart(); renderMeasuresChart(); renderWeightETA(); renderMonthlyProgress(); renderPubertyQuestions(); renderTannerStages(); renderHeightPercentile(); renderWeightHeightTable(); renderGrowthFactors(); }
+    if (btn.dataset.tab === "cialo") { renderProfilCard(); renderProteinTarget(); renderGrowthCalculator(); renderHeightChart(); renderMeasuresChart(); renderWeightETA(); renderSleepDebt(); renderLastDayTracker(); renderStrengthChart(); renderPubertyQuestions(); renderTannerStages(); renderHeightPercentile(); renderWeightHeightTable(); renderGrowthFactors(); }
     if (btn.dataset.tab === "poradnik") { renderGuideSections(); renderMealIdeas(); renderKnowledgeBase(); renderFactOfDay(); }
-    if (btn.dataset.tab === "postepy") { renderCalendar(); renderBadges(); renderBestStats(); renderGoal(); renderPersonalRecords(); renderMonthlyComparison(); renderLast30Days(); renderYearChart(); renderSmartGoals(); renderCharts(); }
+    if (btn.dataset.tab === "postepy") { renderCalendar(); renderBadges(); renderBestStats(); renderGoal(); renderPersonalRecords(); renderPastSelfComparison(); renderLast30Days(); renderYearChart(); renderSmartGoals(); renderCharts(); }
     if (btn.dataset.tab === "mentor") { renderMentorHistory(); renderGlowUp(); renderCharts(); }
   });
 });
@@ -1817,36 +1994,6 @@ document.querySelectorAll(".report-btn").forEach(btn => {
     $(`form-${btn.dataset.report}`).classList.remove("hidden");
   });
 });
-document.querySelectorAll(".range-btn").forEach(btn => {
-  btn.addEventListener("click", () => {
-    document.querySelectorAll(".range-btn").forEach(b => { b.classList.remove("bg-gradient-to-br", "from-mint", "to-lilac", "text-ink"); b.classList.add("text-neutral-400"); });
-    btn.classList.add("bg-gradient-to-br", "from-mint", "to-lilac", "text-ink"); btn.classList.remove("text-neutral-400");
-    state.chartRange = parseInt(btn.dataset.range, 10); renderCharts();
-  });
-});
-$("btn-analyze-ai")?.addEventListener("click", async () => {
-  const label = $("ai-btn-label"); const spinner = $("ai-btn-spinner");
-  label.classList.add("opacity-0"); spinner.classList.remove("hidden");
-  try {
-    const html = await generateTrainerBrief();
-    const existing = (await loadDayDoc(todayKey)) || { date: todayKey };
-    const textVersion = html.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
-    await saveDayDoc({ ...existing, aiVerdict: textVersion });
-    const box = $("ai-result-box"); if (box) box.classList.remove("hidden");
-    const txt = $("ai-result-text"); if (txt) txt.innerHTML = html;
-    const mv = $("mentor-verdict-box"); if (mv) mv.classList.remove("hidden");
-    const mt = $("mentor-verdict-text"); if (mt) mt.textContent = textVersion.slice(0, 250) + "...";
-    renderMentorHistory();
-  } catch (e) { showToast("Błąd"); }
-  finally { label.classList.remove("opacity-0"); spinner.classList.add("hidden"); }
-});
-$("btn-history-refresh")?.addEventListener("click", renderMentorHistory);
-$("btn-glowup-refresh")?.addEventListener("click", renderGlowUp);
-$("btn-weekly-summary")?.addEventListener("click", async () => {
-  const b = $("btn-weekly-summary"); b.disabled = true; b.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-1"></i>...';
-  $("weekly-summary-text").textContent = await generateWeeklySummary();
-  b.disabled = false; b.innerHTML = '<i class="fa-solid fa-arrows-rotate mr-1"></i>Odśwież';
-});
 $("cal-prev")?.addEventListener("click", () => { calViewDate.setMonth(calViewDate.getMonth() - 1); renderCalendar(); });
 $("cal-next")?.addEventListener("click", () => { calViewDate.setMonth(calViewDate.getMonth() + 1); renderCalendar(); });
 $("onb-next")?.addEventListener("click", () => { onbStep++; if (onbStep >= ONBOARDING_STEPS.length) { hideOnboarding(); return; } renderOnboarding(); });
@@ -1856,13 +2003,12 @@ $("btn-puberty-evaluate")?.addEventListener("click", () => {
   const checked = PUBERTY_QUESTIONS.filter(q => $(`pq-${q.id}`)?.checked).length;
   const result = $("puberty-result"); if (!result) return;
   let stage, advice;
-  if (checked <= 1) { stage = "Przed okresem dojrzewania (Tanner 1)"; advice = "Masz cały wzrost przed sobą. Sen 8-9h, białko, basen."; }
-  else if (checked <= 3) { stage = "Początek (Tanner 2-3)"; advice = "Skok wzrostu się zaczyna. Sen, dieta, basen = klucz."; }
-  else if (checked <= 5) { stage = "Środek (Tanner 3-4)"; advice = "Szczyt skoku wzrostu. Możesz rosnąć 8-12 cm rocznie."; }
-  else { stage = "Koniec (Tanner 4-5)"; advice = "Możesz jeszcze wyciągnąć 2-4 cm. Postawa, drążek, sen 8h+."; }
+  if (checked <= 1) { stage = "Przed okresem dojrzewania (Tanner 1)"; advice = "Masz cały wzrost przed sobą."; }
+  else if (checked <= 3) { stage = "Początek (Tanner 2-3)"; advice = "Skok wzrostu się zaczyna."; }
+  else if (checked <= 5) { stage = "Środek (Tanner 3-4)"; advice = "Szczyt skoku wzrostu."; }
+  else { stage = "Koniec (Tanner 4-5)"; advice = "Możesz jeszcze wyciągnąć 2-4 cm."; }
   result.classList.remove("hidden");
   result.innerHTML = `<div class="text-[10px] text-neutral-400 font-bold tracking-widest mb-1">TWOJA FAZA</div><div class="text-lg font-extrabold text-mint mb-2">${stage}</div><p class="text-xs text-neutral-200 font-medium leading-relaxed">${advice}</p>`;
-  localStorage.setItem("regim:used-puberty", "1");
 });
 $("btn-breath-start")?.addEventListener("click", () => {
   if (breathTimer) return;
@@ -1873,6 +2019,28 @@ $("btn-breath-start")?.addEventListener("click", () => {
   runBreathCycle();
 });
 $("btn-breath-stop")?.addEventListener("click", stopBreath);
+
+// REST TIMER
+let restTimer = null, restRemaining = 0;
+document.querySelectorAll(".rest-time-btn").forEach(b => {
+  b.addEventListener("click", () => {
+    document.querySelectorAll(".rest-time-btn").forEach(x => x.classList.remove("bg-gradient-to-br", "from-mint", "to-lilac", "text-ink"));
+    b.classList.add("bg-gradient-to-br", "from-mint", "to-lilac", "text-ink");
+    restRemaining = parseInt(b.dataset.rest, 10);
+    $("rest-timer-display").textContent = formatMMSS(restRemaining);
+  });
+});
+$("btn-rest-start")?.addEventListener("click", () => {
+  if (restRemaining === 0) restRemaining = 90;
+  $("btn-rest-start").classList.add("hidden"); $("btn-rest-stop").classList.remove("hidden");
+  restTimer = setInterval(() => {
+    restRemaining -= 1;
+    $("rest-timer-display").textContent = formatMMSS(restRemaining);
+    if (restRemaining <= 0) { stopRest(); beep(880, 400); vibrate(200); }
+  }, 1000);
+});
+$("btn-rest-stop")?.addEventListener("click", stopRest);
+function stopRest() { clearInterval(restTimer); restTimer = null; $("btn-rest-start")?.classList.remove("hidden"); $("btn-rest-stop")?.classList.add("hidden"); }
 
 // ODDYCHANIE
 let breathTimer = null, breathTotalRemaining = 180;
@@ -1893,6 +2061,16 @@ function stopBreath() {
   if (c) c.className = "breath-circle mb-5"; if (t) t.textContent = "Gotowy";
   if (tm) tm.textContent = "03:00"; if (s) s.classList.remove("hidden"); if (st) st.classList.add("hidden");
 }
+function beep(freq = 880, dur = 250) {
+  try {
+    audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
+    const osc = audioCtx.createOscillator(), gain = audioCtx.createGain();
+    osc.frequency.value = freq; osc.type = "sine";
+    gain.gain.setValueAtTime(0.16, audioCtx.currentTime);
+    osc.connect(gain); gain.connect(audioCtx.destination);
+    osc.start(); osc.stop(audioCtx.currentTime + dur / 1000);
+  } catch (e) {}
+}
 
 // SETTINGS
 function populateSettings() {
@@ -1906,7 +2084,7 @@ function populateSettings() {
 }
 $("btn-settings-save")?.addEventListener("click", () => {
   const s = { name: $("input-name").value || USER_NAME_DEFAULT, age: parseInt($("input-age").value) || 14, height: parseFloat($("input-height").value) || 166, heightDad: parseFloat($("input-height-dad").value) || null, heightMom: parseFloat($("input-height-mom").value) || null, goalWeight: parseFloat($("input-goal-weight-settings").value) || 50.0, autoTheme: $("input-auto-theme").checked };
-  saveSettings(s); applyAutoTheme(); renderGoal(); renderBMI(); renderGrowthCalculator(); renderProteinTargets();
+  saveSettings(s); applyAutoTheme(); renderGoal(); renderBMI(); renderGrowthCalculator(); renderProteinTarget();
   $("header-greeting").textContent = `Cześć, ${s.name} 👋`;
   showToast("Zapisane ✓"); closeAllModals();
 });
@@ -1914,17 +2092,21 @@ $("btn-settings-save")?.addEventListener("click", () => {
 // FORMULARZE
 $("form-morning")?.addEventListener("submit", async e => {
   e.preventDefault();
-  const morning = { sleepTotal: parseFloat($("input-sleep-total").value) || null, sleepDeep: parseFloat($("input-sleep-deep").value) || null, sleepRem: parseFloat($("input-sleep-rem").value) || null, rhr: parseInt($("input-rhr").value) || null, dailyWeight: parseFloat($("input-weight-daily").value) || null };
+  const mood = parseInt($("input-mood-morning").value, 10);
+  const moodTags = Array.from(document.querySelectorAll("#mood-tags-morning .tag-chip.active")).map(x => x.dataset.tag);
+  const morning = { sleepTotal: parseFloat($("input-sleep-total").value) || null, sleepDeep: parseFloat($("input-sleep-deep").value) || null, sleepRem: parseFloat($("input-sleep-rem").value) || null, rhr: parseInt($("input-rhr").value) || null, dailyWeight: parseFloat($("input-weight-daily").value) || null, moodMorning: mood, moodTags };
   state.morning = morning;
+  applyConditionalTasks(); syncTasksFromState();
   const existing = (await loadDayDoc(todayKey)) || { date: todayKey };
   await saveDayDoc({ ...existing, morning });
   showToast("Raport poranny ✓");
-  renderReadiness(); renderGoal(); renderProteinTargets(); checkDeload(); renderHealthWarnings();
+  renderTasksByCategory(); renderReadiness(); renderGoal(); renderProteinTarget(); checkDeload(); renderHealthWarnings(); renderQuoteDay();
   await autoRefreshBrief();
 });
 $("form-evening")?.addEventListener("submit", async e => {
   e.preventDefault();
-  const evening = { steps: parseInt($("input-steps").value) || null, hrDay: parseInt($("input-hr-day").value) || null, rpe: parseInt($("input-rpe").value) || null, stress: parseInt($("input-stress").value) || null };
+  const mood = parseInt($("input-mood-evening").value, 10);
+  const evening = { steps: parseInt($("input-steps").value) || null, hrDay: parseInt($("input-hr-day").value) || null, rpe: parseInt($("input-rpe").value) || null, stress: parseInt($("input-stress").value) || null, moodEvening: mood };
   state.evening = evening;
   const existing = (await loadDayDoc(todayKey)) || { date: todayKey };
   await saveDayDoc({ ...existing, evening });
@@ -1960,7 +2142,22 @@ async function renderBadges() {
   }).join("");
 }
 
-// PWA / THEME / UTIL
+// COUNTDOWN + QUOTE
+function renderCountdown() {
+  const now = new Date();
+  const start = new Date(LOCKIN_START);
+  const day = Math.floor((now - start) / 86400000) + 1;
+  if ($("lockin-day")) $("lockin-day").textContent = `Dzień ${Math.max(1, day)}`;
+  const nextYear = now.getMonth() >= 11 ? now.getFullYear() + 1 : now.getFullYear();
+  const jan1 = new Date(nextYear, 0, 1);
+  const daysToJan = Math.ceil((jan1 - now) / 86400000);
+  if ($("days-to-january")) $("days-to-january").textContent = `${daysToJan} dni`;
+}
+function renderQuoteDay() {
+  if ($("quote-day")) $("quote-day").textContent = getPersonalQuote();
+}
+
+// PWA / NOTIF / THEME
 let deferredInstallPrompt = null;
 window.addEventListener("beforeinstallprompt", e => { e.preventDefault(); deferredInstallPrompt = e; if (!localStorage.getItem("regim:install-dismissed")) $("install-banner")?.classList.remove("hidden"); });
 $("btn-install")?.addEventListener("click", async () => { if (!deferredInstallPrompt) return; deferredInstallPrompt.prompt(); const { outcome } = await deferredInstallPrompt.userChoice; if (outcome === "accepted") showToast("Dodano 🎉"); deferredInstallPrompt = null; $("install-banner")?.classList.add("hidden"); });
@@ -1976,7 +2173,7 @@ function applyAutoTheme() { const s = getSettings(); if (!s.autoTheme) return; c
 $("btn-theme-toggle")?.addEventListener("click", () => { applyTheme(document.documentElement.classList.contains("light-theme") ? "dark" : "light"); });
 function vibrate(p) { if (navigator.vibrate) try { navigator.vibrate(p); } catch (e) {} }
 let audioCtx = null;
-function playSound(type) { try { audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)(); const osc = audioCtx.createOscillator(), gain = audioCtx.createGain(); osc.connect(gain); gain.connect(audioCtx.destination); if (type === "done") { osc.frequency.value = 880; gain.gain.setValueAtTime(0.08, audioCtx.currentTime); } osc.type = "sine"; osc.start(); osc.stop(audioCtx.currentTime + 0.15); } catch (e) {} }
+function playSound(type) { beep(880, 100); }
 function fireConfetti() {
   const canvas = $("confetti-canvas"); if (!canvas) return;
   const ctx = canvas.getContext("2d"); canvas.width = window.innerWidth; canvas.height = window.innerHeight;
@@ -1985,6 +2182,19 @@ function fireConfetti() {
   let frame = 0;
   function tick() { frame++; ctx.clearRect(0, 0, canvas.width, canvas.height); particles.forEach(p => { p.vy += p.gravity; p.x += p.vx; p.y += p.vy; p.rot += p.vr; ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.rot); ctx.fillStyle = p.color; ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size * 0.6); ctx.restore(); }); if (frame < 130) requestAnimationFrame(tick); else ctx.clearRect(0, 0, canvas.width, canvas.height); }
   tick();
+}
+function spawnParticles() {
+  const layer = $("particles-layer"); if (!layer) return;
+  for (let i = 0; i < 25; i++) {
+    const p = document.createElement("div");
+    p.className = "particle";
+    p.style.left = Math.random() * 100 + "%";
+    p.style.background = `rgba(255,255,255,${0.1 + Math.random() * 0.2})`;
+    p.style.animationDuration = (10 + Math.random() * 20) + "s";
+    p.style.animationDelay = Math.random() * 15 + "s";
+    p.style.opacity = 0.4;
+    layer.appendChild(p);
+  }
 }
 function downloadFile(fn, c, m) { const b = new Blob([c], { type: m }); const u = URL.createObjectURL(b); const a = document.createElement("a"); a.href = u; a.download = fn; document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(u); }
 $("btn-export")?.addEventListener("click", async () => {
@@ -2008,7 +2218,7 @@ async function reloadEverything() {
     state.evening = existing.evening || {};
     state.note = existing.note || "";
     applyConditionalTasks(); syncTasksFromState();
-    renderTasksByCategory(); renderProgress(); renderReadiness(); renderImprovementTips();
+    renderTasksByCategory(); renderProgress(); renderReadiness(); renderImprovementTips(); renderQuoteDay();
     await refreshStreak(); checkDeload(); renderHealthWarnings(); renderGoal(); renderChallenge();
     await loadBrief(false);
   } else location.reload();
@@ -2020,6 +2230,11 @@ async function bootApp() {
   $("header-greeting").textContent = `Cześć, ${s.name} 👋`;
   applyAutoTheme();
   setInterval(applyAutoTheme, 60000);
+  spawnParticles();
+  renderCountdown();
+  renderQuoteDay();
+  setInterval(() => { renderCountdown(); renderQuoteDay(); }, 60000);
+
   const existing = await loadDayDoc(todayKey);
   applyConditionalTasks();
   if (existing?.tasks?.length) {
@@ -2034,12 +2249,12 @@ async function bootApp() {
   }
   renderTasksByCategory(); renderProgress(); renderReadiness(); renderImprovementTips();
   await refreshStreak(); checkDeload(); renderHealthWarnings(); renderGoal(); renderChallenge();
-  renderProfilCard(); renderProteinTargets(); renderGrowthCalculator(); renderPubertyQuestions(); renderTannerStages(); renderHeightPercentile(); renderWeightHeightTable(); renderGrowthFactors();
+  renderProfilCard(); renderProteinTarget(); renderGrowthCalculator(); renderPubertyQuestions(); renderTannerStages(); renderHeightPercentile(); renderWeightHeightTable(); renderGrowthFactors(); renderLastDayTracker();
   renderGuideSections(); renderMealIdeas(); renderKnowledgeBase(); renderFactOfDay();
-  if (existing?.morning) { const m = existing.morning; if (m.sleepTotal != null) $("input-sleep-total").value = m.sleepTotal; if (m.sleepDeep != null) $("input-sleep-deep").value = m.sleepDeep; if (m.sleepRem != null) $("input-sleep-rem").value = m.sleepRem; if (m.rhr != null) $("input-rhr").value = m.rhr; if (m.dailyWeight != null) $("input-weight-daily").value = m.dailyWeight; }
-  if (existing?.evening) { const e = existing.evening; if (e.steps != null) $("input-steps").value = e.steps; if (e.hrDay != null) $("input-hr-day").value = e.hrDay; if (e.rpe != null) $("input-rpe").value = e.rpe; if (e.stress != null) $("input-stress").value = e.stress; }
+  if (existing?.morning) { const m = existing.morning; if (m.sleepTotal != null) $("input-sleep-total").value = m.sleepTotal; if (m.sleepDeep != null) $("input-sleep-deep").value = m.sleepDeep; if (m.sleepRem != null) $("input-sleep-rem").value = m.sleepRem; if (m.rhr != null) $("input-rhr").value = m.rhr; if (m.dailyWeight != null) $("input-weight-daily").value = m.dailyWeight; if (m.moodMorning != null) { $("input-mood-morning").value = m.moodMorning; $("mood-morning-value").textContent = m.moodMorning; } }
+  if (existing?.evening) { const e = existing.evening; if (e.steps != null) $("input-steps").value = e.steps; if (e.hrDay != null) $("input-hr-day").value = e.hrDay; if (e.rpe != null) $("input-rpe").value = e.rpe; if (e.stress != null) $("input-stress").value = e.stress; if (e.moodEvening != null) { $("input-mood-evening").value = e.moodEvening; $("mood-evening-value").textContent = e.moodEvening; } }
   if (state.note) $("input-note").value = state.note;
-  if (existing?.aiVerdict) { const mv = $("mentor-verdict-box"); if (mv) mv.classList.remove("hidden"); const mt = $("mentor-verdict-text"); if (mt) mt.textContent = existing.aiVerdict; }
+  if (existing?.aiVerdict) { $("mentor-verdict-box")?.classList.remove("hidden"); $("mentor-verdict-text").textContent = existing.aiVerdict; }
   await loadBrief(false);
   if (!localStorage.getItem("regim:onboarded")) setTimeout(showOnboarding, 800);
 }
