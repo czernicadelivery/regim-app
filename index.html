@@ -100,6 +100,11 @@ html.light-theme .history-item{border-left-color:rgba(30,26,53,.12)}
 .analysis-card{background:linear-gradient(135deg,rgba(255,255,255,.03),rgba(94,234,212,.04));border:1px solid rgba(94,234,212,.2);border-radius:20px;padding:16px}
 .analysis-section{padding:10px 0;border-bottom:1px solid rgba(255,255,255,.05)}
 .analysis-section:last-child{border-bottom:none}
+.analysis-title{font-size:11px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px;display:flex;align-items:center;gap:6px}
+.analysis-body{font-size:13px;line-height:1.65;color:#e5e5e5;font-weight:500}
+.analysis-body strong{color:#5eead4;font-weight:700}
+.analysis-body em{color:#fbbf9d;font-style:normal;font-weight:700}
+.food-card{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:18px;padding:12px;margin-bottom:8px}
 </style>
 </head>
 <body class="text-neutral-100 font-sans min-h-screen pb-28">
@@ -125,7 +130,6 @@ html.light-theme .history-item{border-left-color:rgba(30,26,53,.12)}
       </div>
       <div id="user-badge" class="hidden glass rounded-full px-3 py-1.5 text-[11px] font-bold text-mint max-w-[100px] truncate"></div>
       <button id="btn-signin" class="glass rounded-full w-9 h-9 flex items-center justify-center text-neutral-400 hover:text-mint transition"><i class="fa-solid fa-user"></i></button>
-      <button id="btn-glossary" class="glass rounded-full w-9 h-9 flex items-center justify-center text-neutral-400 hover:text-lilac transition"><i class="fa-solid fa-book"></i></button>
       <button id="btn-settings" class="glass rounded-full w-9 h-9 flex items-center justify-center text-neutral-400 hover:text-mint transition"><i class="fa-solid fa-gear"></i></button>
       <button id="btn-theme-toggle" class="glass rounded-full w-9 h-9 flex items-center justify-center text-neutral-400 hover:text-gold transition"><i class="fa-solid fa-moon" id="theme-icon"></i></button>
       <button id="btn-export" class="glass rounded-full w-9 h-9 flex items-center justify-center text-neutral-400 hover:text-mint transition"><i class="fa-solid fa-download"></i></button>
@@ -139,15 +143,6 @@ html.light-theme .history-item{border-left-color:rgba(30,26,53,.12)}
     <div class="flex-1 min-w-0"><div class="font-bold text-sm">Miej REGIM zawsze pod ręką</div><div class="text-xs text-neutral-400">Dodaj do ekranu głównego</div></div>
     <button id="btn-install" class="bg-gradient-to-br from-mint to-lilac text-ink font-extrabold text-sm px-4 py-2 rounded-full whitespace-nowrap active:scale-95 transition">Dodaj</button>
     <button id="btn-install-dismiss" class="text-neutral-500 w-6 h-6 flex items-center justify-center flex-shrink-0"><i class="fa-solid fa-xmark"></i></button>
-  </div>
-</div>
-
-<div id="notif-banner" class="hidden max-w-lg mx-auto px-5 mb-2">
-  <div class="rise glass rounded-3xl p-4 flex items-center gap-3 shadow-soft">
-    <div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-peach/30 to-gold/30 flex items-center justify-center flex-shrink-0"><i class="fa-solid fa-bell text-peach text-lg"></i></div>
-    <div class="flex-1 min-w-0"><div class="font-bold text-sm">Włącz przypomnienia</div><div class="text-xs text-neutral-400">Rano i wieczorem</div></div>
-    <button id="btn-notif-enable" class="bg-gradient-to-br from-peach to-gold text-ink font-extrabold text-sm px-4 py-2 rounded-full whitespace-nowrap active:scale-95 transition">Włącz</button>
-    <button id="btn-notif-dismiss" class="text-neutral-500 w-6 h-6 flex items-center justify-center flex-shrink-0"><i class="fa-solid fa-xmark"></i></button>
   </div>
 </div>
 
@@ -278,10 +273,6 @@ html.light-theme .history-item{border-left-color:rgba(30,26,53,.12)}
             <button type="button" data-tag="stres" class="tag-chip glass rounded-full px-3 py-1 text-[11px] font-bold border border-transparent">😰 stres</button>
           </div>
         </div>
-        <label id="weight-field-wrapper" class="hidden block col-span-2 rise">
-          <span class="text-[11px] text-gold ml-1 font-bold">Niedziela — waga tygodniowa (kg):</span>
-          <input type="number" step="0.1" id="input-weight-weekly" placeholder="52.5" class="w-full mt-1 bg-gold/10 border border-gold/30 rounded-2xl px-3 py-2.5 text-neutral-100 font-semibold focus:outline-none focus:border-gold transition">
-        </label>
         <button type="submit" class="col-span-2 mt-1 py-3 rounded-full bg-gradient-to-br from-peach to-gold text-ink font-extrabold active:scale-95 transition"><i class="fa-solid fa-floppy-disk mr-1.5"></i>Zapisz raport poranny</button>
       </form>
 
@@ -324,7 +315,6 @@ html.light-theme .history-item{border-left-color:rgba(30,26,53,.12)}
       </form>
     </div>
 
-    <!-- AUTO ANALIZA TRENERA (pokazuje się po raporcie wieczornym) -->
     <div id="auto-analysis-box" class="hidden rise glass rounded-4xl p-5 shadow-warm border border-peach/30">
       <div class="flex items-center justify-between mb-3">
         <div class="flex items-center gap-2"><i class="fa-solid fa-dumbbell text-peach"></i><span class="font-bold text-sm text-peach">🔥 RADA TRENERA NA DZIŚ</span></div>
@@ -349,7 +339,7 @@ html.light-theme .history-item{border-left-color:rgba(30,26,53,.12)}
         <button id="btn-roll-food" class="text-[11px] font-bold text-mint glass rounded-full px-3 py-1.5 active:scale-95 transition"><i class="fa-solid fa-rotate mr-1"></i>Losuj</button>
       </div>
       <div id="food-roll" class="glass rounded-3xl p-4 border border-mint/20">
-        <p class="text-xs text-neutral-400 font-medium">Kliknij "Losuj" — dostaniesz gotowy plan: śniadanie + przekąska + kolacja + szejk.</p>
+        <p class="text-xs text-neutral-400 font-medium">Kliknij "Losuj" — dostaniesz gotowy plan: śniadanie + obiad + przekąska + kolacja + szejk.</p>
       </div>
     </div>
 
@@ -401,19 +391,9 @@ html.light-theme .history-item{border-left-color:rgba(30,26,53,.12)}
     </div>
     <div class="glass rounded-4xl p-5 shadow-warm"><div class="flex items-center gap-2 mb-3"><i class="fa-solid fa-chart-line text-lilac"></i><span class="font-bold text-base">Tracker wzrostu</span></div><canvas id="chart-height" height="140"></canvas><div class="text-[10px] text-neutral-500 font-medium mt-2 text-center">Pomiar 1. dnia miesiąca</div></div>
     <div class="glass rounded-4xl p-5 shadow-warm"><div class="flex items-center gap-2 mb-3"><i class="fa-solid fa-ruler-horizontal text-peach"></i><span class="font-bold text-base">Obwody ciała</span></div><canvas id="chart-measures" height="140"></canvas><div class="text-[10px] text-neutral-500 font-medium mt-2 text-center">Klatka / talia / biceps — 1. dnia miesiąca</div></div>
-    <div class="glass rounded-4xl p-5 shadow-warm"><div class="flex items-center gap-2 mb-3"><i class="fa-solid fa-clock text-gold"></i><span class="font-bold text-base">Kiedy osiągnę wagę X</span></div><div id="weight-eta" class="text-sm text-neutral-200 leading-relaxed font-medium">Wpisz wagę.</div></div>
     <div class="glass rounded-4xl p-5 shadow-warm"><div class="flex items-center gap-2 mb-3"><i class="fa-solid fa-bed text-lilac"></i><span class="font-bold text-base">Dług senny (7 dni)</span></div><div id="sleep-debt" class="text-sm text-neutral-200 leading-relaxed font-medium">Ładuję...</div></div>
     <div class="glass rounded-4xl p-5 shadow-warm"><div class="flex items-center gap-2 mb-3"><i class="fa-solid fa-fire text-gold"></i><span class="font-bold text-base">Ostatni dzień...</span></div><div id="last-day-tracker" class="space-y-2"></div></div>
     <div class="glass rounded-4xl p-5 shadow-warm"><div class="flex items-center gap-2 mb-3"><i class="fa-solid fa-dumbbell text-mint"></i><span class="font-bold text-base">Wykres treningów — tydzień</span></div><canvas id="chart-strength" height="140"></canvas></div>
-    <div class="glass rounded-4xl p-5 shadow-warm"><div class="flex items-center gap-2 mb-3"><i class="fa-solid fa-chart-bar text-gold"></i><span class="font-bold text-base">Wzrost — percentyle WHO</span></div><div id="height-percentile"></div></div>
-    <div class="glass rounded-4xl p-5 shadow-warm"><div class="flex items-center gap-2 mb-3"><i class="fa-solid fa-weight-scale text-peach"></i><span class="font-bold text-base">Waga do wzrostu</span></div><div id="weight-height-table" class="text-sm text-neutral-200 leading-relaxed font-medium"></div></div>
-    <div class="glass rounded-4xl p-5 shadow-warm"><div class="flex items-center gap-2 mb-3"><i class="fa-solid fa-list-ol text-lilac"></i><span class="font-bold text-base">Tanner Stage</span></div><div id="tanner-stages" class="space-y-2"></div></div>
-    <div class="glass rounded-4xl p-5 shadow-warm">
-      <div class="flex items-center gap-2 mb-3"><i class="fa-solid fa-person-arrow-up-from-line text-lilac"></i><span class="font-bold text-base">Puberty Check</span></div>
-      <div id="puberty-questions" class="space-y-2"></div>
-      <button id="btn-puberty-evaluate" class="w-full mt-3 py-3 rounded-full bg-gradient-to-br from-lilac to-mint text-ink font-extrabold active:scale-95 transition">Oceń</button>
-      <div id="puberty-result" class="hidden mt-4 glass rounded-3xl p-4"></div>
-    </div>
     <div class="glass rounded-4xl p-5 shadow-warm"><div class="flex items-center gap-2 mb-3"><i class="fa-solid fa-ranking-star text-mint"></i><span class="font-bold text-base">Co wpływa na wzrost</span></div><div id="growth-factors" class="space-y-2"></div></div>
   </section>
 
@@ -476,7 +456,7 @@ html.light-theme .history-item{border-left-color:rgba(30,26,53,.12)}
     <div class="glass rounded-4xl p-5 shadow-soft"><div class="flex items-center gap-2 mb-4"><i class="fa-solid fa-medal text-gold"></i><span class="font-bold text-sm">Odznaki</span></div><div id="badges-grid" class="grid grid-cols-3 gap-3"></div></div>
   </section>
 
-  <!-- ============ TRENER (z Poradnikiem) ============ -->
+  <!-- ============ TRENER ============ -->
   <section id="tab-mentor" class="tab-panel hidden space-y-5">
     <button id="btn-analyze-ai" class="w-full py-4 bg-gradient-to-br from-peach to-gold text-ink font-extrabold rounded-full text-base active:scale-95 transition shadow-warm flex items-center justify-center gap-2">
       <span id="ai-btn-label"><i class="fa-solid fa-dumbbell mr-1.5"></i>🏋️ Pełna analiza Trenera</span>
@@ -569,37 +549,6 @@ html.light-theme .history-item{border-left-color:rgba(30,26,53,.12)}
       <div class="glass rounded-3xl p-4"><div class="text-[11px] text-neutral-400 font-bold mb-2">KONTO</div><div id="settings-account" class="text-xs text-neutral-300 font-medium">Niezalogowany</div></div>
     </div>
     <button id="btn-settings-save" class="w-full py-3.5 rounded-full bg-gradient-to-br from-mint to-lilac text-ink font-extrabold mt-5">Zapisz ustawienia</button>
-    <button id="btn-restart-onboarding" class="w-full py-3 rounded-full glass font-bold text-neutral-300 mt-2 text-sm">Pokaż onboarding</button>
-  </div>
-</div>
-
-<div id="modal-onboarding" class="modal-wrap hidden fixed inset-0 z-50 flex items-center justify-center p-5">
-  <div class="modal-backdrop absolute inset-0"></div>
-  <div class="modal-pop relative glass rounded-4xl w-full sm:max-w-md p-6 shadow-soft max-h-[85vh] overflow-y-auto text-center">
-    <div id="onb-content"></div>
-    <div class="flex items-center justify-center gap-1.5 my-5" id="onb-dots"></div>
-    <div class="flex gap-2">
-      <button id="onb-skip" class="flex-1 py-3 rounded-full glass font-bold text-neutral-400 text-sm">Pomiń</button>
-      <button id="onb-next" class="flex-1 py-3 rounded-full bg-gradient-to-br from-mint to-lilac text-ink font-extrabold">Dalej</button>
-    </div>
-  </div>
-</div>
-
-<div id="modal-glossary" class="modal-wrap hidden fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-5">
-  <div class="modal-backdrop absolute inset-0" data-close-modal></div>
-  <div class="modal-pop relative glass rounded-t-4xl sm:rounded-4xl w-full sm:max-w-md p-6 shadow-soft max-h-[85vh] overflow-y-auto">
-    <div class="flex items-start justify-between mb-4"><div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-lilac/25 to-mint/25 flex items-center justify-center"><i class="fa-solid fa-book text-lilac text-2xl"></i></div><button data-close-modal class="w-9 h-9 rounded-full glass flex items-center justify-center text-neutral-400"><i class="fa-solid fa-xmark"></i></button></div>
-    <h3 class="font-extrabold text-xl mb-1">📖 Słowniczek</h3>
-    <div id="glossary-content" class="space-y-3 mt-4"></div>
-  </div>
-</div>
-
-<div id="modal-knowledge" class="modal-wrap hidden fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-5">
-  <div class="modal-backdrop absolute inset-0" data-close-modal></div>
-  <div class="modal-pop relative glass rounded-t-4xl sm:rounded-4xl w-full sm:max-w-md p-6 shadow-soft max-h-[85vh] overflow-y-auto">
-    <div class="flex items-start justify-between mb-4"><div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-lilac/25 to-mint/25 flex items-center justify-center"><i class="fa-solid fa-graduation-cap text-lilac text-2xl"></i></div><button data-close-modal class="w-9 h-9 rounded-full glass flex items-center justify-center text-neutral-400"><i class="fa-solid fa-xmark"></i></button></div>
-    <h3 id="kb-title" class="font-extrabold text-xl mb-3">Temat</h3>
-    <div id="kb-body" class="text-sm text-neutral-200 leading-relaxed font-medium"></div>
   </div>
 </div>
 
@@ -671,10 +620,45 @@ function saveSettings(s) {
 function calcBMI(w, h) { if (!w || !h) return null; return w / ((h / 100) ** 2); }
 function bmiLabel(b) { if (b == null) return ""; if (b < 18.5) return "Niedowaga — buduj masę"; if (b < 25) return "Norma"; if (b < 30) return "Nadwaga"; return "Otyłość"; }
 function dateKey(date) { const y = date.getFullYear(); const m = String(date.getMonth() + 1).padStart(2, "0"); const d = String(date.getDate()).padStart(2, "0"); return `${y}-${m}-${d}`; }
-function dayIndexSinceEpoch(d) { return Math.floor(d.getTime() / 86400000); }
 function average(arr) { return arr.length ? arr.reduce((a, b) => a + b, 0) / arr.length : null; }
 function escapeHtml(s) { const d = document.createElement("div"); d.textContent = s || ""; return d.innerHTML; }
 function showToast(msg) { const t = $("toast"); if (!t) return; t.textContent = msg; t.classList.remove("hidden"); clearTimeout(showToast._t); showToast._t = setTimeout(() => t.classList.add("hidden"), 2400); }
+function vibrate(pattern) { if (navigator.vibrate) navigator.vibrate(pattern); }
+function playSound(type) {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const o = ctx.createOscillator(); const g = ctx.createGain();
+    o.connect(g); g.connect(ctx.destination);
+    o.frequency.value = type === "done" ? 880 : 440;
+    g.gain.setValueAtTime(0.05, ctx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.15);
+    o.start(); o.stop(ctx.currentTime + 0.15);
+  } catch (e) {}
+}
+function fireConfetti() {
+  const c = $("confetti-canvas"); if (!c) return;
+  const ctx = c.getContext("2d");
+  c.width = innerWidth; c.height = innerHeight;
+  const colors = ["#5eead4", "#c4b5fd", "#fbbf24", "#fbbf9d", "#fb7185"];
+  const parts = Array.from({ length: 80 }, () => ({
+    x: Math.random() * c.width, y: -20, vy: 2 + Math.random() * 3,
+    vx: -1 + Math.random() * 2, s: 4 + Math.random() * 4,
+    col: colors[Math.floor(Math.random() * colors.length)], rot: Math.random() * 6.28,
+  }));
+  let frames = 0;
+  const tick = () => {
+    ctx.clearRect(0, 0, c.width, c.height);
+    parts.forEach(p => {
+      p.x += p.vx; p.y += p.vy; p.rot += 0.1;
+      ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.rot);
+      ctx.fillStyle = p.col; ctx.fillRect(-p.s / 2, -p.s / 2, p.s, p.s);
+      ctx.restore();
+    });
+    frames++;
+    if (frames < 180) requestAnimationFrame(tick); else ctx.clearRect(0, 0, c.width, c.height);
+  };
+  tick();
+}
 
 // ============================================================================
 // DATA
@@ -836,7 +820,7 @@ async function initFirebase() {
         const provider = new authMod.GoogleAuthProvider();
         provider.setCustomParameters({ prompt: "select_account" });
         await authMod.signInWithPopup(auth, provider);
-      } catch (e) { try { await authMod.signInAnonymously(auth); } catch (e2) { showToast("Błąd logowania"); } }
+      } catch (e) { try { await authMod.signInAnonymously(auth); } catch (e2) { showToast("Błąd logowania: " + (e?.code || "unknown")); } }
     });
   } catch (e) { firebaseReady = false; authResolved = true; updateSyncUI(); }
 }
@@ -847,19 +831,10 @@ async function initFirebase() {
 const todayObj = new Date();
 const todayKey = dateKey(todayObj);
 const todayDow = todayObj.getDay();
-const isMonday = todayDow === 1;
-const isSunday = todayDow === 0;
 
 const state = {
-  tasks: [],
-  morning: {},
-  evening: {},
-  note: "",
-  moodTags: [],
-  dayTags: [],
-  chartRange: 7,
+  tasks: [], morning: {}, evening: {}, note: "", moodTags: [], dayTags: [],
   lastMilestoneShown: null,
-  historyCache: [],
 };
 
 // ============================================================================
@@ -876,7 +851,7 @@ const KEYWORDS = {
   lazy: ["leniwy","nie chciało","nie chce","brak siły","leń","olewam","odpuszczam","nie chce mi się","brak motywacji","nie robiłem","nic nie robiłem"],
   school: ["szkoła","lekcje","klasa","sprawdzian","kartkówka","test","nauczyciel","ocena","jedynka","dwójka","piątka","nauka","zadanie domowe","liceum","technikum"],
   family: ["rodzina","mama","tata","brat","siostra","babcia","dziadek","ciocia","wujek","rodzice"],
-  lonely: ["sam","samotny","smutny","przygnębiony","dołek","depresja","płakałem","smutek","przygnębiająco","ponuro","źle","nie chcę żyć","beznadzieja"],
+  lonely: ["sam","samotny","smutny","przygnębiony","dołek","depresja","płakałem","smutek","przygnębiająco","ponuro","źle","beznadzieja"],
   success: ["rekord","pobity","poprawa","progres","nowy","najlepszy","osiągnąłem","sukces","udało się","zrobiłem","wygrałem","przeszedłem","pobiłem"],
   injury: ["boli","kontuzja","skręcenie","uraz","kolano","bark","plecy","naderwanie","stłuczenie","zwichnięcie","ból","ból pleców","ból barku","ból kolana"],
   conflict: ["kłótnia","awantura","pokłóciłem","zła","złość","wściekły","wkurzony","irytacja","nie fair","obrażony"],
@@ -1092,7 +1067,7 @@ async function persistToday() {
   syncStateFromCategories();
   const existing = (await loadDayDoc(todayKey)) || {};
   await saveDayDoc({ ...existing, date: todayKey, tasks: state.tasks, completedPct: calcCompletionPct(), note: state.note, moodTags: state.moodTags, dayTags: state.dayTags, morning: { ...(existing.morning || {}), ...state.morning }, evening: { ...(existing.evening || {}), ...state.evening }, updatedAt: Date.now() });
-  await refreshStreak(); renderImprovementTips(); renderReadiness(); checkDeload(); checkMilestone(); renderHealthWarnings();
+  await refreshStreak(); await renderImprovementTips(); renderReadiness(); checkDeload(); checkMilestone(); renderHealthWarnings();
 }
 async function refreshStreak() {
   const today = await loadDayDoc(todayKey);
@@ -1179,7 +1154,10 @@ function getPersonalQuote() {
   return "🎯 Skup się na jednej rzeczy naraz. Małe kroki codziennie > wielkie plany raz na miesiąc.";
 }
 
-function renderImprovementTips() {
+// ============================================================================
+// IMPROVEMENT TIPS (FIXED)
+// ============================================================================
+async function renderImprovementTips() {
   const m = state.morning || {}; const e = state.evening || {};
   const tips = [];
   const kws = detectKeywords(state.note);
@@ -1197,27 +1175,18 @@ function renderImprovementTips() {
   if (m.rhr != null && m.rhr > 68) tips.push({ icon: "💓", text: `RHR ${m.rhr} bpm — wysokie. Sprawdź czy się nie przemęczasz.` });
   if (m.breathing != null && m.breathing < 85) tips.push({ icon: "🫁", text: `Punkty oddychania ${m.breathing} — przewietrz sypialnię, sprawdź pozycję snu.` });
   if (e.stress != null && e.stress > 60) tips.push({ icon: "🧘", text: `Stres ${e.stress}/100 — oddech 4-7-8 przed snem.` });
+
   const done = state.tasks.filter(t => t.done).length;
-  if (done < state.tasks.length) tips.push({ icon: "⚡", text: `Zostało ${state.tasks.length - done} zadań.` });
-  else tips.push({ icon: "🏆", text: "Wszystko zaliczone — LOCK IN!" });
-    if (state.tasks.length > 0 && done === state.tasks.length) {
+  if (state.tasks.length > 0 && done < state.tasks.length) {
+    tips.push({ icon: "⚡", text: `Zostało ${state.tasks.length - done} zadań.` });
+  } else if (state.tasks.length > 0 && done === state.tasks.length) {
+    tips.push({ icon: "🏆", text: "Wszystko zaliczone — LOCK IN!" });
     const today = await loadDayDoc(todayKey);
-    if (!today?.perfectDay) {
+    if (today && !today.perfectDay) {
       tips.push({ icon: "🔥", text: "Perfect day zaliczony — jutro nie odpuszczaj!" });
     }
   }
-  const box = $("improvement-tips");
-  if (!box) return;
-  box.innerHTML = tips.length
-    ? tips.map(t => `...`).join("")
-    : `<p class="text-neutral-400">Uzupełnij raporty żeby zobaczyć wskazówki.</p>`;
-}
-    if (state.tasks.length > 0 && done === state.tasks.length) {
-    const today = await loadDayDoc(todayKey);
-    if (!today?.perfectDay) {
-      tips.push({ icon: "🔥", text: "Perfect day zaliczony — jutro nie odpuszczaj!" });
-    }
-  }
+
   const box = $("improvement-tips");
   if (!box) return;
   box.innerHTML = tips.length
@@ -1226,12 +1195,11 @@ function renderImprovementTips() {
 }
 
 // ============================================================================
-// RAPORT TRENERA (brief na Dziś)
+// RAPORT TRENERA (brief)
 // ============================================================================
 async function renderBrief() {
   const el = $("brief-text"); if (!el) return;
   const m = state.morning || {};
-  const e = state.evening || {};
   const readiness = calculateReadiness();
   const level = getTrainingLevel();
   const lines = [];
@@ -1379,7 +1347,7 @@ function rollFoodPlan() {
 }
 
 // ============================================================================
-// ANALIZA TRENERA — 9 SEKCJI, KONTEKST 7 DNI
+// ANALIZA TRENERA — 9 SEKCJI
 // ============================================================================
 function sec(title, icon, body, color = "#5eead4") {
   return `<div class="analysis-section">
@@ -1407,13 +1375,10 @@ async function generateFullAnalysis() {
   const kws = detectKeywords(today.note);
 
   const sleep7 = past7.map(d => d.morning?.sleepTotal).filter(v => v != null);
-  const deep7 = past7.map(d => d.morning?.sleepDeep).filter(v => v != null);
-  const rem7 = past7.map(d => d.morning?.sleepRem).filter(v => v != null);
   const rhr7 = past7.map(d => d.morning?.rhr).filter(v => v != null);
   const stress7 = past7.map(d => d.evening?.stress).filter(v => v != null);
   const steps7 = past7.map(d => d.evening?.steps).filter(v => v != null);
   const mood7 = past7.map(d => d.morning?.moodMorning).filter(v => v != null);
-  const breath7 = past7.map(d => d.morning?.breathing).filter(v => v != null);
   const weight7 = past7.map(d => d.morning?.dailyWeight).filter(v => v != null);
 
   const avg = (arr) => arr.length ? arr.reduce((a, b) => a + b, 0) / arr.length : null;
@@ -1449,7 +1414,7 @@ async function generateFullAnalysis() {
     sections.push(sec("Sen", "🌙", b, "#c4b5fd"));
   }
 
-  // 2. REGENERACJA (RHR)
+  // 2. RHR
   {
     let b = "";
     if (m.rhr == null) b = "Brak RHR. Mierz rano przed wstaniem — to najważniejszy wskaźnik przeciążenia.";
@@ -1479,13 +1444,13 @@ async function generateFullAnalysis() {
       if (readiness >= 80) b += "Możesz dziś napierdalać — pełny plan, ciężkie serie.";
       else if (readiness >= 60) b += "Standardowy trening — nic na siłę, nic na odpierdol.";
       else if (readiness >= 40) b += "Lżejszy dzień. Technika > ciężar.";
-      else b += "<em>Niska gotowość.</em> Recovery day: spacer, oddech, rozciąganie. Nie rób z siebie debila, siłowanie się z organizmem nic nie da.";
+      else b += "<em>Niska gotowość.</em> Recovery day: spacer, oddech, rozciąganie. Siłowanie się z organizmem nic nie da.";
     }
     if (level === "recovery") b += " Dziś poziom: <em>RECOVERY</em>.";
     else if (level === "light") b += " Poziom: <em>LIGHT</em>.";
     else if (level === "full") b += " Poziom: <strong>FULL</strong> 🔥.";
     if (e.rpe != null) {
-      b += ` RPE wczoraj: ${e.rpe}/10.`;
+      b += ` RPE: ${e.rpe}/10.`;
       if (e.rpe >= 9) b += " Ciężko było — pilnuj snu.";
     }
     sections.push(sec("Gotowość + Trening", "🏋️", b, "#fbbf9d"));
@@ -1500,7 +1465,7 @@ async function generateFullAnalysis() {
       if (mood >= 8) b += `Nastrój <strong>${mood}/10</strong> — jest ogień, wykorzystaj to.`;
       else if (mood >= 6) b += `Nastrój <strong>${mood}/10</strong> — stabilnie.`;
       else if (mood >= 4) b += `Nastrój <strong>${mood}/10</strong> — taki sobie dzień. Trzymaj rytm zadań.`;
-      else b += `Nastrój <strong>${mood}/10</strong> — <em>dołek.</em> Nie musisz być bohaterem. Wystarczy, że zrobisz podstawy i pójdziesz spać.`;
+      else b += `Nastrój <strong>${mood}/10</strong> — <em>dołek.</em> Nie musisz być bohaterem. Zrób podstawy i idź spać.`;
       if (m.moodMorning != null && e.moodEvening != null) {
         const d = e.moodEvening - m.moodMorning;
         if (d >= 2) b += " Wieczorem lepiej niż rano — coś dobrego się stało.";
@@ -1508,7 +1473,7 @@ async function generateFullAnalysis() {
       }
       if (avgMood != null) b += ` ${trendLabel(mood, avgMood)}.`;
     }
-    if (kws.includes("lonely") || kws.includes("sad")) b += " <em>Widzę w notatce smutek.</em> Pogadaj z kimś zaufanym — to nie wstyd, to siła.";
+    if (kws.includes("lonely")) b += " <em>Widzę w notatce smutek.</em> Pogadaj z kimś zaufanym — to nie wstyd, to siła.";
     if (kws.includes("happy") || kws.includes("success")) b += " 🔥 Notatka pełna energii — tak trzymaj.";
     sections.push(sec("Nastrój", "😊", b, "#fbbf9d"));
   }
@@ -1532,7 +1497,7 @@ async function generateFullAnalysis() {
     sections.push(sec("Aktywność", "🏃", b, "#fbbf24"));
   }
 
-  // 6. STRES I ODDYCHANIE
+  // 6. STRES + ODDYCHANIE
   {
     let b = "";
     if (e.stress == null && m.breathing == null) b = "Brak danych stresu i oddychania.";
@@ -1609,7 +1574,7 @@ async function generateFullAnalysis() {
       "Kreatyna zwiększa uwodnienie mięśni — dlatego woda 2.5L jest obowiązkowa.",
       "Witamina D3 + K2 razem = lepsze wchłanianie wapnia do kości.",
       "Tran zawiera omega-3 DHA — kluczowe dla mózgu i redukcji stanów zapalnych skóry (acne).",
-      "Rozciąganie po treningu nie zwiększa wzrostu, ale poprawia postawę — a dobra postawa dodaje 1-2 cm wizualnie.",
+      "Dobra postawa dodaje 1-2 cm wizualnie — ćwicz core i plecy.",
       "Testosteron rośnie najbardziej przez sen 7-9h + trening siłowy + tłuszcze zwierzęce.",
       "Pompki to najlepsze ćwiczenie na klatkę, triceps i barki jednocześnie — 3 w 1.",
       "Białko rozłożone na 4-5 posiłków po 25-40g daje najlepszą syntezę mięśniową.",
@@ -1635,8 +1600,6 @@ async function renderAutoAnalysis() {
   const html = await generateFullAnalysis();
   content.innerHTML = html;
   box.classList.remove("hidden");
-
-  // Zapisz do historii
   await saveAnalysisToHistory(html);
 }
 
@@ -1669,7 +1632,7 @@ async function renderAnalysisHistory() {
 }
 
 // ============================================================================
-// GLOW UP + KORELACJA + WEEKLY SUMMARY
+// GLOW UP / KORELACJA / WEEKLY
 // ============================================================================
 async function renderGlowUp() {
   const el = $("glowup-content"); if (!el) return;
@@ -1734,7 +1697,7 @@ async function renderWeeklySummary() {
 }
 
 // ============================================================================
-// POSTĘPY — 30 DNI, REKORDY, PORÓWNANIE
+// POSTĘPY
 // ============================================================================
 async function renderLast30() {
   const el = $("last-30-days"); if (!el) return;
@@ -1965,7 +1928,7 @@ const FACTS = [
   "Zimny prysznic po treningu redukuje zakwasy, ale hamuje hipertrofię.",
   "Tran DHA poprawia pamięć i koncentrację w szkole.",
   "Białko rozłożone na 4-5 posiłków = lepsza synteza mięśniowa.",
-  "Post 16h (16:8) podnosi GH o 2000% — ale rosnącemu chłopakowi nie zalecany.",
+  "Dobra postawa dodaje 1-2 cm wizualnie — ćwicz core i plecy.",
   "Testosteron rośnie najbardziej przez sen 7-9h + trening siłowy.",
 ];
 function renderFactOfDay() {
@@ -1975,7 +1938,7 @@ function renderFactOfDay() {
 }
 
 // ============================================================================
-// LICZNIK DO 1 STYCZNIA (naprawiony)
+// LICZNIK DO 1 STYCZNIA
 // ============================================================================
 function updateCountdown() {
   const now = new Date();
@@ -2014,7 +1977,6 @@ document.querySelectorAll(".tab-btn").forEach(btn => {
   });
 });
 
-// REPORT FORM SWITCH
 document.querySelectorAll(".report-btn").forEach(btn => {
   btn.addEventListener("click", () => {
     document.querySelectorAll(".report-btn").forEach(b => { b.classList.remove("bg-gradient-to-br", "from-peach", "to-gold", "text-ink"); b.classList.add("text-neutral-400"); });
@@ -2026,7 +1988,6 @@ document.querySelectorAll(".report-btn").forEach(btn => {
   });
 });
 
-// FOOD TABS
 document.querySelectorAll("[data-food-tab]").forEach(btn => {
   btn.addEventListener("click", () => {
     document.querySelectorAll("[data-food-tab]").forEach(b => { b.classList.remove("bg-gradient-to-br", "from-peach", "to-gold", "text-ink"); b.classList.add("text-neutral-400"); });
@@ -2038,7 +1999,7 @@ document.querySelectorAll("[data-food-tab]").forEach(btn => {
 });
 $("btn-roll-food")?.addEventListener("click", rollFoodPlan);
 
-// FORM MORNING
+// MORNING FORM
 $("form-morning")?.addEventListener("submit", async (e) => {
   e.preventDefault();
   const g = (id) => { const v = $(id)?.value; return v === "" ? null : parseFloat(v); };
@@ -2057,9 +2018,10 @@ $("form-morning")?.addEventListener("submit", async (e) => {
   await persistToday();
   showToast("✅ Raport poranny zapisany");
   renderReadiness(); renderBrief(); renderTasksByCategory(); renderProgress(); renderAutoAnalysis();
+  if ($("quote-day")) $("quote-day").textContent = getPersonalQuote();
 });
 
-// FORM EVENING
+// EVENING FORM
 $("form-evening")?.addEventListener("submit", async (e) => {
   e.preventDefault();
   const g = (id) => { const v = $(id)?.value; return v === "" ? null : parseFloat(v); };
@@ -2077,20 +2039,12 @@ $("form-evening")?.addEventListener("submit", async (e) => {
   state.dayTags = Array.from(document.querySelectorAll("#day-tags .tag-chip.active")).map(b => b.dataset.tag);
   await persistToday();
   showToast("✅ Podsumowanie dnia zapisane");
-  // AUTO-ANALIZA
-  await renderAutoAnalysis();
-  renderAutoAnalysis_andScroll();
-});
-
-async function renderAutoAnalysis_andScroll() {
   await renderAutoAnalysis();
   const box = $("auto-analysis-box");
-  if (box && !box.classList.contains("hidden")) {
-    box.scrollIntoView({ behavior: "smooth", block: "start" });
-  }
-}
+  if (box && !box.classList.contains("hidden")) box.scrollIntoView({ behavior: "smooth", block: "start" });
+});
 
-// MOOD SLIDER
+// MOOD SLIDERS
 $("input-mood-morning")?.addEventListener("input", (e) => { $("mood-morning-value").textContent = e.target.value; });
 $("input-mood-evening")?.addEventListener("input", (e) => { $("mood-evening-value").textContent = e.target.value; });
 
@@ -2113,10 +2067,7 @@ $("btn-analyze-ai")?.addEventListener("click", async () => {
   showToast("🔥 Analiza gotowa");
 });
 
-// TOGGLE AUTO ANALYSIS
-$("btn-toggle-analysis")?.addEventListener("click", () => {
-  $("auto-analysis-content")?.classList.toggle("hidden");
-});
+$("btn-toggle-analysis")?.addEventListener("click", () => { $("auto-analysis-content")?.classList.toggle("hidden"); });
 
 // SETTINGS
 $("btn-settings")?.addEventListener("click", () => {
@@ -2140,27 +2091,21 @@ $("btn-settings-save")?.addEventListener("click", () => {
   });
   showToast("✅ Zapisano");
   closeModal($("modal-settings"));
-  renderAll();
+  renderCialo();
 });
 
-// GLOWUP
+// GLOWUP etc
 $("btn-glowup-refresh")?.addEventListener("click", () => { renderGlowUp(); renderCorrelation(); });
 $("btn-history-refresh")?.addEventListener("click", renderAnalysisHistory);
 $("btn-weekly-summary")?.addEventListener("click", renderWeeklySummary);
 $("btn-refresh-brief")?.addEventListener("click", renderBrief);
 
-// MODALE: breathing, rest, 1rm
+// BREATHING + REST
 $("btn-breath-start")?.addEventListener("click", startBreathing);
 $("btn-breath-stop")?.addEventListener("click", stopBreathing);
 $("btn-rest-start")?.addEventListener("click", startRest);
 $("btn-rest-stop")?.addEventListener("click", stopRest);
 document.querySelectorAll(".rest-time-btn").forEach(b => b.addEventListener("click", () => { restSeconds = parseInt(b.dataset.rest); $("rest-timer-display").textContent = `00:${String(restSeconds).padStart(2, "0")}`; }));
-$("btn-rm-calculate")?.addEventListener("click", () => {
-  const w = parseFloat($("input-rm-weight").value); const r = parseInt($("input-rm-reps").value);
-  if (!w || !r) return;
-  const rm = w * (1 + r / 30);
-  $("rm-value").textContent = rm.toFixed(1);
-});
 
 // THEME
 $("btn-theme-toggle")?.addEventListener("click", () => {
@@ -2179,7 +2124,7 @@ $("btn-export")?.addEventListener("click", async () => {
   showToast("✅ Eksport gotowy");
 });
 
-// INSTALL BANNER
+// INSTALL
 let deferredPrompt = null;
 window.addEventListener("beforeinstallprompt", (e) => { e.preventDefault(); deferredPrompt = e; $("install-banner")?.classList.remove("hidden"); });
 $("btn-install")?.addEventListener("click", async () => { if (deferredPrompt) { deferredPrompt.prompt(); await deferredPrompt.userChoice; deferredPrompt = null; $("install-banner")?.classList.add("hidden"); } });
@@ -2190,53 +2135,12 @@ $("cal-prev")?.addEventListener("click", () => { calMonth.setMonth(calMonth.getM
 $("cal-next")?.addEventListener("click", () => { calMonth.setMonth(calMonth.getMonth() + 1); renderCalendar(); });
 
 // ============================================================================
-// UTIL: dźwięk, wibracja, confetti
-// ============================================================================
-function vibrate(pattern) { if (navigator.vibrate) navigator.vibrate(pattern); }
-function playSound(type) {
-  try {
-    const ctx = new (window.AudioContext || window.webkitAudioContext)();
-    const o = ctx.createOscillator(); const g = ctx.createGain();
-    o.connect(g); g.connect(ctx.destination);
-    o.frequency.value = type === "done" ? 880 : 440;
-    g.gain.setValueAtTime(0.05, ctx.currentTime);
-    g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.15);
-    o.start(); o.stop(ctx.currentTime + 0.15);
-  } catch (e) {}
-}
-function fireConfetti() {
-  const c = $("confetti-canvas"); if (!c) return;
-  const ctx = c.getContext("2d");
-  c.width = innerWidth; c.height = innerHeight;
-  const colors = ["#5eead4", "#c4b5fd", "#fbbf24", "#fbbf9d", "#fb7185"];
-  const parts = Array.from({ length: 80 }, () => ({
-    x: Math.random() * c.width, y: -20, vy: 2 + Math.random() * 3,
-    vx: -1 + Math.random() * 2, s: 4 + Math.random() * 4,
-    col: colors[Math.floor(Math.random() * colors.length)], rot: Math.random() * 6.28,
-  }));
-  let frames = 0;
-  const tick = () => {
-    ctx.clearRect(0, 0, c.width, c.height);
-    parts.forEach(p => {
-      p.x += p.vx; p.y += p.vy; p.rot += 0.1;
-      ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.rot);
-      ctx.fillStyle = p.col; ctx.fillRect(-p.s / 2, -p.s / 2, p.s, p.s);
-      ctx.restore();
-    });
-    frames++;
-    if (frames < 180) requestAnimationFrame(tick); else ctx.clearRect(0, 0, c.width, c.height);
-  };
-  tick();
-}
-
-// ============================================================================
 // BREATHING TIMER
 // ============================================================================
-let breathTimer = null, breathPhase = "idle", breathSeconds = 180;
+let breathTimer = null, breathSeconds = 180, breathCounter = null;
 function startBreathing() {
   const phases = [["inhale", 4], ["hold", 7], ["exhale", 8]];
-  let pi = 0, remaining = phases[0][1];
-  breathPhase = phases[0][0];
+  let pi = 0;
   $("btn-breath-start")?.classList.add("hidden");
   $("btn-breath-stop")?.classList.remove("hidden");
   const circle = $("breath-circle");
@@ -2244,21 +2148,19 @@ function startBreathing() {
     const [phase, dur] = phases[pi];
     $("breath-phase-text").textContent = phase === "inhale" ? "Wdech" : phase === "hold" ? "Trzymaj" : "Wydech";
     circle.className = "breath-circle " + phase;
-    breathTimer = setTimeout(() => {
-      pi = (pi + 1) % phases.length;
-      update();
-    }, dur * 1000);
+    breathTimer = setTimeout(() => { pi = (pi + 1) % phases.length; update(); }, dur * 1000);
   };
   update();
-  const counter = setInterval(() => {
+  breathSeconds = 180;
+  breathCounter = setInterval(() => {
     breathSeconds--;
     const m = Math.floor(breathSeconds / 60); const s = breathSeconds % 60;
     $("breath-timer").textContent = `${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
-    if (breathSeconds <= 0) { clearInterval(counter); stopBreathing(); }
+    if (breathSeconds <= 0) { clearInterval(breathCounter); stopBreathing(); }
   }, 1000);
 }
 function stopBreathing() {
-  clearTimeout(breathTimer);
+  clearTimeout(breathTimer); clearInterval(breathCounter);
   $("btn-breath-start")?.classList.remove("hidden");
   $("btn-breath-stop")?.classList.add("hidden");
   $("breath-phase-text").textContent = "Gotowy";
@@ -2310,7 +2212,6 @@ async function renderCialo() {
     if ($("protein-target")) $("protein-target").textContent = `${prot} g`;
     if ($("protein-hint")) $("protein-hint").textContent = `Twoja waga ${w} kg`;
   }
-  // predicted height
   if (s.heightDad && s.heightMom) {
     const pred = ((s.heightDad + s.heightMom) / 2) + 6.5;
     if ($("predicted-height")) $("predicted-height").textContent = `${pred.toFixed(1)} cm`;
@@ -2334,13 +2235,11 @@ async function bootApp() {
   updateCountdown();
   setInterval(updateCountdown, 60000);
 
-  // theme
-  if (localStorage.getItem("regim:theme") === "light" || (s.autoTheme && new Date().getHours() >= 7 && new Date().getHours() < 19)) {
+  if (localStorage.getItem("regim:theme") === "light") {
     document.documentElement.classList.add("light-theme");
     if ($("theme-icon")) $("theme-icon").className = "fa-solid fa-sun";
   }
 
-  // load today
   const today = await loadDayDoc(todayKey);
   if (today) {
     state.tasks = today.tasks || [];
@@ -2353,12 +2252,12 @@ async function bootApp() {
   syncTasksFromState();
   renderTasksByCategory();
   renderProgress();
-  refreshStreak();
+  await refreshStreak();
   renderReadiness();
   renderBrief();
   renderHealthWarnings();
   checkDeload();
-  renderImprovementTips();
+  await renderImprovementTips();
   renderGuideSections();
   renderKnowledgeBase();
   renderFactOfDay();
@@ -2367,31 +2266,30 @@ async function bootApp() {
   renderCialo();
   await renderAutoAnalysis();
 
-  // quote
   if ($("quote-day")) $("quote-day").textContent = getPersonalQuote();
 
-  // restore inputs
   const m = state.morning || {}; const e = state.evening || {};
-  if (m.sleepTotal != null) $("input-sleep-total") && ($("input-sleep-total").value = m.sleepTotal);
-  if (m.sleepDeep != null) $("input-sleep-deep") && ($("input-sleep-deep").value = m.sleepDeep);
-  if (m.sleepRem != null) $("input-sleep-rem") && ($("input-sleep-rem").value = m.sleepRem);
-  if (m.sleepWakes != null) $("input-sleep-wakes") && ($("input-sleep-wakes").value = m.sleepWakes);
-  if (m.sleepHr != null) $("input-sleep-hr") && ($("input-sleep-hr").value = m.sleepHr);
-  if (m.rhr != null) $("input-rhr") && ($("input-rhr").value = m.rhr);
-  if (m.breathing != null) $("input-breathing") && ($("input-breathing").value = m.breathing);
-  if (m.dailyWeight != null) $("input-weight-daily") && ($("input-weight-daily").value = m.dailyWeight);
+  const setVal = (id, v) => { if (v != null && $(id)) $(id).value = v; };
+  setVal("input-sleep-total", m.sleepTotal);
+  setVal("input-sleep-deep", m.sleepDeep);
+  setVal("input-sleep-rem", m.sleepRem);
+  setVal("input-sleep-wakes", m.sleepWakes);
+  setVal("input-sleep-hr", m.sleepHr);
+  setVal("input-rhr", m.rhr);
+  setVal("input-breathing", m.breathing);
+  setVal("input-weight-daily", m.dailyWeight);
   if (m.moodMorning != null && $("input-mood-morning")) { $("input-mood-morning").value = m.moodMorning; $("mood-morning-value").textContent = m.moodMorning; }
-  if (e.steps != null) $("input-steps") && ($("input-steps").value = e.steps);
-  if (e.kcalBurned != null) $("input-kcal-burned") && ($("input-kcal-burned").value = e.kcalBurned);
-  if (e.hrDay != null) $("input-hr-day") && ($("input-hr-day").value = e.hrDay);
-  if (e.spo2Day != null) $("input-spo2-day") && ($("input-spo2-day").value = e.spo2Day);
-  if (e.rpe != null) $("input-rpe") && ($("input-rpe").value = e.rpe);
-  if (e.stress != null) $("input-stress") && ($("input-stress").value = e.stress);
+  setVal("input-steps", e.steps);
+  setVal("input-kcal-burned", e.kcalBurned);
+  setVal("input-hr-day", e.hrDay);
+  setVal("input-spo2-day", e.spo2Day);
+  setVal("input-rpe", e.rpe);
+  setVal("input-stress", e.stress);
   if (e.moodEvening != null && $("input-mood-evening")) { $("input-mood-evening").value = e.moodEvening; $("mood-evening-value").textContent = e.moodEvening; }
-  if (state.note) $("input-note") && ($("input-note").value = state.note);
+  if (state.note && $("input-note")) $("input-note").value = state.note;
 }
 
-// Particles background
+// PARTICLES
 (function particles() {
   const layer = $("particles-layer"); if (!layer) return;
   const colors = ["#5eead4", "#c4b5fd", "#fbbf24"];
@@ -2407,11 +2305,9 @@ async function bootApp() {
   }
 })();
 
-// Init
+// INIT
 updateSyncUI();
 initFirebase().catch(() => { authResolved = true; bootApp(); });
-
-// Fallback — jeśli Firebase nie wystartuje w 3s, bootuj lokalnie
 setTimeout(() => { if (!booted) { authResolved = true; bootApp(); } }, 3000);
 </script>
 </body>
