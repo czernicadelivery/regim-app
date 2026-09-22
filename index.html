@@ -46,8 +46,6 @@ input[type="number"]::-webkit-outer-spin-button,input[type="number"]::-webkit-in
 input[type="number"]{-moz-appearance:textfield}
 input,textarea{transition:all .3s ease}
 input:focus,textarea:focus{transform:scale(1.01)}
-.tab-underline{transition:all .3s cubic-bezier(.16,1,.3,1)}
-.timer-ring{transition:stroke-dashoffset 1s linear}
 .modal-backdrop{background:rgba(10,8,20,.72);backdrop-filter:blur(8px)}
 @keyframes modal-pop{from{opacity:0;transform:translateY(28px) scale(.94)}to{opacity:1;transform:translateY(0) scale(1)}}
 .modal-pop{animation:modal-pop .4s cubic-bezier(.16,1,.3,1) both}
@@ -89,15 +87,9 @@ html.light-theme .history-item{border-left-color:rgba(30,26,53,.12)}
 .guide-header:hover{background:rgba(255,255,255,.03)}
 .guide-body{padding:0 16px 16px;display:none}
 .guide-section.open .guide-body{display:block}
-.percentile-bar{height:8px;background:rgba(255,255,255,.08);border-radius:999px;position:relative;margin:8px 0}
-.percentile-marker{position:absolute;top:-4px;width:3px;height:16px;background:#5eead4;border-radius:2px}
 .task-item{transition:all .15s ease}.task-item:active{transform:scale(.985)}
-.brief-section{padding:12px 14px;border-radius:16px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);margin-bottom:10px}
-.brief-section-title{font-size:10px;font-weight:900;letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px}
 .rest-timer{font-variant-numeric:tabular-nums}
 .countdown-widget{background:linear-gradient(135deg,rgba(94,234,212,.15),rgba(196,181,253,.15));border:1px solid rgba(94,234,212,.3);border-radius:20px;padding:14px}
-.kcal-fill{transition:width .6s cubic-bezier(.16,1,.3,1)}
-.analysis-card{background:linear-gradient(135deg,rgba(255,255,255,.03),rgba(94,234,212,.04));border:1px solid rgba(94,234,212,.2);border-radius:20px;padding:16px}
 .analysis-section{padding:10px 0;border-bottom:1px solid rgba(255,255,255,.05)}
 .analysis-section:last-child{border-bottom:none}
 .analysis-title{font-size:11px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px;display:flex;align-items:center;gap:6px}
@@ -544,7 +536,6 @@ html.light-theme .history-item{border-left-color:rgba(30,26,53,.12)}
       <label class="block"><span class="text-[11px] text-neutral-400 ml-1 font-semibold">Wzrost ojca (cm):</span><input type="number" step="0.1" id="input-height-dad" placeholder="178" class="w-full mt-1 bg-white/5 border border-white/10 rounded-2xl px-3 py-2.5 text-neutral-100 font-semibold"></label>
       <label class="block"><span class="text-[11px] text-neutral-400 ml-1 font-semibold">Wzrost matki (cm):</span><input type="number" step="0.1" id="input-height-mom" placeholder="165" class="w-full mt-1 bg-white/5 border border-white/10 rounded-2xl px-3 py-2.5 text-neutral-100 font-semibold"></label>
       <label class="block"><span class="text-[11px] text-neutral-400 ml-1 font-semibold">Cel wagowy (kg):</span><input type="number" step="0.1" id="input-goal-weight-settings" placeholder="50.0" class="w-full mt-1 bg-white/5 border border-white/10 rounded-2xl px-3 py-2.5 text-neutral-100 font-semibold"></label>
-      <label class="flex items-center gap-3 cursor-pointer"><input type="checkbox" id="input-auto-theme" class="w-5 h-5 rounded-md accent-mint"><span class="text-sm font-medium flex-1">🌗 Auto-motyw dzień/noc</span></label>
       <div class="glass rounded-3xl p-4"><div class="text-[11px] text-neutral-400 font-bold mb-2">TWOJE BMI</div><div id="settings-bmi" class="text-2xl font-extrabold text-mint">—</div><div id="settings-bmi-label" class="text-xs text-neutral-400 font-medium mt-1">Wpisz wagę</div></div>
       <div class="glass rounded-3xl p-4"><div class="text-[11px] text-neutral-400 font-bold mb-2">KONTO</div><div id="settings-account" class="text-xs text-neutral-300 font-medium">Niezalogowany</div></div>
     </div>
@@ -605,7 +596,6 @@ function getSettings() {
     heightDad: parseFloat(localStorage.getItem("regim:height-dad")) || null,
     heightMom: parseFloat(localStorage.getItem("regim:height-mom")) || null,
     goalWeight: parseFloat(localStorage.getItem("regim:goal-weight")) || 50.0,
-    autoTheme: localStorage.getItem("regim:auto-theme") === "1",
   };
 }
 function saveSettings(s) {
@@ -615,12 +605,10 @@ function saveSettings(s) {
   if (s.heightDad != null) localStorage.setItem("regim:height-dad", String(s.heightDad));
   if (s.heightMom != null) localStorage.setItem("regim:height-mom", String(s.heightMom));
   localStorage.setItem("regim:goal-weight", String(s.goalWeight));
-  localStorage.setItem("regim:auto-theme", s.autoTheme ? "1" : "0");
 }
 function calcBMI(w, h) { if (!w || !h) return null; return w / ((h / 100) ** 2); }
 function bmiLabel(b) { if (b == null) return ""; if (b < 18.5) return "Niedowaga — buduj masę"; if (b < 25) return "Norma"; if (b < 30) return "Nadwaga"; return "Otyłość"; }
 function dateKey(date) { const y = date.getFullYear(); const m = String(date.getMonth() + 1).padStart(2, "0"); const d = String(date.getDate()).padStart(2, "0"); return `${y}-${m}-${d}`; }
-function average(arr) { return arr.length ? arr.reduce((a, b) => a + b, 0) / arr.length : null; }
 function escapeHtml(s) { const d = document.createElement("div"); d.textContent = s || ""; return d.innerHTML; }
 function showToast(msg) { const t = $("toast"); if (!t) return; t.textContent = msg; t.classList.remove("hidden"); clearTimeout(showToast._t); showToast._t = setTimeout(() => t.classList.add("hidden"), 2400); }
 function vibrate(pattern) { if (navigator.vibrate) navigator.vibrate(pattern); }
@@ -833,40 +821,9 @@ const todayKey = dateKey(todayObj);
 const todayDow = todayObj.getDay();
 
 const state = {
-  tasks: [], morning: {}, evening: {}, note: "", moodTags: [], dayTags: [],
+  tasks: [], morning: {}, evening: {}, note: "",
   lastMilestoneShown: null,
 };
-
-// ============================================================================
-// KEYWORDS
-// ============================================================================
-const KEYWORDS = {
-  sick: ["chory","choroba","gorączka","przeziębienie","katar","kaszel","grypa","ból głowy","migrena","osłabiony","rozbity","niedobrze","mdli","wymioty","boli","źle się czuję","przeziębiony","gorączkuję","infekcja","zapalenie","angina","temperatura","dreszcze"],
-  alcohol: ["piwo","wódka","alkohol","impreza","kac","wino","drink","pub","klub","popiłem","napiłem","browar","pijany","bal","wódzia"],
-  stress: ["stres","stresu","stresujący","deadline","egzamin","sprawdzian","kolokwium","szef","kłótnia","kłopot","problem","zawalony","presja","nerwy","zdenerwowany","panika","niepokój","spięty","napięty","przygnębiony","dołek","dół"],
-  travel: ["podróż","wyjazd","samolot","pociąg","lotnisko","wakacje","urlop","hotel","wyjechałem","podróżowałem","wycieczka"],
-  happy: ["dobry","świetny","super","radosny","wesoły","szczęśliwy","udany","wygrałem","wygrałam","zadowolony","euforia","mega","ekstra","zajebiście","świetnie","fantastycznie","genialnie","bosko","mocno","energia"],
-  tired: ["zmęczony","wyczerpany","padnięty","senny","bez siły","opary","ledwo żyję","słaby","senność","nie mam siły","wypompowany","zombie","spać","niedospany"],
-  motivated: ["zmotywowany","energia","moc","power","chce mi się","cisnę","daję radę","w pełni sił","nakręcony","gotowy","pełen energii","ogarniam"],
-  lazy: ["leniwy","nie chciało","nie chce","brak siły","leń","olewam","odpuszczam","nie chce mi się","brak motywacji","nie robiłem","nic nie robiłem"],
-  school: ["szkoła","lekcje","klasa","sprawdzian","kartkówka","test","nauczyciel","ocena","jedynka","dwójka","piątka","nauka","zadanie domowe","liceum","technikum"],
-  family: ["rodzina","mama","tata","brat","siostra","babcia","dziadek","ciocia","wujek","rodzice"],
-  lonely: ["sam","samotny","smutny","przygnębiony","dołek","depresja","płakałem","smutek","przygnębiająco","ponuro","źle","beznadzieja"],
-  success: ["rekord","pobity","poprawa","progres","nowy","najlepszy","osiągnąłem","sukces","udało się","zrobiłem","wygrałem","przeszedłem","pobiłem"],
-  injury: ["boli","kontuzja","skręcenie","uraz","kolano","bark","plecy","naderwanie","stłuczenie","zwichnięcie","ból","ból pleców","ból barku","ból kolana"],
-  conflict: ["kłótnia","awantura","pokłóciłem","zła","złość","wściekły","wkurzony","irytacja","nie fair","obrażony"],
-  cold: ["zimno","mróz","przemarzłem","zmarłem","chłodno","minus"],
-  love: ["dziewczyna","laska","zakochałem","miłość","serce","randka","podoba się","przyjemnie"],
-};
-function detectKeywords(text) {
-  if (!text) return [];
-  const lower = text.toLowerCase();
-  const found = new Set();
-  Object.entries(KEYWORDS).forEach(([cat, words]) => {
-    if (words.some(w => lower.includes(w))) found.add(cat);
-  });
-  return Array.from(found);
-}
 
 // ============================================================================
 // ADAPTACYJNY TRENING
@@ -929,26 +886,23 @@ function getTrainingLevel() {
 
 function buildTrainingTask() {
   const level = getTrainingLevel();
-
   if (level === "recovery") {
     return { id: "trening", label: "🌿 Recovery day", hint: "Sen/RHR złe — dziś tylko regeneracja", done: false, level: "recovery", extra: ["🚶 Spacer 20 min", "🫁 Oddech 4-7-8 (5 min)", "🧘 Rozciąganie 10 min", "💧 Dużo wody"] };
   }
-
   if (todayDow === 1) return { id: "trening", label: "🏊 Basen 1,5h", hint: level === "light" ? "Dziś lżej — 45 min zamiast 1,5h" : "Poniedziałek — dzień na wodę", done: false, level };
   if (todayDow === 2 || todayDow === 5) return { id: "trening", label: "🚴 Rower 7 km", hint: level === "light" ? "Dziś lżej — 4 km spokojnie" : "Stały, spokojny rytm", done: false, level };
   if (todayDow === 0) return { id: "trening", label: "🌅 Dzień wolny", hint: "Regeneracja — spacer opcjonalnie", done: false, level: "off" };
-
   if (level === "full") return { id: "trening", label: "💪 Kalistenika + hantle (FULL)", hint: "🔥 Pełny plan — sen i RHR idealne", done: false, level: "full", exercises: BASE_CALISTHENICS };
   if (level === "light") return { id: "trening", label: "💪 Kalistenika (LIGHT)", hint: "🟡 Lżejszy plan — mniej serii", done: false, level: "light", exercises: LIGHT_CALISTHENICS };
   return { id: "trening", label: "💪 Kalistenika + hantle", hint: "Standardowy plan", done: false, level: "normal", exercises: BASE_CALISTHENICS };
 }
 
 // ============================================================================
-// TASK CATEGORIES
+// TASK CATEGORIES  (D3 ×3)
 // ============================================================================
 const TASK_CATEGORIES = [
   { id: "suplementy", icon: "💊", name: "Suplementacja", color: "gold", tasks: [
-    { id: "d3", label: "D3 ×2 kapsułki", hint: "Rano, do tłuszczu", done: false },
+    { id: "d3", label: "D3 ×3 kapsułki", hint: "Rano, do tłuszczu", done: false },
     { id: "tran-r", label: "Tran rano", hint: "1 łyżka, do śniadania", done: false },
     { id: "tran-w", label: "Tran wieczór", hint: "1 łyżka, do kolacji", done: false },
     { id: "kreatyna", label: "Kreatyna 3 g", hint: "Do szejka lub wody", done: false },
@@ -991,7 +945,6 @@ function applyConditionalTasks() {
   state.tasks = TASK_CATEGORIES.flatMap(c => c.tasks).map(t => ({ id: t.id, label: t.label, done: t.done }));
 }
 function syncStateFromCategories() { state.tasks = TASK_CATEGORIES.flatMap(c => c.tasks).map(t => ({ id: t.id, label: t.label, done: t.done })); }
-function syncTasksFromState() { const savedIds = new Map(state.tasks.map(t => [t.id, t.done])); TASK_CATEGORIES.forEach(c => c.tasks.forEach(t => { if (savedIds.has(t.id)) t.done = savedIds.get(t.id); })); }
 function calcCompletionPct() { const done = state.tasks.filter(t => t.done).length; return state.tasks.length ? Math.round((done / state.tasks.length) * 100) : 0; }
 
 // ============================================================================
@@ -1066,7 +1019,7 @@ function renderProgress() {
 async function persistToday() {
   syncStateFromCategories();
   const existing = (await loadDayDoc(todayKey)) || {};
-  await saveDayDoc({ ...existing, date: todayKey, tasks: state.tasks, completedPct: calcCompletionPct(), note: state.note, moodTags: state.moodTags, dayTags: state.dayTags, morning: { ...(existing.morning || {}), ...state.morning }, evening: { ...(existing.evening || {}), ...state.evening }, updatedAt: Date.now() });
+  await saveDayDoc({ ...existing, date: todayKey, tasks: state.tasks, completedPct: calcCompletionPct(), note: state.note, morning: { ...(existing.morning || {}), ...state.morning }, evening: { ...(existing.evening || {}), ...state.evening }, updatedAt: Date.now() });
   await refreshStreak(); await renderImprovementTips(); renderReadiness(); checkDeload(); checkMilestone(); renderHealthWarnings();
 }
 async function refreshStreak() {
@@ -1136,7 +1089,7 @@ async function renderHealthWarnings() {
 }
 
 // ============================================================================
-// INTELIGENTNY CYTAT
+// CYTAT
 // ============================================================================
 function getPersonalQuote() {
   const m = state.morning || {};
@@ -1155,7 +1108,7 @@ function getPersonalQuote() {
 }
 
 // ============================================================================
-// IMPROVEMENT TIPS (FIXED)
+// IMPROVEMENT TIPS
 // ============================================================================
 async function renderImprovementTips() {
   const m = state.morning || {}; const e = state.evening || {};
@@ -1181,10 +1134,6 @@ async function renderImprovementTips() {
     tips.push({ icon: "⚡", text: `Zostało ${state.tasks.length - done} zadań.` });
   } else if (state.tasks.length > 0 && done === state.tasks.length) {
     tips.push({ icon: "🏆", text: "Wszystko zaliczone — LOCK IN!" });
-    const today = await loadDayDoc(todayKey);
-    if (today && !today.perfectDay) {
-      tips.push({ icon: "🔥", text: "Perfect day zaliczony — jutro nie odpuszczaj!" });
-    }
   }
 
   const box = $("improvement-tips");
@@ -1195,7 +1144,7 @@ async function renderImprovementTips() {
 }
 
 // ============================================================================
-// RAPORT TRENERA (brief)
+// BRIEF
 // ============================================================================
 async function renderBrief() {
   const el = $("brief-text"); if (!el) return;
@@ -1203,7 +1152,6 @@ async function renderBrief() {
   const readiness = calculateReadiness();
   const level = getTrainingLevel();
   const lines = [];
-
   if (m.sleepTotal != null) {
     if (m.sleepTotal >= 8) lines.push(`Sen ${m.sleepTotal.toFixed(1)}h — solidnie.`);
     else if (m.sleepTotal >= 7) lines.push(`Sen ${m.sleepTotal.toFixed(1)}h — ok, ale mogło być lepiej.`);
@@ -1215,15 +1163,38 @@ async function renderBrief() {
   if (level === "recovery") lines.push("→ Dziś recovery.");
   else if (level === "full") lines.push("→ FULL plan gotowy.");
   else if (level === "light") lines.push("→ Lżejszy trening.");
-
   const doneCount = state.tasks.filter(t => t.done).length;
   lines.push(`Zadania: ${doneCount}/${state.tasks.length}.`);
-
   el.textContent = lines.length ? lines.join(" ") : "Uzupełnij raport poranny żeby dostać brief.";
 }
 
 // ============================================================================
-// JEDZENIE — 60+ dań
+// KEYWORDS
+// ============================================================================
+const KEYWORDS = {
+  sick: ["chory","choroba","gorączka","przeziębienie","katar","kaszel","grypa","ból głowy","migrena","osłabiony","rozbity","niedobrze","mdli","wymioty","boli","źle się czuję","przeziębiony","gorączkuję","infekcja","zapalenie","angina","temperatura","dreszcze"],
+  alcohol: ["piwo","wódka","alkohol","impreza","kac","wino","drink","pub","klub","popiłem","napiłem","browar","pijany","bal","wódzia"],
+  stress: ["stres","stresu","stresujący","deadline","egzamin","sprawdzian","kolokwium","szef","kłótnia","kłopot","problem","zawalony","presja","nerwy","zdenerwowany","panika","niepokój","spięty","napięty","przygnębiony","dołek","dół"],
+  happy: ["dobry","świetny","super","radosny","wesoły","szczęśliwy","udany","wygrałem","zadowolony","euforia","mega","ekstra","świetnie","fantastycznie","genialnie","energia"],
+  tired: ["zmęczony","wyczerpany","padnięty","senny","bez siły","ledwo żyję","słaby","senność","nie mam siły","wypompowany","zombie","spać","niedospany"],
+  motivated: ["zmotywowany","energia","moc","chce mi się","cisnę","daję radę","nakręcony","gotowy","ogarniam"],
+  lazy: ["leniwy","nie chciało","nie chce","brak siły","leń","olewam","odpuszczam","nie chce mi się","brak motywacji"],
+  injury: ["kontuzja","skręcenie","uraz","naderwanie","stłuczenie","zwichnięcie","ból pleców","ból barku","ból kolana"],
+  lonely: ["samotny","smutny","przygnębiony","depresja","płakałem","smutek","beznadzieja"],
+  success: ["rekord","pobity","poprawa","progres","sukces","udało się","pobiłem"],
+};
+function detectKeywords(text) {
+  if (!text) return [];
+  const lower = text.toLowerCase();
+  const found = new Set();
+  Object.entries(KEYWORDS).forEach(([cat, words]) => {
+    if (words.some(w => lower.includes(w))) found.add(cat);
+  });
+  return Array.from(found);
+}
+
+// ============================================================================
+// JEDZENIE
 // ============================================================================
 const FOOD_DB = {
   breakfast: [
@@ -1374,16 +1345,14 @@ async function generateFullAnalysis() {
   const ym = yesterday.morning || {};
   const kws = detectKeywords(today.note);
 
-  const sleep7 = past7.map(d => d.morning?.sleepTotal).filter(v => v != null);
-  const rhr7 = past7.map(d => d.morning?.rhr).filter(v => v != null);
-  const stress7 = past7.map(d => d.evening?.stress).filter(v => v != null);
-  const steps7 = past7.map(d => d.evening?.steps).filter(v => v != null);
-  const mood7 = past7.map(d => d.morning?.moodMorning).filter(v => v != null);
-  const weight7 = past7.map(d => d.morning?.dailyWeight).filter(v => v != null);
-
   const avg = (arr) => arr.length ? arr.reduce((a, b) => a + b, 0) / arr.length : null;
-  const avgSleep = avg(sleep7), avgRhr = avg(rhr7), avgStress = avg(stress7);
-  const avgSteps = avg(steps7), avgMood = avg(mood7), avgWeight = avg(weight7);
+  const avgSleep = avg(past7.map(d => d.morning?.sleepTotal).filter(v => v != null));
+  const avgRhr = avg(past7.map(d => d.morning?.rhr).filter(v => v != null));
+  const avgStress = avg(past7.map(d => d.evening?.stress).filter(v => v != null));
+  const avgSteps = avg(past7.map(d => d.evening?.steps).filter(v => v != null));
+  const avgMood = avg(past7.map(d => d.morning?.moodMorning).filter(v => v != null));
+  const avgWeight = avg(past7.map(d => d.morning?.dailyWeight).filter(v => v != null));
+
   const readiness = calculateReadiness();
   const level = getTrainingLevel();
   const sections = [];
@@ -1405,10 +1374,7 @@ async function generateFullAnalysis() {
         if (r < 0.13) b += " Mało głębokiego — bez niego nie ma hormonu wzrostu.";
       }
       if (m.sleepRem != null) b += ` REM: <strong>${m.sleepRem.toFixed(2)}h</strong>.`;
-      if (m.sleepWakes != null) {
-        if (m.sleepWakes >= 3) b += ` <em>${m.sleepWakes} pobudek</em> — coś wybudza. Telefon? Za ciepło?`;
-        else if (m.sleepWakes >= 1) b += ` Pobudki: ${m.sleepWakes}.`;
-      }
+      if (m.sleepWakes != null && m.sleepWakes >= 3) b += ` <em>${m.sleepWakes} pobudek</em> — coś wybudza. Telefon? Za ciepło?`;
       if (avgSleep != null) b += ` ${trendLabel(s, avgSleep)}.`;
     }
     sections.push(sec("Sen", "🌙", b, "#c4b5fd"));
@@ -1444,7 +1410,7 @@ async function generateFullAnalysis() {
       if (readiness >= 80) b += "Możesz dziś napierdalać — pełny plan, ciężkie serie.";
       else if (readiness >= 60) b += "Standardowy trening — nic na siłę, nic na odpierdol.";
       else if (readiness >= 40) b += "Lżejszy dzień. Technika > ciężar.";
-      else b += "<em>Niska gotowość.</em> Recovery day: spacer, oddech, rozciąganie. Siłowanie się z organizmem nic nie da.";
+      else b += "<em>Niska gotowość.</em> Recovery day: spacer, oddech, rozciąganie.";
     }
     if (level === "recovery") b += " Dziś poziom: <em>RECOVERY</em>.";
     else if (level === "light") b += " Poziom: <em>LIGHT</em>.";
@@ -1880,7 +1846,7 @@ const GUIDE_SECTIONS = [
   { icon: "💪", title: "Trening — kalistenika + hantle", body: "3-4 treningi w tygodniu. Bazowe ruchy: pompki (klatka, triceps, barki), przysiady (nogi, pośladki), deska (core), hantle (barki, biceps). Postępuj stopniowo — dodawaj 1 powtórzenie co tydzień. Forma > ciężar." },
   { icon: "🧴", title: "Skóra — walka z trądzikiem", body: "Tołpa/Ziaja rano i wieczorem, Acnederm punktowo na wypryski, Cetaphil krem nawilżający. Nie wyciskaj — blizny zostają na lata. Zmieniaj poszewkę co tydzień. Unikaj cukru i mleka krowiego (może zaostrzać acne)." },
   { icon: "🧠", title: "Głowa — stres i nastrój", body: "Oddech 4-7-8 (wdech 4s, trzymaj 7s, wydech 8s) — 5 minut dziennie. Medytacja 10 min. Wyjdź z domu, pogadaj z kimś. Samotność i stres obniżają testosteron i hamują wzrost. Dbaj o psychikę jak o mięśnie." },
-  { icon: "💊", title: "Suplementacja — co i dlaczego", body: "D3 ×2 (2000-4000 IU) z tłuszczem — kości, hormony, odporność. Tran rano i wieczorem — omega-3 DHA/EPA, mózg i skóra. Kreatyna 3g — siła, uwodnienie mięśni, kognicja. Woda 2.5L — bez tego kreatyna nie działa. Mleko 1-2 szklanki — białko, wapń, kalorie." },
+  { icon: "💊", title: "Suplementacja — co i dlaczego", body: "D3 ×3 (3000-6000 IU) z tłuszczem — kości, hormony, odporność. Tran rano i wieczorem — omega-3 DHA/EPA, mózg i skóra. Kreatyna 3g — siła, uwodnienie mięśni, kognicja. Woda 2.5L — bez tego kreatyna nie działa. Mleko 1-2 szklanki — białko, wapń, kalorie." },
   { icon: "📏", title: "Pomiary — co i kiedy", body: "Wzrost: rano, boso, plecy do ściany, 1. dnia miesiąca. Obwody: klatka, talia, biceps — 1. dnia miesiąca. Waga: codziennie rano po toalecie. RHR: codziennie rano przed wstaniem. Systematyczność = klucz do śledzenia progresu." },
 ];
 
@@ -1901,7 +1867,7 @@ const KNOWLEDGE_BASE = [
   { title: "Testosteron", body: "Rośnie przez: sen 7-9h, trening siłowy, tłuszcze zwierzęce, witaminę D, cynk. Spada przez: stres, alkohol, niedobór snu, otyłość." },
   { title: "Białko — ile i kiedy", body: "1.7g/kg masy ciała = 75-100g dla Ciebie. Rozłożone na 4-5 posiłków po 25-40g. Okno anaboliczne 2h po treningu. Twaróg przed snem = kazeina = wolne uwalnianie." },
   { title: "Kreatyna", body: "3-5g dziennie, bez ładowania. Zwiększa siłę, masę, uwodnienie mięśni. Wymaga 2.5-3L wody dziennie. Najlepiej z posiłkiem węglowodanowym." },
-  { title: "Witamina D3", body: "2000-4000 IU dziennie, z tłuszczem (wchłania się w tłuszczu). Kluczowa dla kości, odporności, testosteronu. Zimą w Polsce praktycznie każdy ma niedobór." },
+  { title: "Witamina D3", body: "3000-6000 IU dziennie, z tłuszczem (wchłania się w tłuszczu). Kluczowa dla kości, odporności, testosteronu. Zimą w Polsce praktycznie każdy ma niedobór." },
   { title: "Tran (omega-3)", body: "DHA + EPA. Mózg, wzrok, serce, skóra. Redukuje stany zapalne (pomaga przy acne). 1 łyżka = 1000mg omega-3. Rano i wieczorem." },
   { title: "Acne — jak walczyć", body: "Higiena (Tołpa, Acnederm, Cetaphil), dieta (mniej cukru i mleka), sen 8h+, stres minimum. Nie wyciskaj. Jeśli nie pomaga 3 miesiące — dermatolog." },
   { title: "Wzrost — ile jeszcze", body: "U chłopaków skok wzrostowy trwa do 16-18 lat, kończy się ok. 18-21. Ostatnie 2-3 lata to wolniejsze tempo. Sen, jedzenie, hormony = twój potencjał genetyczny." },
@@ -1958,7 +1924,6 @@ function openModal(id) { const m = $(id); if (m) { m.classList.remove("hidden");
 function closeModal(m) { if (m) { m.classList.add("hidden"); document.body.style.overflow = ""; } }
 document.querySelectorAll("[data-close-modal]").forEach(el => el.addEventListener("click", () => closeModal(el.closest(".modal-wrap"))));
 
-// TABS
 document.querySelectorAll(".tab-btn").forEach(btn => {
   btn.addEventListener("click", () => {
     document.querySelectorAll(".tab-btn").forEach(b => {
@@ -1999,7 +1964,6 @@ document.querySelectorAll("[data-food-tab]").forEach(btn => {
 });
 $("btn-roll-food")?.addEventListener("click", rollFoodPlan);
 
-// MORNING FORM
 $("form-morning")?.addEventListener("submit", async (e) => {
   e.preventDefault();
   const g = (id) => { const v = $(id)?.value; return v === "" ? null : parseFloat(v); };
@@ -2021,7 +1985,6 @@ $("form-morning")?.addEventListener("submit", async (e) => {
   if ($("quote-day")) $("quote-day").textContent = getPersonalQuote();
 });
 
-// EVENING FORM
 $("form-evening")?.addEventListener("submit", async (e) => {
   e.preventDefault();
   const g = (id) => { const v = $(id)?.value; return v === "" ? null : parseFloat(v); };
@@ -2036,7 +1999,6 @@ $("form-evening")?.addEventListener("submit", async (e) => {
     completedAt: Date.now(),
   };
   state.note = $("input-note")?.value || "";
-  state.dayTags = Array.from(document.querySelectorAll("#day-tags .tag-chip.active")).map(b => b.dataset.tag);
   await persistToday();
   showToast("✅ Podsumowanie dnia zapisane");
   await renderAutoAnalysis();
@@ -2044,16 +2006,13 @@ $("form-evening")?.addEventListener("submit", async (e) => {
   if (box && !box.classList.contains("hidden")) box.scrollIntoView({ behavior: "smooth", block: "start" });
 });
 
-// MOOD SLIDERS
 $("input-mood-morning")?.addEventListener("input", (e) => { $("mood-morning-value").textContent = e.target.value; });
 $("input-mood-evening")?.addEventListener("input", (e) => { $("mood-evening-value").textContent = e.target.value; });
 
-// TAGS
 document.querySelectorAll(".tag-chip").forEach(chip => {
   chip.addEventListener("click", () => chip.classList.toggle("active"));
 });
 
-// BTN ANALYZE
 $("btn-analyze-ai")?.addEventListener("click", async () => {
   const label = $("ai-btn-label"); const spinner = $("ai-btn-spinner"); const box = $("ai-result-box"); const text = $("ai-result-text");
   spinner?.classList.remove("hidden"); if (label) label.textContent = "Analizuję...";
@@ -2069,13 +2028,11 @@ $("btn-analyze-ai")?.addEventListener("click", async () => {
 
 $("btn-toggle-analysis")?.addEventListener("click", () => { $("auto-analysis-content")?.classList.toggle("hidden"); });
 
-// SETTINGS
 $("btn-settings")?.addEventListener("click", () => {
   const s = getSettings();
   $("input-name").value = s.name; $("input-age").value = s.age; $("input-height").value = s.height;
   $("input-height-dad").value = s.heightDad || ""; $("input-height-mom").value = s.heightMom || "";
   $("input-goal-weight-settings").value = s.goalWeight;
-  $("input-auto-theme").checked = s.autoTheme;
   const w = lastWeight(); if (w && s.height) { const bmi = calcBMI(w, s.height); $("settings-bmi").textContent = bmi.toFixed(1); $("settings-bmi-label").textContent = bmiLabel(bmi); }
   openModal("modal-settings");
 });
@@ -2087,34 +2044,29 @@ $("btn-settings-save")?.addEventListener("click", () => {
     heightDad: parseFloat($("input-height-dad").value) || null,
     heightMom: parseFloat($("input-height-mom").value) || null,
     goalWeight: parseFloat($("input-goal-weight-settings").value) || 50,
-    autoTheme: $("input-auto-theme").checked,
   });
   showToast("✅ Zapisano");
   closeModal($("modal-settings"));
   renderCialo();
 });
 
-// GLOWUP etc
 $("btn-glowup-refresh")?.addEventListener("click", () => { renderGlowUp(); renderCorrelation(); });
 $("btn-history-refresh")?.addEventListener("click", renderAnalysisHistory);
 $("btn-weekly-summary")?.addEventListener("click", renderWeeklySummary);
 $("btn-refresh-brief")?.addEventListener("click", renderBrief);
 
-// BREATHING + REST
 $("btn-breath-start")?.addEventListener("click", startBreathing);
 $("btn-breath-stop")?.addEventListener("click", stopBreathing);
 $("btn-rest-start")?.addEventListener("click", startRest);
 $("btn-rest-stop")?.addEventListener("click", stopRest);
 document.querySelectorAll(".rest-time-btn").forEach(b => b.addEventListener("click", () => { restSeconds = parseInt(b.dataset.rest); $("rest-timer-display").textContent = `00:${String(restSeconds).padStart(2, "0")}`; }));
 
-// THEME
 $("btn-theme-toggle")?.addEventListener("click", () => {
   const isLight = document.documentElement.classList.toggle("light-theme");
   $("theme-icon").className = isLight ? "fa-solid fa-sun" : "fa-solid fa-moon";
   localStorage.setItem("regim:theme", isLight ? "light" : "dark");
 });
 
-// EXPORT
 $("btn-export")?.addEventListener("click", async () => {
   const days = await collectAllDays();
   const blob = new Blob([JSON.stringify(days, null, 2)], { type: "application/json" });
@@ -2124,13 +2076,11 @@ $("btn-export")?.addEventListener("click", async () => {
   showToast("✅ Eksport gotowy");
 });
 
-// INSTALL
 let deferredPrompt = null;
 window.addEventListener("beforeinstallprompt", (e) => { e.preventDefault(); deferredPrompt = e; $("install-banner")?.classList.remove("hidden"); });
 $("btn-install")?.addEventListener("click", async () => { if (deferredPrompt) { deferredPrompt.prompt(); await deferredPrompt.userChoice; deferredPrompt = null; $("install-banner")?.classList.add("hidden"); } });
 $("btn-install-dismiss")?.addEventListener("click", () => $("install-banner")?.classList.add("hidden"));
 
-// CALENDAR NAV
 $("cal-prev")?.addEventListener("click", () => { calMonth.setMonth(calMonth.getMonth() - 1); renderCalendar(); });
 $("cal-next")?.addEventListener("click", () => { calMonth.setMonth(calMonth.getMonth() + 1); renderCalendar(); });
 
@@ -2240,16 +2190,24 @@ async function bootApp() {
     if ($("theme-icon")) $("theme-icon").className = "fa-solid fa-sun";
   }
 
+  // ── FIX: wczytaj zapisane zadania zanim nadpiszesz je świeżymi ──
   const today = await loadDayDoc(todayKey);
-  if (today) {
-    state.tasks = today.tasks || [];
-    state.morning = today.morning || {};
-    state.evening = today.evening || {};
-    state.note = today.note || "";
-  }
+  const savedTasks = today?.tasks || [];
+  state.morning = today?.morning || {};
+  state.evening = today?.evening || {};
+  state.note = today?.note || "";
 
   applyConditionalTasks();
-  syncTasksFromState();
+
+  // Odtwórz stany 'done' z zapisanych zadań
+  if (savedTasks.length) {
+    const savedMap = new Map(savedTasks.map(t => [t.id, t.done]));
+    TASK_CATEGORIES.forEach(c => c.tasks.forEach(t => {
+      if (savedMap.has(t.id)) t.done = savedMap.get(t.id);
+    }));
+  }
+  syncStateFromCategories();
+
   renderTasksByCategory();
   renderProgress();
   await refreshStreak();
