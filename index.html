@@ -82,12 +82,15 @@ html.light-theme .history-item{border-left-color:rgba(30,26,53,.12)}
 #sync-status.syncing{background:rgba(251,191,36,.15);color:#fbbf24}
 #sync-status.synced{background:rgba(94,234,212,.15);color:#5eead4}
 .warning-card{background:linear-gradient(135deg,rgba(251,113,133,.12),rgba(251,191,36,.08));border:1px solid rgba(251,113,133,.35);border-radius:16px;padding:12px}
+.info-card{background:linear-gradient(135deg,rgba(94,234,212,.1),rgba(196,181,253,.08));border:1px solid rgba(94,234,212,.3);border-radius:16px;padding:12px}
 .guide-section{background:rgba(255,255,255,.03);border-radius:20px;border:1px solid rgba(255,255,255,.06);overflow:hidden}
 .guide-header{padding:14px 16px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;transition:background .2s}
 .guide-header:hover{background:rgba(255,255,255,.03)}
 .guide-body{padding:0 16px 16px;display:none}
 .guide-section.open .guide-body{display:block}
 .task-item{transition:all .15s ease}.task-item:active{transform:scale(.985)}
+.task-item.optional{opacity:.75}
+.task-item.optional .opt-badge{background:rgba(196,181,253,.15);color:#c4b5fd}
 .rest-timer{font-variant-numeric:tabular-nums}
 .countdown-widget{background:linear-gradient(135deg,rgba(94,234,212,.15),rgba(196,181,253,.15));border:1px solid rgba(94,234,212,.3);border-radius:20px;padding:14px}
 .analysis-section{padding:10px 0;border-bottom:1px solid rgba(255,255,255,.05)}
@@ -97,6 +100,9 @@ html.light-theme .history-item{border-left-color:rgba(30,26,53,.12)}
 .analysis-body strong{color:#5eead4;font-weight:700}
 .analysis-body em{color:#fbbf9d;font-style:normal;font-weight:700}
 .food-card{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:18px;padding:12px;margin-bottom:8px}
+.glass-mini{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:14px}
+.water-btn{transition:all .2s;cursor:pointer}
+.water-btn:active{transform:scale(.92)}
 </style>
 </head>
 <body class="text-neutral-100 font-sans min-h-screen pb-28">
@@ -171,6 +177,20 @@ html.light-theme .history-item{border-left-color:rgba(30,26,53,.12)}
     </div>
   </div>
 
+  <!-- BANNER: 1. dzień miesiąca -->
+  <div id="monthly-measure-banner" class="hidden mb-4 rise">
+    <div class="glass rounded-3xl p-4 border border-gold/40 milestone-glow">
+      <div class="flex items-start gap-3">
+        <div class="text-2xl">📏</div>
+        <div class="flex-1 min-w-0">
+          <div class="font-bold text-sm text-gold">1. dzień miesiąca — czas na pomiary!</div>
+          <p class="text-xs text-neutral-200 font-medium leading-relaxed mt-1">Zmierzyć: wzrost (rano, boso, plecy do ściany), obwody (klatka, talia, biceps). Wpisz w Ustawieniach potem.</p>
+        </div>
+        <button id="btn-measure-dismiss" class="text-neutral-500 w-6 h-6 flex items-center justify-center flex-shrink-0"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+    </div>
+  </div>
+
   <div id="health-warnings" class="hidden mb-4 space-y-2"></div>
 
   <div class="glass rounded-3xl px-4 py-3 mb-5 overflow-hidden">
@@ -212,6 +232,49 @@ html.light-theme .history-item{border-left-color:rgba(30,26,53,.12)}
       </div>
     </div>
 
+    <!-- KARTA: Suplementacja -->
+    <div class="glass rounded-4xl p-5 shadow-warm border border-gold/20">
+      <div class="flex items-center justify-between mb-3">
+        <div class="flex items-center gap-2"><i class="fa-solid fa-capsules text-gold"></i><span class="font-bold text-sm text-gold">Dzisiejsza suplementacja</span></div>
+        <span id="supp-status-badge" class="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-mint/15 text-mint">—</span>
+      </div>
+      <div class="space-y-2.5">
+        <div>
+          <div class="flex items-center justify-between text-xs mb-1">
+            <span class="font-bold text-neutral-200">Witamina D3</span>
+            <span id="supp-d3-text" class="font-extrabold text-gold">0 / 4000 IU</span>
+          </div>
+          <div class="h-2 bg-white/5 rounded-full overflow-hidden"><div id="supp-d3-bar" class="progress-fill h-full rounded-full bg-gradient-to-r from-gold to-peach" style="width:0%"></div></div>
+          <div id="supp-d3-hint" class="text-[10px] text-neutral-500 font-medium mt-1">Cel: do 4000 IU dziennie</div>
+        </div>
+        <div>
+          <div class="flex items-center justify-between text-xs mb-1">
+            <span class="font-bold text-neutral-200">Witamina A</span>
+            <span id="supp-a-text" class="font-extrabold text-peach">0 / 9000 IU</span>
+          </div>
+          <div class="h-2 bg-white/5 rounded-full overflow-hidden"><div id="supp-a-bar" class="progress-fill h-full rounded-full bg-gradient-to-r from-peach to-rose" style="width:0%"></div></div>
+        </div>
+        <div id="supp-warning" class="hidden warning-card text-xs text-neutral-200 font-medium leading-relaxed"></div>
+      </div>
+    </div>
+
+    <!-- KARTA: Nawodnienie -->
+    <div class="glass rounded-4xl p-5 shadow-soft border border-mint/20">
+      <div class="flex items-center justify-between mb-3">
+        <div class="flex items-center gap-2"><i class="fa-solid fa-droplet text-mint"></i><span class="font-bold text-sm text-mint">Nawodnienie</span></div>
+        <span id="water-pct" class="text-[10px] font-extrabold text-mint">0%</span>
+      </div>
+      <div class="h-3 bg-white/5 rounded-full overflow-hidden mb-2"><div id="water-bar" class="progress-fill h-full rounded-full bg-gradient-to-r from-mint to-lilac" style="width:0%"></div></div>
+      <div class="flex items-center justify-between mb-3">
+        <div class="text-xs font-bold text-neutral-200"><span id="water-ml">0</span> / 2500 ml</div>
+        <div class="text-xs font-bold text-neutral-400"><span id="water-glasses">0</span> szklanek</div>
+      </div>
+      <div class="flex gap-2">
+        <button id="btn-water-add" class="flex-1 water-btn py-2.5 rounded-2xl bg-gradient-to-br from-mint to-lilac text-ink font-extrabold text-sm">+ Szklanka 250 ml</button>
+        <button id="btn-water-reset" class="water-btn px-4 py-2.5 rounded-2xl glass font-bold text-xs text-neutral-400">Reset</button>
+      </div>
+    </div>
+
     <div class="glass rounded-3xl px-4 py-3 shadow-soft flex items-center gap-3">
       <i class="fa-solid fa-quote-left text-mint text-sm flex-shrink-0"></i>
       <p id="quote-day" class="text-xs text-neutral-300 font-semibold leading-snug">Ładuję...</p>
@@ -249,7 +312,7 @@ html.light-theme .history-item{border-left-color:rgba(30,26,53,.12)}
         <label class="block"><span class="text-[11px] text-neutral-400 ml-1 font-semibold">Śr. tętno snu:</span>
           <input type="number" id="input-sleep-hr" placeholder="58" class="w-full mt-1 bg-white/5 border border-white/10 rounded-2xl px-3 py-2.5 text-neutral-100 font-semibold focus:outline-none focus:border-mint transition"></label>
         <label class="block"><span class="text-[11px] text-mint ml-1 font-bold">RHR rano:</span>
-          <input type="number" id="input-rhr" placeholder="62" class="w-full mt-1 bg-mint/10 border border-mint/30 rounded-2xl px-3 py-2.5 text-neutral-100 font-semibold focus:outline-none focus:border-mint transition"></label>
+          <input type="number" id="input-rhr" placeholder="72" class="w-full mt-1 bg-mint/10 border border-mint/30 rounded-2xl px-3 py-2.5 text-neutral-100 font-semibold focus:outline-none focus:border-mint transition"></label>
         <label class="block"><span class="text-[11px] text-lilac ml-1 font-bold">Punkty oddychania:</span>
           <input type="number" min="0" max="100" id="input-breathing" placeholder="95" class="w-full mt-1 bg-lilac/10 border border-lilac/30 rounded-2xl px-3 py-2.5 text-neutral-100 font-semibold focus:outline-none focus:border-lilac transition"></label>
         <label class="block col-span-2"><span class="text-[11px] text-gold ml-1 font-bold">Waga (kg):</span>
@@ -384,7 +447,6 @@ html.light-theme .history-item{border-left-color:rgba(30,26,53,.12)}
     <div class="glass rounded-4xl p-5 shadow-warm"><div class="flex items-center gap-2 mb-3"><i class="fa-solid fa-chart-line text-lilac"></i><span class="font-bold text-base">Tracker wzrostu</span></div><canvas id="chart-height" height="140"></canvas><div class="text-[10px] text-neutral-500 font-medium mt-2 text-center">Pomiar 1. dnia miesiąca</div></div>
     <div class="glass rounded-4xl p-5 shadow-warm"><div class="flex items-center gap-2 mb-3"><i class="fa-solid fa-ruler-horizontal text-peach"></i><span class="font-bold text-base">Obwody ciała</span></div><canvas id="chart-measures" height="140"></canvas><div class="text-[10px] text-neutral-500 font-medium mt-2 text-center">Klatka / talia / biceps — 1. dnia miesiąca</div></div>
     <div class="glass rounded-4xl p-5 shadow-warm"><div class="flex items-center gap-2 mb-3"><i class="fa-solid fa-bed text-lilac"></i><span class="font-bold text-base">Dług senny (7 dni)</span></div><div id="sleep-debt" class="text-sm text-neutral-200 leading-relaxed font-medium">Ładuję...</div></div>
-    <div class="glass rounded-4xl p-5 shadow-warm"><div class="flex items-center gap-2 mb-3"><i class="fa-solid fa-fire text-gold"></i><span class="font-bold text-base">Ostatni dzień...</span></div><div id="last-day-tracker" class="space-y-2"></div></div>
     <div class="glass rounded-4xl p-5 shadow-warm"><div class="flex items-center gap-2 mb-3"><i class="fa-solid fa-dumbbell text-mint"></i><span class="font-bold text-base">Wykres treningów — tydzień</span></div><canvas id="chart-strength" height="140"></canvas></div>
     <div class="glass rounded-4xl p-5 shadow-warm"><div class="flex items-center gap-2 mb-3"><i class="fa-solid fa-ranking-star text-mint"></i><span class="font-bold text-base">Co wpływa na wzrost</span></div><div id="growth-factors" class="space-y-2"></div></div>
   </section>
@@ -536,6 +598,17 @@ html.light-theme .history-item{border-left-color:rgba(30,26,53,.12)}
       <label class="block"><span class="text-[11px] text-neutral-400 ml-1 font-semibold">Wzrost ojca (cm):</span><input type="number" step="0.1" id="input-height-dad" placeholder="178" class="w-full mt-1 bg-white/5 border border-white/10 rounded-2xl px-3 py-2.5 text-neutral-100 font-semibold"></label>
       <label class="block"><span class="text-[11px] text-neutral-400 ml-1 font-semibold">Wzrost matki (cm):</span><input type="number" step="0.1" id="input-height-mom" placeholder="165" class="w-full mt-1 bg-white/5 border border-white/10 rounded-2xl px-3 py-2.5 text-neutral-100 font-semibold"></label>
       <label class="block"><span class="text-[11px] text-neutral-400 ml-1 font-semibold">Cel wagowy (kg):</span><input type="number" step="0.1" id="input-goal-weight-settings" placeholder="50.0" class="w-full mt-1 bg-white/5 border border-white/10 rounded-2xl px-3 py-2.5 text-neutral-100 font-semibold"></label>
+
+      <div class="pt-3 border-t border-white/10">
+        <div class="text-[11px] text-gold font-extrabold tracking-widest uppercase mb-3"><i class="fa-solid fa-capsules mr-1"></i>Moje suplementy</div>
+        <div class="space-y-3">
+          <label class="block"><span class="text-[11px] text-neutral-400 ml-1 font-semibold">1 tabletka D3 (IU):</span><input type="number" id="input-d3-iu" placeholder="2000" class="w-full mt-1 bg-white/5 border border-white/10 rounded-2xl px-3 py-2.5 text-neutral-100 font-semibold"></label>
+          <label class="block"><span class="text-[11px] text-neutral-400 ml-1 font-semibold">1 łyżeczka tranu (ml):</span><input type="number" step="0.5" id="input-tran-ml" placeholder="5" class="w-full mt-1 bg-white/5 border border-white/10 rounded-2xl px-3 py-2.5 text-neutral-100 font-semibold"></label>
+          <label class="block"><span class="text-[11px] text-neutral-400 ml-1 font-semibold">D3 w 1 łyżeczce tranu (IU):</span><input type="number" id="input-tran-d3-iu" placeholder="400" class="w-full mt-1 bg-white/5 border border-white/10 rounded-2xl px-3 py-2.5 text-neutral-100 font-semibold"></label>
+          <label class="block"><span class="text-[11px] text-neutral-400 ml-1 font-semibold">Wit. A w 1 łyżeczce tranu (IU):</span><input type="number" id="input-tran-a-iu" placeholder="766" class="w-full mt-1 bg-white/5 border border-white/10 rounded-2xl px-3 py-2.5 text-neutral-100 font-semibold"></label>
+        </div>
+      </div>
+
       <div class="glass rounded-3xl p-4"><div class="text-[11px] text-neutral-400 font-bold mb-2">TWOJE BMI</div><div id="settings-bmi" class="text-2xl font-extrabold text-mint">—</div><div id="settings-bmi-label" class="text-xs text-neutral-400 font-medium mt-1">Wpisz wagę</div></div>
       <div class="glass rounded-3xl p-4"><div class="text-[11px] text-neutral-400 font-bold mb-2">KONTO</div><div id="settings-account" class="text-xs text-neutral-300 font-medium">Niezalogowany</div></div>
     </div>
@@ -596,6 +669,10 @@ function getSettings() {
     heightDad: parseFloat(localStorage.getItem("regim:height-dad")) || null,
     heightMom: parseFloat(localStorage.getItem("regim:height-mom")) || null,
     goalWeight: parseFloat(localStorage.getItem("regim:goal-weight")) || 50.0,
+    d3Iu: parseInt(localStorage.getItem("regim:d3-iu")) || 2000,
+    tranMl: parseFloat(localStorage.getItem("regim:tran-ml")) || 5,
+    tranD3Iu: parseInt(localStorage.getItem("regim:tran-d3-iu")) || 400,
+    tranAIu: parseInt(localStorage.getItem("regim:tran-a-iu")) || 766,
   };
 }
 function saveSettings(s) {
@@ -605,6 +682,10 @@ function saveSettings(s) {
   if (s.heightDad != null) localStorage.setItem("regim:height-dad", String(s.heightDad));
   if (s.heightMom != null) localStorage.setItem("regim:height-mom", String(s.heightMom));
   localStorage.setItem("regim:goal-weight", String(s.goalWeight));
+  localStorage.setItem("regim:d3-iu", String(s.d3Iu));
+  localStorage.setItem("regim:tran-ml", String(s.tranMl));
+  localStorage.setItem("regim:tran-d3-iu", String(s.tranD3Iu));
+  localStorage.setItem("regim:tran-a-iu", String(s.tranAIu));
 }
 function calcBMI(w, h) { if (!w || !h) return null; return w / ((h / 100) ** 2); }
 function bmiLabel(b) { if (b == null) return ""; if (b < 18.5) return "Niedowaga — buduj masę"; if (b < 25) return "Norma"; if (b < 30) return "Nadwaga"; return "Otyłość"; }
@@ -729,7 +810,7 @@ async function loadDaysRange(n, offset) {
 }
 
 // ============================================================================
-// MIGRACJA + AUTH
+// AUTH
 // ============================================================================
 async function migrateLocalToCloud() {
   if (migrateDone || !isCloud()) return;
@@ -826,6 +907,58 @@ const state = {
 };
 
 // ============================================================================
+// RHR — dynamiczne progi wg wieku
+// ============================================================================
+function getRhrRange(age) {
+  if (!age || age < 6) return { min: 75, max: 120, label: "małe dzieci" };
+  if (age < 12) return { min: 70, max: 110, label: "dzieci 6-11" };
+  if (age < 18) return { min: 60, max: 90, label: "nastolatki 12-17" };
+  if (age < 65) return { min: 60, max: 100, label: "dorośli" };
+  return { min: 60, max: 100, label: "seniorzy" };
+}
+
+function analyzeRhr(rhr, age, avg7Rhr) {
+  // zwraca: { status: 'no-data'|'normal'|'high'|'very-high'|'low-sport'|'low-alarm'|'spike', message }
+  if (rhr == null) return { status: "no-data" };
+  const range = getRhrRange(age);
+  const pctAboveAvg = (avg7Rhr && avg7Rhr > 0) ? ((rhr - avg7Rhr) / avg7Rhr) * 100 : 0;
+
+  // Priorytet: >15% vs średnia 7d
+  if (avg7Rhr != null && pctAboveAvg >= 15) {
+    return {
+      status: "spike",
+      message: `<strong>${rhr} bpm</strong> — skok <em>+${pctAboveAvg.toFixed(0)}%</em> względem średniej 7d (${avg7Rhr.toFixed(0)} bpm). Możliwe: początek choroby, przemęczenie, stres. Obserwuj dziś, nie forsuj treningu.`
+    };
+  }
+  // Powyżej górnej granicy
+  if (rhr > range.max) {
+    return {
+      status: "high",
+      message: `<strong>${rhr} bpm</strong> — powyżej normy dla Twojego wieku (${range.min}–${range.max} bpm). Odpocznij, dużo wody, sprawdź czy nie zaczynasz się przeziębiać.`
+    };
+  }
+  // Poniżej dolnej granicy
+  if (rhr < range.min && rhr >= 50) {
+    return {
+      status: "low-sport",
+      message: `<strong>${rhr} bpm</strong> — poniżej typowej normy (${range.min}–${range.max}), ale przy regularnej aktywności to normalne (sportowa bradykardia). Nie ma się czym stresować.`
+    };
+  }
+  // Bardzo niskie <50
+  if (rhr < 50) {
+    return {
+      status: "low-alarm",
+      message: `<strong>${rhr} bpm</strong> — dość niskie tętno spoczynkowe. Jeśli trenujesz regularnie — spoko. Jeśli nie i czujesz zawroty/osłabienie — powiedz o tym lekarzowi.`
+    };
+  }
+  // Norma
+  return {
+    status: "normal",
+    message: `<strong>${rhr} bpm</strong> — w normie dla Twojego wieku (${range.min}–${range.max} bpm). Serce pracuje jak trzeba.`
+  };
+}
+
+// ============================================================================
 // ADAPTACYJNY TRENING
 // ============================================================================
 const BASE_CALISTHENICS = [
@@ -850,10 +983,19 @@ const LIGHT_CALISTHENICS = [
 
 function calculateReadiness() {
   const m = state.morning || {}; const e = state.evening || {};
+  const age = getSettings().age;
+  const range = getRhrRange(age);
   let score = 0, max = 0;
   if (m.sleepTotal != null) { max += 40; const s = m.sleepTotal; if (s >= 8) score += 40; else if (s >= 7) score += 32; else if (s >= 6) score += 20; else if (s >= 5) score += 10; }
   if (m.sleepDeep != null && m.sleepTotal) { max += 15; const r = m.sleepDeep / m.sleepTotal; if (r >= .20) score += 15; else if (r >= .15) score += 10; else if (r >= .10) score += 5; }
-  if (m.rhr != null) { max += 20; if (m.rhr < 55) score += 20; else if (m.rhr < 62) score += 16; else if (m.rhr < 68) score += 10; else if (m.rhr < 75) score += 5; }
+  if (m.rhr != null) {
+    max += 20;
+    if (m.rhr <= range.max && m.rhr >= range.min) score += 20;
+    else if (m.rhr < range.min && m.rhr >= 50) score += 18; // sportowe niskie = ok
+    else if (m.rhr <= range.max + 5) score += 12;
+    else if (m.rhr <= range.max + 15) score += 5;
+    // >max+15 = 0 pkt
+  }
   if (e.stress != null) { max += 15; const s = e.stress; if (s < 25) score += 15; else if (s < 40) score += 12; else if (s < 55) score += 8; else if (s < 70) score += 3; }
   if (m.breathing != null) { max += 10; if (m.breathing >= 95) score += 10; else if (m.breathing >= 85) score += 7; else if (m.breathing >= 70) score += 4; }
   if (max === 0) return null;
@@ -862,6 +1004,8 @@ function calculateReadiness() {
 
 function getTrainingLevel() {
   const m = state.morning || {};
+  const age = getSettings().age;
+  const range = getRhrRange(age);
   const sleep = m.sleepTotal;
   const rhr = m.rhr;
   const mood = m.moodMorning;
@@ -871,12 +1015,13 @@ function getTrainingLevel() {
 
   if (kws.includes("sick") || kws.includes("injury")) return "recovery";
   if (sleep != null && sleep < 5) return "recovery";
-  if (rhr != null && rhr > 75) return "recovery";
+  if (rhr != null && rhr > range.max + 15) return "recovery";
   if (breathing != null && breathing < 70) return "recovery";
   if (readiness != null && readiness < 40) return "recovery";
 
   if (sleep != null && sleep < 6.5) return "light";
   if (mood != null && mood <= 3) return "light";
+  if (rhr != null && rhr > range.max) return "light";
   if (readiness != null && readiness < 60) return "light";
 
   if (sleep != null && sleep >= 8 && (mood == null || mood >= 7)) return "full";
@@ -898,29 +1043,29 @@ function buildTrainingTask() {
 }
 
 // ============================================================================
-// TASK CATEGORIES  (D3 ×3)
+// TASK CATEGORIES
 // ============================================================================
 const TASK_CATEGORIES = [
   { id: "suplementy", icon: "💊", name: "Suplementacja", color: "gold", tasks: [
-    { id: "d3", label: "D3 ×3 kapsułki", hint: "Rano, do tłuszczu", done: false },
-    { id: "tran-r", label: "Tran rano", hint: "1 łyżka, do śniadania", done: false },
-    { id: "tran-w", label: "Tran wieczór", hint: "1 łyżka, do kolacji", done: false },
+    { id: "d3", label: "D3 ×1 tabletka", hint: "Rano, do tłuszczu (2000 IU)", done: false },
+    { id: "tran-r", label: "Tran rano", hint: "1 łyżeczka (5 ml) — do śniadania", done: false },
+    { id: "tran-w", label: "Tran wieczór", hint: "1 łyżeczka (5 ml) — do kolacji", done: false },
     { id: "kreatyna", label: "Kreatyna 3 g", hint: "Do szejka lub wody", done: false },
   ]},
   { id: "napoje", icon: "🥛", name: "Napoje", color: "peach", tasks: [
     { id: "mleko", label: "Szklanka mleka (1-2×)", hint: "Dla masy — białko i kalorie", done: false },
-    { id: "woda", label: "Woda 2.5 L", hint: "Kreatyna potrzebuje wody", done: false },
+    { id: "woda", label: "Woda 2.5 L", hint: "Kreatyna potrzebuje wody — licz w karcie Nawodnienie", done: false },
   ]},
   { id: "trening", icon: "💪", name: "Trening", color: "mint", tasks: [] },
   { id: "higiena", icon: "🧴", name: "Higiena i skóra", color: "lilac", tasks: [
     { id: "skincare-tolpa", label: "Tołpa / Ziaja", hint: "Umyj twarz żelem", done: false },
     { id: "skincare-acnederm", label: "Acnederm", hint: "Punktowo na wypryski", done: false },
     { id: "skincare-cetaphil", label: "Cetaphil", hint: "Krem nawilżający na całą twarz", done: false },
-    { id: "balsam", label: "Balsam do ust", hint: "Rano i wieczorem", done: false },
-    { id: "fonix", label: "Fonix — higiena uszu", hint: "Kilka kropli", done: false },
+    { id: "balsam", label: "Balsam do ust", hint: "Rano i wieczorem — jesień/zima", done: false },
+    { id: "fonix", label: "Fonix — higiena uszu", hint: "W razie potrzeby — nie wlicza się do %", done: false, optional: true },
   ]},
   { id: "regeneracja", icon: "😴", name: "Regeneracja", color: "lilac", tasks: [
-    { id: "telefon-off", label: "Telefon off 1h przed snem", hint: "Odłóż na biurko", done: false },
+    { id: "telefon-off", label: "Telefon off 1h przed snem", hint: "Odłóż na biurko — jakość snu", done: false },
   ]},
   { id: "pomiary", icon: "📏", name: "Pomiary", color: "mint", tasks: [] },
 ];
@@ -942,10 +1087,131 @@ function applyConditionalTasks() {
     pomiaryList.push({ id: "cm", label: "Pomiar obwodów", hint: "Klatka, talia, biceps", done: false });
   }
   pomiaryCat.tasks = pomiaryList;
-  state.tasks = TASK_CATEGORIES.flatMap(c => c.tasks).map(t => ({ id: t.id, label: t.label, done: t.done }));
+  state.tasks = TASK_CATEGORIES.flatMap(c => c.tasks).map(t => ({ id: t.id, label: t.label, done: t.done, optional: !!t.optional }));
 }
-function syncStateFromCategories() { state.tasks = TASK_CATEGORIES.flatMap(c => c.tasks).map(t => ({ id: t.id, label: t.label, done: t.done })); }
-function calcCompletionPct() { const done = state.tasks.filter(t => t.done).length; return state.tasks.length ? Math.round((done / state.tasks.length) * 100) : 0; }
+function syncStateFromCategories() { state.tasks = TASK_CATEGORIES.flatMap(c => c.tasks).map(t => ({ id: t.id, label: t.label, done: t.done, optional: !!t.optional })); }
+function calcCompletionPct() {
+  // Opcjonalne (fonix) nie liczą się do mianownika
+  const required = state.tasks.filter(t => !t.optional);
+  if (!required.length) return 0;
+  const done = required.filter(t => t.done).length;
+  return Math.round((done / required.length) * 100);
+}
+function calcCompletionStats() {
+  const required = state.tasks.filter(t => !t.optional);
+  const optional = state.tasks.filter(t => t.optional);
+  return {
+    requiredDone: required.filter(t => t.done).length,
+    requiredTotal: required.length,
+    optionalDone: optional.filter(t => t.done).length,
+    optionalTotal: optional.length,
+  };
+}
+
+// ============================================================================
+// SUPLEMENTACJA — licznik
+// ============================================================================
+function getSupplementTotals() {
+  const s = getSettings();
+  const isDone = (id) => { const t = state.tasks.find(x => x.id === id); return t && t.done; };
+  const d3Done = isDone("d3") ? 1 : 0;
+  const tranRDone = isDone("tran-r") ? 1 : 0;
+  const tranWDone = isDone("tran-w") ? 1 : 0;
+
+  const d3FromTablets = s.d3Iu * d3Done;
+  const d3FromTranR = s.tranD3Iu * tranRDone;
+  const d3FromTranW = s.tranD3Iu * tranWDone;
+  const totalD3 = d3FromTablets + d3FromTranR + d3FromTranW;
+
+  const aFromTranR = s.tranAIu * tranRDone;
+  const aFromTranW = s.tranAIu * tranWDone;
+  const totalA = aFromTranR + aFromTranW;
+
+  return { totalD3, totalA, d3FromTablets, d3FromTranR, d3FromTranW };
+}
+
+function renderSupplementsCard() {
+  const { totalD3, totalA } = getSupplementTotals();
+  const MAX_D3 = 4000;
+  const MAX_A = 9000;
+
+  const d3Pct = Math.min(100, Math.round((totalD3 / MAX_D3) * 100));
+  const aPct = Math.min(100, Math.round((totalA / MAX_A) * 100));
+
+  const d3Bar = $("supp-d3-bar"), d3Text = $("supp-d3-text"), d3Hint = $("supp-d3-hint");
+  const aBar = $("supp-a-bar"), aText = $("supp-a-text");
+  const warning = $("supp-warning");
+  const badge = $("supp-status-badge");
+
+  if (d3Bar) d3Bar.style.width = `${d3Pct}%`;
+  if (d3Text) d3Text.textContent = `${totalD3} / ${MAX_D3} IU`;
+  if (aBar) aBar.style.width = `${aPct}%`;
+  if (aText) aText.textContent = `${totalA} / ${MAX_A} IU`;
+
+  if (d3Hint) {
+    if (totalD3 > MAX_D3) d3Hint.innerHTML = `<em class="text-rose">Przekroczyłeś 4000 IU — zmniejsz dawkę D3.</em>`;
+    else if (totalD3 >= MAX_D3 * 0.9) d3Hint.textContent = "Blisko górnej granicy (4000 IU) — nie dodawaj więcej.";
+    else d3Hint.textContent = `Zostało ${MAX_D3 - totalD3} IU do granicy`;
+  }
+
+  if (warning) {
+    const warnings = [];
+    if (totalD3 > MAX_D3) warnings.push(`<div class="flex items-start gap-2"><span class="text-lg">⚠️</span><div><strong class="text-rose">Zbyt wysoka dawka D3:</strong> ${totalD3} IU (max 4000 IU dla nastolatka). Zmniejsz liczbę tabletek lub tranu.</div></div>`);
+    if (totalA > MAX_A) warnings.push(`<div class="flex items-start gap-2"><span class="text-lg">⚠️</span><div><strong class="text-rose">Zbyt wysoka dawka witaminy A:</strong> ${totalA} IU (max ~9000 IU). Uwaga — nadmiar odkłada się w wątrobie.</div></div>`);
+    if (totalA > MAX_A * 0.8 && totalA <= MAX_A) warnings.push(`<div class="flex items-start gap-2"><span class="text-lg">ℹ️</span><div>Witamina A blisko górnej granicy (${totalA} IU). Nie dodawaj więcej tranu.</div></div>`);
+
+    if (warnings.length) {
+      warning.classList.remove("hidden");
+      warning.innerHTML = warnings.join("");
+    } else {
+      warning.classList.add("hidden");
+    }
+  }
+
+  if (badge) {
+    if (totalD3 > MAX_D3) { badge.textContent = "PRZEKROCZONE"; badge.className = "text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-rose/15 text-rose"; }
+    else if (totalD3 >= MAX_D3 * 0.9) { badge.textContent = "OK (góra)"; badge.className = "text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-gold/15 text-gold"; }
+    else if (totalD3 > 0) { badge.textContent = "W normie"; badge.className = "text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-mint/15 text-mint"; }
+    else { badge.textContent = "0 IU"; badge.className = "text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-white/10 text-neutral-400"; }
+  }
+}
+
+// ============================================================================
+// NAWODNIENIE — licznik szklanek
+// ============================================================================
+const WATER_GLASS_ML = 250;
+const WATER_TARGET_ML = 2500;
+const WATER_GLASSES_TARGET = WATER_TARGET_ML / WATER_GLASS_ML; // = 10
+
+function getWaterGlasses() {
+  const raw = localStorage.getItem(localKey("water-" + todayKey));
+  return raw ? parseInt(raw) || 0 : 0;
+}
+function setWaterGlasses(n) {
+  n = Math.max(0, Math.min(50, n));
+  localStorage.setItem(localKey("water-" + todayKey), String(n));
+  // Auto-sync z zadaniem "woda"
+  const waterTask = TASK_CATEGORIES.find(c => c.id === "napoje")?.tasks.find(t => t.id === "woda");
+  if (waterTask) {
+    const shouldBeDone = n * WATER_GLASS_ML >= WATER_TARGET_ML;
+    if (waterTask.done !== shouldBeDone) {
+      waterTask.done = shouldBeDone;
+      syncStateFromCategories();
+      renderTasksByCategory();
+    }
+  }
+  renderWaterCard();
+  renderProgress();
+}
+function renderWaterCard() {
+  const n = getWaterGlasses();
+  const ml = n * WATER_GLASS_ML;
+  const pct = Math.min(100, Math.round((ml / WATER_TARGET_ML) * 100));
+  if ($("water-bar")) $("water-bar").style.width = `${pct}%`;
+  if ($("water-ml")) $("water-ml").textContent = ml;
+  if ($("water-glasses")) $("water-glasses").textContent = n;
+  if ($("water-pct")) $("water-pct").textContent = `${pct}%`;
+}
 
 // ============================================================================
 // RENDER TASKS
@@ -972,9 +1238,10 @@ function renderTasksByCategory() {
           const extra = t.extra ? `<div class="mt-2 flex flex-wrap gap-1">${t.extra.map(e => `<span class="text-[9px] glass rounded-full px-2 py-0.5">${e}</span>`).join("")}</div>` : "";
           const exList = t.exercises ? `<div class="mt-2 grid grid-cols-2 gap-1">${t.exercises.map(e => `<span class="text-[9px] glass rounded-lg px-2 py-1">${e.label} · ${e.series}</span>`).join("")}</div>` : "";
           const levelBadge = t.level === "full" ? '<span class="text-[9px] font-bold text-mint bg-mint/15 rounded-full px-2 py-0.5 ml-1">FULL 🔥</span>' : t.level === "light" ? '<span class="text-[9px] font-bold text-gold bg-gold/15 rounded-full px-2 py-0.5 ml-1">LIGHT 🟡</span>' : t.level === "recovery" ? '<span class="text-[9px] font-bold text-rose bg-rose/15 rounded-full px-2 py-0.5 ml-1">RECOVERY</span>' : "";
-          return `<div class="task-item flex items-start gap-3 p-3 rounded-2xl ${t.done ? "bg-gradient-to-r from-mint/10 to-lilac/10 border border-mint/30" : "bg-white/3 border border-white/8"} cursor-pointer" data-task-id="${t.id}">
+          const optBadge = t.optional ? '<span class="opt-badge text-[9px] font-bold rounded-full px-2 py-0.5 ml-1">OPCJONALNE</span>' : "";
+          return `<div class="task-item ${t.optional ? "optional" : ""} flex items-start gap-3 p-3 rounded-2xl ${t.done ? "bg-gradient-to-r from-mint/10 to-lilac/10 border border-mint/30" : "bg-white/3 border border-white/8"} cursor-pointer" data-task-id="${t.id}">
             <div class="flex-1 min-w-0">
-              <div class="text-sm font-bold ${t.done ? "text-mint line-through" : "text-neutral-200"}">${t.label}${levelBadge}</div>
+              <div class="text-sm font-bold ${t.done ? "text-mint line-through" : "text-neutral-200"}">${t.label}${levelBadge}${optBadge}</div>
               <div class="text-[10px] text-neutral-500 font-medium">${t.hint || ""}</div>
               ${extra}
               ${exList}
@@ -995,7 +1262,7 @@ function renderTasksByCategory() {
       syncStateFromCategories();
       vibrate(20); if (task.done) playSound("done");
       if (task.done) el.classList.add("task-flash");
-      renderTasksByCategory(); renderProgress();
+      renderTasksByCategory(); renderProgress(); renderSupplementsCard();
       await persistToday();
       if (task.done && calcCompletionPct() === 100) setTimeout(() => { fireConfetti(); vibrate([40, 60, 40, 60, 80]); }, 250);
     });
@@ -1003,10 +1270,14 @@ function renderTasksByCategory() {
 }
 function renderProgress() {
   const pct = calcCompletionPct();
-  const done = state.tasks.filter(t => t.done).length;
+  const { requiredDone, requiredTotal, optionalDone, optionalTotal } = calcCompletionStats();
   if ($("progress-bar")) $("progress-bar").style.width = `${pct}%`;
   if ($("hero-pct")) $("hero-pct").textContent = `${pct}%`;
-  if ($("progress-sub")) $("progress-sub").textContent = `${done} z ${state.tasks.length} zadań`;
+  if ($("progress-sub")) {
+    let sub = `${requiredDone} z ${requiredTotal} zadań`;
+    if (optionalTotal > 0) sub += ` (+${optionalDone}/${optionalTotal} opcjonalne)`;
+    $("progress-sub").textContent = sub;
+  }
   if ($("hero-ring")) $("hero-ring").style.strokeDashoffset = 169.6 - (pct / 100) * 169.6;
   if ($("progress-headline")) {
     if (pct === 100) $("progress-headline").textContent = "LOCK IN! 🥶🔥";
@@ -1020,7 +1291,7 @@ async function persistToday() {
   syncStateFromCategories();
   const existing = (await loadDayDoc(todayKey)) || {};
   await saveDayDoc({ ...existing, date: todayKey, tasks: state.tasks, completedPct: calcCompletionPct(), note: state.note, morning: { ...(existing.morning || {}), ...state.morning }, evening: { ...(existing.evening || {}), ...state.evening }, updatedAt: Date.now() });
-  await refreshStreak(); await renderImprovementTips(); renderReadiness(); checkDeload(); checkMilestone(); renderHealthWarnings();
+  await refreshStreak(); await renderImprovementTips(); renderReadiness(); checkDeload(); checkMilestone(); renderHealthWarnings(); renderSupplementsCard();
 }
 async function refreshStreak() {
   const today = await loadDayDoc(todayKey);
@@ -1070,18 +1341,34 @@ async function checkDeload() {
   const banner = $("deload-banner"); if (!banner) return;
   if (rpeDays >= 3) { $("deload-text").textContent = `3 ostatnie treningi RPE ≥ 8. Zalecany deload: połowa serii, 60%.`; banner.classList.remove("hidden"); } else banner.classList.add("hidden");
 }
+
+// ============================================================================
+// HEALTH WARNINGS — RHR +15% vs 7d
+// ============================================================================
 async function renderHealthWarnings() {
-  const days = await loadLastNDays(7);
+  const days = await loadLastNDays(8);
   const withData = days.filter(d => d.morning || d.evening);
   const warnings = [];
-  const rhrs = withData.slice(-4).map(d => d.morning?.rhr).filter(r => r != null);
-  if (rhrs.length >= 4) { const recent = rhrs.slice(-3); const baseline = rhrs[0]; const avg = recent.reduce((a, b) => a + b, 0) / recent.length; if (avg - baseline >= 5) warnings.push({ icon: "💓", title: "RHR +5 bpm", text: `Średnia ${avg.toFixed(0)} vs baza ${baseline}. Coś się dzieje z organizmem.` }); }
+  const age = getSettings().age;
+  const range = getRhrRange(age);
+
+  // RHR: ostatnie 7 dni bez dzisiejszego
+  const rhrPrev7 = withData.slice(-8, -1).map(d => d.morning?.rhr).filter(r => r != null);
+  const todayRhr = withData[withData.length - 1]?.morning?.rhr;
+  if (todayRhr != null && rhrPrev7.length >= 3) {
+    const avg7 = rhrPrev7.reduce((a, b) => a + b, 0) / rhrPrev7.length;
+    const pctAbove = ((todayRhr - avg7) / avg7) * 100;
+    if (pctAbove >= 15) warnings.push({ icon: "💓", title: `RHR +${pctAbove.toFixed(0)}% vs 7d`, text: `${todayRhr} bpm vs średnia ${avg7.toFixed(0)} bpm. Możliwe: choroba/przemęczenie. Obserwuj.` });
+    else if (todayRhr > range.max) warnings.push({ icon: "💓", title: `RHR powyżej normy (${range.min}–${range.max})`, text: `${todayRhr} bpm — powyżej górnej granicy dla wieku ${age} lat. Odpocznij, dużo wody.` });
+  }
+
   const sleep3 = withData.slice(-3).map(d => d.morning?.sleepTotal).filter(s => s != null);
   if (sleep3.length === 3 && sleep3.every(s => s < 6)) warnings.push({ icon: "😴", title: "3 dni <6h snu", text: "Kumulujesz dług senny. Dziś 8h+ obowiązkowo." });
   const weights = withData.slice(-4).map(d => d.morning?.dailyWeight).filter(w => w != null);
   if (weights.length >= 4) { const declining = weights.slice(-3).every((w, i) => i === 0 || w < weights[weights.length - 4 + i]); if (declining) warnings.push({ icon: "⚖️", title: "Waga spada 3 dni", text: "Jesz za mało. Dorzuć szejk albo twaróg." }); }
   const stress3 = withData.slice(-3).map(d => d.evening?.stress).filter(s => s != null);
   if (stress3.length === 3 && stress3.every(s => s > 70)) warnings.push({ icon: "🧘", title: "3 dni stresu >70", text: "Układ nerwowy przeciążony. Reset szczęki obowiązkowy." });
+
   const box = $("health-warnings"); if (!box) return;
   if (warnings.length === 0) { box.classList.add("hidden"); return; }
   box.classList.remove("hidden");
@@ -1095,12 +1382,14 @@ function getPersonalQuote() {
   const m = state.morning || {};
   const readiness = calculateReadiness();
   const level = getTrainingLevel();
+  const age = getSettings().age;
+  const range = getRhrRange(age);
   const sleep = m.sleepTotal;
   const rhr = m.rhr;
   const mood = m.moodMorning;
   if (level === "recovery") return "🛌 Dziś regeneracja. Sen, woda, oddech. Organizm mówi stop — słuchaj go.";
   if (sleep != null && sleep < 6) return "😴 Kurwa, krótko spałeś. Dziś nie bij rekordów — chodzi o przetrwanie dnia.";
-  if (rhr != null && rhr > 70) return "💓 Wysokie RHR — serce pracuje ciężej niż zwykle. Coś się dzieje, obserwuj.";
+  if (rhr != null && rhr > range.max + 5) return `💓 RHR ${rhr} bpm — powyżej normy dla Twojego wieku (${range.min}–${range.max}). Coś się dzieje, obserwuj.`;
   if (mood != null && mood <= 3) return "😔 Słabszy dzień psychicznie. Nie musisz być bohaterem — dokończ zadania i idź spać wcześniej.";
   if (level === "full") return "🔥 Sen, RHR i nastrój idealne. Dziś możesz pobić rekord. Wykorzystaj ten dzień, kurwa!";
   if (readiness != null && readiness >= 70) return "✅ Solidna gotowość. Trzymaj rytm — regularność buduje mistrza, nie pojedyncze wybryki.";
@@ -1108,12 +1397,14 @@ function getPersonalQuote() {
 }
 
 // ============================================================================
-// IMPROVEMENT TIPS
+// IMPROVEMENT TIPS — RHR dynamiczne
 // ============================================================================
 async function renderImprovementTips() {
   const m = state.morning || {}; const e = state.evening || {};
   const tips = [];
   const kws = detectKeywords(state.note);
+  const age = getSettings().age;
+  const range = getRhrRange(age);
 
   if (kws.includes("sick")) tips.push({ icon: "🤒", text: "Choroba — dziś zero treningu, sen i woda." });
   if (kws.includes("injury")) tips.push({ icon: "🩹", text: "Kontuzja/ból — odpuść trening, regeneracja." });
@@ -1125,14 +1416,35 @@ async function renderImprovementTips() {
   if (kws.includes("lazy")) tips.push({ icon: "💀", text: "Lenistwo wykryte — jedna rzecz teraz, kurwa, ruszyć dupe." });
   if (kws.includes("alcohol")) tips.push({ icon: "🍺", text: "Alkohol — dużo wody, zero forsowania jutro." });
   if (m.sleepTotal != null && m.sleepTotal < 7) tips.push({ icon: "😴", text: `Sen ${m.sleepTotal}h — poniżej progu. Idź spać przed 22:30.` });
-  if (m.rhr != null && m.rhr > 68) tips.push({ icon: "💓", text: `RHR ${m.rhr} bpm — wysokie. Sprawdź czy się nie przemęczasz.` });
+
+  // RHR — z analizą wieku i +15% vs 7d
+  if (m.rhr != null) {
+    const days = await loadLastNDays(8);
+    const rhrPrev7 = days.slice(0, -1).map(d => d.morning?.rhr).filter(r => r != null);
+    const avg7 = rhrPrev7.length >= 3 ? rhrPrev7.reduce((a, b) => a + b, 0) / rhrPrev7.length : null;
+    const analysis = analyzeRhr(m.rhr, age, avg7);
+    if (analysis.status === "high" || analysis.status === "spike" || analysis.status === "very-high") {
+      tips.push({ icon: "💓", text: analysis.message });
+    } else if (analysis.status === "low-alarm") {
+      tips.push({ icon: "💙", text: analysis.message });
+    } else if (analysis.status === "low-sport") {
+      tips.push({ icon: "✅", text: analysis.message });
+    }
+    // status "normal" → nie ma tipu (wszystko OK)
+  }
+
   if (m.breathing != null && m.breathing < 85) tips.push({ icon: "🫁", text: `Punkty oddychania ${m.breathing} — przewietrz sypialnię, sprawdź pozycję snu.` });
   if (e.stress != null && e.stress > 60) tips.push({ icon: "🧘", text: `Stres ${e.stress}/100 — oddech 4-7-8 przed snem.` });
 
-  const done = state.tasks.filter(t => t.done).length;
-  if (state.tasks.length > 0 && done < state.tasks.length) {
-    tips.push({ icon: "⚡", text: `Zostało ${state.tasks.length - done} zadań.` });
-  } else if (state.tasks.length > 0 && done === state.tasks.length) {
+  // Suplementy — suma D3
+  const { totalD3, totalA } = getSupplementTotals();
+  if (totalD3 > 4000) tips.push({ icon: "💊", text: `Uwaga: suma D3 = ${totalD3} IU (max 4000). Zmniejsz tabletki D3 lub tran.` });
+  if (totalA > 9000) tips.push({ icon: "💊", text: `Uwaga: suma wit. A = ${totalA} IU (max ~9000). Ogranicz tran — nadmiar A odkłada się w wątrobie.` });
+
+  const { requiredDone, requiredTotal } = calcCompletionStats();
+  if (requiredTotal > 0 && requiredDone < requiredTotal) {
+    tips.push({ icon: "⚡", text: `Zostało ${requiredTotal - requiredDone} zadań (opcjonalne nie liczą się).` });
+  } else if (requiredTotal > 0) {
     tips.push({ icon: "🏆", text: "Wszystko zaliczone — LOCK IN!" });
   }
 
@@ -1151,6 +1463,8 @@ async function renderBrief() {
   const m = state.morning || {};
   const readiness = calculateReadiness();
   const level = getTrainingLevel();
+  const age = getSettings().age;
+  const range = getRhrRange(age);
   const lines = [];
   if (m.sleepTotal != null) {
     if (m.sleepTotal >= 8) lines.push(`Sen ${m.sleepTotal.toFixed(1)}h — solidnie.`);
@@ -1158,13 +1472,16 @@ async function renderBrief() {
     else if (m.sleepTotal >= 6) lines.push(`Sen ${m.sleepTotal.toFixed(1)}h — poniżej progu.`);
     else lines.push(`Sen ${m.sleepTotal.toFixed(1)}h — kurwa, za mało.`);
   }
-  if (m.rhr != null) lines.push(`RHR ${m.rhr} bpm.`);
+  if (m.rhr != null) {
+    const inNorm = m.rhr >= range.min && m.rhr <= range.max;
+    lines.push(`RHR ${m.rhr} bpm${inNorm ? " (ok)" : ""}.`);
+  }
   if (readiness != null) lines.push(`Gotowość ${readiness}%.`);
   if (level === "recovery") lines.push("→ Dziś recovery.");
   else if (level === "full") lines.push("→ FULL plan gotowy.");
   else if (level === "light") lines.push("→ Lżejszy trening.");
-  const doneCount = state.tasks.filter(t => t.done).length;
-  lines.push(`Zadania: ${doneCount}/${state.tasks.length}.`);
+  const { requiredDone, requiredTotal } = calcCompletionStats();
+  lines.push(`Zadania: ${requiredDone}/${requiredTotal}.`);
   el.textContent = lines.length ? lines.join(" ") : "Uzupełnij raport poranny żeby dostać brief.";
 }
 
@@ -1344,10 +1661,13 @@ async function generateFullAnalysis() {
   const e = today.evening || {};
   const ym = yesterday.morning || {};
   const kws = detectKeywords(today.note);
+  const age = getSettings().age;
+  const rhrRange = getRhrRange(age);
 
   const avg = (arr) => arr.length ? arr.reduce((a, b) => a + b, 0) / arr.length : null;
   const avgSleep = avg(past7.map(d => d.morning?.sleepTotal).filter(v => v != null));
-  const avgRhr = avg(past7.map(d => d.morning?.rhr).filter(v => v != null));
+  const rhrPrev7 = past7.map(d => d.morning?.rhr).filter(v => v != null);
+  const avgRhr = avg(rhrPrev7);
   const avgStress = avg(past7.map(d => d.evening?.stress).filter(v => v != null));
   const avgSteps = avg(past7.map(d => d.evening?.steps).filter(v => v != null));
   const avgMood = avg(past7.map(d => d.morning?.moodMorning).filter(v => v != null));
@@ -1380,23 +1700,19 @@ async function generateFullAnalysis() {
     sections.push(sec("Sen", "🌙", b, "#c4b5fd"));
   }
 
-  // 2. RHR
+  // 2. RHR — z dynamiczną normą
   {
     let b = "";
     if (m.rhr == null) b = "Brak RHR. Mierz rano przed wstaniem — to najważniejszy wskaźnik przeciążenia.";
     else {
-      const r = m.rhr;
-      if (r < 55) b += `<strong>${r} bpm</strong> — sportowa baza. Serce pracuje jak silnik diesla.`;
-      else if (r < 62) b += `<strong>${r} bpm</strong> — dobra regeneracja.`;
-      else if (r < 68) b += `<strong>${r} bpm</strong> — norma.`;
-      else if (r < 75) b += `<strong>${r} bpm</strong> — podwyższone. Sprawdź czy się nie przemęczasz.`;
-      else b += `<em>${r} bpm — serce wali jak dzwon alarmowy.</em> Możliwe: choroba, stres, przemęczenie. Odpuść dziś.`;
+      const analysis = analyzeRhr(m.rhr, age, avgRhr);
+      b += `Norma dla wieku ${age} lat: <strong>${rhrRange.min}–${rhrRange.max} bpm</strong>. `;
+      b += analysis.message;
       if (ym.rhr != null) {
-        const d = r - ym.rhr;
-        if (d >= 5) b += ` <em>+${d} vs wczoraj</em> — skok.`;
-        else if (d <= -3) b += ` <em>${d} vs wczoraj</em> — super spadek.`;
+        const d = m.rhr - ym.rhr;
+        if (d >= 5) b += ` <em>+${d} vs wczoraj</em>.`;
+        else if (d <= -3) b += ` <em>${d} vs wczoraj</em>.`;
       }
-      if (avgRhr != null) b += ` ${trendLabel(r, avgRhr)}.`;
     }
     sections.push(sec("Regeneracja (RHR)", "💓", b, "#5eead4"));
   }
@@ -1489,10 +1805,11 @@ async function generateFullAnalysis() {
 
   // 7. ZADANIA
   {
-    const done = state.tasks.filter(t => t.done).length;
-    const total = state.tasks.length;
+    const { requiredDone, requiredTotal, optionalDone, optionalTotal } = calcCompletionStats();
     const pct = calcCompletionPct();
-    let b = `Zadania: <strong>${done}/${total}</strong> (${pct}%). `;
+    let b = `Zadania (wymagane): <strong>${requiredDone}/${requiredTotal}</strong> (${pct}%).`;
+    if (optionalTotal > 0) b += ` Opcjonalne: ${optionalDone}/${optionalTotal}.`;
+    b += " ";
     if (pct === 100) b += "Perfect day, kurwa! Tak się buduje dyscyplinę. Jutro nie odpuszczaj.";
     else if (pct >= 75) b += "Bardzo dobrze — dokończ resztę, nie zostawiaj na ostatnią chwilę.";
     else if (pct >= 50) b += "Połowa za tobą. Rusz resztę.";
@@ -1527,12 +1844,14 @@ async function generateFullAnalysis() {
   {
     const priorities = [];
     if (m.sleepTotal != null && m.sleepTotal < 7) priorities.push("Sen 8h+ dziś — telefon off 1h przed snem.");
-    if (m.rhr != null && m.rhr > 68) priorities.push("Sprawdź czy nie jesteś przeziębiony — RHR podniesione.");
+    if (m.rhr != null && m.rhr > rhrRange.max) priorities.push(`RHR ${m.rhr} bpm powyżej normy — odpocznij, dużo wody.`);
     if (e.stress != null && e.stress > 60) priorities.push("Oddech 4-7-8 (5 min) przed snem.");
     if (m.breathing != null && m.breathing < 85) priorities.push("Przewietrz sypialnię przed snem.");
-    const doneCount = state.tasks.filter(t => t.done).length;
-    if (doneCount < state.tasks.length) priorities.push(`Dokończ ${state.tasks.length - doneCount} zadań.`);
+    const { requiredDone, requiredTotal } = calcCompletionStats();
+    if (requiredDone < requiredTotal) priorities.push(`Dokończ ${requiredTotal - requiredDone} zadań.`);
     if (m.dailyWeight != null && avgWeight != null && m.dailyWeight < avgWeight - 0.3) priorities.push("Zwiększ kalorie — dorzuć szejk masowy.");
+    const { totalD3 } = getSupplementTotals();
+    if (totalD3 > 4000) priorities.push(`Uwaga: D3 ${totalD3} IU — zmniejsz dawkę.`);
     if (priorities.length === 0) priorities.push("Utrzymaj rytm — wszystko idzie zgodnie z planem.");
 
     const facts = [
@@ -1846,7 +2165,7 @@ const GUIDE_SECTIONS = [
   { icon: "💪", title: "Trening — kalistenika + hantle", body: "3-4 treningi w tygodniu. Bazowe ruchy: pompki (klatka, triceps, barki), przysiady (nogi, pośladki), deska (core), hantle (barki, biceps). Postępuj stopniowo — dodawaj 1 powtórzenie co tydzień. Forma > ciężar." },
   { icon: "🧴", title: "Skóra — walka z trądzikiem", body: "Tołpa/Ziaja rano i wieczorem, Acnederm punktowo na wypryski, Cetaphil krem nawilżający. Nie wyciskaj — blizny zostają na lata. Zmieniaj poszewkę co tydzień. Unikaj cukru i mleka krowiego (może zaostrzać acne)." },
   { icon: "🧠", title: "Głowa — stres i nastrój", body: "Oddech 4-7-8 (wdech 4s, trzymaj 7s, wydech 8s) — 5 minut dziennie. Medytacja 10 min. Wyjdź z domu, pogadaj z kimś. Samotność i stres obniżają testosteron i hamują wzrost. Dbaj o psychikę jak o mięśnie." },
-  { icon: "💊", title: "Suplementacja — co i dlaczego", body: "D3 ×3 (3000-6000 IU) z tłuszczem — kości, hormony, odporność. Tran rano i wieczorem — omega-3 DHA/EPA, mózg i skóra. Kreatyna 3g — siła, uwodnienie mięśni, kognicja. Woda 2.5L — bez tego kreatyna nie działa. Mleko 1-2 szklanki — białko, wapń, kalorie." },
+  { icon: "💊", title: "Suplementacja — bezpieczne dawki", body: "Nastolatki 12-17 lat: D3 max 4000 IU/dzień, witamina A max ~9000 IU/dzień. Twój stack: D3 ×1 (2000 IU) + tran 2× 1 łyżeczka (2×400 IU) = 2800 IU D3 — bezpiecznie. Tran dostarcza też omega-3 (DHA/EPA) kluczowe dla mózgu i skóry. Kreatyna 3g — bezpieczna dla nastolatków. Woda 2.5L — bez tego kreatyna nie działa." },
   { icon: "📏", title: "Pomiary — co i kiedy", body: "Wzrost: rano, boso, plecy do ściany, 1. dnia miesiąca. Obwody: klatka, talia, biceps — 1. dnia miesiąca. Waga: codziennie rano po toalecie. RHR: codziennie rano przed wstaniem. Systematyczność = klucz do śledzenia progresu." },
 ];
 
@@ -1867,10 +2186,12 @@ const KNOWLEDGE_BASE = [
   { title: "Testosteron", body: "Rośnie przez: sen 7-9h, trening siłowy, tłuszcze zwierzęce, witaminę D, cynk. Spada przez: stres, alkohol, niedobór snu, otyłość." },
   { title: "Białko — ile i kiedy", body: "1.7g/kg masy ciała = 75-100g dla Ciebie. Rozłożone na 4-5 posiłków po 25-40g. Okno anaboliczne 2h po treningu. Twaróg przed snem = kazeina = wolne uwalnianie." },
   { title: "Kreatyna", body: "3-5g dziennie, bez ładowania. Zwiększa siłę, masę, uwodnienie mięśni. Wymaga 2.5-3L wody dziennie. Najlepiej z posiłkiem węglowodanowym." },
-  { title: "Witamina D3", body: "3000-6000 IU dziennie, z tłuszczem (wchłania się w tłuszczu). Kluczowa dla kości, odporności, testosteronu. Zimą w Polsce praktycznie każdy ma niedobór." },
-  { title: "Tran (omega-3)", body: "DHA + EPA. Mózg, wzrok, serce, skóra. Redukuje stany zapalne (pomaga przy acne). 1 łyżka = 1000mg omega-3. Rano i wieczorem." },
+  { title: "Witamina D3 — bezpieczne dawki", body: "Nastolatki 12-17 lat: max 4000 IU/dzień. Wchłania się w tłuszczu — bierz z posiłkiem. Objawy nadmiaru: nudności, osłabienie, bóle głowy, nadmiar wapnia w krwi (po miesiącach). Twój stack: 2800 IU = bezpiecznie." },
+  { title: "Witamina A — uwaga na tran", body: "Tran zawiera wit. A (retinol) — nadmiar odkłada się w wątrobie i może być toksyczny. Max ~9000 IU/dzień dla nastolatka. 1 łyżeczka tranu = ~766 IU. 2 łyżeczki = ~1532 IU — bezpiecznie. Nie łącz z dodatkową wit. A." },
+  { title: "Tran (omega-3)", body: "DHA + EPA. Mózg, wzrok, serce, skóra. Redukuje stany zapalne (pomaga przy acne). 1 łyżeczka = 5 ml, zawiera ~400 IU D3 + ~766 IU wit. A + ~1000 mg omega-3. Rano i wieczorem." },
   { title: "Acne — jak walczyć", body: "Higiena (Tołpa, Acnederm, Cetaphil), dieta (mniej cukru i mleka), sen 8h+, stres minimum. Nie wyciskaj. Jeśli nie pomaga 3 miesiące — dermatolog." },
   { title: "Wzrost — ile jeszcze", body: "U chłopaków skok wzrostowy trwa do 16-18 lat, kończy się ok. 18-21. Ostatnie 2-3 lata to wolniejsze tempo. Sen, jedzenie, hormony = twój potencjał genetyczny." },
+  { title: "RHR — tętno spoczynkowe", body: "Norma dla nastolatków 12-17 lat: 60-90 bpm. Sportowcy mogą mieć niżej (50-60) — to bradykardia sportowa, nie choroba. Wysokie (>90) = stres, choroba, przemęczenie. Skok +15% względem średniej tygodniowej to sygnał ostrzegawczy." },
 ];
 
 function renderKnowledgeBase() {
@@ -1964,6 +2285,24 @@ document.querySelectorAll("[data-food-tab]").forEach(btn => {
 });
 $("btn-roll-food")?.addEventListener("click", rollFoodPlan);
 
+// NAWODNIENIE
+$("btn-water-add")?.addEventListener("click", () => {
+  setWaterGlasses(getWaterGlasses() + 1);
+  vibrate(15); playSound("done");
+  persistToday();
+});
+$("btn-water-reset")?.addEventListener("click", () => {
+  setWaterGlasses(0);
+  persistToday();
+});
+
+// BANNER 1. DZIEŃ MIESIĄCA
+$("btn-measure-dismiss")?.addEventListener("click", () => {
+  $("monthly-measure-banner")?.classList.add("hidden");
+  localStorage.setItem("regim:measure-dismiss-" + dateKey(new Date()), "1");
+});
+
+// MORNING FORM
 $("form-morning")?.addEventListener("submit", async (e) => {
   e.preventDefault();
   const g = (id) => { const v = $(id)?.value; return v === "" ? null : parseFloat(v); };
@@ -1985,6 +2324,7 @@ $("form-morning")?.addEventListener("submit", async (e) => {
   if ($("quote-day")) $("quote-day").textContent = getPersonalQuote();
 });
 
+// EVENING FORM
 $("form-evening")?.addEventListener("submit", async (e) => {
   e.preventDefault();
   const g = (id) => { const v = $(id)?.value; return v === "" ? null : parseFloat(v); };
@@ -2033,6 +2373,10 @@ $("btn-settings")?.addEventListener("click", () => {
   $("input-name").value = s.name; $("input-age").value = s.age; $("input-height").value = s.height;
   $("input-height-dad").value = s.heightDad || ""; $("input-height-mom").value = s.heightMom || "";
   $("input-goal-weight-settings").value = s.goalWeight;
+  $("input-d3-iu").value = s.d3Iu;
+  $("input-tran-ml").value = s.tranMl;
+  $("input-tran-d3-iu").value = s.tranD3Iu;
+  $("input-tran-a-iu").value = s.tranAIu;
   const w = lastWeight(); if (w && s.height) { const bmi = calcBMI(w, s.height); $("settings-bmi").textContent = bmi.toFixed(1); $("settings-bmi-label").textContent = bmiLabel(bmi); }
   openModal("modal-settings");
 });
@@ -2044,10 +2388,14 @@ $("btn-settings-save")?.addEventListener("click", () => {
     heightDad: parseFloat($("input-height-dad").value) || null,
     heightMom: parseFloat($("input-height-mom").value) || null,
     goalWeight: parseFloat($("input-goal-weight-settings").value) || 50,
+    d3Iu: parseInt($("input-d3-iu").value) || 2000,
+    tranMl: parseFloat($("input-tran-ml").value) || 5,
+    tranD3Iu: parseInt($("input-tran-d3-iu").value) || 400,
+    tranAIu: parseInt($("input-tran-a-iu").value) || 766,
   });
   showToast("✅ Zapisano");
   closeModal($("modal-settings"));
-  renderCialo();
+  renderCialo(); renderSupplementsCard(); renderReadiness(); renderBrief();
 });
 
 $("btn-glowup-refresh")?.addEventListener("click", () => { renderGlowUp(); renderCorrelation(); });
@@ -2190,7 +2538,13 @@ async function bootApp() {
     if ($("theme-icon")) $("theme-icon").className = "fa-solid fa-sun";
   }
 
-  // ── FIX: wczytaj zapisane zadania zanim nadpiszesz je świeżymi ──
+  // BANNER: 1. dzień miesiąca (jeśli dziś 1. i nie odrzucone)
+  if (todayObj.getDate() === 1) {
+    const dismissed = localStorage.getItem("regim:measure-dismiss-" + dateKey(todayObj));
+    if (!dismissed) $("monthly-measure-banner")?.classList.remove("hidden");
+  }
+
+  // FIX: wczytaj zapisane zadania zanim nadpiszesz świeżymi
   const today = await loadDayDoc(todayKey);
   const savedTasks = today?.tasks || [];
   state.morning = today?.morning || {};
@@ -2199,7 +2553,6 @@ async function bootApp() {
 
   applyConditionalTasks();
 
-  // Odtwórz stany 'done' z zapisanych zadań
   if (savedTasks.length) {
     const savedMap = new Map(savedTasks.map(t => [t.id, t.done]));
     TASK_CATEGORIES.forEach(c => c.tasks.forEach(t => {
@@ -2216,6 +2569,8 @@ async function bootApp() {
   renderHealthWarnings();
   checkDeload();
   await renderImprovementTips();
+  renderSupplementsCard();
+  renderWaterCard();
   renderGuideSections();
   renderKnowledgeBase();
   renderFactOfDay();
