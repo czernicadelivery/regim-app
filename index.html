@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>REGIM / Lock In</title>
-<meta name="description" content="Zimowy Lock In — masa, wzrost, wygląd.">
+<title>REGIM / Lock In v2.0</title>
+<meta name="description" content="Zimowy Lock In v2.0 — masa, wzrost, wygląd.">
 <meta name="theme-color" content="#1a1530">
 <link rel="manifest" href="manifest.json">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2222%22 fill=%22%231a1530%22/><text x=%2250%22 y=%2270%22 font-size=%2258%22 text-anchor=%22middle%22 fill=%22%235eead4%22 font-family=%22Arial%22 font-weight=%22900%22>L</text></svg>">
@@ -101,8 +101,13 @@ html.light-theme .history-item{border-left-color:rgba(30,26,53,.12)}
 .analysis-body em{color:#fbbf9d;font-style:normal;font-weight:700}
 .food-card{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:18px;padding:12px;margin-bottom:8px}
 .glass-mini{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:14px}
-.water-btn{transition:all .2s;cursor:pointer}
-.water-btn:active{transform:scale(.92)}
+@keyframes beast-glow{0%,100%{box-shadow:0 0 30px -4px rgba(251,191,36,.7),0 0 60px -8px rgba(251,191,36,.4)}50%{box-shadow:0 0 40px -2px rgba(251,191,36,.9),0 0 80px -4px rgba(251,191,36,.6)}}
+.beast-badge{background:linear-gradient(135deg,#fbbf24,#fbbf9d,#fbbf24);background-size:200% 200%;animation:gradient-shift 3s ease infinite,beast-glow 2s ease-in-out infinite;color:#0f0c1d;font-weight:900;letter-spacing:.05em}
+.toggle-switch{position:relative;width:52px;height:30px;background:rgba(255,255,255,.1);border-radius:999px;transition:background .3s;cursor:pointer;flex-shrink:0}
+.toggle-switch::after{content:"";position:absolute;top:3px;left:3px;width:24px;height:24px;background:#fff;border-radius:50%;transition:transform .3s cubic-bezier(.16,1,.3,1);box-shadow:0 2px 6px rgba(0,0,0,.3)}
+.toggle-switch.on{background:linear-gradient(135deg,#5eead4,#c4b5fd)}
+.toggle-switch.on::after{transform:translateX(22px)}
+.booster-badge{background:linear-gradient(135deg,rgba(251,113,133,.2),rgba(251,191,36,.2));border:1px solid rgba(251,113,133,.4);color:#fb7185;font-size:10px;font-weight:800;padding:2px 8px;border-radius:999px}
 </style>
 </head>
 <body class="text-neutral-100 font-sans min-h-screen pb-28">
@@ -116,7 +121,7 @@ html.light-theme .history-item{border-left-color:rgba(30,26,53,.12)}
         <i class="fa-solid fa-bolt text-ink text-lg"></i>
       </div>
       <div>
-        <div class="font-extrabold text-lg leading-none tracking-tight">REGIM</div>
+        <div class="font-extrabold text-lg leading-none tracking-tight">REGIM<span class="text-mint text-[10px] ml-1">v2.0</span></div>
         <div class="text-[11px] text-neutral-400 leading-none mt-0.5" id="header-greeting">Ładuję...</div>
       </div>
     </div>
@@ -162,29 +167,34 @@ html.light-theme .history-item{border-left-color:rgba(30,26,53,.12)}
       </div>
     </div>
     <div class="h-2 bg-white/5 rounded-full overflow-hidden"><div id="progress-bar" class="progress-fill h-full rounded-full bg-gradient-to-r from-mint to-lilac" style="width:0%"></div></div>
+    <div id="beast-mode-badge" class="hidden mt-3 beast-badge rounded-2xl py-2.5 text-center text-xs tracking-widest pulse-glow">🔥 BEAST MODE ACTIVE 🔥</div>
   </section>
 
   <div class="countdown-widget mb-5 rise">
-    <div class="flex items-center justify-between">
+    <div class="flex items-center justify-between gap-3">
       <div>
         <div class="text-[10px] text-mint font-extrabold tracking-widest uppercase mb-1">LOCK IN</div>
         <div class="text-sm font-bold" id="lockin-day">Dzień 1</div>
       </div>
+      <div class="text-center">
+        <div class="text-[10px] text-neutral-400 font-extrabold tracking-widest uppercase mb-1">POZOSTAŁO</div>
+        <div class="text-2xl font-extrabold text-mint" id="days-remaining">73</div>
+        <div class="text-[9px] text-neutral-400 font-bold">dni Lock In</div>
+      </div>
       <div class="text-right">
-        <div class="text-[10px] text-neutral-400 font-extrabold tracking-widest uppercase mb-1">DO 1 STYCZNIA</div>
-        <div class="text-sm font-bold text-mint" id="days-to-january">—</div>
+        <div class="text-[10px] text-neutral-400 font-extrabold tracking-widest uppercase mb-1">DO 1 STY</div>
+        <div class="text-sm font-bold text-gold" id="days-to-january">—</div>
       </div>
     </div>
   </div>
 
-  <!-- BANNER: 1. dzień miesiąca -->
   <div id="monthly-measure-banner" class="hidden mb-4 rise">
     <div class="glass rounded-3xl p-4 border border-gold/40 milestone-glow">
       <div class="flex items-start gap-3">
         <div class="text-2xl">📏</div>
         <div class="flex-1 min-w-0">
           <div class="font-bold text-sm text-gold">1. dzień miesiąca — czas na pomiary!</div>
-          <p class="text-xs text-neutral-200 font-medium leading-relaxed mt-1">Zmierzyć: wzrost (rano, boso, plecy do ściany), obwody (klatka, talia, biceps). Wpisz w Ustawieniach potem.</p>
+          <p class="text-xs text-neutral-200 font-medium leading-relaxed mt-1">Zmierzyć: wzrost (rano, boso, plecy do ściany), obwody (klatka, talia, biceps).</p>
         </div>
         <button id="btn-measure-dismiss" class="text-neutral-500 w-6 h-6 flex items-center justify-center flex-shrink-0"><i class="fa-solid fa-xmark"></i></button>
       </div>
@@ -213,7 +223,6 @@ html.light-theme .history-item{border-left-color:rgba(30,26,53,.12)}
     <button data-tab="mentor" class="tab-btn flex-1 py-2 rounded-full text-[10px] font-bold text-neutral-400 whitespace-nowrap">Trener</button>
   </nav>
 
-  <!-- ============ DZIŚ ============ -->
   <section id="tab-dashboard" class="tab-panel space-y-4">
     <div class="glass rounded-4xl p-5 shadow-soft">
       <div class="flex items-center gap-2 mb-3"><i class="fa-solid fa-gauge-high text-mint"></i><span class="font-bold text-sm">Gotowość dnia</span></div>
@@ -232,46 +241,21 @@ html.light-theme .history-item{border-left-color:rgba(30,26,53,.12)}
       </div>
     </div>
 
-    <!-- KARTA: Suplementacja -->
     <div class="glass rounded-4xl p-5 shadow-warm border border-gold/20">
       <div class="flex items-center justify-between mb-3">
-        <div class="flex items-center gap-2"><i class="fa-solid fa-capsules text-gold"></i><span class="font-bold text-sm text-gold">Dzisiejsza suplementacja</span></div>
+        <div class="flex items-center gap-2"><i class="fa-solid fa-capsules text-gold"></i><span class="font-bold text-sm text-gold">Suplementacja — D3</span></div>
         <span id="supp-status-badge" class="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-mint/15 text-mint">—</span>
       </div>
       <div class="space-y-2.5">
         <div>
           <div class="flex items-center justify-between text-xs mb-1">
-            <span class="font-bold text-neutral-200">Witamina D3</span>
+            <span class="font-bold text-neutral-200">Witamina D3 ×2 tabletki</span>
             <span id="supp-d3-text" class="font-extrabold text-gold">0 / 4000 IU</span>
           </div>
           <div class="h-2 bg-white/5 rounded-full overflow-hidden"><div id="supp-d3-bar" class="progress-fill h-full rounded-full bg-gradient-to-r from-gold to-peach" style="width:0%"></div></div>
-          <div id="supp-d3-hint" class="text-[10px] text-neutral-500 font-medium mt-1">Cel: do 4000 IU dziennie</div>
-        </div>
-        <div>
-          <div class="flex items-center justify-between text-xs mb-1">
-            <span class="font-bold text-neutral-200">Witamina A</span>
-            <span id="supp-a-text" class="font-extrabold text-peach">0 / 9000 IU</span>
-          </div>
-          <div class="h-2 bg-white/5 rounded-full overflow-hidden"><div id="supp-a-bar" class="progress-fill h-full rounded-full bg-gradient-to-r from-peach to-rose" style="width:0%"></div></div>
+          <div id="supp-d3-hint" class="text-[10px] text-neutral-500 font-medium mt-1">Cel: 4000 IU dziennie (2 tabletki × 2000 IU)</div>
         </div>
         <div id="supp-warning" class="hidden warning-card text-xs text-neutral-200 font-medium leading-relaxed"></div>
-      </div>
-    </div>
-
-    <!-- KARTA: Nawodnienie -->
-    <div class="glass rounded-4xl p-5 shadow-soft border border-mint/20">
-      <div class="flex items-center justify-between mb-3">
-        <div class="flex items-center gap-2"><i class="fa-solid fa-droplet text-mint"></i><span class="font-bold text-sm text-mint">Nawodnienie</span></div>
-        <span id="water-pct" class="text-[10px] font-extrabold text-mint">0%</span>
-      </div>
-      <div class="h-3 bg-white/5 rounded-full overflow-hidden mb-2"><div id="water-bar" class="progress-fill h-full rounded-full bg-gradient-to-r from-mint to-lilac" style="width:0%"></div></div>
-      <div class="flex items-center justify-between mb-3">
-        <div class="text-xs font-bold text-neutral-200"><span id="water-ml">0</span> / 2500 ml</div>
-        <div class="text-xs font-bold text-neutral-400"><span id="water-glasses">0</span> szklanek</div>
-      </div>
-      <div class="flex gap-2">
-        <button id="btn-water-add" class="flex-1 water-btn py-2.5 rounded-2xl bg-gradient-to-br from-mint to-lilac text-ink font-extrabold text-sm">+ Szklanka 250 ml</button>
-        <button id="btn-water-reset" class="water-btn px-4 py-2.5 rounded-2xl glass font-bold text-xs text-neutral-400">Reset</button>
       </div>
     </div>
 
@@ -288,6 +272,11 @@ html.light-theme .history-item{border-left-color:rgba(30,26,53,.12)}
     <div id="milestone-banner" class="hidden rise glass rounded-4xl p-5 border border-gold/40 milestone-glow">
       <div class="flex items-center gap-2 mb-2"><i class="fa-solid fa-trophy text-gold"></i><span class="font-bold text-sm text-gold" id="milestone-title">Milestone!</span></div>
       <p id="milestone-text" class="text-sm text-neutral-200 leading-relaxed font-medium"></p>
+    </div>
+
+    <div id="booster-banner" class="hidden rise glass rounded-4xl p-5 border border-rose/30">
+      <div class="flex items-center gap-2 mb-2"><i class="fa-solid fa-fire text-rose"></i><span class="font-bold text-sm text-rose">BOOSTER +15% AKTYWNY</span></div>
+      <p class="text-sm text-neutral-200 leading-relaxed font-medium">Masz wyłączony tryb Skincare lub Suplementy — trening objętościowo podbity o +15% (dodatkowa seria do ćwiczeń). Włącz brakujące tryby żeby wrócić do bazy.</p>
     </div>
 
     <div class="glass rounded-4xl p-4 shadow-soft">
@@ -316,7 +305,7 @@ html.light-theme .history-item{border-left-color:rgba(30,26,53,.12)}
         <label class="block"><span class="text-[11px] text-lilac ml-1 font-bold">Punkty oddychania:</span>
           <input type="number" min="0" max="100" id="input-breathing" placeholder="95" class="w-full mt-1 bg-lilac/10 border border-lilac/30 rounded-2xl px-3 py-2.5 text-neutral-100 font-semibold focus:outline-none focus:border-lilac transition"></label>
         <label class="block col-span-2"><span class="text-[11px] text-gold ml-1 font-bold">Waga (kg):</span>
-          <input type="number" step="0.1" id="input-weight-daily" placeholder="44.4" class="w-full mt-1 bg-gold/10 border border-gold/30 rounded-2xl px-3 py-2.5 text-neutral-100 font-semibold focus:outline-none focus:border-gold transition"></label>
+          <input type="number" step="0.1" id="input-weight-daily" placeholder="45.0" class="w-full mt-1 bg-gold/10 border border-gold/30 rounded-2xl px-3 py-2.5 text-neutral-100 font-semibold focus:outline-none focus:border-gold transition"></label>
         <div class="col-span-2 block">
           <span class="text-[11px] text-peach ml-1 font-bold">Nastrój rano:</span>
           <div class="mt-2 flex items-center gap-3"><input type="range" min="1" max="10" value="5" id="input-mood-morning" class="slider-custom flex-1"><span id="mood-morning-value" class="text-lg font-extrabold text-peach w-8 text-center">5</span></div>
@@ -386,8 +375,17 @@ html.light-theme .history-item{border-left-color:rgba(30,26,53,.12)}
     </div>
   </section>
 
-  <!-- ============ JEDZENIE ============ -->
   <section id="tab-jedzenie" class="tab-panel hidden space-y-4">
+    <div class="glass rounded-4xl p-5 shadow-warm border border-gold/20">
+      <div class="flex items-center justify-between mb-3">
+        <div class="flex items-center gap-2"><i class="fa-solid fa-blender text-gold"></i><span class="font-bold text-base">🥤 Mass Shake Generator 700 kcal</span></div>
+        <button id="btn-roll-shake" class="text-[11px] font-bold text-gold glass rounded-full px-3 py-1.5 active:scale-95 transition"><i class="fa-solid fa-rotate mr-1"></i>Losuj</button>
+      </div>
+      <div id="mass-shake-roll" class="glass rounded-3xl p-4 border border-gold/20">
+        <p class="text-xs text-neutral-400 font-medium">Kliknij "Losuj" — dostaniesz gotowy przepis na szejka masowego ≈ 700 kcal z domowych składników.</p>
+      </div>
+    </div>
+
     <div class="glass rounded-4xl p-5 shadow-warm">
       <div class="flex items-center justify-between mb-3">
         <div class="flex items-center gap-2"><i class="fa-solid fa-dice text-mint"></i><span class="font-bold text-base">🎲 Losuj plan dnia</span></div>
@@ -396,6 +394,16 @@ html.light-theme .history-item{border-left-color:rgba(30,26,53,.12)}
       <div id="food-roll" class="glass rounded-3xl p-4 border border-mint/20">
         <p class="text-xs text-neutral-400 font-medium">Kliknij "Losuj" — dostaniesz gotowy plan: śniadanie + obiad + przekąska + kolacja + szejk.</p>
       </div>
+    </div>
+
+    <div class="glass rounded-4xl p-5 shadow-soft border border-mint/20">
+      <div class="flex items-center gap-2 mb-3"><i class="fa-solid fa-bullseye text-mint"></i><span class="font-bold text-sm text-mint">🎯 Cel: 50 kg — masa i białko</span></div>
+      <div class="grid grid-cols-3 gap-3">
+        <div class="glass rounded-2xl p-3 text-center"><div class="text-[10px] text-neutral-400 font-bold tracking-widest">START</div><div class="text-lg font-extrabold text-gold">45 kg</div></div>
+        <div class="glass rounded-2xl p-3 text-center"><div class="text-[10px] text-neutral-400 font-bold tracking-widest">CEL</div><div class="text-lg font-extrabold text-mint">50 kg</div></div>
+        <div class="glass rounded-2xl p-3 text-center"><div class="text-[10px] text-neutral-400 font-bold tracking-widest">BIAŁKO</div><div class="text-lg font-extrabold text-peach">77 g</div></div>
+      </div>
+      <p class="text-xs text-neutral-400 font-medium mt-3">1.7 g białka / kg masy ciała = ~77 g dziennie. Bez nadwyżki kalorycznej masa nie rośnie.</p>
     </div>
 
     <div class="flex gap-1.5 overflow-x-auto pb-1">
@@ -413,9 +421,9 @@ html.light-theme .history-item{border-left-color:rgba(30,26,53,.12)}
       <div class="flex items-center gap-2 mb-2"><i class="fa-solid fa-lightbulb text-gold"></i><span class="font-bold text-sm text-gold">💡 Zasady jedzenia pod masę</span></div>
       <ul class="text-xs text-neutral-300 leading-relaxed font-medium space-y-1.5 list-disc ml-4">
         <li>Cel: <strong>2800-3000 kcal dziennie</strong> — bez tego masa nie rośnie</li>
-        <li>Białko: <strong>75-100 g</strong> (1.7 g/kg masy ciała)</li>
+        <li>Białko: <strong>~77 g</strong> (1.7 g/kg masy ciała)</li>
         <li>Białko w <strong>każdym</strong> posiłku — jajka, mięso, twaróg, Skyr, mleko</li>
-        <li>Szejk masowy po szkole = <strong>game changer</strong> (+600 kcal w 5 min)</li>
+        <li>Szejk masowy po szkole = <strong>game changer</strong> (+700 kcal w 5 min)</li>
         <li>Zero cukru po 18:00 — psuje sen i tłumi hormon wzrostu</li>
         <li>Jedz 4-5 posiłków, nie 2-3</li>
         <li>Twaróg/Skyr przed snem — buduje mięśnie w nocy</li>
@@ -423,7 +431,6 @@ html.light-theme .history-item{border-left-color:rgba(30,26,53,.12)}
     </div>
   </section>
 
-  <!-- ============ CIAŁO ============ -->
   <section id="tab-cialo" class="tab-panel hidden space-y-4">
     <div class="glass rounded-4xl p-5 shadow-warm"><div class="flex items-center gap-2 mb-3"><i class="fa-solid fa-user text-mint"></i><span class="font-bold text-base">Mój profil</span></div><div id="profil-card" class="grid grid-cols-2 gap-3"></div></div>
     <div class="glass rounded-4xl p-5 shadow-warm">
@@ -451,7 +458,6 @@ html.light-theme .history-item{border-left-color:rgba(30,26,53,.12)}
     <div class="glass rounded-4xl p-5 shadow-warm"><div class="flex items-center gap-2 mb-3"><i class="fa-solid fa-ranking-star text-mint"></i><span class="font-bold text-base">Co wpływa na wzrost</span></div><div id="growth-factors" class="space-y-2"></div></div>
   </section>
 
-  <!-- ============ POSTĘPY ============ -->
   <section id="tab-postepy" class="tab-panel hidden space-y-5">
     <div class="glass rounded-4xl p-5 shadow-warm"><div class="flex items-center gap-2 mb-4"><i class="fa-solid fa-chart-pie text-mint"></i><span class="font-bold text-base">Ostatnie 30 dni</span></div><div id="last-30-days" class="grid grid-cols-2 gap-3"></div></div>
     <div class="glass rounded-4xl p-5 shadow-warm"><div class="flex items-center gap-2 mb-4"><i class="fa-solid fa-crown text-gold"></i><span class="font-bold text-sm">Rekordy osobiste</span></div><div id="personal-records" class="grid grid-cols-2 gap-3"></div></div>
@@ -467,7 +473,7 @@ html.light-theme .history-item{border-left-color:rgba(30,26,53,.12)}
       <div id="past-self-comparison" class="space-y-2"><p class="text-xs text-neutral-400">Ładuję...</p></div>
     </div>
     <div class="glass rounded-4xl p-5 shadow-warm">
-      <div class="flex items-center gap-2 mb-3"><i class="fa-solid fa-bullseye text-mint"></i><span class="font-bold text-sm">Cel wagowy</span><button id="btn-goal-edit" class="ml-auto text-[11px] font-bold text-neutral-400 glass rounded-full px-3 py-1"><i class="fa-solid fa-gear mr-1"></i>Zmień</button></div>
+      <div class="flex items-center gap-2 mb-3"><i class="fa-solid fa-bullseye text-mint"></i><span class="font-bold text-sm">Cel wagowy 50 kg</span><button id="btn-goal-edit" class="ml-auto text-[11px] font-bold text-neutral-400 glass rounded-full px-3 py-1"><i class="fa-solid fa-gear mr-1"></i>Zmień</button></div>
       <div class="space-y-3">
         <div class="flex items-end justify-between"><div><div class="text-3xl font-extrabold" id="goal-current">—</div><div class="text-[11px] text-neutral-400 font-semibold">aktualna</div></div><div class="text-right"><div class="text-2xl font-extrabold text-mint" id="goal-target">50.0 kg</div><div class="text-[11px] text-neutral-400 font-semibold">cel</div></div></div>
         <div id="goal-progress-text" class="text-xs text-neutral-300 font-medium leading-snug">Wpisz wagę.</div>
@@ -510,7 +516,6 @@ html.light-theme .history-item{border-left-color:rgba(30,26,53,.12)}
     <div class="glass rounded-4xl p-5 shadow-soft"><div class="flex items-center gap-2 mb-4"><i class="fa-solid fa-medal text-gold"></i><span class="font-bold text-sm">Odznaki</span></div><div id="badges-grid" class="grid grid-cols-3 gap-3"></div></div>
   </section>
 
-  <!-- ============ TRENER ============ -->
   <section id="tab-mentor" class="tab-panel hidden space-y-5">
     <button id="btn-analyze-ai" class="w-full py-4 bg-gradient-to-br from-peach to-gold text-ink font-extrabold rounded-full text-base active:scale-95 transition shadow-warm flex items-center justify-center gap-2">
       <span id="ai-btn-label"><i class="fa-solid fa-dumbbell mr-1.5"></i>🏋️ Pełna analiza Trenera</span>
@@ -556,7 +561,6 @@ html.light-theme .history-item{border-left-color:rgba(30,26,53,.12)}
 
 <div id="toast" class="hidden fixed bottom-6 left-1/2 -translate-x-1/2 z-50 glass rounded-full px-5 py-3 text-sm font-bold shadow-soft rise"></div>
 
-<!-- MODALE -->
 <div id="modal-breathing" class="modal-wrap hidden fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-5">
   <div class="modal-backdrop absolute inset-0" data-close-modal></div>
   <div class="modal-pop relative glass rounded-t-4xl sm:rounded-4xl w-full sm:max-w-md p-6 shadow-soft max-h-[85vh] overflow-y-auto text-center">
@@ -591,6 +595,30 @@ html.light-theme .history-item{border-left-color:rgba(30,26,53,.12)}
   <div class="modal-pop relative glass rounded-t-4xl sm:rounded-4xl w-full sm:max-w-md p-6 shadow-soft max-h-[85vh] overflow-y-auto">
     <div class="flex items-start justify-between mb-4"><div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-mint/25 to-lilac/25 flex items-center justify-center"><i class="fa-solid fa-gear text-mint text-2xl"></i></div><button data-close-modal class="w-9 h-9 rounded-full glass flex items-center justify-center text-neutral-400"><i class="fa-solid fa-xmark"></i></button></div>
     <h3 class="font-extrabold text-xl mb-5">⚙️ Ustawienia</h3>
+
+    <div class="pt-3 pb-3 border-b border-white/10 mb-4">
+      <div class="text-[11px] text-mint font-extrabold tracking-widest uppercase mb-3"><i class="fa-solid fa-sliders mr-1"></i>Tryby aplikacji</div>
+      <div class="space-y-3">
+        <div class="flex items-center justify-between">
+          <div><div class="text-sm font-bold">Tryb Suplementy</div><div class="text-[10px] text-neutral-400">D3 ×2 tabletki</div></div>
+          <div id="toggle-supplements" class="toggle-switch" data-toggle="supplements"></div>
+        </div>
+        <div class="flex items-center justify-between">
+          <div><div class="text-sm font-bold">Tryb Skincare / Pielęgnacja</div><div class="text-[10px] text-neutral-400">Tołpa, Acnederm, Cetaphil</div></div>
+          <div id="toggle-skincare" class="toggle-switch" data-toggle="skincare"></div>
+        </div>
+        <div class="flex items-center justify-between">
+          <div><div class="text-sm font-bold">Tryb Jawline & Postawa</div><div class="text-[10px] text-neutral-400">Mewing, postawa, symetria</div></div>
+          <div id="toggle-jawline" class="toggle-switch" data-toggle="jawline"></div>
+        </div>
+        <div class="flex items-center justify-between">
+          <div><div class="text-sm font-bold">Tryb Hardcore / Beast Mode</div><div class="text-[10px] text-neutral-400">Zimny prysznic, ekstra wyzwania</div></div>
+          <div id="toggle-beast" class="toggle-switch" data-toggle="beast"></div>
+        </div>
+      </div>
+      <p class="text-[10px] text-neutral-500 font-medium mt-3 leading-relaxed">⚠️ Wyłączenie Skincare lub Suplementów = <strong class="text-rose">+15% objętości treningu</strong> (booster wyrównawczy).</p>
+    </div>
+
     <div class="space-y-4">
       <label class="block"><span class="text-[11px] text-neutral-400 ml-1 font-semibold">Imię:</span><input type="text" id="input-name" placeholder="Karol" class="w-full mt-1 bg-white/5 border border-white/10 rounded-2xl px-3 py-2.5 text-neutral-100 font-semibold"></label>
       <label class="block"><span class="text-[11px] text-neutral-400 ml-1 font-semibold">Wiek:</span><input type="number" id="input-age" placeholder="14" class="w-full mt-1 bg-white/5 border border-white/10 rounded-2xl px-3 py-2.5 text-neutral-100 font-semibold"></label>
@@ -600,13 +628,9 @@ html.light-theme .history-item{border-left-color:rgba(30,26,53,.12)}
       <label class="block"><span class="text-[11px] text-neutral-400 ml-1 font-semibold">Cel wagowy (kg):</span><input type="number" step="0.1" id="input-goal-weight-settings" placeholder="50.0" class="w-full mt-1 bg-white/5 border border-white/10 rounded-2xl px-3 py-2.5 text-neutral-100 font-semibold"></label>
 
       <div class="pt-3 border-t border-white/10">
-        <div class="text-[11px] text-gold font-extrabold tracking-widest uppercase mb-3"><i class="fa-solid fa-capsules mr-1"></i>Moje suplementy</div>
-        <div class="space-y-3">
-          <label class="block"><span class="text-[11px] text-neutral-400 ml-1 font-semibold">1 tabletka D3 (IU):</span><input type="number" id="input-d3-iu" placeholder="2000" class="w-full mt-1 bg-white/5 border border-white/10 rounded-2xl px-3 py-2.5 text-neutral-100 font-semibold"></label>
-          <label class="block"><span class="text-[11px] text-neutral-400 ml-1 font-semibold">1 łyżeczka tranu (ml):</span><input type="number" step="0.5" id="input-tran-ml" placeholder="5" class="w-full mt-1 bg-white/5 border border-white/10 rounded-2xl px-3 py-2.5 text-neutral-100 font-semibold"></label>
-          <label class="block"><span class="text-[11px] text-neutral-400 ml-1 font-semibold">D3 w 1 łyżeczce tranu (IU):</span><input type="number" id="input-tran-d3-iu" placeholder="400" class="w-full mt-1 bg-white/5 border border-white/10 rounded-2xl px-3 py-2.5 text-neutral-100 font-semibold"></label>
-          <label class="block"><span class="text-[11px] text-neutral-400 ml-1 font-semibold">Wit. A w 1 łyżeczce tranu (IU):</span><input type="number" id="input-tran-a-iu" placeholder="766" class="w-full mt-1 bg-white/5 border border-white/10 rounded-2xl px-3 py-2.5 text-neutral-100 font-semibold"></label>
-        </div>
+        <div class="text-[11px] text-gold font-extrabold tracking-widest uppercase mb-3"><i class="fa-solid fa-capsules mr-1"></i>Suplementacja D3</div>
+        <label class="block"><span class="text-[11px] text-neutral-400 ml-1 font-semibold">1 tabletka D3 (IU):</span><input type="number" id="input-d3-iu" placeholder="2000" class="w-full mt-1 bg-white/5 border border-white/10 rounded-2xl px-3 py-2.5 text-neutral-100 font-semibold"></label>
+        <label class="block mt-3"><span class="text-[11px] text-neutral-400 ml-1 font-semibold">Liczba tabletek dziennie:</span><input type="number" id="input-d3-tablets" placeholder="2" class="w-full mt-1 bg-white/5 border border-white/10 rounded-2xl px-3 py-2.5 text-neutral-100 font-semibold"></label>
       </div>
 
       <div class="glass rounded-3xl p-4"><div class="text-[11px] text-neutral-400 font-bold mb-2">TWOJE BMI</div><div id="settings-bmi" class="text-2xl font-extrabold text-mint">—</div><div id="settings-bmi-label" class="text-xs text-neutral-400 font-medium mt-1">Wpisz wagę</div></div>
@@ -631,67 +655,38 @@ html.light-theme .history-item{border-left-color:rgba(30,26,53,.12)}
 // ============================================================================
 let firebaseReady = false, currentUser = { uid: "local" }, authResolved = false, syncInProgress = false, booted = false, migrateDone = false;
 const USER_NAME_DEFAULT = "Karol";
+const LOCKIN_TOTAL_DAYS = 73;
 if (!localStorage.getItem("regim:lockin-start")) {
   const d = new Date();
-  const y = d.getMonth() >= 10 ? d.getFullYear() : d.getFullYear() - 1;
-  localStorage.setItem("regim:lockin-start", `${y}-11-01`);
+  d.setDate(d.getDate() - 0);
+  localStorage.setItem("regim:lockin-start", d.toISOString().split("T")[0]);
 }
-const LOCKIN_START = localStorage.getItem("regim:lockin-start");
+const LOCKIN_START = new Date(localStorage.getItem("regim:lockin-start") + "T00:00:00");
+const LOCKIN_END = new Date(LOCKIN_START.getTime() + LOCKIN_TOTAL_DAYS * 86400000);
 
 const firebaseConfig = {
   apiKey: "AIzaSyChzU-QWJ_lyE7kLePHCvYltIayMZuXlL8",
   authDomain: "regim-web.firebaseapp.com",
-  databaseURL: "https://regim-web-default-rtdb.europe-west1.firebasedatabase.app",
   projectId: "regim-web",
   storageBucket: "regim-web.firebasestorage.app",
   messagingSenderId: "1025631760665",
   appId: "1:1025631760665:web:93c5b62295bd8b0b675588",
 };
 function $(id) { return document.getElementById(id); }
-
 function setSyncStatus(mode, label) {
   const el = $("sync-status"); if (!el) return;
   el.className = mode;
   const icons = { offline: "fa-cloud", syncing: "fa-cloud-arrow-up", synced: "fa-cloud-check" };
-  el.innerHTML = `<i class="fa-solid ${icons[mode]}"></i><span>${label}</span>`;
+  el.innerHTML = '<i class="fa-solid ' + icons[mode] + '"></i><span>' + label + '</span>';
 }
 function updateSyncUI() {
   if (!firebaseReady) return setSyncStatus("offline", "Lokalnie");
-  if (currentUser?.uid === "local") return setSyncStatus("offline", "Lokalnie");
+  if (currentUser && currentUser.uid === "local") return setSyncStatus("offline", "Lokalnie");
   if (syncInProgress) return setSyncStatus("syncing", "Sync...");
   setSyncStatus("synced", "Chmura");
 }
-function getSettings() {
-  return {
-    name: localStorage.getItem("regim:name") || USER_NAME_DEFAULT,
-    age: parseInt(localStorage.getItem("regim:age")) || 14,
-    height: parseFloat(localStorage.getItem("regim:height")) || 166,
-    heightDad: parseFloat(localStorage.getItem("regim:height-dad")) || null,
-    heightMom: parseFloat(localStorage.getItem("regim:height-mom")) || null,
-    goalWeight: parseFloat(localStorage.getItem("regim:goal-weight")) || 50.0,
-    d3Iu: parseInt(localStorage.getItem("regim:d3-iu")) || 2000,
-    tranMl: parseFloat(localStorage.getItem("regim:tran-ml")) || 5,
-    tranD3Iu: parseInt(localStorage.getItem("regim:tran-d3-iu")) || 400,
-    tranAIu: parseInt(localStorage.getItem("regim:tran-a-iu")) || 766,
-  };
-}
-function saveSettings(s) {
-  localStorage.setItem("regim:name", s.name || USER_NAME_DEFAULT);
-  localStorage.setItem("regim:age", String(s.age));
-  localStorage.setItem("regim:height", String(s.height));
-  if (s.heightDad != null) localStorage.setItem("regim:height-dad", String(s.heightDad));
-  if (s.heightMom != null) localStorage.setItem("regim:height-mom", String(s.heightMom));
-  localStorage.setItem("regim:goal-weight", String(s.goalWeight));
-  localStorage.setItem("regim:d3-iu", String(s.d3Iu));
-  localStorage.setItem("regim:tran-ml", String(s.tranMl));
-  localStorage.setItem("regim:tran-d3-iu", String(s.tranD3Iu));
-  localStorage.setItem("regim:tran-a-iu", String(s.tranAIu));
-}
-function calcBMI(w, h) { if (!w || !h) return null; return w / ((h / 100) ** 2); }
-function bmiLabel(b) { if (b == null) return ""; if (b < 18.5) return "Niedowaga — buduj masę"; if (b < 25) return "Norma"; if (b < 30) return "Nadwaga"; return "Otyłość"; }
-function dateKey(date) { const y = date.getFullYear(); const m = String(date.getMonth() + 1).padStart(2, "0"); const d = String(date.getDate()).padStart(2, "0"); return `${y}-${m}-${d}`; }
 function escapeHtml(s) { const d = document.createElement("div"); d.textContent = s || ""; return d.innerHTML; }
-function showToast(msg) { const t = $("toast"); if (!t) return; t.textContent = msg; t.classList.remove("hidden"); clearTimeout(showToast._t); showToast._t = setTimeout(() => t.classList.add("hidden"), 2400); }
+function showToast(msg) { const t = $("toast"); if (!t) return; t.textContent = msg; t.classList.remove("hidden"); clearTimeout(showToast._t); showToast._t = setTimeout(function(){ t.classList.add("hidden"); }, 2400); }
 function vibrate(pattern) { if (navigator.vibrate) navigator.vibrate(pattern); }
 function playSound(type) {
   try {
@@ -709,20 +704,12 @@ function fireConfetti() {
   const ctx = c.getContext("2d");
   c.width = innerWidth; c.height = innerHeight;
   const colors = ["#5eead4", "#c4b5fd", "#fbbf24", "#fbbf9d", "#fb7185"];
-  const parts = Array.from({ length: 80 }, () => ({
-    x: Math.random() * c.width, y: -20, vy: 2 + Math.random() * 3,
-    vx: -1 + Math.random() * 2, s: 4 + Math.random() * 4,
-    col: colors[Math.floor(Math.random() * colors.length)], rot: Math.random() * 6.28,
-  }));
+  const parts = [];
+  for (let i = 0; i < 80; i++) parts.push({ x: Math.random() * c.width, y: -20, vy: 2 + Math.random() * 3, vx: -1 + Math.random() * 2, s: 4 + Math.random() * 4, col: colors[Math.floor(Math.random() * colors.length)], rot: Math.random() * 6.28 });
   let frames = 0;
   const tick = () => {
     ctx.clearRect(0, 0, c.width, c.height);
-    parts.forEach(p => {
-      p.x += p.vx; p.y += p.vy; p.rot += 0.1;
-      ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.rot);
-      ctx.fillStyle = p.col; ctx.fillRect(-p.s / 2, -p.s / 2, p.s, p.s);
-      ctx.restore();
-    });
+    parts.forEach(p => { p.x += p.vx; p.y += p.vy; p.rot += 0.1; ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.rot); ctx.fillStyle = p.col; ctx.fillRect(-p.s / 2, -p.s / 2, p.s, p.s); ctx.restore(); });
     frames++;
     if (frames < 180) requestAnimationFrame(tick); else ctx.clearRect(0, 0, c.width, c.height);
   };
@@ -730,15 +717,56 @@ function fireConfetti() {
 }
 
 // ============================================================================
-// DATA
+// SETTINGS + TOGGLES
 // ============================================================================
-function localKey(key, uid) { return `regim:${uid || currentUser?.uid || "local"}:${key}`; }
-function isCloud() { return firebaseReady && window.__fb && currentUser?.uid && currentUser.uid !== "local"; }
+function getToggle(name) {
+  const v = localStorage.getItem("regim:toggle-" + name);
+  if (v === null) return true;
+  return v === "1";
+}
+function setToggle(name, val) {
+  localStorage.setItem("regim:toggle-" + name, val ? "1" : "0");
+}
+function isBoosterActive() {
+  return !getToggle("skincare") || !getToggle("supplements");
+}
+function getSettings() {
+  return {
+    name: localStorage.getItem("regim:name") || USER_NAME_DEFAULT,
+    age: parseInt(localStorage.getItem("regim:age")) || 14,
+    height: parseFloat(localStorage.getItem("regim:height")) || 166,
+    heightDad: parseFloat(localStorage.getItem("regim:height-dad")) || null,
+    heightMom: parseFloat(localStorage.getItem("regim:height-mom")) || null,
+    goalWeight: parseFloat(localStorage.getItem("regim:goal-weight")) || 50.0,
+    startWeight: parseFloat(localStorage.getItem("regim:start-weight")) || 45.0,
+    d3Iu: parseInt(localStorage.getItem("regim:d3-iu")) || 2000,
+    d3Tablets: parseInt(localStorage.getItem("regim:d3-tablets")) || 2,
+  };
+}
+function saveSettings(s) {
+  localStorage.setItem("regim:name", s.name || USER_NAME_DEFAULT);
+  localStorage.setItem("regim:age", String(s.age));
+  localStorage.setItem("regim:height", String(s.height));
+  if (s.heightDad != null) localStorage.setItem("regim:height-dad", String(s.heightDad));
+  if (s.heightMom != null) localStorage.setItem("regim:height-mom", String(s.heightMom));
+  localStorage.setItem("regim:goal-weight", String(s.goalWeight));
+  localStorage.setItem("regim:d3-iu", String(s.d3Iu));
+  localStorage.setItem("regim:d3-tablets", String(s.d3Tablets));
+}
+function calcBMI(w, h) { if (!w || !h) return null; return w / ((h / 100) ** 2); }
+function bmiLabel(b) { if (b == null) return ""; if (b < 18.5) return "Niedowaga — buduj masę"; if (b < 25) return "Norma"; if (b < 30) return "Nadwaga"; return "Otyłość"; }
+function dateKey(date) { const y = date.getFullYear(); const m = String(date.getMonth() + 1).padStart(2, "0"); const d = String(date.getDate()).padStart(2, "0"); return y + "-" + m + "-" + d; }
+
+// ============================================================================
+// PERSISTENCE
+// ============================================================================
+function localKey(key, uid) { return "regim:" + (uid || (currentUser && currentUser.uid) || "local") + ":" + key; }
+function isCloud() { return firebaseReady && window.__fb && currentUser && currentUser.uid && currentUser.uid !== "local"; }
 async function saveDayDoc(d) {
   localStorage.setItem(localKey(d.date), JSON.stringify(d));
   if (!isCloud()) { updateSyncUI(); return; }
   syncInProgress = true; updateSyncUI();
-  try { const { fsMod, db } = window.__fb; await fsMod.setDoc(fsMod.doc(db, "users", currentUser.uid, "days", d.date), d, { merge: true }); }
+  try { const fb = window.__fb; await fb.fsMod.setDoc(fb.fsMod.doc(fb.db, "users", currentUser.uid, "days", d.date), d, { merge: true }); }
   catch (e) { console.error(e); } finally { syncInProgress = false; updateSyncUI(); }
 }
 async function loadDayDoc(dateStr) {
@@ -746,11 +774,11 @@ async function loadDayDoc(dateStr) {
   const localDoc = rawLocal ? JSON.parse(rawLocal) : null;
   if (isCloud()) {
     try {
-      const { fsMod, db } = window.__fb;
-      const snap = await fsMod.getDoc(fsMod.doc(db, "users", currentUser.uid, "days", dateStr));
+      const fb = window.__fb;
+      const snap = await fb.fsMod.getDoc(fb.fsMod.doc(fb.db, "users", currentUser.uid, "days", dateStr));
       if (snap.exists()) {
         const cloudDoc = snap.data();
-        const merged = { ...(localDoc || {}), ...cloudDoc };
+        const merged = Object.assign({}, localDoc || {}, cloudDoc);
         localStorage.setItem(localKey(dateStr), JSON.stringify(merged));
         return merged;
       }
@@ -764,10 +792,10 @@ async function loadLastNDays(n) {
   let cloudDocs = {};
   if (isCloud()) {
     try {
-      const { fsMod, db } = window.__fb;
+      const fb = window.__fb;
       const start = new Date(today); start.setDate(start.getDate() - (n - 1));
-      const q = fsMod.query(fsMod.collection(db, "users", currentUser.uid, "days"), fsMod.where("date", ">=", dateKey(start)), fsMod.orderBy("date", "asc"));
-      const snaps = await fsMod.getDocs(q);
+      const q = fb.fsMod.query(fb.fsMod.collection(fb.db, "users", currentUser.uid, "days"), fb.fsMod.where("date", ">=", dateKey(start)), fb.fsMod.orderBy("date", "asc"));
+      const snaps = await fb.fsMod.getDocs(q);
       snaps.forEach(s => { cloudDocs[s.id] = s.data(); });
     } catch (e) {}
   }
@@ -776,7 +804,7 @@ async function loadLastNDays(n) {
     const raw = localStorage.getItem(localKey(dk));
     const localDoc = raw ? JSON.parse(raw) : null;
     const cloudDoc = cloudDocs[dk];
-    const merged = cloudDoc ? { ...(localDoc || {}), ...cloudDoc } : localDoc;
+    const merged = cloudDoc ? Object.assign({}, localDoc || {}, cloudDoc) : localDoc;
     if (merged) docs.push(merged);
   }
   return docs;
@@ -792,20 +820,22 @@ async function collectAllDays() {
   }
   if (isCloud()) {
     try {
-      const { fsMod, db } = window.__fb;
-      const snaps = await fsMod.getDocs(fsMod.collection(db, "users", currentUser.uid, "days"));
-      snaps.forEach(s => { results[s.id] = { ...(results[s.id] || {}), ...s.data() }; });
+      const fb = window.__fb;
+      const snaps = await fb.fsMod.getDocs(fb.fsMod.collection(fb.db, "users", currentUser.uid, "days"));
+      snaps.forEach(s => { results[s.id] = Object.assign({}, results[s.id] || {}, s.data()); });
     } catch (e) {}
   }
   return Object.values(results).sort((a, b) => (a.date || "").localeCompare(b.date || ""));
 }
 async function loadDaysRange(n, offset) {
   const docs = []; const today = new Date();
+  const promises = [];
   for (let i = n - 1; i >= 0; i--) {
     const d = new Date(today); d.setDate(d.getDate() - i - offset);
-    const doc = await loadDayDoc(dateKey(d));
-    if (doc) docs.push(doc);
+    promises.push(loadDayDoc(dateKey(d)));
   }
+  const results = await Promise.all(promises);
+  results.forEach(doc => { if (doc) docs.push(doc); });
   return docs;
 }
 
@@ -816,9 +846,9 @@ async function migrateLocalToCloud() {
   if (migrateDone || !isCloud()) return;
   migrateDone = true;
   try {
-    const { fsMod, db } = window.__fb;
-    const metaRef = fsMod.doc(db, "users", currentUser.uid, "meta", "migration");
-    const metaSnap = await fsMod.getDoc(metaRef);
+    const fb = window.__fb;
+    const metaRef = fb.fsMod.doc(fb.db, "users", currentUser.uid, "meta", "migration");
+    const metaSnap = await fb.fsMod.getDoc(metaRef);
     if (metaSnap.exists() && metaSnap.data().done) return;
     const localDays = [];
     for (let i = 0; i < localStorage.length; i++) {
@@ -828,29 +858,28 @@ async function migrateLocalToCloud() {
       if (!/^\d{4}-\d{2}-\d{2}$/.test(ds)) continue;
       try { const p = JSON.parse(localStorage.getItem(k)); if (p) localDays.push(p); } catch (e) {}
     }
-    if (localDays.length === 0) { await fsMod.setDoc(metaRef, { done: true, at: Date.now(), count: 0 }); return; }
-    showToast(`Migracja ${localDays.length} dni...`);
+    if (localDays.length === 0) { await fb.fsMod.setDoc(metaRef, { done: true, at: Date.now(), count: 0 }); return; }
+    showToast("Migracja " + localDays.length + " dni...");
     syncInProgress = true; updateSyncUI();
-    const chunks = [];
-    for (let i = 0; i < localDays.length; i += 400) chunks.push(localDays.slice(i, i + 400));
-    for (const chunk of chunks) {
-      const batch = fsMod.writeBatch(db);
-      chunk.forEach(day => batch.set(fsMod.doc(db, "users", currentUser.uid, "days", day.date), day, { merge: true }));
+    for (let i = 0; i < localDays.length; i += 400) {
+      const chunk = localDays.slice(i, i + 400);
+      const batch = fb.fsMod.writeBatch(fb.db);
+      chunk.forEach(day => batch.set(fb.fsMod.doc(fb.db, "users", currentUser.uid, "days", day.date), day, { merge: true }));
       await batch.commit();
     }
-    await fsMod.setDoc(metaRef, { done: true, at: Date.now(), count: localDays.length });
-    showToast(`✅ Zmigrowano ${localDays.length} dni`);
+    await fb.fsMod.setDoc(metaRef, { done: true, at: Date.now(), count: localDays.length });
+    showToast("✅ Zmigrowano " + localDays.length + " dni");
   } catch (e) { console.error(e); } finally { syncInProgress = false; updateSyncUI(); }
 }
 function updateAuthUI(user) {
   const badge = $("user-badge"); const signinBtn = $("btn-signin"); const acc = $("settings-account");
   if (!badge || !signinBtn) return;
   if (user) {
-    const name = user.displayName || user.email?.split("@")[0] || user.uid.slice(0, 8);
+    const name = user.displayName || (user.email ? user.email.split("@")[0] : user.uid.slice(0, 8));
     badge.textContent = name; badge.classList.remove("hidden");
     signinBtn.innerHTML = '<i class="fa-solid fa-right-from-bracket"></i>';
     signinBtn.classList.remove("text-neutral-400"); signinBtn.classList.add("text-mint");
-    if (acc) acc.innerHTML = `✅ <strong>${escapeHtml(name)}</strong>`;
+    if (acc) acc.innerHTML = "✅ <strong>" + escapeHtml(name) + "</strong>";
   } else {
     badge.classList.add("hidden");
     signinBtn.innerHTML = '<i class="fa-solid fa-user"></i>';
@@ -860,10 +889,10 @@ function updateAuthUI(user) {
 }
 async function initFirebase() {
   try {
-    const { initializeApp } = await import("https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js");
+    const appMod = await import("https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js");
     const authMod = await import("https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js");
     const fsMod = await import("https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js");
-    const app = initializeApp(firebaseConfig);
+    const app = appMod.initializeApp(firebaseConfig);
     const auth = authMod.getAuth(app);
     const db = fsMod.getFirestore(app);
     try { await authMod.setPersistence(auth, authMod.browserLocalPersistence); } catch (e) {}
@@ -877,10 +906,11 @@ async function initFirebase() {
       if (!authResolved || !booted) { authResolved = true; await bootApp(); }
       else await reloadEverything();
     });
-    $("btn-signin")?.addEventListener("click", async () => {
+    const signinBtn = $("btn-signin");
+    if (signinBtn) signinBtn.addEventListener("click", async () => {
       const user = auth.currentUser;
       if (user) {
-        if (confirm(`Wylogować się z ${user.displayName || user.email}?`)) {
+        if (confirm("Wylogować się z " + (user.displayName || user.email) + "?")) {
           try { await authMod.signOut(auth); showToast("Wylogowano"); } catch (e) {}
         }
         return;
@@ -889,7 +919,7 @@ async function initFirebase() {
         const provider = new authMod.GoogleAuthProvider();
         provider.setCustomParameters({ prompt: "select_account" });
         await authMod.signInWithPopup(auth, provider);
-      } catch (e) { try { await authMod.signInAnonymously(auth); } catch (e2) { showToast("Błąd logowania: " + (e?.code || "unknown")); } }
+      } catch (e) { try { await authMod.signInAnonymously(auth); } catch (e2) { showToast("Błąd logowania: " + (e && e.code ? e.code : "unknown")); } }
     });
   } catch (e) { firebaseReady = false; authResolved = true; updateSyncUI(); }
 }
@@ -916,71 +946,52 @@ function getRhrRange(age) {
   if (age < 65) return { min: 60, max: 100, label: "dorośli" };
   return { min: 60, max: 100, label: "seniorzy" };
 }
-
 function analyzeRhr(rhr, age, avg7Rhr) {
-  // zwraca: { status: 'no-data'|'normal'|'high'|'very-high'|'low-sport'|'low-alarm'|'spike', message }
   if (rhr == null) return { status: "no-data" };
   const range = getRhrRange(age);
   const pctAboveAvg = (avg7Rhr && avg7Rhr > 0) ? ((rhr - avg7Rhr) / avg7Rhr) * 100 : 0;
-
-  // Priorytet: >15% vs średnia 7d
   if (avg7Rhr != null && pctAboveAvg >= 15) {
-    return {
-      status: "spike",
-      message: `<strong>${rhr} bpm</strong> — skok <em>+${pctAboveAvg.toFixed(0)}%</em> względem średniej 7d (${avg7Rhr.toFixed(0)} bpm). Możliwe: początek choroby, przemęczenie, stres. Obserwuj dziś, nie forsuj treningu.`
-    };
+    return { status: "spike", message: "<strong>" + rhr + " bpm</strong> — skok <em>+" + pctAboveAvg.toFixed(0) + "%</em> vs średnia 7d (" + avg7Rhr.toFixed(0) + " bpm). Możliwe: choroba, przemęczenie. Obserwuj dziś." };
   }
-  // Powyżej górnej granicy
-  if (rhr > range.max) {
-    return {
-      status: "high",
-      message: `<strong>${rhr} bpm</strong> — powyżej normy dla Twojego wieku (${range.min}–${range.max} bpm). Odpocznij, dużo wody, sprawdź czy nie zaczynasz się przeziębiać.`
-    };
-  }
-  // Poniżej dolnej granicy
-  if (rhr < range.min && rhr >= 50) {
-    return {
-      status: "low-sport",
-      message: `<strong>${rhr} bpm</strong> — poniżej typowej normy (${range.min}–${range.max}), ale przy regularnej aktywności to normalne (sportowa bradykardia). Nie ma się czym stresować.`
-    };
-  }
-  // Bardzo niskie <50
-  if (rhr < 50) {
-    return {
-      status: "low-alarm",
-      message: `<strong>${rhr} bpm</strong> — dość niskie tętno spoczynkowe. Jeśli trenujesz regularnie — spoko. Jeśli nie i czujesz zawroty/osłabienie — powiedz o tym lekarzowi.`
-    };
-  }
-  // Norma
-  return {
-    status: "normal",
-    message: `<strong>${rhr} bpm</strong> — w normie dla Twojego wieku (${range.min}–${range.max} bpm). Serce pracuje jak trzeba.`
-  };
+  if (rhr > range.max) return { status: "high", message: "<strong>" + rhr + " bpm</strong> — powyżej normy dla wieku (" + range.min + "–" + range.max + "). Odpocznij, dużo wody." };
+  if (rhr < range.min && rhr >= 50) return { status: "low-sport", message: "<strong>" + rhr + " bpm</strong> — poniżej typowej normy, ale przy regularnej aktywności to normalne." };
+  if (rhr < 50) return { status: "low-alarm", message: "<strong>" + rhr + " bpm</strong> — dość niskie tętno. Jeśli trenujesz regularnie — spoko. Jeśli nie i czujesz zawroty — lekarz." };
+  return { status: "normal", message: "<strong>" + rhr + " bpm</strong> — w normie dla wieku (" + range.min + "–" + range.max + ")." };
 }
 
 // ============================================================================
-// ADAPTACYJNY TRENING
+// TRENING
 // ============================================================================
 const BASE_CALISTHENICS = [
-  { id: "pompki", label: "Pompki klasyczne", series: "3×10-12" },
-  { id: "pompki-diament", label: "Pompki diamentowe", series: "3×8" },
+  { id: "pompki", label: "Pompki klasyczne (tempo 3s opuszczania)", series: "3×10-12" },
+  { id: "pompki-diament", label: "Pompki diamentowe (tempo 3s)", series: "3×8" },
   { id: "pompki-szerokie", label: "Pompki szerokie", series: "3×10" },
-  { id: "przysiady", label: "Przysiady", series: "3×15" },
-  { id: "wykroki", label: "Wykroki chodzone", series: "3×10/noga" },
+  { id: "przysiady", label: "Przysiady z pauzą 2s w dole", series: "3×15" },
+  { id: "wykroki", label: "Wykroki chodzone z pauzą", series: "3×10/noga" },
+  { id: "wznosy-barki", label: "Wznosy bokiem hantle 1kg (1s pauza na górze)", series: "3×20-25" },
+  { id: "wyciskanie-1kg", label: "Wyciskanie hantli 1kg nad głowę", series: "3×15" },
+  { id: "biceps-1kg", label: "Uginanie ramion hantle 1kg", series: "3×15" },
   { id: "wznosy-bioder", label: "Wznosy bioder", series: "3×15" },
   { id: "deska", label: "Deska (plank)", series: "3×45s" },
   { id: "unoszenie-nog", label: "Unoszenie nóg leżąc", series: "3×12" },
-  { id: "hantle-barki", label: "Hantle — unoszenie bokiem", series: "3×12" },
-  { id: "hantle-nadglowa", label: "Hantle — wyciskanie nad głowę", series: "3×10" },
-  { id: "hantle-biceps", label: "Hantle — uginanie ramion", series: "3×12" },
 ];
 const LIGHT_CALISTHENICS = [
   { id: "pompki", label: "Pompki klasyczne", series: "2×6" },
   { id: "przysiady", label: "Przysiady", series: "2×10" },
+  { id: "wznosy-barki", label: "Wznosy bokiem hantle 1kg", series: "2×15" },
   { id: "deska", label: "Deska (plank)", series: "2×20s" },
   { id: "wznosy-bioder", label: "Wznosy bioder", series: "2×10" },
 ];
-
+function boostSeries(series) {
+  const m = series.match(/^(\d+)×(.*)$/);
+  if (!m) return series;
+  const sets = parseInt(m[1]) + 1;
+  return sets + "×" + m[2];
+}
+function boostExercises(exercises) {
+  if (!isBoosterActive()) return exercises;
+  return exercises.map(ex => ({ id: ex.id, label: ex.label, series: boostSeries(ex.series), boosted: true }));
+}
 function calculateReadiness() {
   const m = state.morning || {}; const e = state.evening || {};
   const age = getSettings().age;
@@ -991,55 +1002,45 @@ function calculateReadiness() {
   if (m.rhr != null) {
     max += 20;
     if (m.rhr <= range.max && m.rhr >= range.min) score += 20;
-    else if (m.rhr < range.min && m.rhr >= 50) score += 18; // sportowe niskie = ok
+    else if (m.rhr < range.min && m.rhr >= 50) score += 18;
     else if (m.rhr <= range.max + 5) score += 12;
     else if (m.rhr <= range.max + 15) score += 5;
-    // >max+15 = 0 pkt
   }
   if (e.stress != null) { max += 15; const s = e.stress; if (s < 25) score += 15; else if (s < 40) score += 12; else if (s < 55) score += 8; else if (s < 70) score += 3; }
   if (m.breathing != null) { max += 10; if (m.breathing >= 95) score += 10; else if (m.breathing >= 85) score += 7; else if (m.breathing >= 70) score += 4; }
   if (max === 0) return null;
   return Math.round((score / max) * 100);
 }
-
 function getTrainingLevel() {
   const m = state.morning || {};
   const age = getSettings().age;
   const range = getRhrRange(age);
-  const sleep = m.sleepTotal;
-  const rhr = m.rhr;
-  const mood = m.moodMorning;
-  const breathing = m.breathing;
+  const sleep = m.sleepTotal; const rhr = m.rhr; const mood = m.moodMorning; const breathing = m.breathing;
   const kws = detectKeywords(state.note);
   const readiness = calculateReadiness();
-
-  if (kws.includes("sick") || kws.includes("injury")) return "recovery";
+  if (kws.indexOf("sick") >= 0 || kws.indexOf("injury") >= 0) return "recovery";
   if (sleep != null && sleep < 5) return "recovery";
   if (rhr != null && rhr > range.max + 15) return "recovery";
   if (breathing != null && breathing < 70) return "recovery";
   if (readiness != null && readiness < 40) return "recovery";
-
   if (sleep != null && sleep < 6.5) return "light";
   if (mood != null && mood <= 3) return "light";
   if (rhr != null && rhr > range.max) return "light";
   if (readiness != null && readiness < 60) return "light";
-
   if (sleep != null && sleep >= 8 && (mood == null || mood >= 7)) return "full";
   if (readiness != null && readiness >= 80) return "full";
   return "normal";
 }
-
 function buildTrainingTask() {
   const level = getTrainingLevel();
   if (level === "recovery") {
-    return { id: "trening", label: "🌿 Recovery day", hint: "Sen/RHR złe — dziś tylko regeneracja", done: false, level: "recovery", extra: ["🚶 Spacer 20 min", "🫁 Oddech 4-7-8 (5 min)", "🧘 Rozciąganie 10 min", "💧 Dużo wody"] };
+    return { id: "trening", label: "🌿 Recovery day", hint: "Sen/RHR złe — dziś tylko regeneracja", done: false, level: "recovery", extra: ["🚶 Spacer 20 min", "🫁 Oddech 4-7-8 (5 min)", "🧘 Rozciąganie 10 min"] };
   }
-  if (todayDow === 1) return { id: "trening", label: "🏊 Basen 1,5h", hint: level === "light" ? "Dziś lżej — 45 min zamiast 1,5h" : "Poniedziałek — dzień na wodę", done: false, level };
-  if (todayDow === 2 || todayDow === 5) return { id: "trening", label: "🚴 Rower 7 km", hint: level === "light" ? "Dziś lżej — 4 km spokojnie" : "Stały, spokojny rytm", done: false, level };
+  if (todayDow === 1) return { id: "trening", label: "🏊 Basen 1,5h", hint: level === "light" ? "Dziś lżej — 45 min zamiast 1,5h" : "Poniedziałek — klatka, plecy, regeneracja w wodzie", done: false, level: level };
   if (todayDow === 0) return { id: "trening", label: "🌅 Dzień wolny", hint: "Regeneracja — spacer opcjonalnie", done: false, level: "off" };
-  if (level === "full") return { id: "trening", label: "💪 Kalistenika + hantle (FULL)", hint: "🔥 Pełny plan — sen i RHR idealne", done: false, level: "full", exercises: BASE_CALISTHENICS };
-  if (level === "light") return { id: "trening", label: "💪 Kalistenika (LIGHT)", hint: "🟡 Lżejszy plan — mniej serii", done: false, level: "light", exercises: LIGHT_CALISTHENICS };
-  return { id: "trening", label: "💪 Kalistenika + hantle", hint: "Standardowy plan", done: false, level: "normal", exercises: BASE_CALISTHENICS };
+  if (level === "full") return { id: "trening", label: "💪 Kalistenika + hantle 1kg (FULL)", hint: "🔥 Pełny plan — sen i RHR idealne", done: false, level: "full", exercises: boostExercises(BASE_CALISTHENICS) };
+  if (level === "light") return { id: "trening", label: "💪 Kalistenika + hantle 1kg (LIGHT)", hint: "🟡 Lżejszy plan — mniej serii", done: false, level: "light", exercises: boostExercises(LIGHT_CALISTHENICS) };
+  return { id: "trening", label: "💪 Kalistenika + hantle 1kg", hint: "Standardowy plan", done: false, level: "normal", exercises: boostExercises(BASE_CALISTHENICS) };
 }
 
 // ============================================================================
@@ -1047,33 +1048,86 @@ function buildTrainingTask() {
 // ============================================================================
 const TASK_CATEGORIES = [
   { id: "suplementy", icon: "💊", name: "Suplementacja", color: "gold", tasks: [
-    { id: "d3", label: "D3 ×1 tabletka", hint: "Rano, do tłuszczu (2000 IU)", done: false },
-    { id: "tran-r", label: "Tran rano", hint: "1 łyżeczka (5 ml) — do śniadania", done: false },
-    { id: "tran-w", label: "Tran wieczór", hint: "1 łyżeczka (5 ml) — do kolacji", done: false },
-    { id: "kreatyna", label: "Kreatyna 3 g", hint: "Do szejka lub wody", done: false },
-  ]},
-  { id: "napoje", icon: "🥛", name: "Napoje", color: "peach", tasks: [
-    { id: "mleko", label: "Szklanka mleka (1-2×)", hint: "Dla masy — białko i kalorie", done: false },
-    { id: "woda", label: "Woda 2.5 L", hint: "Kreatyna potrzebuje wody — licz w karcie Nawodnienie", done: false },
+    { id: "d3", label: "D3 ×2 tabletki (4000 IU)", hint: "Rano, do tłuszczu", done: false }
   ]},
   { id: "trening", icon: "💪", name: "Trening", color: "mint", tasks: [] },
-  { id: "higiena", icon: "🧴", name: "Higiena i skóra", color: "lilac", tasks: [
-    { id: "skincare-tolpa", label: "Tołpa / Ziaja", hint: "Umyj twarz żelem", done: false },
-    { id: "skincare-acnederm", label: "Acnederm", hint: "Punktowo na wypryski", done: false },
-    { id: "skincare-cetaphil", label: "Cetaphil", hint: "Krem nawilżający na całą twarz", done: false },
-    { id: "balsam", label: "Balsam do ust", hint: "Rano i wieczorem — jesień/zima", done: false },
-    { id: "fonix", label: "Fonix — higiena uszu", hint: "W razie potrzeby — nie wlicza się do %", done: false, optional: true },
+  { id: "burnout", icon: "🔥", name: "Burnout Set", color: "rose", tasks: [
+    { id: "burnout", label: "Burnout Set — 1 seria do upadku", hint: "Max pompek LUB krzesełko przy ścianie", done: false }
+  ]},
+  { id: "skincare", icon: "🧴", name: "Skincare / Glow Up", color: "lilac", tasks: [
+    { id: "cold-water-am", label: "Przemycie twarzy zimną wodą (rano)", hint: "Redukcja czerwonego nosa, obrzęk", done: false },
+    { id: "skincare-tolpa", label: "Tołpa / Ziaja — mycie twarzy", hint: "Delikatny żel", done: false },
+    { id: "skincare-acnederm", label: "Acnederm punktowo", hint: "Na wypryski", done: false },
+    { id: "skincare-cetaphil", label: "Cetaphil — krem nawilżający", hint: "Cała twarz", done: false },
+    { id: "cold-water-pm", label: "Przemycie twarzy zimną wodą (wieczór)", hint: "Zamknięcie porów", done: false }
+  ]},
+  { id: "jawline", icon: "🗿", name: "Jawline & Postawa", color: "mint", tasks: [
+    { id: "mewing", label: "Mewing — prawidłowa pozycja języka", hint: "Cały dzień, kluczowa dla linii szczęki", done: false },
+    { id: "postawa", label: "Kontrola postawy", hint: "Barki do tyłu, brzuch wciągnięty", done: false }
+  ]},
+  { id: "higiena", icon: "🚿", name: "Higiena", color: "peach", tasks: [
+    { id: "morning-water", label: "Szklanka wody po przebudzeniu", hint: "Podkrążone oczy + nawodnienie", done: false }
   ]},
   { id: "regeneracja", icon: "😴", name: "Regeneracja", color: "lilac", tasks: [
-    { id: "telefon-off", label: "Telefon off 1h przed snem", hint: "Odłóż na biurko — jakość snu", done: false },
+    { id: "telefon-off", label: "Telefon off 1h przed snem", hint: "Jakość snu", done: false }
   ]},
   { id: "pomiary", icon: "📏", name: "Pomiary", color: "mint", tasks: [] },
 ];
-
 function applyConditionalTasks() {
+  // Suplementy — tylko jeśli toggle ON
+  const suppCat = TASK_CATEGORIES.find(c => c.id === "suplementy");
+  if (getToggle("supplements")) {
+    suppCat.tasks = [{ id: "d3", label: "D3 ×2 tabletki (4000 IU)", hint: "Rano, do tłuszczu", done: false }];
+  } else {
+    suppCat.tasks = [];
+  }
+
+  // Trening
   const treningCat = TASK_CATEGORIES.find(c => c.id === "trening");
   treningCat.tasks = [buildTrainingTask()];
 
+  // Burnout — tylko w dni treningowe (nie Nd, nie recovery)
+  const burnoutCat = TASK_CATEGORIES.find(c => c.id === "burnout");
+  const treningTask = treningCat.tasks[0];
+  const isTrainingDay = todayDow !== 0 && todayDow !== 1 && treningTask.level !== "recovery" && treningTask.level !== "off";
+  burnoutCat.tasks = isTrainingDay ? [{ id: "burnout", label: "Burnout Set — 1 seria do upadku", hint: "Max pompek LUB krzesełko przy ścianie (max czas)", done: false }] : [];
+
+  // Skincare — warunkowe
+  const skincareCat = TASK_CATEGORIES.find(c => c.id === "skincare");
+  if (getToggle("skincare")) {
+    skincareCat.tasks = [
+      { id: "cold-water-am", label: "Przemycie twarzy zimną wodą (rano)", hint: "Redukcja czerwonego nosa i obrzęku", done: false },
+      { id: "skincare-tolpa", label: "Tołpa / Ziaja — mycie twarzy", hint: "Delikatny żel", done: false },
+      { id: "skincare-acnederm", label: "Acnederm punktowo", hint: "Na wypryski", done: false },
+      { id: "skincare-cetaphil", label: "Cetaphil — krem nawilżający", hint: "Cała twarz", done: false },
+      { id: "cold-water-pm", label: "Przemycie twarzy zimną wodą (wieczór)", hint: "Zamknięcie porów", done: false }
+    ];
+  } else {
+    skincareCat.tasks = [];
+  }
+
+  // Jawline — warunkowe
+  const jawlineCat = TASK_CATEGORIES.find(c => c.id === "jawline");
+  if (getToggle("jawline")) {
+    jawlineCat.tasks = [
+      { id: "mewing", label: "Mewing — prawidłowa pozycja języka", hint: "Klucz do linii szczęki i symetrii twarzy", done: false },
+      { id: "postawa", label: "Kontrola postawy", hint: "Barki do tyłu, brzuch wciągnięty", done: false }
+    ];
+  } else {
+    jawlineCat.tasks = [];
+  }
+
+  // Higiena + regeneracja bazowe
+  const higienaCat = TASK_CATEGORIES.find(c => c.id === "higiena");
+  higienaCat.tasks = [
+    { id: "morning-water", label: "Szklanka wody po przebudzeniu", hint: "Podkrążone oczy + nawodnienie", done: false }
+  ];
+  const regenCat = TASK_CATEGORIES.find(c => c.id === "regeneracja");
+  const regenTasks = [{ id: "telefon-off", label: "Telefon off 1h przed snem", hint: "Jakość snu", done: false }];
+  if (getToggle("beast")) regenTasks.push({ id: "cold-shower", label: "Zimny prysznic 2 min", hint: "HARDCORE — hartowanie", done: false });
+  regenCat.tasks = regenTasks;
+
+  // Pomiary warunkowe
   const pomiaryCat = TASK_CATEGORIES.find(c => c.id === "pomiary");
   const pomiaryList = [];
   if (todayDow === 1 || todayDow === 4 || todayDow === 6) pomiaryList.push({ id: "wlosy", label: "Mycie włosów", hint: "Szampon + odżywka", done: false });
@@ -1087,11 +1141,11 @@ function applyConditionalTasks() {
     pomiaryList.push({ id: "cm", label: "Pomiar obwodów", hint: "Klatka, talia, biceps", done: false });
   }
   pomiaryCat.tasks = pomiaryList;
+
   state.tasks = TASK_CATEGORIES.flatMap(c => c.tasks).map(t => ({ id: t.id, label: t.label, done: t.done, optional: !!t.optional }));
 }
 function syncStateFromCategories() { state.tasks = TASK_CATEGORIES.flatMap(c => c.tasks).map(t => ({ id: t.id, label: t.label, done: t.done, optional: !!t.optional })); }
 function calcCompletionPct() {
-  // Opcjonalne (fonix) nie liczą się do mianownika
   const required = state.tasks.filter(t => !t.optional);
   if (!required.length) return 0;
   const done = required.filter(t => t.done).length;
@@ -1109,112 +1163,32 @@ function calcCompletionStats() {
 }
 
 // ============================================================================
-// SUPLEMENTACJA — licznik
+// SUPLEMENTY
 // ============================================================================
 function getSupplementTotals() {
   const s = getSettings();
   const isDone = (id) => { const t = state.tasks.find(x => x.id === id); return t && t.done; };
   const d3Done = isDone("d3") ? 1 : 0;
-  const tranRDone = isDone("tran-r") ? 1 : 0;
-  const tranWDone = isDone("tran-w") ? 1 : 0;
-
-  const d3FromTablets = s.d3Iu * d3Done;
-  const d3FromTranR = s.tranD3Iu * tranRDone;
-  const d3FromTranW = s.tranD3Iu * tranWDone;
-  const totalD3 = d3FromTablets + d3FromTranR + d3FromTranW;
-
-  const aFromTranR = s.tranAIu * tranRDone;
-  const aFromTranW = s.tranAIu * tranWDone;
-  const totalA = aFromTranR + aFromTranW;
-
-  return { totalD3, totalA, d3FromTablets, d3FromTranR, d3FromTranW };
+  const totalD3 = s.d3Iu * s.d3Tablets * d3Done;
+  return { totalD3 };
 }
-
 function renderSupplementsCard() {
-  const { totalD3, totalA } = getSupplementTotals();
-  const MAX_D3 = 4000;
-  const MAX_A = 9000;
-
+  const { totalD3 } = getSupplementTotals();
+  const s = getSettings();
+  const MAX_D3 = s.d3Iu * s.d3Tablets;
   const d3Pct = Math.min(100, Math.round((totalD3 / MAX_D3) * 100));
-  const aPct = Math.min(100, Math.round((totalA / MAX_A) * 100));
-
-  const d3Bar = $("supp-d3-bar"), d3Text = $("supp-d3-text"), d3Hint = $("supp-d3-hint");
-  const aBar = $("supp-a-bar"), aText = $("supp-a-text");
-  const warning = $("supp-warning");
+  if ($("supp-d3-bar")) $("supp-d3-bar").style.width = d3Pct + "%";
+  if ($("supp-d3-text")) $("supp-d3-text").textContent = totalD3 + " / " + MAX_D3 + " IU";
+  if ($("supp-d3-hint")) $("supp-d3-hint").textContent = "Cel: " + MAX_D3 + " IU dziennie (" + s.d3Tablets + " tabletki × " + s.d3Iu + " IU)";
   const badge = $("supp-status-badge");
-
-  if (d3Bar) d3Bar.style.width = `${d3Pct}%`;
-  if (d3Text) d3Text.textContent = `${totalD3} / ${MAX_D3} IU`;
-  if (aBar) aBar.style.width = `${aPct}%`;
-  if (aText) aText.textContent = `${totalA} / ${MAX_A} IU`;
-
-  if (d3Hint) {
-    if (totalD3 > MAX_D3) d3Hint.innerHTML = `<em class="text-rose">Przekroczyłeś 4000 IU — zmniejsz dawkę D3.</em>`;
-    else if (totalD3 >= MAX_D3 * 0.9) d3Hint.textContent = "Blisko górnej granicy (4000 IU) — nie dodawaj więcej.";
-    else d3Hint.textContent = `Zostało ${MAX_D3 - totalD3} IU do granicy`;
-  }
-
-  if (warning) {
-    const warnings = [];
-    if (totalD3 > MAX_D3) warnings.push(`<div class="flex items-start gap-2"><span class="text-lg">⚠️</span><div><strong class="text-rose">Zbyt wysoka dawka D3:</strong> ${totalD3} IU (max 4000 IU dla nastolatka). Zmniejsz liczbę tabletek lub tranu.</div></div>`);
-    if (totalA > MAX_A) warnings.push(`<div class="flex items-start gap-2"><span class="text-lg">⚠️</span><div><strong class="text-rose">Zbyt wysoka dawka witaminy A:</strong> ${totalA} IU (max ~9000 IU). Uwaga — nadmiar odkłada się w wątrobie.</div></div>`);
-    if (totalA > MAX_A * 0.8 && totalA <= MAX_A) warnings.push(`<div class="flex items-start gap-2"><span class="text-lg">ℹ️</span><div>Witamina A blisko górnej granicy (${totalA} IU). Nie dodawaj więcej tranu.</div></div>`);
-
-    if (warnings.length) {
-      warning.classList.remove("hidden");
-      warning.innerHTML = warnings.join("");
-    } else {
-      warning.classList.add("hidden");
-    }
-  }
-
   if (badge) {
-    if (totalD3 > MAX_D3) { badge.textContent = "PRZEKROCZONE"; badge.className = "text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-rose/15 text-rose"; }
-    else if (totalD3 >= MAX_D3 * 0.9) { badge.textContent = "OK (góra)"; badge.className = "text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-gold/15 text-gold"; }
-    else if (totalD3 > 0) { badge.textContent = "W normie"; badge.className = "text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-mint/15 text-mint"; }
+    if (totalD3 > 0) { badge.textContent = "W normie"; badge.className = "text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-mint/15 text-mint"; }
     else { badge.textContent = "0 IU"; badge.className = "text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-white/10 text-neutral-400"; }
   }
 }
 
 // ============================================================================
-// NAWODNIENIE — licznik szklanek
-// ============================================================================
-const WATER_GLASS_ML = 250;
-const WATER_TARGET_ML = 2500;
-const WATER_GLASSES_TARGET = WATER_TARGET_ML / WATER_GLASS_ML; // = 10
-
-function getWaterGlasses() {
-  const raw = localStorage.getItem(localKey("water-" + todayKey));
-  return raw ? parseInt(raw) || 0 : 0;
-}
-function setWaterGlasses(n) {
-  n = Math.max(0, Math.min(50, n));
-  localStorage.setItem(localKey("water-" + todayKey), String(n));
-  // Auto-sync z zadaniem "woda"
-  const waterTask = TASK_CATEGORIES.find(c => c.id === "napoje")?.tasks.find(t => t.id === "woda");
-  if (waterTask) {
-    const shouldBeDone = n * WATER_GLASS_ML >= WATER_TARGET_ML;
-    if (waterTask.done !== shouldBeDone) {
-      waterTask.done = shouldBeDone;
-      syncStateFromCategories();
-      renderTasksByCategory();
-    }
-  }
-  renderWaterCard();
-  renderProgress();
-}
-function renderWaterCard() {
-  const n = getWaterGlasses();
-  const ml = n * WATER_GLASS_ML;
-  const pct = Math.min(100, Math.round((ml / WATER_TARGET_ML) * 100));
-  if ($("water-bar")) $("water-bar").style.width = `${pct}%`;
-  if ($("water-ml")) $("water-ml").textContent = ml;
-  if ($("water-glasses")) $("water-glasses").textContent = n;
-  if ($("water-pct")) $("water-pct").textContent = `${pct}%`;
-}
-
-// ============================================================================
-// RENDER TASKS
+// RENDER ZADAŃ
 // ============================================================================
 function renderTasksByCategory() {
   const container = $("tasks-container"); if (!container) return;
@@ -1222,35 +1196,34 @@ function renderTasksByCategory() {
     if (cat.tasks.length === 0) return "";
     const doneCount = cat.tasks.filter(t => t.done).length;
     const total = cat.tasks.length;
-    const colorMap = { gold: "from-gold/25 to-peach/25 text-gold", peach: "from-peach/25 to-rose/25 text-peach", mint: "from-mint/25 to-lilac/25 text-mint", lilac: "from-lilac/25 to-mint/25 text-lilac" };
+    const colorMap = { gold: "from-gold/25 to-peach/25 text-gold", peach: "from-peach/25 to-rose/25 text-peach", mint: "from-mint/25 to-lilac/25 text-mint", lilac: "from-lilac/25 to-mint/25 text-lilac", rose: "from-rose/25 to-gold/25 text-rose" };
     const cc = colorMap[cat.color] || "from-mint/25 to-lilac/25 text-mint";
     const fullDone = doneCount === total;
-    return `<div class="glass rounded-4xl p-4 shadow-soft rise">
-      <div class="flex items-center justify-between mb-3">
-        <div class="flex items-center gap-2">
-          <div class="w-9 h-9 rounded-xl bg-gradient-to-br ${cc} flex items-center justify-center flex-shrink-0"><span class="text-lg">${cat.icon}</span></div>
-          <div class="font-bold text-base">${cat.name}</div>
-        </div>
-        <div class="text-xs font-extrabold ${fullDone ? "text-mint" : "text-neutral-400"}">${doneCount}/${total}</div>
-      </div>
-      <div class="space-y-1.5">
-        ${cat.tasks.map(t => {
-          const extra = t.extra ? `<div class="mt-2 flex flex-wrap gap-1">${t.extra.map(e => `<span class="text-[9px] glass rounded-full px-2 py-0.5">${e}</span>`).join("")}</div>` : "";
-          const exList = t.exercises ? `<div class="mt-2 grid grid-cols-2 gap-1">${t.exercises.map(e => `<span class="text-[9px] glass rounded-lg px-2 py-1">${e.label} · ${e.series}</span>`).join("")}</div>` : "";
+    return '<div class="glass rounded-4xl p-4 shadow-soft rise">' +
+      '<div class="flex items-center justify-between mb-3">' +
+        '<div class="flex items-center gap-2">' +
+          '<div class="w-9 h-9 rounded-xl bg-gradient-to-br ' + cc + ' flex items-center justify-center flex-shrink-0"><span class="text-lg">' + cat.icon + '</span></div>' +
+          '<div class="font-bold text-base">' + cat.name + '</div>' +
+        '</div>' +
+        '<div class="text-xs font-extrabold ' + (fullDone ? "text-mint" : "text-neutral-400") + '">' + doneCount + "/" + total + '</div>' +
+      '</div>' +
+      '<div class="space-y-1.5">' +
+        cat.tasks.map(t => {
+          const extra = t.extra ? '<div class="mt-2 flex flex-wrap gap-1">' + t.extra.map(e => '<span class="text-[9px] glass rounded-full px-2 py-0.5">' + e + '</span>').join("") + '</div>' : "";
+          const exList = t.exercises ? '<div class="mt-2 grid grid-cols-1 gap-1">' + t.exercises.map(e => '<span class="text-[10px] glass rounded-lg px-2 py-1 flex items-center justify-between">' + e.label + '<span class="font-bold text-mint ml-2">' + e.series + '</span></span>').join("") + '</div>' : "";
           const levelBadge = t.level === "full" ? '<span class="text-[9px] font-bold text-mint bg-mint/15 rounded-full px-2 py-0.5 ml-1">FULL 🔥</span>' : t.level === "light" ? '<span class="text-[9px] font-bold text-gold bg-gold/15 rounded-full px-2 py-0.5 ml-1">LIGHT 🟡</span>' : t.level === "recovery" ? '<span class="text-[9px] font-bold text-rose bg-rose/15 rounded-full px-2 py-0.5 ml-1">RECOVERY</span>' : "";
           const optBadge = t.optional ? '<span class="opt-badge text-[9px] font-bold rounded-full px-2 py-0.5 ml-1">OPCJONALNE</span>' : "";
-          return `<div class="task-item ${t.optional ? "optional" : ""} flex items-start gap-3 p-3 rounded-2xl ${t.done ? "bg-gradient-to-r from-mint/10 to-lilac/10 border border-mint/30" : "bg-white/3 border border-white/8"} cursor-pointer" data-task-id="${t.id}">
-            <div class="flex-1 min-w-0">
-              <div class="text-sm font-bold ${t.done ? "text-mint line-through" : "text-neutral-200"}">${t.label}${levelBadge}${optBadge}</div>
-              <div class="text-[10px] text-neutral-500 font-medium">${t.hint || ""}</div>
-              ${extra}
-              ${exList}
-            </div>
-            <div class="w-6 h-6 rounded-full border-2 flex-shrink-0 flex items-center justify-center ${t.done ? "bg-mint border-mint check-done" : "border-white/20"}">${t.done ? '<i class="fa-solid fa-check text-[10px] text-ink"></i>' : ""}</div>
-          </div>`;
-        }).join("")}
-      </div>
-    </div>`;
+          return '<div class="task-item ' + (t.optional ? "optional" : "") + ' flex items-start gap-3 p-3 rounded-2xl ' + (t.done ? "bg-gradient-to-r from-mint/10 to-lilac/10 border border-mint/30" : "bg-white/5 border border-white/8") + ' cursor-pointer" data-task-id="' + t.id + '">' +
+            '<div class="flex-1 min-w-0">' +
+              '<div class="text-sm font-bold ' + (t.done ? "text-mint line-through" : "text-neutral-200") + '">' + t.label + levelBadge + optBadge + '</div>' +
+              '<div class="text-[10px] text-neutral-500 font-medium">' + (t.hint || "") + '</div>' +
+              extra + exList +
+            '</div>' +
+            '<div class="w-6 h-6 rounded-full border-2 flex-shrink-0 flex items-center justify-center ' + (t.done ? "bg-mint border-mint check-done" : "border-white/20") + '">' + (t.done ? '<i class="fa-solid fa-check text-[10px] text-ink"></i>' : "") + '</div>' +
+          '</div>';
+        }).join("") +
+      '</div>' +
+    '</div>';
   }).join("");
   container.querySelectorAll(".task-item").forEach(el => {
     el.addEventListener("click", async () => {
@@ -1270,12 +1243,12 @@ function renderTasksByCategory() {
 }
 function renderProgress() {
   const pct = calcCompletionPct();
-  const { requiredDone, requiredTotal, optionalDone, optionalTotal } = calcCompletionStats();
-  if ($("progress-bar")) $("progress-bar").style.width = `${pct}%`;
-  if ($("hero-pct")) $("hero-pct").textContent = `${pct}%`;
+  const stats = calcCompletionStats();
+  if ($("progress-bar")) $("progress-bar").style.width = pct + "%";
+  if ($("hero-pct")) $("hero-pct").textContent = pct + "%";
   if ($("progress-sub")) {
-    let sub = `${requiredDone} z ${requiredTotal} zadań`;
-    if (optionalTotal > 0) sub += ` (+${optionalDone}/${optionalTotal} opcjonalne)`;
+    let sub = stats.requiredDone + " z " + stats.requiredTotal + " zadań";
+    if (stats.optionalTotal > 0) sub += " (+" + stats.optionalDone + "/" + stats.optionalTotal + " opcjonalne)";
     $("progress-sub").textContent = sub;
   }
   if ($("hero-ring")) $("hero-ring").style.strokeDashoffset = 169.6 - (pct / 100) * 169.6;
@@ -1283,39 +1256,63 @@ function renderProgress() {
     if (pct === 100) $("progress-headline").textContent = "LOCK IN! 🥶🔥";
     else if (pct >= 75) $("progress-headline").textContent = "Idziesz jak maszyna 🔥";
     else if (pct >= 50) $("progress-headline").textContent = "Dobra robota 💪";
-    else $("progress-headline").textContent = `Zimowy Lock In 🥶`;
+    else $("progress-headline").textContent = "Zimowy Lock In 🥶";
+  }
+  const beast = $("beast-mode-badge");
+  if (beast) {
+    if (pct === 100) beast.classList.remove("hidden"); else beast.classList.add("hidden");
+  }
+  const boosterBanner = $("booster-banner");
+  if (boosterBanner) {
+    if (isBoosterActive()) boosterBanner.classList.remove("hidden"); else boosterBanner.classList.add("hidden");
   }
 }
-
 async function persistToday() {
   syncStateFromCategories();
   const existing = (await loadDayDoc(todayKey)) || {};
-  await saveDayDoc({ ...existing, date: todayKey, tasks: state.tasks, completedPct: calcCompletionPct(), note: state.note, morning: { ...(existing.morning || {}), ...state.morning }, evening: { ...(existing.evening || {}), ...state.evening }, updatedAt: Date.now() });
+  await saveDayDoc(Object.assign({}, existing, {
+    date: todayKey,
+    tasks: state.tasks,
+    completedPct: calcCompletionPct(),
+    note: state.note,
+    morning: Object.assign({}, existing.morning || {}, state.morning),
+    evening: Object.assign({}, existing.evening || {}, state.evening),
+    updatedAt: Date.now()
+  }));
   await refreshStreak(); await renderImprovementTips(); renderReadiness(); checkDeload(); checkMilestone(); renderHealthWarnings(); renderSupplementsCard();
 }
 async function refreshStreak() {
   const today = await loadDayDoc(todayKey);
-  const pctToday = today?.completedPct ?? 0;
+  const pctToday = today && today.completedPct != null ? today.completedPct : 0;
   const base = await computeStreakUpTo(todayKey);
   const streak = pctToday === 100 ? base + 1 : base;
   if ($("streak-count")) $("streak-count").textContent = streak;
   const pill = $("streak-pill"); if (pill) { if (streak > 0) pill.classList.add("ring-pulse"); else pill.classList.remove("ring-pulse"); }
 }
-async function computeStreakUpTo(dateStr) { let streak = 0; let cursor = new Date(dateStr); cursor.setDate(cursor.getDate() - 1); for (let i = 0; i < 400; i++) { const data = await loadDayDoc(dateKey(cursor)); if (data && data.completedPct === 100) { streak++; cursor.setDate(cursor.getDate() - 1); } else break; } return streak; }
+async function computeStreakUpTo(dateStr) {
+  let streak = 0;
+  const cursor = new Date(dateStr + "T00:00:00");
+  cursor.setDate(cursor.getDate() - 1);
+  for (let i = 0; i < 400; i++) {
+    const data = await loadDayDoc(dateKey(cursor));
+    if (data && data.completedPct === 100) { streak++; cursor.setDate(cursor.getDate() - 1); }
+    else break;
+  }
+  return streak;
+}
 async function checkMilestone() {
-  const streak = parseInt($("streak-count")?.textContent) || 0;
-  const milestones = [30, 60, 90, 100, 180, 365];
+  const streak = parseInt($("streak-count") && $("streak-count").textContent) || 0;
+  const milestones = [7, 14, 30, 60, 73];
   const hit = milestones.find(m => streak === m);
   if (!hit || state.lastMilestoneShown === hit) return;
   state.lastMilestoneShown = hit;
   const banner = $("milestone-banner"); if (!banner) return;
-  $("milestone-title").textContent = `🎉 ${hit} dni streak!`;
-  const messages = { 30: "Miesiąc! To nie eksperyment, to Twoje życie.", 60: "Dwa miesiące. Jesteś inną osobą niż na starcie.", 90: "Kwartał! 90% ludzi nie dolatuje tutaj.", 100: "Sto dni. Legendarny wynik.", 180: "Pół roku. To styl życia.", 365: "Rok. Maszyna." };
-  $("milestone-text").textContent = messages[hit] || `${hit} dni!`;
+  $("milestone-title").textContent = "🎉 " + hit + " dni streak!";
+  const messages = { 7: "Tydzień! Pierwszy kamień milowy.", 14: "Dwa tygodnie. Wchodzi w nawyk.", 30: "Miesiąc! To nie eksperyment, to życie.", 60: "Dwa miesiące. Jesteś inną osobą.", 73: "Koniec Lock In! 73 dni dyscypliny — LEGENDA." };
+  $("milestone-text").textContent = messages[hit] || hit + " dni!";
   banner.classList.remove("hidden"); setTimeout(() => banner.classList.add("hidden"), 12000);
   fireConfetti();
 }
-
 function renderReadiness() {
   const pct = calculateReadiness();
   const ring = $("readiness-ring"); const pctEl = $("readiness-pct"); const labelEl = $("readiness-label"); const tipEl = $("readiness-tip");
@@ -1323,56 +1320,49 @@ function renderReadiness() {
   const circ = 213.6;
   if (pct == null) { pctEl.textContent = "—"; ring.style.strokeDashoffset = circ; ring.setAttribute("stroke", "#8b8397"); labelEl.textContent = "Uzupełnij raport"; labelEl.className = "font-extrabold text-base mb-1 text-neutral-400"; tipEl.textContent = "Im więcej danych, tym lepsza ocena."; return; }
   ring.style.strokeDashoffset = circ - (pct / 100) * circ;
-  pctEl.textContent = `${pct}%`;
+  pctEl.textContent = pct + "%";
   let color, label, tip, cls;
   if (pct >= 80) { color = "#5eead4"; label = "Pełna gotowość"; tip = "Trenuj mocno, dziś FULL plan."; cls = "text-mint"; }
   else if (pct >= 60) { color = "#fbbf24"; label = "Umiarkowana"; tip = "Trening normalny."; cls = "text-gold"; }
   else if (pct >= 40) { color = "#fbbf9d"; label = "Obniżona"; tip = "Lżejszy trening."; cls = "text-peach"; }
   else { color = "#fb7185"; label = "Niska"; tip = "Dziś recovery."; cls = "text-rose"; }
   ring.setAttribute("stroke", color);
-  labelEl.textContent = label; labelEl.className = `font-extrabold text-base mb-1 ${cls}`;
+  labelEl.textContent = label; labelEl.className = "font-extrabold text-base mb-1 " + cls;
   tipEl.textContent = tip;
 }
 async function checkDeload() {
   const days = await loadLastNDays(14);
   const withData = days.filter(d => d.morning || d.evening);
   const last3 = withData.slice(-3);
-  const rpeDays = last3.filter(d => (d.evening?.rpe ?? 0) >= 8).length;
+  const rpeDays = last3.filter(d => ((d.evening && d.evening.rpe) || 0) >= 8).length;
   const banner = $("deload-banner"); if (!banner) return;
-  if (rpeDays >= 3) { $("deload-text").textContent = `3 ostatnie treningi RPE ≥ 8. Zalecany deload: połowa serii, 60%.`; banner.classList.remove("hidden"); } else banner.classList.add("hidden");
+  if (rpeDays >= 3) { $("deload-text").textContent = "3 ostatnie treningi RPE ≥ 8. Zalecany deload: połowa serii, 60%."; banner.classList.remove("hidden"); } else banner.classList.add("hidden");
 }
-
-// ============================================================================
-// HEALTH WARNINGS — RHR +15% vs 7d
-// ============================================================================
 async function renderHealthWarnings() {
   const days = await loadLastNDays(8);
   const withData = days.filter(d => d.morning || d.evening);
   const warnings = [];
   const age = getSettings().age;
   const range = getRhrRange(age);
-
-  // RHR: ostatnie 7 dni bez dzisiejszego
-  const rhrPrev7 = withData.slice(-8, -1).map(d => d.morning?.rhr).filter(r => r != null);
-  const todayRhr = withData[withData.length - 1]?.morning?.rhr;
+  const rhrPrev7 = withData.slice(-8, -1).map(d => d.morning && d.morning.rhr).filter(r => r != null);
+  const todayDoc = withData[withData.length - 1] || {};
+  const todayRhr = todayDoc.morning && todayDoc.morning.rhr;
   if (todayRhr != null && rhrPrev7.length >= 3) {
     const avg7 = rhrPrev7.reduce((a, b) => a + b, 0) / rhrPrev7.length;
     const pctAbove = ((todayRhr - avg7) / avg7) * 100;
-    if (pctAbove >= 15) warnings.push({ icon: "💓", title: `RHR +${pctAbove.toFixed(0)}% vs 7d`, text: `${todayRhr} bpm vs średnia ${avg7.toFixed(0)} bpm. Możliwe: choroba/przemęczenie. Obserwuj.` });
-    else if (todayRhr > range.max) warnings.push({ icon: "💓", title: `RHR powyżej normy (${range.min}–${range.max})`, text: `${todayRhr} bpm — powyżej górnej granicy dla wieku ${age} lat. Odpocznij, dużo wody.` });
+    if (pctAbove >= 15) warnings.push({ icon: "💓", title: "RHR +" + pctAbove.toFixed(0) + "% vs 7d", text: todayRhr + " bpm vs średnia " + avg7.toFixed(0) + " bpm. Możliwe: choroba/przemęczenie." });
+    else if (todayRhr > range.max) warnings.push({ icon: "💓", title: "RHR powyżej normy (" + range.min + "–" + range.max + ")", text: todayRhr + " bpm — powyżej górnej granicy dla wieku." });
   }
-
-  const sleep3 = withData.slice(-3).map(d => d.morning?.sleepTotal).filter(s => s != null);
+  const sleep3 = withData.slice(-3).map(d => d.morning && d.morning.sleepTotal).filter(s => s != null);
   if (sleep3.length === 3 && sleep3.every(s => s < 6)) warnings.push({ icon: "😴", title: "3 dni <6h snu", text: "Kumulujesz dług senny. Dziś 8h+ obowiązkowo." });
-  const weights = withData.slice(-4).map(d => d.morning?.dailyWeight).filter(w => w != null);
-  if (weights.length >= 4) { const declining = weights.slice(-3).every((w, i) => i === 0 || w < weights[weights.length - 4 + i]); if (declining) warnings.push({ icon: "⚖️", title: "Waga spada 3 dni", text: "Jesz za mało. Dorzuć szejk albo twaróg." }); }
-  const stress3 = withData.slice(-3).map(d => d.evening?.stress).filter(s => s != null);
-  if (stress3.length === 3 && stress3.every(s => s > 70)) warnings.push({ icon: "🧘", title: "3 dni stresu >70", text: "Układ nerwowy przeciążony. Reset szczęki obowiązkowy." });
-
+  const weights = withData.slice(-4).map(d => d.morning && d.morning.dailyWeight).filter(w => w != null);
+  if (weights.length >= 4) { const declining = weights.slice(-3).every((w, i) => i === 0 || w < weights[weights.length - 4 + i]); if (declining) warnings.push({ icon: "⚖️", title: "Waga spada 3 dni", text: "Jesz za mało. Dorzuć szejk masowy." }); }
+  const stress3 = withData.slice(-3).map(d => d.evening && d.evening.stress).filter(s => s != null);
+  if (stress3.length === 3 && stress3.every(s => s > 70)) warnings.push({ icon: "🧘", title: "3 dni stresu >70", text: "Reset szczęki + oddech 4-7-8 obowiązkowy." });
   const box = $("health-warnings"); if (!box) return;
   if (warnings.length === 0) { box.classList.add("hidden"); return; }
   box.classList.remove("hidden");
-  box.innerHTML = warnings.map(w => `<div class="warning-card rise flex items-start gap-3"><div class="text-2xl">${w.icon}</div><div class="flex-1 min-w-0"><div class="font-bold text-sm text-rose">${w.title}</div><p class="text-xs text-neutral-200 font-medium leading-relaxed mt-1">${w.text}</p></div></div>`).join("");
+  box.innerHTML = warnings.map(w => '<div class="warning-card rise flex items-start gap-3"><div class="text-2xl">' + w.icon + '</div><div class="flex-1 min-w-0"><div class="font-bold text-sm text-rose">' + w.title + '</div><p class="text-xs text-neutral-200 font-medium leading-relaxed mt-1">' + w.text + '</p></div></div>').join("");
 }
 
 // ============================================================================
@@ -1384,20 +1374,18 @@ function getPersonalQuote() {
   const level = getTrainingLevel();
   const age = getSettings().age;
   const range = getRhrRange(age);
-  const sleep = m.sleepTotal;
-  const rhr = m.rhr;
-  const mood = m.moodMorning;
+  const sleep = m.sleepTotal; const rhr = m.rhr; const mood = m.moodMorning;
   if (level === "recovery") return "🛌 Dziś regeneracja. Sen, woda, oddech. Organizm mówi stop — słuchaj go.";
   if (sleep != null && sleep < 6) return "😴 Kurwa, krótko spałeś. Dziś nie bij rekordów — chodzi o przetrwanie dnia.";
-  if (rhr != null && rhr > range.max + 5) return `💓 RHR ${rhr} bpm — powyżej normy dla Twojego wieku (${range.min}–${range.max}). Coś się dzieje, obserwuj.`;
+  if (rhr != null && rhr > range.max + 5) return "💓 RHR " + rhr + " bpm — powyżej normy dla wieku (" + range.min + "–" + range.max + "). Obserwuj.";
   if (mood != null && mood <= 3) return "😔 Słabszy dzień psychicznie. Nie musisz być bohaterem — dokończ zadania i idź spać wcześniej.";
-  if (level === "full") return "🔥 Sen, RHR i nastrój idealne. Dziś możesz pobić rekord. Wykorzystaj ten dzień, kurwa!";
-  if (readiness != null && readiness >= 70) return "✅ Solidna gotowość. Trzymaj rytm — regularność buduje mistrza, nie pojedyncze wybryki.";
+  if (level === "full") return "🔥 Sen, RHR i nastrój idealne. Dziś możesz pobić rekord. Wykorzystaj to!";
+  if (readiness != null && readiness >= 70) return "✅ Solidna gotowość. Trzymaj rytm — regularność buduje mistrza.";
   return "🎯 Skup się na jednej rzeczy naraz. Małe kroki codziennie > wielkie plany raz na miesiąc.";
 }
 
 // ============================================================================
-// IMPROVEMENT TIPS — RHR dynamiczne
+// IMPROVEMENT TIPS
 // ============================================================================
 async function renderImprovementTips() {
   const m = state.morning || {}; const e = state.evening || {};
@@ -1405,54 +1393,34 @@ async function renderImprovementTips() {
   const kws = detectKeywords(state.note);
   const age = getSettings().age;
   const range = getRhrRange(age);
-
-  if (kws.includes("sick")) tips.push({ icon: "🤒", text: "Choroba — dziś zero treningu, sen i woda." });
-  if (kws.includes("injury")) tips.push({ icon: "🩹", text: "Kontuzja/ból — odpuść trening, regeneracja." });
-  if (kws.includes("stress") || kws.includes("conflict")) tips.push({ icon: "😰", text: "Stres w notatce — 5 min oddechu 4-7-8 pomoże." });
-  if (kws.includes("tired")) tips.push({ icon: "😴", text: "Zmęczenie — priorytet sen 8h+ dziś w nocy." });
-  if (kws.includes("lonely") || kws.includes("sad")) tips.push({ icon: "💙", text: "Trudne emocje — pogadaj z kimś bliskim, wyjdź z domu." });
-  if (kws.includes("happy") || kws.includes("success")) tips.push({ icon: "🌟", text: "Dobry dzień — zapamiętaj go, wracaj do niego w gorsze dni." });
-  if (kws.includes("motivated")) tips.push({ icon: "🔥", text: "Nakręcenie — wykorzystaj to, weź się za trudne zadanie." });
-  if (kws.includes("lazy")) tips.push({ icon: "💀", text: "Lenistwo wykryte — jedna rzecz teraz, kurwa, ruszyć dupe." });
-  if (kws.includes("alcohol")) tips.push({ icon: "🍺", text: "Alkohol — dużo wody, zero forsowania jutro." });
-  if (m.sleepTotal != null && m.sleepTotal < 7) tips.push({ icon: "😴", text: `Sen ${m.sleepTotal}h — poniżej progu. Idź spać przed 22:30.` });
-
-  // RHR — z analizą wieku i +15% vs 7d
+  if (kws.indexOf("sick") >= 0) tips.push({ icon: "🤒", text: "Choroba — dziś zero treningu, sen i woda." });
+  if (kws.indexOf("injury") >= 0) tips.push({ icon: "🩹", text: "Kontuzja/ból — odpuść trening, regeneracja." });
+  if (kws.indexOf("stress") >= 0) tips.push({ icon: "😰", text: "Stres w notatce — 5 min oddechu 4-7-8 pomoże." });
+  if (kws.indexOf("tired") >= 0) tips.push({ icon: "😴", text: "Zmęczenie — priorytet sen 8h+ dziś w nocy." });
+  if (kws.indexOf("lonely") >= 0 || kws.indexOf("sad") >= 0) tips.push({ icon: "💙", text: "Trudne emocje — pogadaj z kimś bliskim, wyjdź z domu." });
+  if (kws.indexOf("happy") >= 0 || kws.indexOf("success") >= 0) tips.push({ icon: "🌟", text: "Dobry dzień — zapamiętaj go, wracaj do niego w gorsze dni." });
+  if (kws.indexOf("motivated") >= 0) tips.push({ icon: "🔥", text: "Nakręcenie — wykorzystaj to, weź się za trudne zadanie." });
+  if (kws.indexOf("lazy") >= 0) tips.push({ icon: "💀", text: "Lenistwo wykryte — jedna rzecz teraz, ruszyć dupe." });
+  if (m.sleepTotal != null && m.sleepTotal < 7) tips.push({ icon: "😴", text: "Sen " + m.sleepTotal + "h — poniżej progu. Idź spać przed 22:30." });
   if (m.rhr != null) {
     const days = await loadLastNDays(8);
-    const rhrPrev7 = days.slice(0, -1).map(d => d.morning?.rhr).filter(r => r != null);
+    const rhrPrev7 = days.slice(0, -1).map(d => d.morning && d.morning.rhr).filter(r => r != null);
     const avg7 = rhrPrev7.length >= 3 ? rhrPrev7.reduce((a, b) => a + b, 0) / rhrPrev7.length : null;
     const analysis = analyzeRhr(m.rhr, age, avg7);
-    if (analysis.status === "high" || analysis.status === "spike" || analysis.status === "very-high") {
-      tips.push({ icon: "💓", text: analysis.message });
-    } else if (analysis.status === "low-alarm") {
-      tips.push({ icon: "💙", text: analysis.message });
-    } else if (analysis.status === "low-sport") {
-      tips.push({ icon: "✅", text: analysis.message });
-    }
-    // status "normal" → nie ma tipu (wszystko OK)
+    if (analysis.status === "high" || analysis.status === "spike") tips.push({ icon: "💓", text: analysis.message });
+    else if (analysis.status === "low-alarm") tips.push({ icon: "💙", text: analysis.message });
   }
-
-  if (m.breathing != null && m.breathing < 85) tips.push({ icon: "🫁", text: `Punkty oddychania ${m.breathing} — przewietrz sypialnię, sprawdź pozycję snu.` });
-  if (e.stress != null && e.stress > 60) tips.push({ icon: "🧘", text: `Stres ${e.stress}/100 — oddech 4-7-8 przed snem.` });
-
-  // Suplementy — suma D3
-  const { totalD3, totalA } = getSupplementTotals();
-  if (totalD3 > 4000) tips.push({ icon: "💊", text: `Uwaga: suma D3 = ${totalD3} IU (max 4000). Zmniejsz tabletki D3 lub tran.` });
-  if (totalA > 9000) tips.push({ icon: "💊", text: `Uwaga: suma wit. A = ${totalA} IU (max ~9000). Ogranicz tran — nadmiar A odkłada się w wątrobie.` });
-
-  const { requiredDone, requiredTotal } = calcCompletionStats();
-  if (requiredTotal > 0 && requiredDone < requiredTotal) {
-    tips.push({ icon: "⚡", text: `Zostało ${requiredTotal - requiredDone} zadań (opcjonalne nie liczą się).` });
-  } else if (requiredTotal > 0) {
-    tips.push({ icon: "🏆", text: "Wszystko zaliczone — LOCK IN!" });
-  }
-
+  if (m.breathing != null && m.breathing < 85) tips.push({ icon: "🫁", text: "Punkty oddychania " + m.breathing + " — przewietrz sypialnię." });
+  if (e.stress != null && e.stress > 60) tips.push({ icon: "🧘", text: "Stres " + e.stress + "/100 — oddech 4-7-8 przed snem." });
+  if (isBoosterActive()) tips.push({ icon: "⚡", text: "Booster +15% aktywny (Skincare lub Suplementy off). Trening podbity." });
+  const { totalD3 } = getSupplementTotals();
+  if (totalD3 > 0) tips.push({ icon: "💊", text: "D3 przyjęte: " + totalD3 + " IU. Bezpieczna dawka dla nastolatka ≤ 4000 IU." });
+  const stats = calcCompletionStats();
+  if (stats.requiredTotal > 0 && stats.requiredDone < stats.requiredTotal) tips.push({ icon: "⚡", text: "Zostało " + (stats.requiredTotal - stats.requiredDone) + " zadań." });
+  else if (stats.requiredTotal > 0) tips.push({ icon: "🏆", text: "Wszystko zaliczone — LOCK IN!" });
   const box = $("improvement-tips");
   if (!box) return;
-  box.innerHTML = tips.length
-    ? tips.map(t => `<div class="flex items-start gap-2.5"><span class="text-lg flex-shrink-0">${t.icon}</span><p class="flex-1 text-sm text-neutral-200 font-medium leading-snug">${t.text}</p></div>`).join("")
-    : `<p class="text-neutral-400">Uzupełnij raporty żeby zobaczyć wskazówki.</p>`;
+  box.innerHTML = tips.length ? tips.map(t => '<div class="flex items-start gap-2.5"><span class="text-lg flex-shrink-0">' + t.icon + '</span><p class="flex-1 text-sm text-neutral-200 font-medium leading-snug">' + t.text + '</p></div>').join("") : '<p class="text-neutral-400">Uzupełnij raporty żeby zobaczyć wskazówki.</p>';
 }
 
 // ============================================================================
@@ -1467,21 +1435,19 @@ async function renderBrief() {
   const range = getRhrRange(age);
   const lines = [];
   if (m.sleepTotal != null) {
-    if (m.sleepTotal >= 8) lines.push(`Sen ${m.sleepTotal.toFixed(1)}h — solidnie.`);
-    else if (m.sleepTotal >= 7) lines.push(`Sen ${m.sleepTotal.toFixed(1)}h — ok, ale mogło być lepiej.`);
-    else if (m.sleepTotal >= 6) lines.push(`Sen ${m.sleepTotal.toFixed(1)}h — poniżej progu.`);
-    else lines.push(`Sen ${m.sleepTotal.toFixed(1)}h — kurwa, za mało.`);
+    if (m.sleepTotal >= 8) lines.push("Sen " + m.sleepTotal.toFixed(1) + "h — solidnie.");
+    else if (m.sleepTotal >= 7) lines.push("Sen " + m.sleepTotal.toFixed(1) + "h — ok.");
+    else if (m.sleepTotal >= 6) lines.push("Sen " + m.sleepTotal.toFixed(1) + "h — poniżej progu.");
+    else lines.push("Sen " + m.sleepTotal.toFixed(1) + "h — kurwa, za mało.");
   }
-  if (m.rhr != null) {
-    const inNorm = m.rhr >= range.min && m.rhr <= range.max;
-    lines.push(`RHR ${m.rhr} bpm${inNorm ? " (ok)" : ""}.`);
-  }
-  if (readiness != null) lines.push(`Gotowość ${readiness}%.`);
+  if (m.rhr != null) { const inNorm = m.rhr >= range.min && m.rhr <= range.max; lines.push("RHR " + m.rhr + " bpm" + (inNorm ? " (ok)" : "") + "."); }
+  if (readiness != null) lines.push("Gotowość " + readiness + "%.");
   if (level === "recovery") lines.push("→ Dziś recovery.");
   else if (level === "full") lines.push("→ FULL plan gotowy.");
   else if (level === "light") lines.push("→ Lżejszy trening.");
-  const { requiredDone, requiredTotal } = calcCompletionStats();
-  lines.push(`Zadania: ${requiredDone}/${requiredTotal}.`);
+  const stats = calcCompletionStats();
+  lines.push("Zadania: " + stats.requiredDone + "/" + stats.requiredTotal + ".");
+  if (isBoosterActive()) lines.push("⚡ Booster +15%.");
   el.textContent = lines.length ? lines.join(" ") : "Uzupełnij raport poranny żeby dostać brief.";
 }
 
@@ -1490,7 +1456,7 @@ async function renderBrief() {
 // ============================================================================
 const KEYWORDS = {
   sick: ["chory","choroba","gorączka","przeziębienie","katar","kaszel","grypa","ból głowy","migrena","osłabiony","rozbity","niedobrze","mdli","wymioty","boli","źle się czuję","przeziębiony","gorączkuję","infekcja","zapalenie","angina","temperatura","dreszcze"],
-  alcohol: ["piwo","wódka","alkohol","impreza","kac","wino","drink","pub","klub","popiłem","napiłem","browar","pijany","bal","wódzia"],
+  alcohol: ["piwo","wódka","alkohol","impreza","kac","wino","drink","pub","klub","popiłem","napiłem","browar","pijany","bal"],
   stress: ["stres","stresu","stresujący","deadline","egzamin","sprawdzian","kolokwium","szef","kłótnia","kłopot","problem","zawalony","presja","nerwy","zdenerwowany","panika","niepokój","spięty","napięty","przygnębiony","dołek","dół"],
   happy: ["dobry","świetny","super","radosny","wesoły","szczęśliwy","udany","wygrałem","zadowolony","euforia","mega","ekstra","świetnie","fantastycznie","genialnie","energia"],
   tired: ["zmęczony","wyczerpany","padnięty","senny","bez siły","ledwo żyję","słaby","senność","nie mam siły","wypompowany","zombie","spać","niedospany"],
@@ -1504,8 +1470,9 @@ function detectKeywords(text) {
   if (!text) return [];
   const lower = text.toLowerCase();
   const found = new Set();
-  Object.entries(KEYWORDS).forEach(([cat, words]) => {
-    if (words.some(w => lower.includes(w))) found.add(cat);
+  Object.keys(KEYWORDS).forEach(cat => {
+    const words = KEYWORDS[cat];
+    if (words.some(w => lower.indexOf(w) >= 0)) found.add(cat);
   });
   return Array.from(found);
 }
@@ -1525,8 +1492,6 @@ const FOOD_DB = {
     { name: "Jogurt grecki 200g + granola + borówki", kcal: 540, prot: 22 },
     { name: "Kanapka z łososiem wędzonym + jajko sadzone", kcal: 610, prot: 30 },
     { name: "Placki bananowe (2 jajka + banan + mąka) z syropem klonowym", kcal: 560, prot: 20 },
-    { name: "Chleb razowy + pasta jajeczna + pomidor", kcal: 480, prot: 24 },
-    { name: "Parówki cielęce (3) + bułka + musztarda", kcal: 620, prot: 26 },
   ],
   lunch: [
     { name: "Kurczak (200g) + ryż (100g) + warzywa na patelni", kcal: 780, prot: 48 },
@@ -1539,8 +1504,6 @@ const FOOD_DB = {
     { name: "Pizza domowa z szynką i serem (3 kawałki)", kcal: 850, prot: 32 },
     { name: "Karkówka pieczona + ziemniaki + mizeria", kcal: 880, prot: 40 },
     { name: "Kluski śląskie + rolada wołowa + modra kapusta", kcal: 820, prot: 38 },
-    { name: "Indyk mielony + kasza jaglana + warzywa", kcal: 720, prot: 44 },
-    { name: "Zupa pomidorowa z makaronem + drugie (kotlet mielony)", kcal: 780, prot: 34 },
   ],
   snack: [
     { name: "Twaróg 150g + miód + orzechy", kcal: 400, prot: 28 },
@@ -1551,8 +1514,6 @@ const FOOD_DB = {
     { name: "Jajka na twardo (3) + sól", kcal: 240, prot: 20 },
     { name: "Koktajl mleko + banan + masło orzechowe", kcal: 460, prot: 18 },
     { name: "Skyr 200g + kakao + banan", kcal: 340, prot: 26 },
-    { name: "Kanapka z szynką i serem", kcal: 380, prot: 20 },
-    { name: "Naleśniki z twarogiem (2 szt)", kcal: 420, prot: 20 },
   ],
   dinner: [
     { name: "Twaróg 200g + warzywa + oliwa", kcal: 420, prot: 32 },
@@ -1563,8 +1524,6 @@ const FOOD_DB = {
     { name: "Skyr 300g + owoce + orzechy", kcal: 460, prot: 32 },
     { name: "Jajka sadzone (3) + chleb razowy + pomidor", kcal: 480, prot: 26 },
     { name: "Łosoś wędzony + twarożek + pieczywo chrupkie", kcal: 420, prot: 30 },
-    { name: "Tofu smażone + ryż + warzywa", kcal: 540, prot: 28 },
-    { name: "Zupa krem z dyni + grzanki + twaróg", kcal: 500, prot: 26 },
   ],
   shake: [
     { name: "Szejk masowy: mleko 400ml + banan + 50g płatków + masło orzechowe + miód", kcal: 700, prot: 22 },
@@ -1573,85 +1532,63 @@ const FOOD_DB = {
     { name: "Szejk owsiany: mleko 400ml + 80g płatków + daktyle + masło orzechowe", kcal: 720, prot: 20 },
     { name: "Szejk owocowy: mleko + mango + banan + jogurt grecki", kcal: 540, prot: 22 },
     { name: "Szejk kawowy: mleko + kawa + białko + masło orzechowe", kcal: 460, prot: 34 },
-    { name: "Szejk czekoladowy: mleko + kakao + banan + białko", kcal: 500, prot: 36 },
-    { name: "Szejk z awokado: mleko + awokado + miód + orzechy", kcal: 620, prot: 16 },
-    { name: "Szejk jaglany: mleko + kasza jaglana + banan + cynamon", kcal: 580, prot: 18 },
-    { name: "Szejk przed snem: mleko + twaróg + łyżka miodu", kcal: 440, prot: 34 },
   ],
   fast: [
     { name: "Kanapka z tuńczykiem z puszki + majonez + ogórek", kcal: 480, prot: 28 },
-    { name: "Parówki + bułka + ketchup (szybkie)", kcal: 560, prot: 22 },
+    { name: "Parówki + bułka + ketchup", kcal: 560, prot: 22 },
     { name: "Jajka na twardo (4) + sól + chleb", kcal: 440, prot: 28 },
     { name: "Twaróg + rzodkiewka + chleb razowy", kcal: 420, prot: 26 },
     { name: "Zapiekanka z serem (bagietka)", kcal: 620, prot: 24 },
     { name: "Kabanosy 100g + bułka + ogórek kiszony", kcal: 580, prot: 26 },
-    { name: "Hot dog z 2 parówkami", kcal: 600, prot: 22 },
-    { name: "Jogurt grecki + miód + orzechy (szybkie)", kcal: 360, prot: 20 },
-    { name: "Tosty z serem i szynką (3 szt)", kcal: 540, prot: 26 },
-    { name: "Serek wiejski + pieczywo chrupkie", kcal: 320, prot: 22 },
   ],
 };
 
-let currentFoodTab = "breakfast";
+const MASS_SHAKES = [
+  { name: "Klasyk Masowy", ingredients: ["300 ml mleka 3.2%", "40 g płatków owsianych", "1 banan", "2 łyżki masła orzechowego"], kcal: 700, prot: 24 },
+  { name: "Czekoladowy Moc", ingredients: ["300 ml mleka", "40 g płatków owsianych", "1 łyżka kakao", "1 banan", "1 łyżka miodu"], kcal: 690, prot: 22 },
+  { name: "Orzechowy Beast", ingredients: ["300 ml mleka", "30 g płatków owsianych", "2 łyżki masła orzechowego", "1 łyżka miodu", "garść orzechów włoskich"], kcal: 750, prot: 22 },
+  { name: "Bananowy Turbo", ingredients: ["350 ml mleka", "50 g płatków owsianych", "2 banany", "1 łyżka masła orzechowego"], kcal: 740, prot: 24 },
+  { name: "Twarogowy Pro", ingredients: ["250 ml mleka", "150 g twarogu", "1 banan", "1 łyżka miodu", "1 łyżka kakao"], kcal: 680, prot: 38 },
+  { name: "Daktyle & Masło", ingredients: ["300 ml mleka", "40 g płatków owsianych", "5 daktyli", "2 łyżki masła orzechowego"], kcal: 720, prot: 20 },
+  { name: "Owocowy Load", ingredients: ["300 ml mleka", "150 g jogurtu greckiego", "1 banan", "garść borówek", "2 łyżki płatków"], kcal: 640, prot: 26 },
+  { name: "Kawowy Rise", ingredients: ["300 ml mleka", "50 g płatków owsianych", "1 łyżka kawy rozpuszczalnej", "1 banan", "1 łyżka masła orzechowego"], kcal: 700, prot: 22 },
+];
 
+let currentFoodTab = "breakfast";
 function renderFoodList() {
   const container = $("food-list"); if (!container) return;
   const items = FOOD_DB[currentFoodTab] || [];
-  container.innerHTML = items.map(f => `
-    <div class="food-card">
-      <div class="text-sm font-bold text-neutral-100 leading-snug">${escapeHtml(f.name)}</div>
-      <div class="flex items-center gap-3 mt-2 text-[11px] font-bold">
-        <span class="text-gold"><i class="fa-solid fa-fire mr-1"></i>${f.kcal} kcal</span>
-        <span class="text-mint"><i class="fa-solid fa-drumstick-bite mr-1"></i>${f.prot} g białka</span>
-      </div>
-    </div>`).join("");
+  container.innerHTML = items.map(f => '<div class="food-card"><div class="text-sm font-bold text-neutral-100 leading-snug">' + escapeHtml(f.name) + '</div><div class="flex items-center gap-3 mt-2 text-[11px] font-bold"><span class="text-gold"><i class="fa-solid fa-fire mr-1"></i>' + f.kcal + ' kcal</span><span class="text-mint"><i class="fa-solid fa-drumstick-bite mr-1"></i>' + f.prot + ' g</span></div></div>').join("");
 }
-
 function rollFoodPlan() {
   const pick = (cat) => FOOD_DB[cat][Math.floor(Math.random() * FOOD_DB[cat].length)];
-  const breakfast = pick("breakfast");
-  const lunch = pick("lunch");
-  const snack = pick("snack");
-  const dinner = pick("dinner");
-  const shake = pick("shake");
+  const breakfast = pick("breakfast"); const lunch = pick("lunch"); const snack = pick("snack"); const dinner = pick("dinner"); const shake = pick("shake");
   const total = breakfast.kcal + lunch.kcal + snack.kcal + dinner.kcal + shake.kcal;
   const prot = breakfast.prot + lunch.prot + snack.prot + dinner.prot + shake.prot;
   const el = $("food-roll");
-  el.innerHTML = `
-    <div class="text-xs font-extrabold text-mint mb-2 tracking-widest uppercase">🎲 Twój plan na dziś</div>
-    <div class="space-y-2 text-xs">
-      <div><strong class="text-peach">Śniadanie:</strong> ${escapeHtml(breakfast.name)} <span class="text-neutral-500">(${breakfast.kcal} kcal / ${breakfast.prot}g)</span></div>
-      <div><strong class="text-gold">Obiad:</strong> ${escapeHtml(lunch.name)} <span class="text-neutral-500">(${lunch.kcal} kcal / ${lunch.prot}g)</span></div>
-      <div><strong class="text-mint">Przekąska:</strong> ${escapeHtml(snack.name)} <span class="text-neutral-500">(${snack.kcal} kcal / ${snack.prot}g)</span></div>
-      <div><strong class="text-lilac">Kolacja:</strong> ${escapeHtml(dinner.name)} <span class="text-neutral-500">(${dinner.kcal} kcal / ${dinner.prot}g)</span></div>
-      <div><strong class="text-rose">Szejk:</strong> ${escapeHtml(shake.name)} <span class="text-neutral-500">(${shake.kcal} kcal / ${shake.prot}g)</span></div>
-    </div>
-    <div class="flex items-center justify-between mt-3 pt-3 border-t border-white/10">
-      <div class="text-sm font-extrabold text-gold">≈ ${total} kcal</div>
-      <div class="text-sm font-extrabold text-mint">≈ ${prot}g białka</div>
-    </div>`;
-  el.classList.remove("hidden");
+  el.innerHTML = '<div class="text-xs font-extrabold text-mint mb-2 tracking-widest uppercase">🎲 Twój plan na dziś</div><div class="space-y-2 text-xs"><div><strong class="text-peach">Śniadanie:</strong> ' + escapeHtml(breakfast.name) + ' <span class="text-neutral-500">(' + breakfast.kcal + ' kcal / ' + breakfast.prot + 'g)</span></div><div><strong class="text-gold">Obiad:</strong> ' + escapeHtml(lunch.name) + ' <span class="text-neutral-500">(' + lunch.kcal + ' kcal / ' + lunch.prot + 'g)</span></div><div><strong class="text-mint">Przekąska:</strong> ' + escapeHtml(snack.name) + ' <span class="text-neutral-500">(' + snack.kcal + ' kcal / ' + snack.prot + 'g)</span></div><div><strong class="text-lilac">Kolacja:</strong> ' + escapeHtml(dinner.name) + ' <span class="text-neutral-500">(' + dinner.kcal + ' kcal / ' + dinner.prot + 'g)</span></div><div><strong class="text-rose">Szejk:</strong> ' + escapeHtml(shake.name) + ' <span class="text-neutral-500">(' + shake.kcal + ' kcal / ' + shake.prot + 'g)</span></div></div><div class="flex items-center justify-between mt-3 pt-3 border-t border-white/10"><div class="text-sm font-extrabold text-gold">≈ ' + total + ' kcal</div><div class="text-sm font-extrabold text-mint">≈ ' + prot + 'g białka</div></div>';
+  vibrate(30); playSound("done");
+}
+function rollMassShake() {
+  const s = MASS_SHAKES[Math.floor(Math.random() * MASS_SHAKES.length)];
+  const el = $("mass-shake-roll");
+  el.innerHTML = '<div class="text-xs font-extrabold text-gold mb-2 tracking-widest uppercase">🥤 ' + escapeHtml(s.name) + '</div><div class="space-y-1.5 text-xs">' + s.ingredients.map(i => '<div class="flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-gold flex-shrink-0"></span><span class="text-neutral-200 font-medium">' + escapeHtml(i) + '</span></div>').join("") + '</div><div class="flex items-center justify-between mt-3 pt-3 border-t border-white/10"><div class="text-sm font-extrabold text-gold"><i class="fa-solid fa-fire mr-1"></i>≈ ' + s.kcal + ' kcal</div><div class="text-sm font-extrabold text-mint"><i class="fa-solid fa-drumstick-bite mr-1"></i>≈ ' + s.prot + 'g</div></div><p class="text-[10px] text-neutral-500 font-medium mt-2">Wrzuć wszystko do blendera. Pij po szkole lub rano.</p>';
   vibrate(30); playSound("done");
 }
 
 // ============================================================================
-// ANALIZA TRENERA — 9 SEKCJI
+// ANALIZA TRENERA
 // ============================================================================
-function sec(title, icon, body, color = "#5eead4") {
-  return `<div class="analysis-section">
-    <div class="analysis-title" style="color:${color}">${icon} ${title}</div>
-    <div class="analysis-body">${body}</div>
-  </div>`;
+function sec(title, icon, body, color) {
+  return '<div class="analysis-section"><div class="analysis-title" style="color:' + (color || "#5eead4") + '">' + icon + ' ' + title + '</div><div class="analysis-body">' + body + '</div></div>';
 }
-
 function trendLabel(today, avg7) {
   if (today == null || avg7 == null) return "";
   const diff = today - avg7;
   if (Math.abs(diff) < 0.05 * avg7) return "≈ w normie";
-  if (diff > 0) return `<em>+${diff.toFixed(1)}</em> vs 7d`;
-  return `<em>${diff.toFixed(1)}</em> vs 7d`;
+  if (diff > 0) return "<em>+" + diff.toFixed(1) + "</em> vs 7d";
+  return "<em>" + diff.toFixed(1) + "</em> vs 7d";
 }
-
 async function generateFullAnalysis() {
   const last7 = await loadLastNDays(8);
   const today = last7[last7.length - 1] || {};
@@ -1663,16 +1600,14 @@ async function generateFullAnalysis() {
   const kws = detectKeywords(today.note);
   const age = getSettings().age;
   const rhrRange = getRhrRange(age);
-
   const avg = (arr) => arr.length ? arr.reduce((a, b) => a + b, 0) / arr.length : null;
-  const avgSleep = avg(past7.map(d => d.morning?.sleepTotal).filter(v => v != null));
-  const rhrPrev7 = past7.map(d => d.morning?.rhr).filter(v => v != null);
+  const avgSleep = avg(past7.map(d => d.morning && d.morning.sleepTotal).filter(v => v != null));
+  const rhrPrev7 = past7.map(d => d.morning && d.morning.rhr).filter(v => v != null);
   const avgRhr = avg(rhrPrev7);
-  const avgStress = avg(past7.map(d => d.evening?.stress).filter(v => v != null));
-  const avgSteps = avg(past7.map(d => d.evening?.steps).filter(v => v != null));
-  const avgMood = avg(past7.map(d => d.morning?.moodMorning).filter(v => v != null));
-  const avgWeight = avg(past7.map(d => d.morning?.dailyWeight).filter(v => v != null));
-
+  const avgStress = avg(past7.map(d => d.evening && d.evening.stress).filter(v => v != null));
+  const avgSteps = avg(past7.map(d => d.evening && d.evening.steps).filter(v => v != null));
+  const avgMood = avg(past7.map(d => d.morning && d.morning.moodMorning).filter(v => v != null));
+  const avgWeight = avg(past7.map(d => d.morning && d.morning.dailyWeight).filter(v => v != null));
   const readiness = calculateReadiness();
   const level = getTrainingLevel();
   const sections = [];
@@ -1680,83 +1615,73 @@ async function generateFullAnalysis() {
   // 1. SEN
   {
     let b = "";
-    if (m.sleepTotal == null) b = "Brak danych o snie. Uzupełnij raport poranny — bez tego nie da się ocenić regeneracji.";
+    if (m.sleepTotal == null) b = "Brak danych o snie. Uzupełnij raport poranny.";
     else {
       const s = m.sleepTotal;
-      if (s >= 8.5) b += `<strong>${s.toFixed(1)}h</strong> — kozacki sen, organizm ma pełne pole do regeneracji.`;
-      else if (s >= 8) b += `<strong>${s.toFixed(1)}h</strong> — solidnie, trzymaj ten rytm.`;
-      else if (s >= 7) b += `<strong>${s.toFixed(1)}h</strong> — ok, ale celuj w 8+.`;
-      else if (s >= 6) b += `<strong>${s.toFixed(1)}h</strong> — poniżej progu. Jutro priorytet: spać wcześniej.`;
-      else b += `<em>Kurwa, tylko ${s.toFixed(1)}h.</em> To nie sen, to drzemka. Organizm nie zbuduje ani masy, ani wzrostu na takim śnie.`;
+      if (s >= 8.5) b += "<strong>" + s.toFixed(1) + "h</strong> — kozacki sen, organizm ma pełne pole do regeneracji.";
+      else if (s >= 8) b += "<strong>" + s.toFixed(1) + "h</strong> — solidnie, trzymaj rytm.";
+      else if (s >= 7) b += "<strong>" + s.toFixed(1) + "h</strong> — ok, ale celuj w 8+.";
+      else if (s >= 6) b += "<strong>" + s.toFixed(1) + "h</strong> — poniżej progu. Jutro priorytet: spać wcześniej.";
+      else b += "<em>Kurwa, tylko " + s.toFixed(1) + "h.</em> Organizm nie zbuduje masy na takim śnie.";
       if (m.sleepDeep != null && s > 0) {
         const r = m.sleepDeep / s;
-        b += ` Głęboki: <strong>${m.sleepDeep.toFixed(2)}h</strong> (${(r * 100).toFixed(0)}%).`;
+        b += " Głęboki: <strong>" + m.sleepDeep.toFixed(2) + "h</strong> (" + (r * 100).toFixed(0) + "%).";
         if (r < 0.13) b += " Mało głębokiego — bez niego nie ma hormonu wzrostu.";
       }
-      if (m.sleepRem != null) b += ` REM: <strong>${m.sleepRem.toFixed(2)}h</strong>.`;
-      if (m.sleepWakes != null && m.sleepWakes >= 3) b += ` <em>${m.sleepWakes} pobudek</em> — coś wybudza. Telefon? Za ciepło?`;
-      if (avgSleep != null) b += ` ${trendLabel(s, avgSleep)}.`;
+      if (avgSleep != null) b += " " + trendLabel(s, avgSleep) + ".";
     }
     sections.push(sec("Sen", "🌙", b, "#c4b5fd"));
   }
 
-  // 2. RHR — z dynamiczną normą
+  // 2. RHR
   {
     let b = "";
-    if (m.rhr == null) b = "Brak RHR. Mierz rano przed wstaniem — to najważniejszy wskaźnik przeciążenia.";
+    if (m.rhr == null) b = "Brak RHR. Mierz rano przed wstaniem.";
     else {
       const analysis = analyzeRhr(m.rhr, age, avgRhr);
-      b += `Norma dla wieku ${age} lat: <strong>${rhrRange.min}–${rhrRange.max} bpm</strong>. `;
+      b += "Norma dla wieku " + age + " lat: <strong>" + rhrRange.min + "–" + rhrRange.max + " bpm</strong>. ";
       b += analysis.message;
       if (ym.rhr != null) {
         const d = m.rhr - ym.rhr;
-        if (d >= 5) b += ` <em>+${d} vs wczoraj</em>.`;
-        else if (d <= -3) b += ` <em>${d} vs wczoraj</em>.`;
+        if (d >= 5) b += " <em>+" + d + " vs wczoraj</em>.";
+        else if (d <= -3) b += " <em>" + d + " vs wczoraj</em>.";
       }
     }
     sections.push(sec("Regeneracja (RHR)", "💓", b, "#5eead4"));
   }
 
-  // 3. GOTOWOŚĆ + TRENING
+  // 3. TRENING
   {
     let b = "";
-    if (readiness == null) b = "Za mało danych do oceny gotowości.";
+    if (readiness == null) b = "Za mało danych.";
     else {
-      b += `Gotowość: <strong>${readiness}%</strong>. `;
-      if (readiness >= 80) b += "Możesz dziś napierdalać — pełny plan, ciężkie serie.";
-      else if (readiness >= 60) b += "Standardowy trening — nic na siłę, nic na odpierdol.";
-      else if (readiness >= 40) b += "Lżejszy dzień. Technika > ciężar.";
-      else b += "<em>Niska gotowość.</em> Recovery day: spacer, oddech, rozciąganie.";
+      b += "Gotowość: <strong>" + readiness + "%</strong>. ";
+      if (readiness >= 80) b += "Możesz dziś napierdalać — pełny plan.";
+      else if (readiness >= 60) b += "Standardowy trening.";
+      else if (readiness >= 40) b += "Lżejszy dzień.";
+      else b += "<em>Niska gotowość.</em> Recovery.";
     }
-    if (level === "recovery") b += " Dziś poziom: <em>RECOVERY</em>.";
+    if (level === "recovery") b += " Poziom: <em>RECOVERY</em>.";
     else if (level === "light") b += " Poziom: <em>LIGHT</em>.";
     else if (level === "full") b += " Poziom: <strong>FULL</strong> 🔥.";
-    if (e.rpe != null) {
-      b += ` RPE: ${e.rpe}/10.`;
-      if (e.rpe >= 9) b += " Ciężko było — pilnuj snu.";
-    }
+    if (isBoosterActive()) b += " <em>⚡ Booster +15% aktywny.</em>";
     sections.push(sec("Gotowość + Trening", "🏋️", b, "#fbbf9d"));
   }
 
   // 4. NASTRÓJ
   {
     let b = "";
-    const mood = m.moodMorning ?? e.moodEvening;
+    const mood = m.moodMorning != null ? m.moodMorning : e.moodEvening;
     if (mood == null) b = "Brak oceny nastroju.";
     else {
-      if (mood >= 8) b += `Nastrój <strong>${mood}/10</strong> — jest ogień, wykorzystaj to.`;
-      else if (mood >= 6) b += `Nastrój <strong>${mood}/10</strong> — stabilnie.`;
-      else if (mood >= 4) b += `Nastrój <strong>${mood}/10</strong> — taki sobie dzień. Trzymaj rytm zadań.`;
-      else b += `Nastrój <strong>${mood}/10</strong> — <em>dołek.</em> Nie musisz być bohaterem. Zrób podstawy i idź spać.`;
-      if (m.moodMorning != null && e.moodEvening != null) {
-        const d = e.moodEvening - m.moodMorning;
-        if (d >= 2) b += " Wieczorem lepiej niż rano — coś dobrego się stało.";
-        else if (d <= -2) b += " Wieczorem gorzej niż rano — coś cię zjadło.";
-      }
-      if (avgMood != null) b += ` ${trendLabel(mood, avgMood)}.`;
+      if (mood >= 8) b += "Nastrój <strong>" + mood + "/10</strong> — jest ogień.";
+      else if (mood >= 6) b += "Nastrój <strong>" + mood + "/10</strong> — stabilnie.";
+      else if (mood >= 4) b += "Nastrój <strong>" + mood + "/10</strong> — taki sobie dzień.";
+      else b += "Nastrój <strong>" + mood + "/10</strong> — <em>dołek.</em> Zrób podstawy.";
+      if (avgMood != null) b += " " + trendLabel(mood, avgMood) + ".";
     }
-    if (kws.includes("lonely")) b += " <em>Widzę w notatce smutek.</em> Pogadaj z kimś zaufanym — to nie wstyd, to siła.";
-    if (kws.includes("happy") || kws.includes("success")) b += " 🔥 Notatka pełna energii — tak trzymaj.";
+    if (kws.indexOf("lonely") >= 0) b += " <em>Widzę w notatce smutek.</em> Pogadaj z kimś.";
+    if (kws.indexOf("happy") >= 0 || kws.indexOf("success") >= 0) b += " 🔥 Notatka pełna energii.";
     sections.push(sec("Nastrój", "😊", b, "#fbbf9d"));
   }
 
@@ -1767,14 +1692,13 @@ async function generateFullAnalysis() {
     else {
       if (e.steps != null) {
         const s = e.steps;
-        if (s >= 12000) b += `Kroki: <strong>${s}</strong> — konkretny dystans.`;
-        else if (s >= 8000) b += `Kroki: <strong>${s}</strong> — solidnie.`;
-        else if (s >= 5000) b += `Kroki: ${s} — przeciętnie.`;
-        else b += `Kroki: ${s} — mało. Wyjdź na spacer, kurwa, ruszyć dupe.`;
-        if (avgSteps != null) b += ` ${trendLabel(s, avgSteps)}.`;
+        if (s >= 12000) b += "Kroki: <strong>" + s + "</strong> — konkretny dystans.";
+        else if (s >= 8000) b += "Kroki: <strong>" + s + "</strong> — solidnie.";
+        else if (s >= 5000) b += "Kroki: " + s + " — przeciętnie.";
+        else b += "Kroki: " + s + " — mało. Wyjdź na spacer.";
+        if (avgSteps != null) b += " " + trendLabel(s, avgSteps) + ".";
       }
-      if (e.kcalBurned != null) b += ` Spalone: <strong>${e.kcalBurned} kcal</strong>.`;
-      if (e.hrDay != null) b += ` Śr. tętno dnia: ${e.hrDay} bpm.`;
+      if (e.kcalBurned != null) b += " Spalone: <strong>" + e.kcalBurned + " kcal</strong>.";
     }
     sections.push(sec("Aktywność", "🏃", b, "#fbbf24"));
   }
@@ -1782,103 +1706,86 @@ async function generateFullAnalysis() {
   // 6. STRES + ODDYCHANIE
   {
     let b = "";
-    if (e.stress == null && m.breathing == null) b = "Brak danych stresu i oddychania.";
+    if (e.stress == null && m.breathing == null) b = "Brak danych.";
     else {
       if (e.stress != null) {
         const s = e.stress;
-        if (s < 25) b += `Stres: <strong>${s}/100</strong> — spokój jak u mnicha.`;
-        else if (s < 40) b += `Stres: ${s}/100 — normalnie.`;
-        else if (s < 60) b += `Stres: ${s}/100 — podniesiony. 5 min oddechu 4-7-8.`;
-        else if (s < 75) b += `Stres: <em>${s}/100</em> — wysoko. Coś cię zjada.`;
-        else b += `Stres: <em>${s}/100 — bardzo wysoko.</em> Układ nerwowy przeciążony, trening odpuść.`;
-        if (avgStress != null) b += ` ${trendLabel(s, avgStress)}.`;
+        if (s < 25) b += "Stres: <strong>" + s + "/100</strong> — spokój.";
+        else if (s < 40) b += "Stres: " + s + "/100 — normalnie.";
+        else if (s < 60) b += "Stres: " + s + "/100 — podniesiony.";
+        else if (s < 75) b += "Stres: <em>" + s + "/100</em> — wysoko.";
+        else b += "Stres: <em>" + s + "/100 — bardzo wysoko.</em>";
+        if (avgStress != null) b += " " + trendLabel(s, avgStress) + ".";
       }
       if (m.breathing != null) {
-        b += ` Punkty oddychania: <strong>${m.breathing}</strong>.`;
-        if (m.breathing < 85) b += " Przewietrz sypialnię przed snem.";
-        if (m.breathing < 70) b += " <em>Nisko</em> — sprawdź pozycję snu i drożność nosa.";
+        b += " Punkty oddychania: <strong>" + m.breathing + "</strong>.";
+        if (m.breathing < 85) b += " Przewietrz sypialnię.";
       }
-      if (kws.includes("stress")) b += " Notatka pełna stresu — oddech 4-7-8 dziś obowiązkowy.";
     }
     sections.push(sec("Stres i oddychanie", "🧘", b, "#c4b5fd"));
   }
 
   // 7. ZADANIA
   {
-    const { requiredDone, requiredTotal, optionalDone, optionalTotal } = calcCompletionStats();
+    const stats = calcCompletionStats();
     const pct = calcCompletionPct();
-    let b = `Zadania (wymagane): <strong>${requiredDone}/${requiredTotal}</strong> (${pct}%).`;
-    if (optionalTotal > 0) b += ` Opcjonalne: ${optionalDone}/${optionalTotal}.`;
+    let b = "Zadania: <strong>" + stats.requiredDone + "/" + stats.requiredTotal + "</strong> (" + pct + "%).";
+    if (stats.optionalTotal > 0) b += " Opcjonalne: " + stats.optionalDone + "/" + stats.optionalTotal + ".";
     b += " ";
-    if (pct === 100) b += "Perfect day, kurwa! Tak się buduje dyscyplinę. Jutro nie odpuszczaj.";
-    else if (pct >= 75) b += "Bardzo dobrze — dokończ resztę, nie zostawiaj na ostatnią chwilę.";
-    else if (pct >= 50) b += "Połowa za tobą. Rusz resztę.";
-    else if (pct > 0) b += "<em>Słabo.</em> Nawet nie próbuj usprawiedliwiać się zmęczeniem. Rób po kolei.";
-    else b += "<em>Zero zadań.</em> Kurwa, od czegoś trzeba zacząć. Jedno zadanie teraz.";
+    if (pct === 100) b += "Perfect day! BEAST MODE ACTIVE. 🔥";
+    else if (pct >= 75) b += "Bardzo dobrze — dokończ resztę.";
+    else if (pct >= 50) b += "Połowa za tobą.";
+    else if (pct > 0) b += "<em>Słabo.</em> Rób po kolei.";
+    else b += "<em>Zero zadań.</em> Od czegoś trzeba zacząć.";
     sections.push(sec("Zadania", "✅", b, "#5eead4"));
   }
 
   // 8. TRENDY
   {
     const lines = [];
-    if (m.sleepTotal != null && ym.sleepTotal != null) {
-      const d = m.sleepTotal - ym.sleepTotal;
-      if (Math.abs(d) >= 0.5) lines.push(`Sen: <em>${d > 0 ? "+" : ""}${d.toFixed(1)}h</em> vs wczoraj`);
-    }
-    if (m.rhr != null && ym.rhr != null) {
-      const d = m.rhr - ym.rhr;
-      if (Math.abs(d) >= 2) lines.push(`RHR: <em>${d > 0 ? "+" : ""}${d} bpm</em> vs wczoraj`);
-    }
-    if (avgWeight != null && m.dailyWeight != null) {
-      const d = m.dailyWeight - avgWeight;
-      if (Math.abs(d) >= 0.2) lines.push(`Waga: <em>${d > 0 ? "+" : ""}${d.toFixed(1)} kg</em> vs 7d`);
-    }
-    if (avgSleep != null) lines.push(`Śr. sen 7d: ${avgSleep.toFixed(1)}h`);
-    if (avgRhr != null) lines.push(`Śr. RHR 7d: ${avgRhr.toFixed(0)} bpm`);
-    if (avgSteps != null) lines.push(`Śr. kroki 7d: ${avgSteps.toFixed(0)}`);
-    let b = lines.length ? lines.join(" · ") : "Za mało danych do trendów.";
-    sections.push(sec("Trendy (vs wczoraj / 7d)", "📈", b, "#fbbf24"));
+    if (m.sleepTotal != null && ym.sleepTotal != null) { const d = m.sleepTotal - ym.sleepTotal; if (Math.abs(d) >= 0.5) lines.push("Sen: <em>" + (d > 0 ? "+" : "") + d.toFixed(1) + "h</em> vs wczoraj"); }
+    if (m.rhr != null && ym.rhr != null) { const d = m.rhr - ym.rhr; if (Math.abs(d) >= 2) lines.push("RHR: <em>" + (d > 0 ? "+" : "") + d + " bpm</em> vs wczoraj"); }
+    if (avgWeight != null && m.dailyWeight != null) { const d = m.dailyWeight - avgWeight; if (Math.abs(d) >= 0.2) lines.push("Waga: <em>" + (d > 0 ? "+" : "") + d.toFixed(1) + " kg</em> vs 7d"); }
+    if (avgSleep != null) lines.push("Śr. sen 7d: " + avgSleep.toFixed(1) + "h");
+    if (avgRhr != null) lines.push("Śr. RHR 7d: " + avgRhr.toFixed(0) + " bpm");
+    if (avgSteps != null) lines.push("Śr. kroki 7d: " + avgSteps.toFixed(0));
+    let b = lines.length ? lines.join(" · ") : "Za mało danych.";
+    sections.push(sec("Trendy", "📈", b, "#fbbf24"));
   }
 
-  // 9. PRIORYTETY + CIEKAWOSTKA
+  // 9. PRIORYTETY
   {
     const priorities = [];
-    if (m.sleepTotal != null && m.sleepTotal < 7) priorities.push("Sen 8h+ dziś — telefon off 1h przed snem.");
-    if (m.rhr != null && m.rhr > rhrRange.max) priorities.push(`RHR ${m.rhr} bpm powyżej normy — odpocznij, dużo wody.`);
-    if (e.stress != null && e.stress > 60) priorities.push("Oddech 4-7-8 (5 min) przed snem.");
-    if (m.breathing != null && m.breathing < 85) priorities.push("Przewietrz sypialnię przed snem.");
-    const { requiredDone, requiredTotal } = calcCompletionStats();
-    if (requiredDone < requiredTotal) priorities.push(`Dokończ ${requiredTotal - requiredDone} zadań.`);
-    if (m.dailyWeight != null && avgWeight != null && m.dailyWeight < avgWeight - 0.3) priorities.push("Zwiększ kalorie — dorzuć szejk masowy.");
-    const { totalD3 } = getSupplementTotals();
-    if (totalD3 > 4000) priorities.push(`Uwaga: D3 ${totalD3} IU — zmniejsz dawkę.`);
+    if (m.sleepTotal != null && m.sleepTotal < 7) priorities.push("Sen 8h+ dziś.");
+    if (m.rhr != null && m.rhr > rhrRange.max) priorities.push("RHR " + m.rhr + " bpm powyżej normy.");
+    if (e.stress != null && e.stress > 60) priorities.push("Oddech 4-7-8 przed snem.");
+    if (isBoosterActive()) priorities.push("Włącz Skincare/Suplementy żeby zdjąć booster +15%.");
+    const stats = calcCompletionStats();
+    if (stats.requiredDone < stats.requiredTotal) priorities.push("Dokończ " + (stats.requiredTotal - stats.requiredDone) + " zadań.");
+    if (m.dailyWeight != null && avgWeight != null && m.dailyWeight < avgWeight - 0.3) priorities.push("Zwiększ kalorie — szejk masowy 700 kcal.");
     if (priorities.length === 0) priorities.push("Utrzymaj rytm — wszystko idzie zgodnie z planem.");
-
     const facts = [
       "Hormon wzrostu wydziela się głównie w głębokim śnie (faza N3) — 70% dobowego wyrzutu.",
-      "Kreatyna zwiększa uwodnienie mięśni — dlatego woda 2.5L jest obowiązkowa.",
-      "Witamina D3 + K2 razem = lepsze wchłanianie wapnia do kości.",
-      "Tran zawiera omega-3 DHA — kluczowe dla mózgu i redukcji stanów zapalnych skóry (acne).",
+      "Białko rozłożone na 4-5 posiłków po 25-40g = najlepsza synteza mięśniowa.",
+      "Wznosy bokiem hantlami 1kg w seriach 20-25 powtórzeń rozbudowują szerokość barków.",
+      "Mewing (język na podniebieniu) poprawia linię szczęki i symetrię twarzy.",
+      "Zimna woda na twarz rano redukuje obrzęk i czerwony nos.",
+      "16-17 lat to szczytowy moment skoku wzrostowego u chłopaków.",
       "Dobra postawa dodaje 1-2 cm wizualnie — ćwicz core i plecy.",
-      "Testosteron rośnie najbardziej przez sen 7-9h + trening siłowy + tłuszcze zwierzęce.",
-      "Pompki to najlepsze ćwiczenie na klatkę, triceps i barki jednocześnie — 3 w 1.",
-      "Białko rozłożone na 4-5 posiłków po 25-40g daje najlepszą syntezę mięśniową.",
-      "16-17 lat to szczytowy moment skoku wzrostowego u większości chłopaków.",
-      "Zimny prysznic po treningu redukuje zakwasy, ale hamuje hipertrofię — lepiej letni.",
+      "Burnout set na koniec treningu pobudza maksymalnie włókna typu II.",
     ];
     const fact = facts[Math.floor(Math.random() * facts.length)];
-    let b = `<strong>Priorytety na jutro:</strong><br>• ${priorities.join("<br>• ")}<br><br>💡 <em>Ciekawostka:</em> ${fact}`;
+    let b = "<strong>Priorytety na jutro:</strong><br>• " + priorities.join("<br>• ") + "<br><br>💡 <em>Ciekawostka:</em> " + fact;
     sections.push(sec("Priorytety + ciekawostka", "🎯", b, "#5eead4"));
   }
 
   return sections.join("");
 }
-
 async function renderAutoAnalysis() {
   const box = $("auto-analysis-box"); const content = $("auto-analysis-content");
   if (!box || !content) return;
   const today = await loadDayDoc(todayKey);
-  if (!today?.evening?.completedAt && !today?.evening?.rpe && !today?.note) {
+  if (!today || (!(today.evening && today.evening.completedAt) && !(today.evening && today.evening.rpe) && !today.note)) {
     box.classList.add("hidden");
     return;
   }
@@ -1887,31 +1794,24 @@ async function renderAutoAnalysis() {
   box.classList.remove("hidden");
   await saveAnalysisToHistory(html);
 }
-
 async function saveAnalysisToHistory(html) {
   try {
     const today = dateKey(new Date());
     const history = JSON.parse(localStorage.getItem(localKey("analysis-history")) || "[]");
     const filtered = history.filter(h => h.date !== today);
-    filtered.unshift({ date: today, html, at: Date.now() });
+    filtered.unshift({ date: today, html: html, at: Date.now() });
     localStorage.setItem(localKey("analysis-history"), JSON.stringify(filtered.slice(0, 30)));
   } catch (e) {}
 }
-
 async function renderAnalysisHistory() {
   const el = $("mentor-history-list"); if (!el) return;
   const history = JSON.parse(localStorage.getItem(localKey("analysis-history")) || "[]");
-  if (!history.length) { el.innerHTML = `<p class="text-sm text-neutral-500 font-medium">Brak historii.</p>`; return; }
-  el.innerHTML = history.map(h => `
-    <div class="history-item pl-3 py-2 cursor-pointer" data-history-date="${h.date}">
-      <div class="text-xs font-extrabold text-mint mb-1">${h.date}</div>
-      <div class="text-[10px] text-neutral-500">Kliknij żeby rozwinąć</div>
-      <div class="hidden mt-2 space-y-2" data-history-body>${h.html}</div>
-    </div>`).join("");
+  if (!history.length) { el.innerHTML = '<p class="text-sm text-neutral-500 font-medium">Brak historii.</p>'; return; }
+  el.innerHTML = history.map(h => '<div class="history-item pl-3 py-2 cursor-pointer" data-history-date="' + h.date + '"><div class="text-xs font-extrabold text-mint mb-1">' + h.date + '</div><div class="text-[10px] text-neutral-500">Kliknij żeby rozwinąć</div><div class="hidden mt-2 space-y-2" data-history-body>' + h.html + '</div></div>').join("");
   el.querySelectorAll("[data-history-date]").forEach(node => {
     node.addEventListener("click", () => {
       const body = node.querySelector("[data-history-body]");
-      body?.classList.toggle("hidden");
+      if (body) body.classList.toggle("hidden");
     });
   });
 }
@@ -1924,12 +1824,12 @@ async function renderGlowUp() {
   const thisWeek = await loadDaysRange(7, 0);
   const lastWeek = await loadDaysRange(7, 7);
   const metrics = [
-    { key: "sleep", label: "Sen", get: d => d.morning?.sleepTotal, unit: "h", better: "up" },
-    { key: "rhr", label: "RHR", get: d => d.morning?.rhr, unit: " bpm", better: "down" },
-    { key: "steps", label: "Kroki", get: d => d.evening?.steps, unit: "", better: "up" },
-    { key: "stress", label: "Stres", get: d => d.evening?.stress, unit: "/100", better: "down" },
-    { key: "mood", label: "Nastrój", get: d => d.morning?.moodMorning, unit: "/10", better: "up" },
-    { key: "weight", label: "Waga", get: d => d.morning?.dailyWeight, unit: " kg", better: "up" },
+    { key: "sleep", label: "Sen", get: d => d.morning && d.morning.sleepTotal, unit: "h", better: "up" },
+    { key: "rhr", label: "RHR", get: d => d.morning && d.morning.rhr, unit: " bpm", better: "down" },
+    { key: "steps", label: "Kroki", get: d => d.evening && d.evening.steps, unit: "", better: "up" },
+    { key: "stress", label: "Stres", get: d => d.evening && d.evening.stress, unit: "/100", better: "down" },
+    { key: "mood", label: "Nastrój", get: d => d.morning && d.morning.moodMorning, unit: "/10", better: "up" },
+    { key: "weight", label: "Waga", get: d => d.morning && d.morning.dailyWeight, unit: " kg", better: "up" },
   ];
   const rows = [];
   metrics.forEach(m => {
@@ -1942,16 +1842,15 @@ async function renderGlowUp() {
     const good = m.better === "up" ? diff > 0 : diff < 0;
     const sign = diff > 0 ? "+" : "";
     const color = Math.abs(diff) < 0.01 ? "text-neutral-400" : good ? "text-mint" : "text-rose";
-    rows.push(`<div class="flex items-center justify-between text-sm"><span class="text-neutral-300 font-semibold">${m.label}</span><span class="font-extrabold ${color}">${sign}${diff.toFixed(2)}${m.unit}</span></div>`);
+    rows.push('<div class="flex items-center justify-between text-sm"><span class="text-neutral-300 font-semibold">' + m.label + '</span><span class="font-extrabold ' + color + '">' + sign + diff.toFixed(2) + m.unit + '</span></div>');
   });
-  el.innerHTML = rows.length ? rows.join("") : `<p class="text-sm text-neutral-400 font-medium">Za mało danych. Zbieraj raporty 14 dni.</p>`;
+  el.innerHTML = rows.length ? rows.join("") : '<p class="text-sm text-neutral-400 font-medium">Za mało danych. Zbieraj raporty 14 dni.</p>';
 }
-
 async function renderCorrelation() {
   const box = $("correlation-box"); const txt = $("correlation-text");
   if (!box || !txt) return;
   const days = await loadLastNDays(14);
-  const pairs = days.map(d => ({ sleep: d.morning?.sleepTotal, stress: d.evening?.stress })).filter(p => p.sleep != null && p.stress != null);
+  const pairs = days.map(d => ({ sleep: d.morning && d.morning.sleepTotal, stress: d.evening && d.evening.stress })).filter(p => p.sleep != null && p.stress != null);
   if (pairs.length < 5) { box.classList.add("hidden"); return; }
   const n = pairs.length;
   const meanX = pairs.reduce((a, p) => a + p.sleep, 0) / n;
@@ -1960,25 +1859,23 @@ async function renderCorrelation() {
   pairs.forEach(p => { const dx = p.sleep - meanX, dy = p.stress - meanY; num += dx * dy; denX += dx * dx; denY += dy * dy; });
   const r = denX && denY ? num / Math.sqrt(denX * denY) : 0;
   let desc;
-  if (r < -0.5) desc = `Wykryto <strong>silną ujemną korelację</strong> (r = ${r.toFixed(2)}). Im więcej śpisz, tym niższy masz stres. Priorytet: sen.`;
-  else if (r < -0.25) desc = `Łagodna ujemna korelacja (r = ${r.toFixed(2)}). Sen pomaga ci w stresie.`;
-  else if (r > 0.4) desc = `Dodatnia korelacja (r = ${r.toFixed(2)}) — dziwne, może stres wpływa na sen. Obserwuj.`;
-  else desc = `Brak wyraźnej zależności (r = ${r.toFixed(2)}). Twoje stres i sen działają niezależnie.`;
+  if (r < -0.5) desc = "Wykryto <strong>silną ujemną korelację</strong> (r = " + r.toFixed(2) + "). Im więcej śpisz, tym niższy masz stres.";
+  else if (r < -0.25) desc = "Łagodna ujemna korelacja (r = " + r.toFixed(2) + "). Sen pomaga ci w stresie.";
+  else if (r > 0.4) desc = "Dodatnia korelacja (r = " + r.toFixed(2) + ") — obserwuj.";
+  else desc = "Brak wyraźnej zależności (r = " + r.toFixed(2) + ").";
   txt.innerHTML = desc;
   box.classList.remove("hidden");
 }
-
 async function renderWeeklySummary() {
   const el = $("weekly-summary-text"); if (!el) return;
   const days = await loadDaysRange(7, 0);
   if (!days.length) { el.textContent = "Brak danych z tego tygodnia."; return; }
-  const sleep = days.map(d => d.morning?.sleepTotal).filter(v => v != null);
-  const steps = days.map(d => d.evening?.steps).filter(v => v != null);
+  const sleep = days.map(d => d.morning && d.morning.sleepTotal).filter(v => v != null);
+  const steps = days.map(d => d.evening && d.evening.steps).filter(v => v != null);
   const avgSleep = sleep.length ? (sleep.reduce((a, b) => a + b, 0) / sleep.length).toFixed(1) : "—";
   const avgSteps = steps.length ? Math.round(steps.reduce((a, b) => a + b, 0) / steps.length) : "—";
   const perfect = days.filter(d => d.completedPct === 100).length;
-  el.innerHTML = `Śr. sen: <strong>${avgSleep}h</strong> · Śr. kroki: <strong>${avgSteps}</strong> · Perfect days: <strong>${perfect}/7</strong>. ` +
-    (perfect >= 5 ? "🔥 Tydzień jak maszyna." : perfect >= 3 ? "💪 Dobry tydzień." : "🎯 Dorzuć perfect days.");
+  el.innerHTML = "Śr. sen: <strong>" + avgSleep + "h</strong> · Śr. kroki: <strong>" + avgSteps + "</strong> · Perfect days: <strong>" + perfect + "/7</strong>. " + (perfect >= 5 ? "🔥 Tydzień jak maszyna." : perfect >= 3 ? "💪 Dobry tydzień." : "🎯 Dorzuć perfect days.");
 }
 
 // ============================================================================
@@ -1989,36 +1886,25 @@ async function renderLast30() {
   const days = await loadDaysRange(30, 0);
   const perfect = days.filter(d => d.completedPct === 100).length;
   const avgPct = days.length ? Math.round(days.reduce((a, b) => a + (b.completedPct || 0), 0) / days.length) : 0;
-  const totalTasks = days.reduce((a, d) => a + (d.tasks?.filter(t => t.done).length || 0), 0);
-  const sleepAvg = days.map(d => d.morning?.sleepTotal).filter(v => v != null);
+  const totalTasks = days.reduce((a, d) => a + ((d.tasks && d.tasks.filter(t => t.done).length) || 0), 0);
+  const sleepAvg = days.map(d => d.morning && d.morning.sleepTotal).filter(v => v != null);
   const avgSleep = sleepAvg.length ? (sleepAvg.reduce((a, b) => a + b, 0) / sleepAvg.length).toFixed(1) : "—";
-  el.innerHTML = `
-    <div class="glass rounded-3xl p-4 text-center"><div class="text-2xl font-extrabold text-mint">${perfect}</div><div class="text-[11px] text-neutral-400 font-semibold mt-1">Perfect days</div></div>
-    <div class="glass rounded-3xl p-4 text-center"><div class="text-2xl font-extrabold text-gold">${avgPct}%</div><div class="text-[11px] text-neutral-400 font-semibold mt-1">Śr. ukończenie</div></div>
-    <div class="glass rounded-3xl p-4 text-center"><div class="text-2xl font-extrabold text-peach">${totalTasks}</div><div class="text-[11px] text-neutral-400 font-semibold mt-1">Zadań zrobionych</div></div>
-    <div class="glass rounded-3xl p-4 text-center"><div class="text-2xl font-extrabold text-lilac">${avgSleep}h</div><div class="text-[11px] text-neutral-400 font-semibold mt-1">Śr. sen</div></div>`;
+  el.innerHTML = '<div class="glass rounded-3xl p-4 text-center"><div class="text-2xl font-extrabold text-mint">' + perfect + '</div><div class="text-[11px] text-neutral-400 font-semibold mt-1">Perfect days</div></div><div class="glass rounded-3xl p-4 text-center"><div class="text-2xl font-extrabold text-gold">' + avgPct + '%</div><div class="text-[11px] text-neutral-400 font-semibold mt-1">Śr. ukończenie</div></div><div class="glass rounded-3xl p-4 text-center"><div class="text-2xl font-extrabold text-peach">' + totalTasks + '</div><div class="text-[11px] text-neutral-400 font-semibold mt-1">Zadań zrobionych</div></div><div class="glass rounded-3xl p-4 text-center"><div class="text-2xl font-extrabold text-lilac">' + avgSleep + 'h</div><div class="text-[11px] text-neutral-400 font-semibold mt-1">Śr. sen</div></div>';
 }
-
 async function renderPersonalRecords() {
   const el = $("personal-records"); if (!el) return;
   const days = await collectAllDays();
   const m = {};
   days.forEach(d => {
     const mm = d.morning || {}; const ee = d.evening || {};
-    if (mm.sleepTotal != null) m.bestSleep = Math.max(m.bestSleep ?? 0, mm.sleepTotal);
-    if (mm.rhr != null) m.lowRhr = Math.min(m.lowRhr ?? 999, mm.rhr);
-    if (ee.steps != null) m.maxSteps = Math.max(m.maxSteps ?? 0, ee.steps);
-    if (mm.dailyWeight != null) m.maxWeight = Math.max(m.maxWeight ?? 0, mm.dailyWeight);
-    if (ee.kcalBurned != null) m.maxKcal = Math.max(m.maxKcal ?? 0, ee.kcalBurned);
+    if (mm.sleepTotal != null) m.bestSleep = Math.max(m.bestSleep != null ? m.bestSleep : 0, mm.sleepTotal);
+    if (mm.rhr != null) m.lowRhr = Math.min(m.lowRhr != null ? m.lowRhr : 999, mm.rhr);
+    if (ee.steps != null) m.maxSteps = Math.max(m.maxSteps != null ? m.maxSteps : 0, ee.steps);
+    if (mm.dailyWeight != null) m.maxWeight = Math.max(m.maxWeight != null ? m.maxWeight : 0, mm.dailyWeight);
+    if (ee.kcalBurned != null) m.maxKcal = Math.max(m.maxKcal != null ? m.maxKcal : 0, ee.kcalBurned);
   });
-  el.innerHTML = `
-    <div class="record-card"><div class="text-[10px] text-gold font-bold tracking-widest">REKORD SNU</div><div class="text-xl font-extrabold">${m.bestSleep ? m.bestSleep.toFixed(1) + "h" : "—"}</div></div>
-    <div class="record-card"><div class="text-[10px] text-mint font-bold tracking-widest">MIN RHR</div><div class="text-xl font-extrabold">${m.lowRhr ? m.lowRhr + " bpm" : "—"}</div></div>
-    <div class="record-card"><div class="text-[10px] text-peach font-bold tracking-widest">MAX KROKI</div><div class="text-xl font-extrabold">${m.maxSteps || "—"}</div></div>
-    <div class="record-card"><div class="text-[10px] text-gold font-bold tracking-widest">MAX WAGA</div><div class="text-xl font-extrabold">${m.maxWeight ? m.maxWeight.toFixed(1) + " kg" : "—"}</div></div>
-    <div class="record-card"><div class="text-[10px] text-rose font-bold tracking-widest">MAX KCAL</div><div class="text-xl font-extrabold">${m.maxKcal || "—"}</div></div>`;
+  el.innerHTML = '<div class="record-card"><div class="text-[10px] text-gold font-bold tracking-widest">REKORD SNU</div><div class="text-xl font-extrabold">' + (m.bestSleep ? m.bestSleep.toFixed(1) + "h" : "—") + '</div></div><div class="record-card"><div class="text-[10px] text-mint font-bold tracking-widest">MIN RHR</div><div class="text-xl font-extrabold">' + (m.lowRhr ? m.lowRhr + " bpm" : "—") + '</div></div><div class="record-card"><div class="text-[10px] text-peach font-bold tracking-widest">MAX KROKI</div><div class="text-xl font-extrabold">' + (m.maxSteps || "—") + '</div></div><div class="record-card"><div class="text-[10px] text-gold font-bold tracking-widest">MAX WAGA</div><div class="text-xl font-extrabold">' + (m.maxWeight ? m.maxWeight.toFixed(1) + " kg" : "—") + '</div></div><div class="record-card"><div class="text-[10px] text-rose font-bold tracking-widest">MAX KCAL</div><div class="text-xl font-extrabold">' + (m.maxKcal || "—") + '</div></div>';
 }
-
 async function renderPastSelf() {
   const el = $("past-self-comparison"); if (!el) return;
   const thisMonth = await loadDaysRange(30, 0);
@@ -2032,16 +1918,10 @@ async function renderPastSelf() {
     const d = avA - avB;
     const sign = d > 0 ? "+" : "";
     const cls = Math.abs(d) < 0.01 ? "text-neutral-400" : d > 0 ? "text-mint" : "text-rose";
-    return `<div class="flex items-center justify-between text-sm"><span class="text-neutral-300 font-semibold">${label}</span><span class="font-extrabold ${cls}">${sign}${d.toFixed(2)}${unit}</span></div>`;
+    return '<div class="flex items-center justify-between text-sm"><span class="text-neutral-300 font-semibold">' + label + '</span><span class="font-extrabold ' + cls + '">' + sign + d.toFixed(2) + unit + '</span></div>';
   };
-  const html = [
-    cmp("Śr. sen", d => d.morning?.sleepTotal, "h"),
-    cmp("Śr. RHR", d => d.morning?.rhr, " bpm"),
-    cmp("Śr. kroki", d => d.evening?.steps, ""),
-    cmp("Śr. waga", d => d.morning?.dailyWeight, " kg"),
-    cmp("Śr. ukończenie", d => d.completedPct, "%"),
-  ].filter(Boolean).join("");
-  el.innerHTML = html || `<p class="text-xs text-neutral-400">Za mało danych.</p>`;
+  const html = [cmp("Śr. sen", d => d.morning && d.morning.sleepTotal, "h"), cmp("Śr. RHR", d => d.morning && d.morning.rhr, " bpm"), cmp("Śr. kroki", d => d.evening && d.evening.steps, ""), cmp("Śr. waga", d => d.morning && d.morning.dailyWeight, " kg"), cmp("Śr. ukończenie", d => d.completedPct, "%")].filter(Boolean).join("");
+  el.innerHTML = html || '<p class="text-xs text-neutral-400">Za mało danych.</p>';
 }
 
 // ============================================================================
@@ -2064,26 +1944,21 @@ function baseChartOpts() {
     }
   };
 }
-
 async function renderCharts() {
   const days = await loadDaysRange(30, 0);
-  const labels = days.map(d => d.date?.slice(5) || "");
-  const mkLine = (data, color) => ({ type: "line", data: { labels, datasets: [{ data, borderColor: color, backgroundColor: color + "33", fill: true, tension: .35, borderWidth: 2, pointRadius: 2 }] }, options: baseChartOpts() });
-
-  makeChart("chart-weight", mkLine(days.map(d => d.morning?.dailyWeight ?? null), chartColors.gold));
-  makeChart("chart-sleep", { type: "line", data: { labels, datasets: [
-    { label: "Deep", data: days.map(d => d.morning?.sleepDeep ?? null), borderColor: chartColors.lilac, tension: .35, borderWidth: 2, pointRadius: 2 },
-    { label: "REM", data: days.map(d => d.morning?.sleepRem ?? null), borderColor: chartColors.mint, tension: .35, borderWidth: 2, pointRadius: 2 },
-  ]}, options: baseChartOpts() });
-  makeChart("chart-rhr", mkLine(days.map(d => d.morning?.rhr ?? null), chartColors.mint));
-  makeChart("chart-steps", mkLine(days.map(d => d.evening?.steps ?? null), chartColors.peach));
-  makeChart("chart-stress", mkLine(days.map(d => d.evening?.stress ?? null), chartColors.rose));
-  makeChart("chart-mood", mkLine(days.map(d => d.morning?.moodMorning ?? d.evening?.moodEvening ?? null), chartColors.peach));
-  makeChart("chart-breathing", mkLine(days.map(d => d.morning?.breathing ?? null), chartColors.lilac));
+  const labels = days.map(d => d.date ? d.date.slice(5) : "");
+  const mkLine = (data, color) => ({ type: "line", data: { labels: labels, datasets: [{ data: data, borderColor: color, backgroundColor: color + "33", fill: true, tension: .35, borderWidth: 2, pointRadius: 2 }] }, options: baseChartOpts() });
+  makeChart("chart-weight", mkLine(days.map(d => (d.morning && d.morning.dailyWeight) || null), chartColors.gold));
+  makeChart("chart-sleep", { type: "line", data: { labels: labels, datasets: [{ label: "Deep", data: days.map(d => (d.morning && d.morning.sleepDeep) || null), borderColor: chartColors.lilac, tension: .35, borderWidth: 2, pointRadius: 2 }, { label: "REM", data: days.map(d => (d.morning && d.morning.sleepRem) || null), borderColor: chartColors.mint, tension: .35, borderWidth: 2, pointRadius: 2 }] }, options: baseChartOpts() });
+  makeChart("chart-rhr", mkLine(days.map(d => (d.morning && d.morning.rhr) || null), chartColors.mint));
+  makeChart("chart-steps", mkLine(days.map(d => (d.evening && d.evening.steps) || null), chartColors.peach));
+  makeChart("chart-stress", mkLine(days.map(d => (d.evening && d.evening.stress) || null), chartColors.rose));
+  makeChart("chart-mood", mkLine(days.map(d => (d.morning && d.morning.moodMorning) || (d.evening && d.evening.moodEvening) || null), chartColors.peach));
+  makeChart("chart-breathing", mkLine(days.map(d => (d.morning && d.morning.breathing) || null), chartColors.lilac));
   makeChart("chart-height", mkLine(days.map(d => parseFloat(localStorage.getItem(localKey("height-" + d.date))) || null), chartColors.mint));
   makeChart("chart-measures", mkLine(days.map(d => parseFloat(localStorage.getItem(localKey("chest-" + d.date))) || null), chartColors.peach));
-  makeChart("chart-strength", { type: "bar", data: { labels, datasets: [{ data: days.map(d => d.completedPct ?? 0), backgroundColor: chartColors.mint + "88" }] }, options: baseChartOpts() });
-  makeChart("chart-year", mkLine(days.map(d => d.morning?.dailyWeight ?? null), chartColors.gold));
+  makeChart("chart-strength", { type: "bar", data: { labels: labels, datasets: [{ data: days.map(d => d.completedPct || 0), backgroundColor: chartColors.mint + "88" }] }, options: baseChartOpts() });
+  makeChart("chart-year", mkLine(days.map(d => (d.morning && d.morning.dailyWeight) || null), chartColors.gold));
 }
 
 // ============================================================================
@@ -2098,36 +1973,32 @@ async function renderCalendar() {
   const first = new Date(y, mo, 1); const startDow = (first.getDay() + 6) % 7;
   const daysInMonth = new Date(y, mo + 1, 0).getDate();
   const cells = [];
-  for (let i = 0; i < startDow; i++) cells.push(`<div></div>`);
+  for (let i = 0; i < startDow; i++) cells.push('<div></div>');
+  const promises = [];
   for (let d = 1; d <= daysInMonth; d++) {
     const dk = dateKey(new Date(y, mo, d));
-    const doc = await loadDayDoc(dk);
-    const pct = doc?.completedPct ?? null;
+    promises.push(loadDayDoc(dk));
+  }
+  const docs = await Promise.all(promises);
+  for (let d = 1; d <= daysInMonth; d++) {
+    const doc = docs[d - 1];
+    const dk = dateKey(new Date(y, mo, d));
+    const pct = doc && doc.completedPct != null ? doc.completedPct : null;
     const color = pct === 100 ? "bg-mint/30" : pct >= 50 ? "bg-gold/30" : pct > 0 ? "bg-white/10" : "bg-white/5";
     const dotColor = pct === 100 ? "bg-mint" : pct >= 50 ? "bg-gold" : "bg-white/15";
     const isToday = dk === todayKey;
-    cells.push(`<div class="cal-day ${color} ${isToday ? "ring-2 ring-mint" : ""}" data-cal-date="${dk}"><div>${d}</div><div class="cal-dot ${dotColor}"></div></div>`);
+    cells.push('<div class="cal-day ' + color + ' ' + (isToday ? "ring-2 ring-mint" : "") + '" data-cal-date="' + dk + '"><div>' + d + '</div><div class="cal-dot ' + dotColor + '"></div></div>');
   }
   grid.innerHTML = cells.join("");
   grid.querySelectorAll("[data-cal-date]").forEach(el => el.addEventListener("click", () => openDayDetail(el.dataset.calDate)));
 }
-
 async function openDayDetail(dk) {
   const doc = await loadDayDoc(dk);
   const title = $("day-detail-title"); const content = $("day-detail-content");
   title.textContent = dk;
-  if (!doc) { content.innerHTML = `<p class="text-sm text-neutral-400">Brak danych z tego dnia.</p>`; openModal("modal-day-detail"); return; }
+  if (!doc) { content.innerHTML = '<p class="text-sm text-neutral-400">Brak danych z tego dnia.</p>'; openModal("modal-day-detail"); return; }
   const m = doc.morning || {}; const e = doc.evening || {};
-  content.innerHTML = `
-    <div class="space-y-3 text-sm">
-      <div class="glass rounded-2xl p-3"><strong class="text-mint">Ukończenie:</strong> ${doc.completedPct ?? 0}%</div>
-      ${m.sleepTotal != null ? `<div class="glass rounded-2xl p-3"><strong>Sen:</strong> ${m.sleepTotal}h (deep ${m.sleepDeep ?? "—"}, REM ${m.sleepRem ?? "—"})</div>` : ""}
-      ${m.rhr != null ? `<div class="glass rounded-2xl p-3"><strong>RHR:</strong> ${m.rhr} bpm</div>` : ""}
-      ${m.dailyWeight != null ? `<div class="glass rounded-2xl p-3"><strong>Waga:</strong> ${m.dailyWeight} kg</div>` : ""}
-      ${e.steps != null ? `<div class="glass rounded-2xl p-3"><strong>Kroki:</strong> ${e.steps}</div>` : ""}
-      ${e.stress != null ? `<div class="glass rounded-2xl p-3"><strong>Stres:</strong> ${e.stress}/100</div>` : ""}
-      ${doc.note ? `<div class="glass rounded-2xl p-3"><strong>Notatka:</strong> ${escapeHtml(doc.note)}</div>` : ""}
-    </div>`;
+  content.innerHTML = '<div class="space-y-3 text-sm"><div class="glass rounded-2xl p-3"><strong class="text-mint">Ukończenie:</strong> ' + (doc.completedPct || 0) + '%</div>' + (m.sleepTotal != null ? '<div class="glass rounded-2xl p-3"><strong>Sen:</strong> ' + m.sleepTotal + 'h</div>' : "") + (m.rhr != null ? '<div class="glass rounded-2xl p-3"><strong>RHR:</strong> ' + m.rhr + ' bpm</div>' : "") + (m.dailyWeight != null ? '<div class="glass rounded-2xl p-3"><strong>Waga:</strong> ' + m.dailyWeight + ' kg</div>' : "") + (e.steps != null ? '<div class="glass rounded-2xl p-3"><strong>Kroki:</strong> ' + e.steps + '</div>' : "") + (e.stress != null ? '<div class="glass rounded-2xl p-3"><strong>Stres:</strong> ' + e.stress + '/100</div>' : "") + (doc.note ? '<div class="glass rounded-2xl p-3"><strong>Notatka:</strong> ' + escapeHtml(doc.note) + '</div>' : "") + '</div>';
   openModal("modal-day-detail");
 }
 
@@ -2137,10 +2008,10 @@ async function openDayDetail(dk) {
 async function renderBadges() {
   const el = $("badges-grid"); if (!el) return;
   const days = await collectAllDays();
-  const streak = parseInt($("streak-count")?.textContent) || 0;
+  const streak = parseInt($("streak-count") && $("streak-count").textContent) || 0;
   const perfect = days.filter(d => d.completedPct === 100).length;
-  const maxSteps = Math.max(...days.map(d => d.evening?.steps || 0), 0);
-  const earlySleep = days.filter(d => (d.morning?.sleepTotal || 0) >= 8).length;
+  const maxSteps = Math.max.apply(null, days.map(d => (d.evening && d.evening.steps) || 0).concat([0]));
+  const earlySleep = days.filter(d => ((d.morning && d.morning.sleepTotal) || 0) >= 8).length;
   const badges = [
     { icon: "🔥", label: "Streak 7", un: streak >= 7 },
     { icon: "💪", label: "Streak 30", un: streak >= 30 },
@@ -2149,58 +2020,47 @@ async function renderBadges() {
     { icon: "😴", label: "8h ×30", un: earlySleep >= 30 },
     { icon: "⭐", label: "Perfect ×50", un: perfect >= 50 },
   ];
-  el.innerHTML = badges.map(b => `
-    <div class="badge-card glass rounded-3xl p-3 text-center ${b.un ? "unlocked" : "locked"}">
-      <div class="text-3xl">${b.icon}</div>
-      <div class="text-[10px] font-bold mt-1 text-neutral-300">${b.label}</div>
-    </div>`).join("");
+  el.innerHTML = badges.map(b => '<div class="badge-card glass rounded-3xl p-3 text-center ' + (b.un ? "unlocked" : "locked") + '"><div class="text-3xl">' + b.icon + '</div><div class="text-[10px] font-bold mt-1 text-neutral-300">' + b.label + '</div></div>').join("");
 }
 
 // ============================================================================
-// GUIDE + KNOWLEDGE + FACT
+// GUIDE / KNOWLEDGE / FACTS
 // ============================================================================
 const GUIDE_SECTIONS = [
-  { icon: "🌙", title: "Sen — fundament wzrostu i masy", body: "Hormon wzrostu (GH) wydziela się w 70% w głębokim śnie (faza N3). Idź spać przed 22:30, telefon off 1h wcześniej, ciemno i chłodno (18-19°C). Sen 8-9h = +2 cm wzrostu rocznie vs 6h. Sen to nie luksus, to inwestycja." },
-  { icon: "🍽️", title: "Jedzenie — masa i wzrost", body: "Cel: 2800-3000 kcal dziennie, białko 75-100g (1.7g/kg). Bez nadwyżki kalorycznej masa nie rośnie, nawet z treningiem. Kluczowe: śniadanie z 30g+ białka, szejk masowy po szkole, twaróg przed snem. Zero cukru po 18:00." },
-  { icon: "💪", title: "Trening — kalistenika + hantle", body: "3-4 treningi w tygodniu. Bazowe ruchy: pompki (klatka, triceps, barki), przysiady (nogi, pośladki), deska (core), hantle (barki, biceps). Postępuj stopniowo — dodawaj 1 powtórzenie co tydzień. Forma > ciężar." },
-  { icon: "🧴", title: "Skóra — walka z trądzikiem", body: "Tołpa/Ziaja rano i wieczorem, Acnederm punktowo na wypryski, Cetaphil krem nawilżający. Nie wyciskaj — blizny zostają na lata. Zmieniaj poszewkę co tydzień. Unikaj cukru i mleka krowiego (może zaostrzać acne)." },
-  { icon: "🧠", title: "Głowa — stres i nastrój", body: "Oddech 4-7-8 (wdech 4s, trzymaj 7s, wydech 8s) — 5 minut dziennie. Medytacja 10 min. Wyjdź z domu, pogadaj z kimś. Samotność i stres obniżają testosteron i hamują wzrost. Dbaj o psychikę jak o mięśnie." },
-  { icon: "💊", title: "Suplementacja — bezpieczne dawki", body: "Nastolatki 12-17 lat: D3 max 4000 IU/dzień, witamina A max ~9000 IU/dzień. Twój stack: D3 ×1 (2000 IU) + tran 2× 1 łyżeczka (2×400 IU) = 2800 IU D3 — bezpiecznie. Tran dostarcza też omega-3 (DHA/EPA) kluczowe dla mózgu i skóry. Kreatyna 3g — bezpieczna dla nastolatków. Woda 2.5L — bez tego kreatyna nie działa." },
-  { icon: "📏", title: "Pomiary — co i kiedy", body: "Wzrost: rano, boso, plecy do ściany, 1. dnia miesiąca. Obwody: klatka, talia, biceps — 1. dnia miesiąca. Waga: codziennie rano po toalecie. RHR: codziennie rano przed wstaniem. Systematyczność = klucz do śledzenia progresu." },
+  { icon: "🌙", title: "Sen — fundament wzrostu i masy", body: "Hormon wzrostu (GH) wydziela się w 70% w głębokim śnie. Idź spać przed 22:30, telefon off 1h wcześniej, ciemno i chłodno (18-19°C). Sen 8-9h = twój wzrost i masa." },
+  { icon: "🍽️", title: "Jedzenie — masa i wzrost", body: "Cel: 2800-3000 kcal dziennie, białko ~77g (1.7g/kg). Szejk masowy 700 kcal po szkole = game changer. Twaróg przed snem. Zero cukru po 18:00." },
+  { icon: "💪", title: "Trening — kalistenika + hantle 1kg", body: "3-4 treningi w tygodniu. Pompki (tempo 3s), przysiady z pauzą, wznosy bokiem z hantlami 1kg w seriach 20-25 powtórzeń = szerokość barków. Burnout set na koniec = max pobudzenie." },
+  { icon: "🔥", title: "Burnout Set — dlaczego działa", body: "1 seria do upadku (max pompek lub krzesełko przy ścianie) na koniec treningu = pobudzenie włókien typu II, wyrzut hormonu wzrostu, maksymalne zmęczenie mięśniowe." },
+  { icon: "🧴", title: "Visual Glow Up — skóra i twarz", body: "Zimna woda rano i wieczorem (redukcja obrzęku, czerwonego nosa), Tołpa/Ziaja, Acnederm punktowo, Cetaphil nawilżanie. Mewing (język na podniebieniu) = linia szczęki i symetria." },
+  { icon: "🧠", title: "Głowa — stres i nastrój", body: "Oddech 4-7-8 (wdech 4s, trzymaj 7s, wydech 8s) 5 min dziennie. Medytacja 10 min. Sen 8h. Stres obniża testosteron i hamuje wzrost." },
+  { icon: "💊", title: "Suplementacja D3 — bezpieczne dawki", body: "Nastolatki 12-17 lat: max 4000 IU/dzień. Twój stack: 2 tabletki × 2000 IU = 4000 IU, bezpiecznie. Wchłania się w tłuszczu — bierz do posiłku." },
+  { icon: "📏", title: "Pomiary — co i kiedy", body: "Wzrost: rano, boso, plecy do ściany, 1. dnia miesiąca. Obwody: klatka, talia, biceps. Waga: codziennie rano po toalecie. RHR: przed wstaniem." },
 ];
 
 function renderGuideSections() {
   const el = $("guide-sections"); if (!el) return;
-  el.innerHTML = GUIDE_SECTIONS.map((s, i) => `
-    <div class="guide-section" data-guide-idx="${i}">
-      <div class="guide-header"><div class="flex items-center gap-2"><span class="text-lg">${s.icon}</span><span class="font-bold text-sm">${s.title}</span></div><i class="fa-solid fa-chevron-down text-neutral-400 text-xs"></i></div>
-      <div class="guide-body"><p class="text-sm text-neutral-200 leading-relaxed font-medium">${s.body}</p></div>
-    </div>`).join("");
+  el.innerHTML = GUIDE_SECTIONS.map((s, i) => '<div class="guide-section" data-guide-idx="' + i + '"><div class="guide-header"><div class="flex items-center gap-2"><span class="text-lg">' + s.icon + '</span><span class="font-bold text-sm">' + s.title + '</span></div><i class="fa-solid fa-chevron-down text-neutral-400 text-xs"></i></div><div class="guide-body"><p class="text-sm text-neutral-200 leading-relaxed font-medium">' + s.body + '</p></div></div>').join("");
   el.querySelectorAll("[data-guide-idx]").forEach(node => {
     node.querySelector(".guide-header").addEventListener("click", () => node.classList.toggle("open"));
   });
 }
 
 const KNOWLEDGE_BASE = [
-  { title: "Hormon wzrostu (GH)", body: "Wydzielany głównie w głębokim śnie. Stymulują go: sen 8h+, trening siłowy, post (16h), arginina. Hamują go: cukier, alkohol, stres, brak snu." },
-  { title: "Testosteron", body: "Rośnie przez: sen 7-9h, trening siłowy, tłuszcze zwierzęce, witaminę D, cynk. Spada przez: stres, alkohol, niedobór snu, otyłość." },
-  { title: "Białko — ile i kiedy", body: "1.7g/kg masy ciała = 75-100g dla Ciebie. Rozłożone na 4-5 posiłków po 25-40g. Okno anaboliczne 2h po treningu. Twaróg przed snem = kazeina = wolne uwalnianie." },
-  { title: "Kreatyna", body: "3-5g dziennie, bez ładowania. Zwiększa siłę, masę, uwodnienie mięśni. Wymaga 2.5-3L wody dziennie. Najlepiej z posiłkiem węglowodanowym." },
-  { title: "Witamina D3 — bezpieczne dawki", body: "Nastolatki 12-17 lat: max 4000 IU/dzień. Wchłania się w tłuszczu — bierz z posiłkiem. Objawy nadmiaru: nudności, osłabienie, bóle głowy, nadmiar wapnia w krwi (po miesiącach). Twój stack: 2800 IU = bezpiecznie." },
-  { title: "Witamina A — uwaga na tran", body: "Tran zawiera wit. A (retinol) — nadmiar odkłada się w wątrobie i może być toksyczny. Max ~9000 IU/dzień dla nastolatka. 1 łyżeczka tranu = ~766 IU. 2 łyżeczki = ~1532 IU — bezpiecznie. Nie łącz z dodatkową wit. A." },
-  { title: "Tran (omega-3)", body: "DHA + EPA. Mózg, wzrok, serce, skóra. Redukuje stany zapalne (pomaga przy acne). 1 łyżeczka = 5 ml, zawiera ~400 IU D3 + ~766 IU wit. A + ~1000 mg omega-3. Rano i wieczorem." },
+  { title: "Hormon wzrostu (GH)", body: "Wydzielany głównie w głębokim śnie. Stymulują go: sen 8h+, trening siłowy, post (16h). Hamują: cukier, alkohol, stres, brak snu." },
+  { title: "Testosteron", body: "Rośnie przez: sen 7-9h, trening siłowy, tłuszcze zwierzęce, witaminę D. Spada przez: stres, alkohol, niedobór snu, otyłość." },
+  { title: "Białko — ile i kiedy", body: "1.7g/kg = ~77g dla Karola. Rozłożone na 4-5 posiłków po 25-40g. Twaróg przed snem = kazeina = wolne uwalnianie w nocy." },
+  { title: "Hantle 1kg — jak używać", body: "Wznosy bokiem 20-25 powtórzeń z 1s pauzą na górze = szerokość barków. Wyciskanie nad głowę 15 powt. Uginanie ramion 15 powt. Nie za mało powtórzeń — high reps tutaj rządzi." },
+  { title: "Mewing — linia szczęki", body: "Język cały czas na podniebieniu (nie na zębach!). Usta zamknięte, oddychanie nosem. Efekty po 3-6 miesiącach. Wspomaga symetrię twarzy i definicję żuchwy." },
+  { title: "Zimna woda — glow up twarzy", body: "Rano: obniża obrzęk, zwęża naczynia, redukuje czerwony nos. Wieczorem: zamyka pory. 30 sekund pod zimną wodą, delikatnie osusz." },
+  { title: "Witamina D3 — bezpieczne dawki", body: "Nastolatki 12-17 lat: max 4000 IU/dzień. Wchłania się w tłuszczu — bierz z posiłkiem. Twój stack: 4000 IU (2 tabletki × 2000 IU). Bezpiecznie." },
+  { title: "Burnout set — jak zrobić", body: "Na koniec treningu: max pompek do upadku (nie zatrzymuj się przy 10 — idź do końca) LUB krzesełko przy ścianie na max czas. 1 seria. Nie 2, nie 3." },
   { title: "Acne — jak walczyć", body: "Higiena (Tołpa, Acnederm, Cetaphil), dieta (mniej cukru i mleka), sen 8h+, stres minimum. Nie wyciskaj. Jeśli nie pomaga 3 miesiące — dermatolog." },
-  { title: "Wzrost — ile jeszcze", body: "U chłopaków skok wzrostowy trwa do 16-18 lat, kończy się ok. 18-21. Ostatnie 2-3 lata to wolniejsze tempo. Sen, jedzenie, hormony = twój potencjał genetyczny." },
-  { title: "RHR — tętno spoczynkowe", body: "Norma dla nastolatków 12-17 lat: 60-90 bpm. Sportowcy mogą mieć niżej (50-60) — to bradykardia sportowa, nie choroba. Wysokie (>90) = stres, choroba, przemęczenie. Skok +15% względem średniej tygodniowej to sygnał ostrzegawczy." },
+  { title: "RHR — tętno spoczynkowe", body: "Norma dla nastolatków 12-17 lat: 60-90 bpm. Sportowcy mogą mieć niżej. Wysokie (>90) = stres, choroba, przemęczenie. Skok +15% vs średnia tygodniowa = alarm." },
 ];
 
 function renderKnowledgeBase() {
   const el = $("knowledge-base"); if (!el) return;
-  el.innerHTML = KNOWLEDGE_BASE.map((k, i) => `
-    <div class="guide-section" data-kb-idx="${i}">
-      <div class="guide-header"><span class="font-bold text-sm">${k.title}</span><i class="fa-solid fa-chevron-down text-neutral-400 text-xs"></i></div>
-      <div class="guide-body"><p class="text-sm text-neutral-200 leading-relaxed font-medium">${k.body}</p></div>
-    </div>`).join("");
+  el.innerHTML = KNOWLEDGE_BASE.map((k, i) => '<div class="guide-section" data-kb-idx="' + i + '"><div class="guide-header"><span class="font-bold text-sm">' + k.title + '</span><i class="fa-solid fa-chevron-down text-neutral-400 text-xs"></i></div><div class="guide-body"><p class="text-sm text-neutral-200 leading-relaxed font-medium">' + k.body + '</p></div></div>').join("");
   el.querySelectorAll("[data-kb-idx]").forEach(node => {
     node.querySelector(".guide-header").addEventListener("click", () => node.classList.toggle("open"));
   });
@@ -2209,33 +2069,34 @@ function renderKnowledgeBase() {
 const FACTS = [
   "Hormon wzrostu wydziela się w 70% w fazie snu N3 (głębokiej).",
   "Witamina D3 z tłuszczem wchłania się 3× lepiej niż na czczo.",
-  "Pompki angażują klatkę, triceps i barki jednocześnie — 3 w 1.",
-  "Kreatyna zwiększa uwodnienie mięśni o 1-2L — dlatego woda 2.5L.",
+  "Wznosy bokiem hantlami 1kg w seriach 20-25 powtórzeń = szerokość barków.",
+  "Mewing przez 3-6 miesięcy zmienia linię szczęki i symetrię twarzy.",
+  "Burnout set na koniec = pobudzenie włókien typu II = wyrzut GH.",
   "16-17 lat to szczyt skoku wzrostowego u większości chłopaków.",
-  "Zimny prysznic po treningu redukuje zakwasy, ale hamuje hipertrofię.",
-  "Tran DHA poprawia pamięć i koncentrację w szkole.",
   "Białko rozłożone na 4-5 posiłków = lepsza synteza mięśniowa.",
   "Dobra postawa dodaje 1-2 cm wizualnie — ćwicz core i plecy.",
+  "Zimna woda na twarz rano redukuje obrzęk i czerwony nos.",
   "Testosteron rośnie najbardziej przez sen 7-9h + trening siłowy.",
 ];
 function renderFactOfDay() {
   const el = $("fact-of-day"); if (!el) return;
   const idx = Math.floor(Date.now() / 86400000) % FACTS.length;
-  el.innerHTML = `<p class="text-sm text-neutral-200 leading-relaxed font-medium">💡 ${FACTS[idx]}</p>`;
+  el.innerHTML = '<p class="text-sm text-neutral-200 leading-relaxed font-medium">💡 ' + FACTS[idx] + '</p>';
 }
 
 // ============================================================================
-// LICZNIK DO 1 STYCZNIA
+// COUNTER
 // ============================================================================
 function updateCountdown() {
   const now = new Date();
   let nextJan = new Date(now.getFullYear(), 0, 1);
   if (now >= nextJan) nextJan = new Date(now.getFullYear() + 1, 0, 1);
   const diff = Math.ceil((nextJan - now) / 86400000);
-  if ($("days-to-january")) $("days-to-january").textContent = `${diff} dni`;
-  const start = new Date(LOCKIN_START + "T00:00:00");
-  const dayNum = Math.max(1, Math.floor((now - start) / 86400000) + 1);
-  if ($("lockin-day")) $("lockin-day").textContent = `Dzień ${dayNum}`;
+  if ($("days-to-january")) $("days-to-january").textContent = diff + " dni";
+  const remaining = Math.max(0, Math.ceil((LOCKIN_END - now) / 86400000));
+  if ($("days-remaining")) $("days-remaining").textContent = remaining;
+  const dayNum = Math.max(1, Math.floor((now - LOCKIN_START) / 86400000) + 1);
+  if ($("lockin-day")) $("lockin-day").textContent = "Dzień " + Math.min(dayNum, LOCKIN_TOTAL_DAYS);
 }
 
 // ============================================================================
@@ -2283,39 +2144,39 @@ document.querySelectorAll("[data-food-tab]").forEach(btn => {
     renderFoodList();
   });
 });
-$("btn-roll-food")?.addEventListener("click", rollFoodPlan);
+if ($("btn-roll-food")) $("btn-roll-food").addEventListener("click", rollFoodPlan);
+if ($("btn-roll-shake")) $("btn-roll-shake").addEventListener("click", rollMassShake);
 
-// NAWODNIENIE
-$("btn-water-add")?.addEventListener("click", () => {
-  setWaterGlasses(getWaterGlasses() + 1);
-  vibrate(15); playSound("done");
-  persistToday();
-});
-$("btn-water-reset")?.addEventListener("click", () => {
-  setWaterGlasses(0);
-  persistToday();
-});
-
-// BANNER 1. DZIEŃ MIESIĄCA
-$("btn-measure-dismiss")?.addEventListener("click", () => {
-  $("monthly-measure-banner")?.classList.add("hidden");
+if ($("btn-measure-dismiss")) $("btn-measure-dismiss").addEventListener("click", () => {
+  const b = $("monthly-measure-banner"); if (b) b.classList.add("hidden");
   localStorage.setItem("regim:measure-dismiss-" + dateKey(new Date()), "1");
 });
 
-// MORNING FORM
+// TOGGLE SWITCHES
+document.querySelectorAll(".toggle-switch").forEach(el => {
+  const name = el.dataset.toggle;
+  if (getToggle(name)) el.classList.add("on"); else el.classList.remove("on");
+  el.addEventListener("click", () => {
+    const newVal = !getToggle(name);
+    setToggle(name, newVal);
+    if (newVal) el.classList.add("on"); else el.classList.remove("on");
+    vibrate(15); playSound("done");
+    if (name === "skincare" || name === "supplements") {
+      applyConditionalTasks();
+      renderTasksByCategory();
+      renderProgress();
+    }
+  });
+});
+
 $("form-morning")?.addEventListener("submit", async (e) => {
   e.preventDefault();
-  const g = (id) => { const v = $(id)?.value; return v === "" ? null : parseFloat(v); };
+  const g = (id) => { const v = $(id) && $(id).value; return v === "" || v == null ? null : parseFloat(v); };
   state.morning = {
-    sleepTotal: g("input-sleep-total"),
-    sleepDeep: g("input-sleep-deep"),
-    sleepRem: g("input-sleep-rem"),
-    sleepWakes: g("input-sleep-wakes"),
-    sleepHr: g("input-sleep-hr"),
-    rhr: g("input-rhr"),
-    breathing: g("input-breathing"),
-    dailyWeight: g("input-weight-daily"),
-    moodMorning: parseInt($("input-mood-morning")?.value) || 5,
+    sleepTotal: g("input-sleep-total"), sleepDeep: g("input-sleep-deep"), sleepRem: g("input-sleep-rem"),
+    sleepWakes: g("input-sleep-wakes"), sleepHr: g("input-sleep-hr"), rhr: g("input-rhr"),
+    breathing: g("input-breathing"), dailyWeight: g("input-weight-daily"),
+    moodMorning: parseInt($("input-mood-morning") && $("input-mood-morning").value) || 5,
     completedAt: Date.now(),
   };
   await persistToday();
@@ -2324,21 +2185,16 @@ $("form-morning")?.addEventListener("submit", async (e) => {
   if ($("quote-day")) $("quote-day").textContent = getPersonalQuote();
 });
 
-// EVENING FORM
 $("form-evening")?.addEventListener("submit", async (e) => {
   e.preventDefault();
-  const g = (id) => { const v = $(id)?.value; return v === "" ? null : parseFloat(v); };
+  const g = (id) => { const v = $(id) && $(id).value; return v === "" || v == null ? null : parseFloat(v); };
   state.evening = {
-    steps: g("input-steps"),
-    kcalBurned: g("input-kcal-burned"),
-    hrDay: g("input-hr-day"),
-    spo2Day: g("input-spo2-day"),
-    rpe: g("input-rpe"),
-    stress: g("input-stress"),
-    moodEvening: parseInt($("input-mood-evening")?.value) || 5,
+    steps: g("input-steps"), kcalBurned: g("input-kcal-burned"), hrDay: g("input-hr-day"),
+    spo2Day: g("input-spo2-day"), rpe: g("input-rpe"), stress: g("input-stress"),
+    moodEvening: parseInt($("input-mood-evening") && $("input-mood-evening").value) || 5,
     completedAt: Date.now(),
   };
-  state.note = $("input-note")?.value || "";
+  state.note = ($("input-note") && $("input-note").value) || "";
   await persistToday();
   showToast("✅ Podsumowanie dnia zapisane");
   await renderAutoAnalysis();
@@ -2346,8 +2202,8 @@ $("form-evening")?.addEventListener("submit", async (e) => {
   if (box && !box.classList.contains("hidden")) box.scrollIntoView({ behavior: "smooth", block: "start" });
 });
 
-$("input-mood-morning")?.addEventListener("input", (e) => { $("mood-morning-value").textContent = e.target.value; });
-$("input-mood-evening")?.addEventListener("input", (e) => { $("mood-evening-value").textContent = e.target.value; });
+if ($("input-mood-morning")) $("input-mood-morning").addEventListener("input", (e) => { $("mood-morning-value").textContent = e.target.value; });
+if ($("input-mood-evening")) $("input-mood-evening").addEventListener("input", (e) => { $("mood-evening-value").textContent = e.target.value; });
 
 document.querySelectorAll(".tag-chip").forEach(chip => {
   chip.addEventListener("click", () => chip.classList.toggle("active"));
@@ -2355,18 +2211,18 @@ document.querySelectorAll(".tag-chip").forEach(chip => {
 
 $("btn-analyze-ai")?.addEventListener("click", async () => {
   const label = $("ai-btn-label"); const spinner = $("ai-btn-spinner"); const box = $("ai-result-box"); const text = $("ai-result-text");
-  spinner?.classList.remove("hidden"); if (label) label.textContent = "Analizuję...";
+  if (spinner) spinner.classList.remove("hidden"); if (label) label.textContent = "Analizuję...";
   await new Promise(r => setTimeout(r, 400));
   const html = await generateFullAnalysis();
   text.innerHTML = html;
-  box?.classList.remove("hidden");
-  spinner?.classList.add("hidden"); if (label) label.innerHTML = '<i class="fa-solid fa-dumbbell mr-1.5"></i>🏋️ Pełna analiza Trenera';
+  box.classList.remove("hidden");
+  if (spinner) spinner.classList.add("hidden"); if (label) label.innerHTML = '<i class="fa-solid fa-dumbbell mr-1.5"></i>🏋️ Pełna analiza Trenera';
   await saveAnalysisToHistory(html);
   vibrate(30); playSound("done");
   showToast("🔥 Analiza gotowa");
 });
 
-$("btn-toggle-analysis")?.addEventListener("click", () => { $("auto-analysis-content")?.classList.toggle("hidden"); });
+$("btn-toggle-analysis")?.addEventListener("click", () => { const c = $("auto-analysis-content"); if (c) c.classList.toggle("hidden"); });
 
 $("btn-settings")?.addEventListener("click", () => {
   const s = getSettings();
@@ -2374,9 +2230,10 @@ $("btn-settings")?.addEventListener("click", () => {
   $("input-height-dad").value = s.heightDad || ""; $("input-height-mom").value = s.heightMom || "";
   $("input-goal-weight-settings").value = s.goalWeight;
   $("input-d3-iu").value = s.d3Iu;
-  $("input-tran-ml").value = s.tranMl;
-  $("input-tran-d3-iu").value = s.tranD3Iu;
-  $("input-tran-a-iu").value = s.tranAIu;
+  $("input-d3-tablets").value = s.d3Tablets;
+  document.querySelectorAll(".toggle-switch").forEach(el => {
+    if (getToggle(el.dataset.toggle)) el.classList.add("on"); else el.classList.remove("on");
+  });
   const w = lastWeight(); if (w && s.height) { const bmi = calcBMI(w, s.height); $("settings-bmi").textContent = bmi.toFixed(1); $("settings-bmi-label").textContent = bmiLabel(bmi); }
   openModal("modal-settings");
 });
@@ -2389,9 +2246,7 @@ $("btn-settings-save")?.addEventListener("click", () => {
     heightMom: parseFloat($("input-height-mom").value) || null,
     goalWeight: parseFloat($("input-goal-weight-settings").value) || 50,
     d3Iu: parseInt($("input-d3-iu").value) || 2000,
-    tranMl: parseFloat($("input-tran-ml").value) || 5,
-    tranD3Iu: parseInt($("input-tran-d3-iu").value) || 400,
-    tranAIu: parseInt($("input-tran-a-iu").value) || 766,
+    d3Tablets: parseInt($("input-d3-tablets").value) || 2,
   });
   showToast("✅ Zapisano");
   closeModal($("modal-settings"));
@@ -2407,7 +2262,7 @@ $("btn-breath-start")?.addEventListener("click", startBreathing);
 $("btn-breath-stop")?.addEventListener("click", stopBreathing);
 $("btn-rest-start")?.addEventListener("click", startRest);
 $("btn-rest-stop")?.addEventListener("click", stopRest);
-document.querySelectorAll(".rest-time-btn").forEach(b => b.addEventListener("click", () => { restSeconds = parseInt(b.dataset.rest); $("rest-timer-display").textContent = `00:${String(restSeconds).padStart(2, "0")}`; }));
+document.querySelectorAll(".rest-time-btn").forEach(b => b.addEventListener("click", () => { restSeconds = parseInt(b.dataset.rest); $("rest-timer-display").textContent = "00:" + String(restSeconds).padStart(2, "0"); }));
 
 $("btn-theme-toggle")?.addEventListener("click", () => {
   const isLight = document.documentElement.classList.toggle("light-theme");
@@ -2419,18 +2274,24 @@ $("btn-export")?.addEventListener("click", async () => {
   const days = await collectAllDays();
   const blob = new Blob([JSON.stringify(days, null, 2)], { type: "application/json" });
   const url = URL.createObjectURL(blob);
-  const a = document.createElement("a"); a.href = url; a.download = `regim-export-${todayKey}.json`; a.click();
+  const a = document.createElement("a"); a.href = url; a.download = "regim-export-" + todayKey + ".json"; a.click();
   URL.revokeObjectURL(url);
   showToast("✅ Eksport gotowy");
 });
 
 let deferredPrompt = null;
-window.addEventListener("beforeinstallprompt", (e) => { e.preventDefault(); deferredPrompt = e; $("install-banner")?.classList.remove("hidden"); });
-$("btn-install")?.addEventListener("click", async () => { if (deferredPrompt) { deferredPrompt.prompt(); await deferredPrompt.userChoice; deferredPrompt = null; $("install-banner")?.classList.add("hidden"); } });
-$("btn-install-dismiss")?.addEventListener("click", () => $("install-banner")?.classList.add("hidden"));
+window.addEventListener("beforeinstallprompt", (e) => { e.preventDefault(); deferredPrompt = e; const b = $("install-banner"); if (b) b.classList.remove("hidden"); });
+$("btn-install")?.addEventListener("click", async () => { if (deferredPrompt) { deferredPrompt.prompt(); await deferredPrompt.userChoice; deferredPrompt = null; const b = $("install-banner"); if (b) b.classList.add("hidden"); } });
+$("btn-install-dismiss")?.addEventListener("click", () => { const b = $("install-banner"); if (b) b.classList.add("hidden"); });
 
 $("cal-prev")?.addEventListener("click", () => { calMonth.setMonth(calMonth.getMonth() - 1); renderCalendar(); });
 $("cal-next")?.addEventListener("click", () => { calMonth.setMonth(calMonth.getMonth() + 1); renderCalendar(); });
+
+$("btn-goal-edit")?.addEventListener("click", () => { const w = $("goal-edit-wrapper"); if (w) w.classList.toggle("hidden"); });
+$("btn-goal-save")?.addEventListener("click", () => {
+  const v = parseFloat($("input-goal-weight").value);
+  if (v > 0) { localStorage.setItem("regim:goal-weight", String(v)); showToast("✅ Cel zapisany"); const w = $("goal-edit-wrapper"); if (w) w.classList.add("hidden"); renderCialo(); }
+});
 
 // ============================================================================
 // BREATHING TIMER
@@ -2443,7 +2304,7 @@ function startBreathing() {
   $("btn-breath-stop")?.classList.remove("hidden");
   const circle = $("breath-circle");
   const update = () => {
-    const [phase, dur] = phases[pi];
+    const phase = phases[pi][0]; const dur = phases[pi][1];
     $("breath-phase-text").textContent = phase === "inhale" ? "Wdech" : phase === "hold" ? "Trzymaj" : "Wydech";
     circle.className = "breath-circle " + phase;
     breathTimer = setTimeout(() => { pi = (pi + 1) % phases.length; update(); }, dur * 1000);
@@ -2453,7 +2314,7 @@ function startBreathing() {
   breathCounter = setInterval(() => {
     breathSeconds--;
     const m = Math.floor(breathSeconds / 60); const s = breathSeconds % 60;
-    $("breath-timer").textContent = `${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
+    $("breath-timer").textContent = String(m).padStart(2, "0") + ":" + String(s).padStart(2, "0");
     if (breathSeconds <= 0) { clearInterval(breathCounter); stopBreathing(); }
   }, 1000);
 }
@@ -2477,7 +2338,7 @@ function startRest() {
   $("btn-rest-stop")?.classList.remove("hidden");
   const tick = () => {
     const m = Math.floor(restRemaining / 60); const s = restRemaining % 60;
-    $("rest-timer-display").textContent = `${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
+    $("rest-timer-display").textContent = String(m).padStart(2, "0") + ":" + String(s).padStart(2, "0");
     if (restRemaining <= 0) { stopRest(); playSound("done"); vibrate([100, 50, 100]); return; }
     restRemaining--;
     restTimer = setTimeout(tick, 1000);
@@ -2494,26 +2355,33 @@ function stopRest() {
 // CIAŁO
 // ============================================================================
 function lastWeight() {
-  try { const t = JSON.parse(localStorage.getItem(localKey(todayKey)) || "{}"); return t.morning?.dailyWeight || null; } catch (e) { return null; }
+  try { const t = JSON.parse(localStorage.getItem(localKey(todayKey)) || "{}"); return (t.morning && t.morning.dailyWeight) || null; } catch (e) { return null; }
 }
 async function renderCialo() {
   const s = getSettings();
   const w = lastWeight();
   const el = $("profil-card"); if (!el) return;
-  el.innerHTML = `
-    <div class="glass rounded-2xl p-3"><div class="text-[10px] text-neutral-400 font-bold tracking-widest">IMIĘ</div><div class="text-lg font-extrabold">${escapeHtml(s.name)}</div></div>
-    <div class="glass rounded-2xl p-3"><div class="text-[10px] text-neutral-400 font-bold tracking-widest">WIEK</div><div class="text-lg font-extrabold">${s.age}</div></div>
-    <div class="glass rounded-2xl p-3"><div class="text-[10px] text-neutral-400 font-bold tracking-widest">WZROST</div><div class="text-lg font-extrabold">${s.height} cm</div></div>
-    <div class="glass rounded-2xl p-3"><div class="text-[10px] text-neutral-400 font-bold tracking-widest">WAGA</div><div class="text-lg font-extrabold text-gold">${w ? w + " kg" : "—"}</div></div>`;
+  el.innerHTML = '<div class="glass rounded-2xl p-3"><div class="text-[10px] text-neutral-400 font-bold tracking-widest">IMIĘ</div><div class="text-lg font-extrabold">' + escapeHtml(s.name) + '</div></div><div class="glass rounded-2xl p-3"><div class="text-[10px] text-neutral-400 font-bold tracking-widest">WIEK</div><div class="text-lg font-extrabold">' + s.age + '</div></div><div class="glass rounded-2xl p-3"><div class="text-[10px] text-neutral-400 font-bold tracking-widest">WZROST</div><div class="text-lg font-extrabold">' + s.height + ' cm</div></div><div class="glass rounded-2xl p-3"><div class="text-[10px] text-neutral-400 font-bold tracking-widest">WAGA</div><div class="text-lg font-extrabold text-gold">' + (w ? w + " kg" : "—") + '</div></div>';
   if (w) {
     const prot = (w * 1.7).toFixed(0);
-    if ($("protein-target")) $("protein-target").textContent = `${prot} g`;
-    if ($("protein-hint")) $("protein-hint").textContent = `Twoja waga ${w} kg`;
+    if ($("protein-target")) $("protein-target").textContent = prot + " g";
+    if ($("protein-hint")) $("protein-hint").textContent = "Twoja waga " + w + " kg";
   }
   if (s.heightDad && s.heightMom) {
     const pred = ((s.heightDad + s.heightMom) / 2) + 6.5;
-    if ($("predicted-height")) $("predicted-height").textContent = `${pred.toFixed(1)} cm`;
-    if ($("predicted-height-range")) $("predicted-height-range").textContent = `Zakres: ${(pred - 4).toFixed(0)}–${(pred + 4).toFixed(0)} cm`;
+    if ($("predicted-height")) $("predicted-height").textContent = pred.toFixed(1) + " cm";
+    if ($("predicted-height-range")) $("predicted-height-range").textContent = "Zakres: " + (pred - 4).toFixed(0) + "–" + (pred + 4).toFixed(0) + " cm";
+  }
+  // Goal
+  if ($("goal-target")) $("goal-target").textContent = s.goalWeight.toFixed(1) + " kg";
+  if ($("goal-current")) $("goal-current").textContent = w ? w.toFixed(1) + " kg" : "—";
+  if (w && $("goal-bar")) {
+    const start = s.startWeight;
+    const range = s.goalWeight - start;
+    const gained = w - start;
+    const pct = Math.max(0, Math.min(100, Math.round((gained / range) * 100)));
+    $("goal-bar").style.width = pct + "%";
+    if ($("goal-progress-text")) $("goal-progress-text").textContent = "Zostało " + (s.goalWeight - w).toFixed(1) + " kg do celu. Zwiększ kalorie.";
   }
 }
 
@@ -2521,14 +2389,13 @@ async function renderCialo() {
 // BOOT
 // ============================================================================
 async function reloadEverything() { await bootApp(); }
-
 async function bootApp() {
   booted = true;
   const s = getSettings();
   if ($("header-greeting")) {
     const h = new Date().getHours();
     const greet = h < 12 ? "Dzień dobry" : h < 18 ? "Cześć" : "Dobry wieczór";
-    $("header-greeting").textContent = `${greet}, ${s.name}`;
+    $("header-greeting").textContent = greet + ", " + s.name;
   }
   updateCountdown();
   setInterval(updateCountdown, 60000);
@@ -2538,18 +2405,16 @@ async function bootApp() {
     if ($("theme-icon")) $("theme-icon").className = "fa-solid fa-sun";
   }
 
-  // BANNER: 1. dzień miesiąca (jeśli dziś 1. i nie odrzucone)
   if (todayObj.getDate() === 1) {
     const dismissed = localStorage.getItem("regim:measure-dismiss-" + dateKey(todayObj));
-    if (!dismissed) $("monthly-measure-banner")?.classList.remove("hidden");
+    if (!dismissed) { const b = $("monthly-measure-banner"); if (b) b.classList.remove("hidden"); }
   }
 
-  // FIX: wczytaj zapisane zadania zanim nadpiszesz świeżymi
   const today = await loadDayDoc(todayKey);
-  const savedTasks = today?.tasks || [];
-  state.morning = today?.morning || {};
-  state.evening = today?.evening || {};
-  state.note = today?.note || "";
+  const savedTasks = (today && today.tasks) || [];
+  state.morning = (today && today.morning) || {};
+  state.evening = (today && today.evening) || {};
+  state.note = (today && today.note) || "";
 
   applyConditionalTasks();
 
@@ -2570,7 +2435,6 @@ async function bootApp() {
   checkDeload();
   await renderImprovementTips();
   renderSupplementsCard();
-  renderWaterCard();
   renderGuideSections();
   renderKnowledgeBase();
   renderFactOfDay();
