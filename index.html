@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>REGIM / Lock In v2.0</title>
-<meta name="description" content="Zimowy Lock In v2.0 — masa, wzrost, wygląd.">
+<title>REGIM / Lock In v2.0 — HARDCORE EDITION</title>
+<meta name="description" content="Zimowy Lock In v2.0 Hardcore — masa, wzrost, dominacja.">
 <meta name="theme-color" content="#1a1530">
 <link rel="manifest" href="manifest.json">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2222%22 fill=%22%231a1530%22/><text x=%2250%22 y=%2270%22 font-size=%2258%22 text-anchor=%22middle%22 fill=%22%235eead4%22 font-family=%22Arial%22 font-weight=%22900%22>L</text></svg>">
@@ -37,8 +37,6 @@ h1,h2,h3,.font-extrabold,.font-bold{letter-spacing:-.02em}
 .task-flash{animation:task-complete-flash .7s ease-out}
 @keyframes float-up{0%{transform:translateY(0) scale(1);opacity:.7}100%{transform:translateY(-100vh) scale(.5);opacity:0}}
 .particle{position:fixed;width:4px;height:4px;border-radius:50%;bottom:-10px;pointer-events:none;z-index:1;animation:float-up linear infinite}
-@keyframes bounce-soft{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
-.bounce-soft{animation:bounce-soft 2s ease-in-out infinite}
 .progress-fill{transition:width .8s cubic-bezier(.16,1,.3,1)}
 .readiness-ring{transition:stroke-dashoffset 1s cubic-bezier(.16,1,.3,1);filter:drop-shadow(0 0 8px rgba(94,234,212,.4))}
 .hero-ring{filter:drop-shadow(0 0 10px rgba(94,234,212,.5))}
@@ -108,82 +106,107 @@ html.light-theme .history-item{border-left-color:rgba(30,26,53,.12)}
 .toggle-switch.on{background:linear-gradient(135deg,#5eead4,#c4b5fd)}
 .toggle-switch.on::after{transform:translateX(22px)}
 .booster-badge{background:linear-gradient(135deg,rgba(251,113,133,.2),rgba(251,191,36,.2));border:1px solid rgba(251,113,133,.4);color:#fb7185;font-size:10px;font-weight:800;padding:2px 8px;border-radius:999px}
+@keyframes rage-pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.05)}}
+.rage-btn{background:linear-gradient(135deg,#fb7185,#fbbf24,#fb7185);background-size:200% 200%;animation:gradient-shift 2s ease infinite,rage-pulse 1.5s ease-in-out infinite;color:#0f0c1d;font-weight:900;letter-spacing:.03em}
+@keyframes rage-flash{0%{opacity:0;transform:scale(.5)}20%{opacity:1;transform:scale(1)}80%{opacity:1;transform:scale(1)}100%{opacity:0;transform:scale(1.1)}}
+.rage-flash{animation:rage-flash 3s ease-in-out both}
+.black-list-item{background:linear-gradient(135deg,rgba(251,113,133,.08),rgba(251,191,36,.04));border-left:3px solid #fb7185;border-radius:12px;padding:10px 12px}
+.food-ing-btn{transition:all .2s}.food-ing-btn:active{transform:scale(.95)}
+.food-ing-btn.added{background:linear-gradient(135deg,rgba(94,234,212,.2),rgba(196,181,253,.15));border-color:rgba(94,234,212,.5)}
+.glowing-btn{box-shadow:0 0 20px -4px rgba(251,191,36,.5),0 0 30px -8px rgba(251,191,36,.3)}
 </style>
 </head>
 <body class="text-neutral-100 font-sans min-h-screen pb-28">
 <canvas id="confetti-canvas"></canvas>
 <div id="particles-layer" class="fixed inset-0 pointer-events-none z-0"></div>
 
-<header class="sticky top-0 z-30 px-5 pt-5 pb-3 bg-gradient-to-b from-ink via-ink/95 to-transparent">
-  <div class="max-w-lg mx-auto flex items-center justify-between gap-2">
-    <div class="flex items-center gap-2.5 flex-shrink-0">
-      <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-mint to-lilac animated-gradient flex items-center justify-center shadow-glow">
-        <i class="fa-solid fa-bolt text-ink text-lg"></i>
+<header class="sticky top-0 z-30 px-4 pt-4 pb-2 bg-gradient-to-b from-ink via-ink/95 to-transparent">
+  <div class="max-w-lg mx-auto">
+    <div class="flex items-center justify-between gap-2 mb-2">
+      <div class="flex items-center gap-2 flex-shrink-0">
+        <div class="w-9 h-9 rounded-2xl bg-gradient-to-br from-mint to-lilac animated-gradient flex items-center justify-center shadow-glow">
+          <i class="fa-solid fa-bolt text-ink text-base"></i>
+        </div>
+        <div>
+          <div class="font-extrabold text-base leading-none tracking-tight">REGIM<span class="text-rose text-[9px] ml-0.5">H</span></div>
+          <div class="text-[10px] text-neutral-400 leading-none mt-0.5" id="header-greeting">Ładuję...</div>
+        </div>
       </div>
-      <div>
-        <div class="font-extrabold text-lg leading-none tracking-tight">REGIM<span class="text-mint text-[10px] ml-1">v2.0</span></div>
-        <div class="text-[11px] text-neutral-400 leading-none mt-0.5" id="header-greeting">Ładuję...</div>
-      </div>
+      <button id="btn-rage" class="rage-btn rounded-full px-3 py-2 text-[11px] whitespace-nowrap glowing-btn flex items-center gap-1">
+        <i class="fa-solid fa-fire"></i> RAGE
+      </button>
     </div>
     <div class="flex items-center gap-1.5 flex-wrap justify-end">
       <div id="sync-status" class="offline"><i class="fa-solid fa-cloud"></i><span>Lokalnie</span></div>
-      <div id="streak-pill" class="flex items-center gap-1.5 glass rounded-full px-3 py-1.5 text-sm font-bold">
+      <div id="streak-pill" class="flex items-center gap-1 glass rounded-full px-2.5 py-1 text-xs font-bold">
         <i class="fa-solid fa-fire text-peach"></i>
         <span id="streak-count">0</span>
       </div>
-      <div id="user-badge" class="hidden glass rounded-full px-3 py-1.5 text-[11px] font-bold text-mint max-w-[100px] truncate"></div>
-      <button id="btn-signin" class="glass rounded-full w-9 h-9 flex items-center justify-center text-neutral-400 hover:text-mint transition"><i class="fa-solid fa-user"></i></button>
-      <button id="btn-settings" class="glass rounded-full w-9 h-9 flex items-center justify-center text-neutral-400 hover:text-mint transition"><i class="fa-solid fa-gear"></i></button>
-      <button id="btn-theme-toggle" class="glass rounded-full w-9 h-9 flex items-center justify-center text-neutral-400 hover:text-gold transition"><i class="fa-solid fa-moon" id="theme-icon"></i></button>
-      <button id="btn-export" class="glass rounded-full w-9 h-9 flex items-center justify-center text-neutral-400 hover:text-mint transition"><i class="fa-solid fa-download"></i></button>
+      <div id="user-badge" class="hidden glass rounded-full px-2.5 py-1 text-[10px] font-bold text-mint max-w-[80px] truncate"></div>
+      <button id="btn-signin" class="glass rounded-full w-8 h-8 flex items-center justify-center text-neutral-400 hover:text-mint transition text-xs"><i class="fa-solid fa-user"></i></button>
+      <button id="btn-settings" class="glass rounded-full w-8 h-8 flex items-center justify-center text-neutral-400 hover:text-mint transition text-xs"><i class="fa-solid fa-gear"></i></button>
+      <button id="btn-theme-toggle" class="glass rounded-full w-8 h-8 flex items-center justify-center text-neutral-400 hover:text-gold transition text-xs"><i class="fa-solid fa-moon" id="theme-icon"></i></button>
+      <button id="btn-export" class="glass rounded-full w-8 h-8 flex items-center justify-center text-neutral-400 hover:text-mint transition text-xs"><i class="fa-solid fa-download"></i></button>
     </div>
   </div>
 </header>
 
 <div id="install-banner" class="hidden max-w-lg mx-auto px-5 mb-2">
-  <div class="rise glass rounded-3xl p-4 flex items-center gap-3 shadow-soft">
-    <div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-mint/30 to-lilac/30 flex items-center justify-center flex-shrink-0"><i class="fa-solid fa-mobile-screen-button text-mint text-lg"></i></div>
-    <div class="flex-1 min-w-0"><div class="font-bold text-sm">Miej REGIM zawsze pod ręką</div><div class="text-xs text-neutral-400">Dodaj do ekranu głównego</div></div>
-    <button id="btn-install" class="bg-gradient-to-br from-mint to-lilac text-ink font-extrabold text-sm px-4 py-2 rounded-full whitespace-nowrap active:scale-95 transition">Dodaj</button>
-    <button id="btn-install-dismiss" class="text-neutral-500 w-6 h-6 flex items-center justify-center flex-shrink-0"><i class="fa-solid fa-xmark"></i></button>
+  <div class="rise glass rounded-3xl p-3 flex items-center gap-2 shadow-soft">
+    <div class="w-9 h-9 rounded-2xl bg-gradient-to-br from-mint/30 to-lilac/30 flex items-center justify-center flex-shrink-0"><i class="fa-solid fa-mobile-screen-button text-mint text-sm"></i></div>
+    <div class="flex-1 min-w-0"><div class="font-bold text-xs">Miej REGIM pod ręką</div><div class="text-[10px] text-neutral-400">Dodaj do ekranu głównego</div></div>
+    <button id="btn-install" class="bg-gradient-to-br from-mint to-lilac text-ink font-extrabold text-xs px-3 py-1.5 rounded-full whitespace-nowrap active:scale-95 transition">Dodaj</button>
+    <button id="btn-install-dismiss" class="text-neutral-500 w-5 h-5 flex items-center justify-center flex-shrink-0 text-xs"><i class="fa-solid fa-xmark"></i></button>
   </div>
 </div>
 
-<main class="max-w-lg mx-auto px-5 relative z-10">
+<main class="max-w-lg mx-auto px-4 relative z-10">
 
-  <section class="rise glass rounded-4xl p-5 mb-5 shadow-soft">
-    <div class="flex items-center justify-between mb-3">
+  <section class="rise glass rounded-4xl p-4 mb-4 shadow-soft">
+    <div class="flex items-center justify-between mb-2">
       <div>
-        <div class="text-2xl font-extrabold" id="progress-headline">Zimowy Lock In 🥶</div>
-        <div class="text-xs text-neutral-400 font-semibold" id="progress-sub">0 z 0 zadań</div>
+        <div class="text-xl font-extrabold" id="progress-headline">Zimowy Lock In 🥶</div>
+        <div class="text-[11px] text-neutral-400 font-semibold" id="progress-sub">0 z 0 zadań</div>
       </div>
-      <div class="relative w-16 h-16 flex-shrink-0">
-        <svg class="w-16 h-16 -rotate-90 hero-ring" viewBox="0 0 64 64">
+      <div class="relative w-14 h-14 flex-shrink-0">
+        <svg class="w-14 h-14 -rotate-90 hero-ring" viewBox="0 0 64 64">
           <circle cx="32" cy="32" r="27" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="7"/>
           <circle id="hero-ring" cx="32" cy="32" r="27" fill="none" stroke="url(#heroGrad)" stroke-width="7" stroke-linecap="round" stroke-dasharray="169.6" stroke-dashoffset="169.6" style="transition:stroke-dashoffset .6s cubic-bezier(.16,1,.3,1);"/>
           <defs><linearGradient id="heroGrad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#5eead4"/><stop offset="100%" stop-color="#c4b5fd"/></linearGradient></defs>
         </svg>
-        <div class="absolute inset-0 flex items-center justify-center font-extrabold text-sm" id="hero-pct">0%</div>
+        <div class="absolute inset-0 flex items-center justify-center font-extrabold text-xs" id="hero-pct">0%</div>
       </div>
     </div>
-    <div class="h-2 bg-white/5 rounded-full overflow-hidden"><div id="progress-bar" class="progress-fill h-full rounded-full bg-gradient-to-r from-mint to-lilac" style="width:0%"></div></div>
-    <div id="beast-mode-badge" class="hidden mt-3 beast-badge rounded-2xl py-2.5 text-center text-xs tracking-widest pulse-glow">🔥 BEAST MODE ACTIVE 🔥</div>
+    <div class="h-1.5 bg-white/5 rounded-full overflow-hidden"><div id="progress-bar" class="progress-fill h-full rounded-full bg-gradient-to-r from-mint to-lilac" style="width:0%"></div></div>
+    <div id="beast-mode-badge" class="hidden mt-2 beast-badge rounded-2xl py-2 text-center text-[10px] tracking-widest pulse-glow">🔥 BEAST MODE ACTIVE 🔥</div>
   </section>
 
-  <div class="countdown-widget mb-5 rise">
-    <div class="flex items-center justify-between gap-3">
-      <div>
-        <div class="text-[10px] text-mint font-extrabold tracking-widest uppercase mb-1">LOCK IN</div>
-        <div class="text-sm font-bold" id="lockin-day">Dzień 1</div>
+  <div class="countdown-widget mb-4 rise">
+    <div class="flex items-center justify-between gap-2">
+      <div class="flex-1">
+        <div class="text-[9px] text-mint font-extrabold tracking-widest uppercase mb-0.5">LOCK IN</div>
+        <div class="text-xs font-bold" id="lockin-day">Dzień 1</div>
       </div>
-      <div class="text-center">
-        <div class="text-[10px] text-neutral-400 font-extrabold tracking-widest uppercase mb-1">POZOSTAŁO</div>
-        <div class="text-2xl font-extrabold text-mint" id="days-remaining">73</div>
-        <div class="text-[9px] text-neutral-400 font-bold">dni Lock In</div>
+      <div class="text-center px-2 border-x border-white/10">
+        <div class="text-[9px] text-rose font-extrabold tracking-widest uppercase mb-0.5">POZOSTAŁO</div>
+        <div class="text-2xl font-extrabold text-rose" id="days-remaining">73</div>
+        <div class="text-[8px] text-neutral-400 font-bold">DNI</div>
       </div>
-      <div class="text-right">
-        <div class="text-[10px] text-neutral-400 font-extrabold tracking-widest uppercase mb-1">DO 1 STY</div>
-        <div class="text-sm font-bold text-gold" id="days-to-january">—</div>
+      <div class="flex-1 text-right">
+        <div class="text-[9px] text-neutral-400 font-extrabold tracking-widest uppercase mb-0.5">DO 1 STY</div>
+        <div class="text-xs font-bold text-gold" id="days-to-january">—</div>
+      </div>
+    </div>
+  </div>
+
+  <div id="sunday-recovery-banner" class="hidden mb-4 rise">
+    <div class="glass rounded-3xl p-4 border border-lilac/40">
+      <div class="flex items-start gap-3">
+        <div class="text-2xl">🌿</div>
+        <div class="flex-1 min-w-0">
+          <div class="font-bold text-sm text-lilac">Dzień regeneracji</div>
+          <p class="text-xs text-neutral-200 font-medium leading-relaxed mt-1">Niedziela. Ciało buduje się w spoczynku. Spacer, oddech 4-7-8, stretching. Zero wymówek na trening — dziś odpoczynek to też dyscyplina.</p>
+        </div>
       </div>
     </div>
   </div>
@@ -193,8 +216,8 @@ html.light-theme .history-item{border-left-color:rgba(30,26,53,.12)}
       <div class="flex items-start gap-3">
         <div class="text-2xl">📏</div>
         <div class="flex-1 min-w-0">
-          <div class="font-bold text-sm text-gold">1. dzień miesiąca — czas na pomiary!</div>
-          <p class="text-xs text-neutral-200 font-medium leading-relaxed mt-1">Zmierzyć: wzrost (rano, boso, plecy do ściany), obwody (klatka, talia, biceps).</p>
+          <div class="font-bold text-sm text-gold">1. dzień miesiąca — pomiary!</div>
+          <p class="text-xs text-neutral-200 font-medium leading-relaxed mt-1">Wzrost rano boso, obwody (klatka, talia, biceps).</p>
         </div>
         <button id="btn-measure-dismiss" class="text-neutral-500 w-6 h-6 flex items-center justify-center flex-shrink-0"><i class="fa-solid fa-xmark"></i></button>
       </div>
@@ -203,7 +226,7 @@ html.light-theme .history-item{border-left-color:rgba(30,26,53,.12)}
 
   <div id="health-warnings" class="hidden mb-4 space-y-2"></div>
 
-  <div class="glass rounded-3xl px-4 py-3 mb-5 overflow-hidden">
+  <div class="glass rounded-3xl px-4 py-3 mb-4 overflow-hidden">
     <div class="flex items-center justify-between mb-1.5">
       <div class="flex items-center gap-2">
         <i class="fa-solid fa-comment-dots text-mint text-sm"></i>
@@ -215,7 +238,7 @@ html.light-theme .history-item{border-left-color:rgba(30,26,53,.12)}
     <div id="brief-text" class="text-xs text-neutral-200 leading-snug">Ładuję...</div>
   </div>
 
-  <nav class="flex glass rounded-full p-1 mb-5 gap-0.5 overflow-x-auto">
+  <nav class="flex glass rounded-full p-1 mb-4 gap-0.5 overflow-x-auto">
     <button data-tab="dashboard" class="tab-btn flex-1 py-2 rounded-full text-[10px] font-bold bg-gradient-to-br from-mint to-lilac text-ink whitespace-nowrap">Dziś</button>
     <button data-tab="jedzenie" class="tab-btn flex-1 py-2 rounded-full text-[10px] font-bold text-neutral-400 whitespace-nowrap">Jedzenie</button>
     <button data-tab="cialo" class="tab-btn flex-1 py-2 rounded-full text-[10px] font-bold text-neutral-400 whitespace-nowrap">Ciało</button>
@@ -224,38 +247,44 @@ html.light-theme .history-item{border-left-color:rgba(30,26,53,.12)}
   </nav>
 
   <section id="tab-dashboard" class="tab-panel space-y-4">
-    <div class="glass rounded-4xl p-5 shadow-soft">
+    <div class="glass rounded-4xl p-4 shadow-soft">
       <div class="flex items-center gap-2 mb-3"><i class="fa-solid fa-gauge-high text-mint"></i><span class="font-bold text-sm">Gotowość dnia</span></div>
-      <div class="flex items-center gap-4">
-        <div class="relative w-20 h-20 flex-shrink-0">
-          <svg class="w-20 h-20 -rotate-90" viewBox="0 0 80 80">
+      <div class="flex items-center gap-3">
+        <div class="relative w-16 h-16 flex-shrink-0">
+          <svg class="w-16 h-16 -rotate-90" viewBox="0 0 80 80">
             <circle cx="40" cy="40" r="34" fill="none" stroke="rgba(255,255,255,.08)" stroke-width="8"/>
             <circle id="readiness-ring" class="readiness-ring" cx="40" cy="40" r="34" fill="none" stroke="#5eead4" stroke-width="8" stroke-linecap="round" stroke-dasharray="213.6" stroke-dashoffset="213.6"/>
           </svg>
-          <div class="absolute inset-0 flex items-center justify-center font-extrabold text-lg" id="readiness-pct">—</div>
+          <div class="absolute inset-0 flex items-center justify-center font-extrabold text-base" id="readiness-pct">—</div>
         </div>
         <div class="flex-1 min-w-0">
-          <div id="readiness-label" class="font-extrabold text-base mb-1">Uzupełnij raport</div>
-          <div id="readiness-tip" class="text-xs text-neutral-400 font-medium leading-snug">Im więcej danych, tym lepsza ocena.</div>
+          <div id="readiness-label" class="font-extrabold text-sm mb-1">Uzupełnij raport</div>
+          <div id="readiness-tip" class="text-[11px] text-neutral-400 font-medium leading-snug">Im więcej danych, tym lepsza ocena.</div>
         </div>
       </div>
     </div>
 
-    <div class="glass rounded-4xl p-5 shadow-warm border border-gold/20">
+    <div id="glowup-mirror-section" class="hidden glass rounded-4xl p-5 shadow-warm border border-gold/30">
+      <div class="flex items-center justify-between mb-3">
+        <div class="flex items-center gap-2"><i class="fa-solid fa-magnifying-glass text-gold"></i><span class="font-bold text-sm text-gold">🪞 Glow Up Mirror Check</span></div>
+        <span id="glowup-score-badge" class="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-gold/15 text-gold">—</span>
+      </div>
+      <p class="text-[11px] text-neutral-400 font-medium mb-3">Niedziela — sprawdź się w lustrze. Zaznacz co spełnia standard.</p>
+      <div id="glowup-questions" class="space-y-2"></div>
+    </div>
+
+    <div class="glass rounded-4xl p-4 shadow-warm border border-gold/20">
       <div class="flex items-center justify-between mb-3">
         <div class="flex items-center gap-2"><i class="fa-solid fa-capsules text-gold"></i><span class="font-bold text-sm text-gold">Suplementacja — D3</span></div>
         <span id="supp-status-badge" class="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-mint/15 text-mint">—</span>
       </div>
-      <div class="space-y-2.5">
-        <div>
-          <div class="flex items-center justify-between text-xs mb-1">
-            <span class="font-bold text-neutral-200">Witamina D3 ×2 tabletki</span>
-            <span id="supp-d3-text" class="font-extrabold text-gold">0 / 4000 IU</span>
-          </div>
-          <div class="h-2 bg-white/5 rounded-full overflow-hidden"><div id="supp-d3-bar" class="progress-fill h-full rounded-full bg-gradient-to-r from-gold to-peach" style="width:0%"></div></div>
-          <div id="supp-d3-hint" class="text-[10px] text-neutral-500 font-medium mt-1">Cel: 4000 IU dziennie (2 tabletki × 2000 IU)</div>
+      <div>
+        <div class="flex items-center justify-between text-xs mb-1">
+          <span class="font-bold text-neutral-200">Witamina D3 ×2 tabletki</span>
+          <span id="supp-d3-text" class="font-extrabold text-gold">0 / 4000 IU</span>
         </div>
-        <div id="supp-warning" class="hidden warning-card text-xs text-neutral-200 font-medium leading-relaxed"></div>
+        <div class="h-2 bg-white/5 rounded-full overflow-hidden"><div id="supp-d3-bar" class="progress-fill h-full rounded-full bg-gradient-to-r from-gold to-peach" style="width:0%"></div></div>
+        <div id="supp-d3-hint" class="text-[10px] text-neutral-500 font-medium mt-1">Cel: 4000 IU dziennie (2 tabletki × 2000 IU)</div>
       </div>
     </div>
 
@@ -276,7 +305,7 @@ html.light-theme .history-item{border-left-color:rgba(30,26,53,.12)}
 
     <div id="booster-banner" class="hidden rise glass rounded-4xl p-5 border border-rose/30">
       <div class="flex items-center gap-2 mb-2"><i class="fa-solid fa-fire text-rose"></i><span class="font-bold text-sm text-rose">BOOSTER +15% AKTYWNY</span></div>
-      <p class="text-sm text-neutral-200 leading-relaxed font-medium">Masz wyłączony tryb Skincare lub Suplementy — trening objętościowo podbity o +15% (dodatkowa seria do ćwiczeń). Włącz brakujące tryby żeby wrócić do bazy.</p>
+      <p class="text-sm text-neutral-200 leading-relaxed font-medium">Skincare lub Suplementy wyłączone — trening podbity o +15% (dodatkowa seria). Włącz brakujące tryby żeby wrócić do bazy.</p>
     </div>
 
     <div class="glass rounded-4xl p-4 shadow-soft">
@@ -370,7 +399,7 @@ html.light-theme .history-item{border-left-color:rgba(30,26,53,.12)}
     <div id="tasks-container" class="space-y-4"></div>
 
     <div class="glass rounded-4xl p-5 shadow-warm">
-      <div class="flex items-center gap-2 mb-3"><i class="fa-solid fa-lightbulb text-gold"></i><span class="font-bold text-sm text-gold">💡 Co polepszyć u mnie:</span></div>
+      <div class="flex items-center gap-2 mb-3"><i class="fa-solid fa-lightbulb text-gold"></i><span class="font-bold text-sm text-gold">💡 Co polepszyć:</span></div>
       <div id="improvement-tips" class="space-y-2.5 text-sm text-neutral-200 leading-relaxed font-medium"><p class="text-neutral-400">Uzupełnij raporty.</p></div>
     </div>
   </section>
@@ -378,32 +407,40 @@ html.light-theme .history-item{border-left-color:rgba(30,26,53,.12)}
   <section id="tab-jedzenie" class="tab-panel hidden space-y-4">
     <div class="glass rounded-4xl p-5 shadow-warm border border-gold/20">
       <div class="flex items-center justify-between mb-3">
-        <div class="flex items-center gap-2"><i class="fa-solid fa-blender text-gold"></i><span class="font-bold text-base">🥤 Mass Shake Generator 700 kcal</span></div>
+        <div class="flex items-center gap-2"><i class="fa-solid fa-blender text-gold"></i><span class="font-bold text-base">🥤 Mass Shake 700 kcal</span></div>
         <button id="btn-roll-shake" class="text-[11px] font-bold text-gold glass rounded-full px-3 py-1.5 active:scale-95 transition"><i class="fa-solid fa-rotate mr-1"></i>Losuj</button>
       </div>
       <div id="mass-shake-roll" class="glass rounded-3xl p-4 border border-gold/20">
-        <p class="text-xs text-neutral-400 font-medium">Kliknij "Losuj" — dostaniesz gotowy przepis na szejka masowego ≈ 700 kcal z domowych składników.</p>
+        <p class="text-xs text-neutral-400 font-medium">Kliknij "Losuj" — szejk masowy ≈ 700 kcal z domowych składników.</p>
       </div>
     </div>
 
-    <div class="glass rounded-4xl p-5 shadow-warm">
+    <div class="glass rounded-4xl p-5 shadow-warm border border-mint/30">
       <div class="flex items-center justify-between mb-3">
-        <div class="flex items-center gap-2"><i class="fa-solid fa-dice text-mint"></i><span class="font-bold text-base">🎲 Losuj plan dnia</span></div>
-        <button id="btn-roll-food" class="text-[11px] font-bold text-mint glass rounded-full px-3 py-1.5 active:scale-95 transition"><i class="fa-solid fa-rotate mr-1"></i>Losuj</button>
+        <div class="flex items-center gap-2"><i class="fa-solid fa-cart-shopping text-mint"></i><span class="font-bold text-base">🛒 Jestem w Żabce / Biedronce</span></div>
+        <button id="btn-store-meals" class="text-[11px] font-bold text-mint glass rounded-full px-3 py-1.5 active:scale-95 transition"><i class="fa-solid fa-bolt mr-1"></i>Pokaż</button>
       </div>
-      <div id="food-roll" class="glass rounded-3xl p-4 border border-mint/20">
-        <p class="text-xs text-neutral-400 font-medium">Kliknij "Losuj" — dostaniesz gotowy plan: śniadanie + obiad + przekąska + kolacja + szejk.</p>
+      <div id="store-meals-content" class="hidden space-y-2"></div>
+    </div>
+
+    <div class="glass rounded-4xl p-5 shadow-warm border border-peach/30">
+      <div class="flex items-center justify-between mb-3">
+        <div class="flex items-center gap-2"><i class="fa-solid fa-utensils text-peach"></i><span class="font-bold text-base">🍽️ Kreator Posiłków</span></div>
+        <button id="btn-open-creator" class="text-[11px] font-bold text-peach glass rounded-full px-3 py-1.5 active:scale-95 transition"><i class="fa-solid fa-plus mr-1"></i>Otwórz</button>
+      </div>
+      <div id="meal-summary" class="glass rounded-3xl p-4 border border-peach/20">
+        <p class="text-xs text-neutral-400 font-medium">Kliknij "Otwórz" — wybierz produkty, zobacz kalorie i białko.</p>
       </div>
     </div>
 
     <div class="glass rounded-4xl p-5 shadow-soft border border-mint/20">
       <div class="flex items-center gap-2 mb-3"><i class="fa-solid fa-bullseye text-mint"></i><span class="font-bold text-sm text-mint">🎯 Cel: 50 kg — masa i białko</span></div>
-      <div class="grid grid-cols-3 gap-3">
-        <div class="glass rounded-2xl p-3 text-center"><div class="text-[10px] text-neutral-400 font-bold tracking-widest">START</div><div class="text-lg font-extrabold text-gold">45 kg</div></div>
-        <div class="glass rounded-2xl p-3 text-center"><div class="text-[10px] text-neutral-400 font-bold tracking-widest">CEL</div><div class="text-lg font-extrabold text-mint">50 kg</div></div>
-        <div class="glass rounded-2xl p-3 text-center"><div class="text-[10px] text-neutral-400 font-bold tracking-widest">BIAŁKO</div><div class="text-lg font-extrabold text-peach">77 g</div></div>
+      <div class="grid grid-cols-3 gap-2">
+        <div class="glass rounded-2xl p-3 text-center"><div class="text-[9px] text-neutral-400 font-bold tracking-widest">START</div><div class="text-base font-extrabold text-gold">45 kg</div></div>
+        <div class="glass rounded-2xl p-3 text-center"><div class="text-[9px] text-neutral-400 font-bold tracking-widest">CEL</div><div class="text-base font-extrabold text-mint">50 kg</div></div>
+        <div class="glass rounded-2xl p-3 text-center"><div class="text-[9px] text-neutral-400 font-bold tracking-widest">BIAŁKO</div><div class="text-base font-extrabold text-peach">80 g</div></div>
       </div>
-      <p class="text-xs text-neutral-400 font-medium mt-3">1.7 g białka / kg masy ciała = ~77 g dziennie. Bez nadwyżki kalorycznej masa nie rośnie.</p>
+      <p class="text-xs text-neutral-400 font-medium mt-3">Cel białko: ~80 g/dzień. Bez nadwyżki kalorycznej masa nie rośnie.</p>
     </div>
 
     <div class="flex gap-1.5 overflow-x-auto pb-1">
@@ -420,11 +457,11 @@ html.light-theme .history-item{border-left-color:rgba(30,26,53,.12)}
     <div class="glass rounded-4xl p-5 shadow-warm">
       <div class="flex items-center gap-2 mb-2"><i class="fa-solid fa-lightbulb text-gold"></i><span class="font-bold text-sm text-gold">💡 Zasady jedzenia pod masę</span></div>
       <ul class="text-xs text-neutral-300 leading-relaxed font-medium space-y-1.5 list-disc ml-4">
-        <li>Cel: <strong>2800-3000 kcal dziennie</strong> — bez tego masa nie rośnie</li>
-        <li>Białko: <strong>~77 g</strong> (1.7 g/kg masy ciała)</li>
+        <li>Cel: <strong>2800-3000 kcal dziennie</strong></li>
+        <li>Białko: <strong>~80 g</strong> dziennie</li>
         <li>Białko w <strong>każdym</strong> posiłku — jajka, mięso, twaróg, Skyr, mleko</li>
-        <li>Szejk masowy po szkole = <strong>game changer</strong> (+700 kcal w 5 min)</li>
-        <li>Zero cukru po 18:00 — psuje sen i tłumi hormon wzrostu</li>
+        <li>Szejk masowy po szkole = game changer (+700 kcal)</li>
+        <li>Zero cukru po 18:00 — psuje sen</li>
         <li>Jedz 4-5 posiłków, nie 2-3</li>
         <li>Twaróg/Skyr przed snem — buduje mięśnie w nocy</li>
       </ul>
@@ -449,10 +486,9 @@ html.light-theme .history-item{border-left-color:rgba(30,26,53,.12)}
         <div class="text-3xl font-extrabold text-mint" id="predicted-height">—</div>
         <div class="text-xs text-neutral-400 font-medium mt-1" id="predicted-height-range">Uzupełnij wzrost rodziców</div>
       </div>
-      <div id="growth-remaining" class="text-xs text-neutral-300 font-medium leading-relaxed"></div>
     </div>
-    <div class="glass rounded-4xl p-5 shadow-warm"><div class="flex items-center gap-2 mb-3"><i class="fa-solid fa-chart-line text-lilac"></i><span class="font-bold text-base">Tracker wzrostu</span></div><canvas id="chart-height" height="140"></canvas><div class="text-[10px] text-neutral-500 font-medium mt-2 text-center">Pomiar 1. dnia miesiąca</div></div>
-    <div class="glass rounded-4xl p-5 shadow-warm"><div class="flex items-center gap-2 mb-3"><i class="fa-solid fa-ruler-horizontal text-peach"></i><span class="font-bold text-base">Obwody ciała</span></div><canvas id="chart-measures" height="140"></canvas><div class="text-[10px] text-neutral-500 font-medium mt-2 text-center">Klatka / talia / biceps — 1. dnia miesiąca</div></div>
+    <div class="glass rounded-4xl p-5 shadow-warm"><div class="flex items-center gap-2 mb-3"><i class="fa-solid fa-chart-line text-lilac"></i><span class="font-bold text-base">Tracker wzrostu</span></div><canvas id="chart-height" height="140"></canvas></div>
+    <div class="glass rounded-4xl p-5 shadow-warm"><div class="flex items-center gap-2 mb-3"><i class="fa-solid fa-ruler-horizontal text-peach"></i><span class="font-bold text-base">Obwody ciała</span></div><canvas id="chart-measures" height="140"></canvas></div>
     <div class="glass rounded-4xl p-5 shadow-warm"><div class="flex items-center gap-2 mb-3"><i class="fa-solid fa-bed text-lilac"></i><span class="font-bold text-base">Dług senny (7 dni)</span></div><div id="sleep-debt" class="text-sm text-neutral-200 leading-relaxed font-medium">Ładuję...</div></div>
     <div class="glass rounded-4xl p-5 shadow-warm"><div class="flex items-center gap-2 mb-3"><i class="fa-solid fa-dumbbell text-mint"></i><span class="font-bold text-base">Wykres treningów — tydzień</span></div><canvas id="chart-strength" height="140"></canvas></div>
     <div class="glass rounded-4xl p-5 shadow-warm"><div class="flex items-center gap-2 mb-3"><i class="fa-solid fa-ranking-star text-mint"></i><span class="font-bold text-base">Co wpływa na wzrost</span></div><div id="growth-factors" class="space-y-2"></div></div>
@@ -517,6 +553,14 @@ html.light-theme .history-item{border-left-color:rgba(30,26,53,.12)}
   </section>
 
   <section id="tab-mentor" class="tab-panel hidden space-y-5">
+    <div class="glass rounded-4xl p-5 shadow-warm border border-rose/30">
+      <div class="flex items-center gap-2 mb-3">
+        <span class="text-xl">🚫</span>
+        <span class="font-extrabold text-base text-rose">CZARNA LISTA — RULES OF DOMINANCE</span>
+      </div>
+      <div id="black-list" class="space-y-2"></div>
+    </div>
+
     <button id="btn-analyze-ai" class="w-full py-4 bg-gradient-to-br from-peach to-gold text-ink font-extrabold rounded-full text-base active:scale-95 transition shadow-warm flex items-center justify-center gap-2">
       <span id="ai-btn-label"><i class="fa-solid fa-dumbbell mr-1.5"></i>🏋️ Pełna analiza Trenera</span>
       <span id="ai-btn-spinner" class="hidden animate-spin h-4 w-4 border-2 border-ink border-t-transparent rounded-full"></span>
@@ -542,7 +586,7 @@ html.light-theme .history-item{border-left-color:rgba(30,26,53,.12)}
     </div>
 
     <div class="glass rounded-4xl p-5 shadow-warm">
-      <div class="flex items-center gap-2 mb-3"><i class="fa-solid fa-graduation-cap text-lilac"></i><span class="font-bold text-base">📚 Baza wiedzy A-Z</span></div>
+      <div class="flex items-center gap-2 mb-3"><i class="fa-solid fa-graduation-cap text-lilac"></i><span class="font-bold text-base">📚 Baza wiedzy</span></div>
       <div id="knowledge-base" class="space-y-2"></div>
     </div>
 
@@ -590,6 +634,16 @@ html.light-theme .history-item{border-left-color:rgba(30,26,53,.12)}
   </div>
 </div>
 
+<div id="modal-rage" class="modal-wrap hidden fixed inset-0 z-50 flex items-center justify-center p-5">
+  <div class="modal-backdrop absolute inset-0" data-close-modal></div>
+  <div class="modal-pop relative glass rounded-4xl w-full sm:max-w-sm p-8 shadow-soft text-center">
+    <div class="text-6xl mb-4">🔥</div>
+    <div id="rage-quote" class="text-2xl font-black text-rose leading-tight mb-4">...</div>
+    <div class="text-[10px] text-neutral-500 font-bold tracking-widest uppercase mb-5">— RAGE MODE ON —</div>
+    <button data-close-modal class="w-full py-3.5 rounded-full bg-gradient-to-br from-rose to-gold text-ink font-extrabold">RUSZAM</button>
+  </div>
+</div>
+
 <div id="modal-settings" class="modal-wrap hidden fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-5">
   <div class="modal-backdrop absolute inset-0" data-close-modal></div>
   <div class="modal-pop relative glass rounded-t-4xl sm:rounded-4xl w-full sm:max-w-md p-6 shadow-soft max-h-[85vh] overflow-y-auto">
@@ -601,22 +655,22 @@ html.light-theme .history-item{border-left-color:rgba(30,26,53,.12)}
       <div class="space-y-3">
         <div class="flex items-center justify-between">
           <div><div class="text-sm font-bold">Tryb Suplementy</div><div class="text-[10px] text-neutral-400">D3 ×2 tabletki</div></div>
-          <div id="toggle-supplements" class="toggle-switch" data-toggle="supplements"></div>
+          <div class="toggle-switch" data-toggle="supplements"></div>
         </div>
         <div class="flex items-center justify-between">
-          <div><div class="text-sm font-bold">Tryb Skincare / Pielęgnacja</div><div class="text-[10px] text-neutral-400">Tołpa, Acnederm, Cetaphil</div></div>
-          <div id="toggle-skincare" class="toggle-switch" data-toggle="skincare"></div>
+          <div><div class="text-sm font-bold">Tryb Skincare</div><div class="text-[10px] text-neutral-400">Tołpa, Acnederm, Cetaphil</div></div>
+          <div class="toggle-switch" data-toggle="skincare"></div>
         </div>
         <div class="flex items-center justify-between">
-          <div><div class="text-sm font-bold">Tryb Jawline & Postawa</div><div class="text-[10px] text-neutral-400">Mewing, postawa, symetria</div></div>
-          <div id="toggle-jawline" class="toggle-switch" data-toggle="jawline"></div>
+          <div><div class="text-sm font-bold">Tryb Jawline & Postawa</div><div class="text-[10px] text-neutral-400">Mewing, postawa</div></div>
+          <div class="toggle-switch" data-toggle="jawline"></div>
         </div>
         <div class="flex items-center justify-between">
-          <div><div class="text-sm font-bold">Tryb Hardcore / Beast Mode</div><div class="text-[10px] text-neutral-400">Zimny prysznic, ekstra wyzwania</div></div>
-          <div id="toggle-beast" class="toggle-switch" data-toggle="beast"></div>
+          <div><div class="text-sm font-bold">Tryb Hardcore</div><div class="text-[10px] text-neutral-400">Zimny prysznic</div></div>
+          <div class="toggle-switch" data-toggle="beast"></div>
         </div>
       </div>
-      <p class="text-[10px] text-neutral-500 font-medium mt-3 leading-relaxed">⚠️ Wyłączenie Skincare lub Suplementów = <strong class="text-rose">+15% objętości treningu</strong> (booster wyrównawczy).</p>
+      <p class="text-[10px] text-neutral-500 font-medium mt-3 leading-relaxed">⚠️ Wyłączenie Skincare lub Suplementów = <strong class="text-rose">+15% objętości treningu</strong>.</p>
     </div>
 
     <div class="space-y-4">
@@ -640,6 +694,55 @@ html.light-theme .history-item{border-left-color:rgba(30,26,53,.12)}
   </div>
 </div>
 
+<div id="modal-food-creator" class="modal-wrap hidden fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-5">
+  <div class="modal-backdrop absolute inset-0" data-close-modal></div>
+  <div class="modal-pop relative glass rounded-t-4xl sm:rounded-4xl w-full sm:max-w-md p-5 shadow-soft max-h-[92vh] overflow-y-auto">
+    <div class="flex items-start justify-between mb-3">
+      <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-peach/25 to-gold/25 flex items-center justify-center"><i class="fa-solid fa-utensils text-peach text-xl"></i></div>
+      <button data-close-modal class="w-9 h-9 rounded-full glass flex items-center justify-center text-neutral-400"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <h3 class="font-extrabold text-lg mb-3">🍽️ Kreator Posiłków</h3>
+
+    <div class="flex glass rounded-full p-1 mb-3 gap-0.5 overflow-x-auto">
+      <button data-meal="breakfast" class="meal-tab flex-shrink-0 py-2 px-3 rounded-full text-[10px] font-bold bg-gradient-to-br from-mint to-lilac text-ink whitespace-nowrap">Śniadanie</button>
+      <button data-meal="breakfast2" class="meal-tab flex-shrink-0 py-2 px-3 rounded-full text-[10px] font-bold text-neutral-400 whitespace-nowrap">2. Śniadanie</button>
+      <button data-meal="lunch" class="meal-tab flex-shrink-0 py-2 px-3 rounded-full text-[10px] font-bold text-neutral-400 whitespace-nowrap">Obiad</button>
+      <button data-meal="dinner" class="meal-tab flex-shrink-0 py-2 px-3 rounded-full text-[10px] font-bold text-neutral-400 whitespace-nowrap">Kolacja</button>
+      <button data-meal="snacks" class="meal-tab flex-shrink-0 py-2 px-3 rounded-full text-[10px] font-bold text-neutral-400 whitespace-nowrap">Przekąski</button>
+    </div>
+
+    <div id="current-meal-items" class="glass rounded-2xl p-3 mb-3 min-h-[60px]"></div>
+
+    <div class="flex glass rounded-full p-1 mb-3 gap-0.5 overflow-x-auto">
+      <button data-cat="pieczywo" class="ing-cat-tab flex-shrink-0 py-1.5 px-3 rounded-full text-[10px] font-bold bg-gradient-to-br from-gold to-peach text-ink whitespace-nowrap">🍞 Pieczywo</button>
+      <button data-cat="wedliny" class="ing-cat-tab flex-shrink-0 py-1.5 px-3 rounded-full text-[10px] font-bold text-neutral-400 whitespace-nowrap">🥓 Wędliny</button>
+      <button data-cat="sery" class="ing-cat-tab flex-shrink-0 py-1.5 px-3 rounded-full text-[10px] font-bold text-neutral-400 whitespace-nowrap">🧀 Sery</button>
+      <button data-cat="jajka" class="ing-cat-tab flex-shrink-0 py-1.5 px-3 rounded-full text-[10px] font-bold text-neutral-400 whitespace-nowrap">🥚 Jajka</button>
+      <button data-cat="dodatki" class="ing-cat-tab flex-shrink-0 py-1.5 px-3 rounded-full text-[10px] font-bold text-neutral-400 whitespace-nowrap">🥑 Dodatki</button>
+      <button data-cat="przekaski" class="ing-cat-tab flex-shrink-0 py-1.5 px-3 rounded-full text-[10px] font-bold text-neutral-400 whitespace-nowrap">🍫 Przekąski</button>
+      <button data-cat="owoce" class="ing-cat-tab flex-shrink-0 py-1.5 px-3 rounded-full text-[10px] font-bold text-neutral-400 whitespace-nowrap">🍌 Owoce</button>
+      <button data-cat="napoje" class="ing-cat-tab flex-shrink-0 py-1.5 px-3 rounded-full text-[10px] font-bold text-neutral-400 whitespace-nowrap">🥛 Napoje</button>
+      <button data-cat="obiady" class="ing-cat-tab flex-shrink-0 py-1.5 px-3 rounded-full text-[10px] font-bold text-neutral-400 whitespace-nowrap">🍝 Obiady</button>
+    </div>
+
+    <div id="ingredients-grid" class="grid grid-cols-2 gap-2 mb-3 max-h-64 overflow-y-auto pr-1"></div>
+
+    <div class="glass rounded-2xl p-3 mb-3">
+      <div class="flex items-center justify-between text-xs mb-2">
+        <span class="font-bold text-neutral-300">DZIŚ RAZEM:</span>
+        <span class="font-extrabold text-gold" id="total-kcal">0 kcal</span>
+      </div>
+      <div class="flex items-center justify-between text-xs mb-2">
+        <span class="font-bold text-neutral-300">BIAŁKO:</span>
+        <span class="font-extrabold text-mint" id="total-prot">0 g / 80 g</span>
+      </div>
+      <div class="h-2 bg-white/5 rounded-full overflow-hidden"><div id="protein-bar" class="progress-fill h-full rounded-full bg-gradient-to-r from-mint to-lilac" style="width:0%"></div></div>
+    </div>
+
+    <button id="btn-clear-mealplan" class="w-full py-2.5 rounded-full glass font-bold text-xs text-rose">Wyczyść wszystko</button>
+  </div>
+</div>
+
 <div id="modal-day-detail" class="modal-wrap hidden fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-5">
   <div class="modal-backdrop absolute inset-0" data-close-modal></div>
   <div class="modal-pop relative glass rounded-t-4xl sm:rounded-4xl w-full sm:max-w-md p-6 shadow-soft max-h-[85vh] overflow-y-auto">
@@ -657,9 +760,7 @@ let firebaseReady = false, currentUser = { uid: "local" }, authResolved = false,
 const USER_NAME_DEFAULT = "Karol";
 const LOCKIN_TOTAL_DAYS = 73;
 if (!localStorage.getItem("regim:lockin-start")) {
-  const d = new Date();
-  d.setDate(d.getDate() - 0);
-  localStorage.setItem("regim:lockin-start", d.toISOString().split("T")[0]);
+  localStorage.setItem("regim:lockin-start", new Date().toISOString().split("T")[0]);
 }
 const LOCKIN_START = new Date(localStorage.getItem("regim:lockin-start") + "T00:00:00");
 const LOCKIN_END = new Date(LOCKIN_START.getTime() + LOCKIN_TOTAL_DAYS * 86400000);
@@ -672,21 +773,10 @@ const firebaseConfig = {
   messagingSenderId: "1025631760665",
   appId: "1:1025631760665:web:93c5b62295bd8b0b675588",
 };
+
 function $(id) { return document.getElementById(id); }
-function setSyncStatus(mode, label) {
-  const el = $("sync-status"); if (!el) return;
-  el.className = mode;
-  const icons = { offline: "fa-cloud", syncing: "fa-cloud-arrow-up", synced: "fa-cloud-check" };
-  el.innerHTML = '<i class="fa-solid ' + icons[mode] + '"></i><span>' + label + '</span>';
-}
-function updateSyncUI() {
-  if (!firebaseReady) return setSyncStatus("offline", "Lokalnie");
-  if (currentUser && currentUser.uid === "local") return setSyncStatus("offline", "Lokalnie");
-  if (syncInProgress) return setSyncStatus("syncing", "Sync...");
-  setSyncStatus("synced", "Chmura");
-}
 function escapeHtml(s) { const d = document.createElement("div"); d.textContent = s || ""; return d.innerHTML; }
-function showToast(msg) { const t = $("toast"); if (!t) return; t.textContent = msg; t.classList.remove("hidden"); clearTimeout(showToast._t); showToast._t = setTimeout(function(){ t.classList.add("hidden"); }, 2400); }
+function showToast(msg) { const t = $("toast"); if (!t) return; t.textContent = msg; t.classList.remove("hidden"); clearTimeout(showToast._t); showToast._t = setTimeout(() => t.classList.add("hidden"), 2400); }
 function vibrate(pattern) { if (navigator.vibrate) navigator.vibrate(pattern); }
 function playSound(type) {
   try {
@@ -724,12 +814,8 @@ function getToggle(name) {
   if (v === null) return true;
   return v === "1";
 }
-function setToggle(name, val) {
-  localStorage.setItem("regim:toggle-" + name, val ? "1" : "0");
-}
-function isBoosterActive() {
-  return !getToggle("skincare") || !getToggle("supplements");
-}
+function setToggle(name, val) { localStorage.setItem("regim:toggle-" + name, val ? "1" : "0"); }
+function isBoosterActive() { return !getToggle("skincare") || !getToggle("supplements"); }
 function getSettings() {
   return {
     name: localStorage.getItem("regim:name") || USER_NAME_DEFAULT,
@@ -828,20 +914,31 @@ async function collectAllDays() {
   return Object.values(results).sort((a, b) => (a.date || "").localeCompare(b.date || ""));
 }
 async function loadDaysRange(n, offset) {
-  const docs = []; const today = new Date();
+  const today = new Date();
   const promises = [];
   for (let i = n - 1; i >= 0; i--) {
     const d = new Date(today); d.setDate(d.getDate() - i - offset);
     promises.push(loadDayDoc(dateKey(d)));
   }
   const results = await Promise.all(promises);
-  results.forEach(doc => { if (doc) docs.push(doc); });
-  return docs;
+  return results.filter(Boolean);
 }
 
 // ============================================================================
-// AUTH
+// AUTH (Firebase lazy)
 // ============================================================================
+function setSyncStatus(mode, label) {
+  const el = $("sync-status"); if (!el) return;
+  el.className = mode;
+  const icons = { offline: "fa-cloud", syncing: "fa-cloud-arrow-up", synced: "fa-cloud-check" };
+  el.innerHTML = '<i class="fa-solid ' + icons[mode] + '"></i><span>' + label + '</span>';
+}
+function updateSyncUI() {
+  if (!firebaseReady) return setSyncStatus("offline", "Lokalnie");
+  if (currentUser && currentUser.uid === "local") return setSyncStatus("offline", "Lokalnie");
+  if (syncInProgress) return setSyncStatus("syncing", "Sync...");
+  setSyncStatus("synced", "Chmura");
+}
 async function migrateLocalToCloud() {
   if (migrateDone || !isCloud()) return;
   migrateDone = true;
@@ -860,7 +957,6 @@ async function migrateLocalToCloud() {
     }
     if (localDays.length === 0) { await fb.fsMod.setDoc(metaRef, { done: true, at: Date.now(), count: 0 }); return; }
     showToast("Migracja " + localDays.length + " dni...");
-    syncInProgress = true; updateSyncUI();
     for (let i = 0; i < localDays.length; i += 400) {
       const chunk = localDays.slice(i, i + 400);
       const batch = fb.fsMod.writeBatch(fb.db);
@@ -869,7 +965,7 @@ async function migrateLocalToCloud() {
     }
     await fb.fsMod.setDoc(metaRef, { done: true, at: Date.now(), count: localDays.length });
     showToast("✅ Zmigrowano " + localDays.length + " dni");
-  } catch (e) { console.error(e); } finally { syncInProgress = false; updateSyncUI(); }
+  } catch (e) { console.error(e); }
 }
 function updateAuthUI(user) {
   const badge = $("user-badge"); const signinBtn = $("btn-signin"); const acc = $("settings-account");
@@ -904,7 +1000,7 @@ async function initFirebase() {
       updateAuthUI(user); updateSyncUI();
       if (user && wasLocal) await migrateLocalToCloud();
       if (!authResolved || !booted) { authResolved = true; await bootApp(); }
-      else await reloadEverything();
+      else await bootApp();
     });
     const signinBtn = $("btn-signin");
     if (signinBtn) signinBtn.addEventListener("click", async () => {
@@ -930,14 +1026,18 @@ async function initFirebase() {
 const todayObj = new Date();
 const todayKey = dateKey(todayObj);
 const todayDow = todayObj.getDay();
+const isSunday = todayDow === 0;
 
 const state = {
   tasks: [], morning: {}, evening: {}, note: "",
   lastMilestoneShown: null,
+  mealPlan: { breakfast: [], breakfast2: [], lunch: [], dinner: [], snacks: [] },
+  activeMeal: "breakfast",
+  activeCat: "pieczywo",
 };
 
 // ============================================================================
-// RHR — dynamiczne progi wg wieku
+// RHR
 // ============================================================================
 function getRhrRange(age) {
   if (!age || age < 6) return { min: 75, max: 120, label: "małe dzieci" };
@@ -950,25 +1050,23 @@ function analyzeRhr(rhr, age, avg7Rhr) {
   if (rhr == null) return { status: "no-data" };
   const range = getRhrRange(age);
   const pctAboveAvg = (avg7Rhr && avg7Rhr > 0) ? ((rhr - avg7Rhr) / avg7Rhr) * 100 : 0;
-  if (avg7Rhr != null && pctAboveAvg >= 15) {
-    return { status: "spike", message: "<strong>" + rhr + " bpm</strong> — skok <em>+" + pctAboveAvg.toFixed(0) + "%</em> vs średnia 7d (" + avg7Rhr.toFixed(0) + " bpm). Możliwe: choroba, przemęczenie. Obserwuj dziś." };
-  }
-  if (rhr > range.max) return { status: "high", message: "<strong>" + rhr + " bpm</strong> — powyżej normy dla wieku (" + range.min + "–" + range.max + "). Odpocznij, dużo wody." };
-  if (rhr < range.min && rhr >= 50) return { status: "low-sport", message: "<strong>" + rhr + " bpm</strong> — poniżej typowej normy, ale przy regularnej aktywności to normalne." };
-  if (rhr < 50) return { status: "low-alarm", message: "<strong>" + rhr + " bpm</strong> — dość niskie tętno. Jeśli trenujesz regularnie — spoko. Jeśli nie i czujesz zawroty — lekarz." };
-  return { status: "normal", message: "<strong>" + rhr + " bpm</strong> — w normie dla wieku (" + range.min + "–" + range.max + ")." };
+  if (avg7Rhr != null && pctAboveAvg >= 15) return { status: "spike", message: "<strong>" + rhr + " bpm</strong> — skok <em>+" + pctAboveAvg.toFixed(0) + "%</em> vs średnia 7d (" + avg7Rhr.toFixed(0) + "). Obserwuj, możliwa choroba." };
+  if (rhr > range.max) return { status: "high", message: "<strong>" + rhr + " bpm</strong> — powyżej normy dla wieku (" + range.min + "–" + range.max + "). Odpocznij." };
+  if (rhr < range.min && rhr >= 50) return { status: "low-sport", message: "<strong>" + rhr + " bpm</strong> — poniżej typowej normy, ale przy treningu to normalne." };
+  if (rhr < 50) return { status: "low-alarm", message: "<strong>" + rhr + " bpm</strong> — dość nisko. Jeśli nie trenujesz regularnie — sprawdź u lekarza." };
+  return { status: "normal", message: "<strong>" + rhr + " bpm</strong> — w normie (" + range.min + "–" + range.max + ")." };
 }
 
 // ============================================================================
 // TRENING
 // ============================================================================
 const BASE_CALISTHENICS = [
-  { id: "pompki", label: "Pompki klasyczne (tempo 3s opuszczania)", series: "3×10-12" },
+  { id: "pompki", label: "Pompki klasyczne (tempo 3s)", series: "3×10-12" },
   { id: "pompki-diament", label: "Pompki diamentowe (tempo 3s)", series: "3×8" },
   { id: "pompki-szerokie", label: "Pompki szerokie", series: "3×10" },
-  { id: "przysiady", label: "Przysiady z pauzą 2s w dole", series: "3×15" },
+  { id: "przysiady", label: "Przysiady z pauzą 2s", series: "3×15" },
   { id: "wykroki", label: "Wykroki chodzone z pauzą", series: "3×10/noga" },
-  { id: "wznosy-barki", label: "Wznosy bokiem hantle 1kg (1s pauza na górze)", series: "3×20-25" },
+  { id: "wznosy-barki", label: "Wznosy bokiem hantle 1kg (1s pauza góra)", series: "3×20-25" },
   { id: "wyciskanie-1kg", label: "Wyciskanie hantli 1kg nad głowę", series: "3×15" },
   { id: "biceps-1kg", label: "Uginanie ramion hantle 1kg", series: "3×15" },
   { id: "wznosy-bioder", label: "Wznosy bioder", series: "3×15" },
@@ -985,8 +1083,7 @@ const LIGHT_CALISTHENICS = [
 function boostSeries(series) {
   const m = series.match(/^(\d+)×(.*)$/);
   if (!m) return series;
-  const sets = parseInt(m[1]) + 1;
-  return sets + "×" + m[2];
+  return (parseInt(m[1]) + 1) + "×" + m[2];
 }
 function boostExercises(exercises) {
   if (!isBoosterActive()) return exercises;
@@ -1033,13 +1130,13 @@ function getTrainingLevel() {
 }
 function buildTrainingTask() {
   const level = getTrainingLevel();
+  if (isSunday) return null;
   if (level === "recovery") {
-    return { id: "trening", label: "🌿 Recovery day", hint: "Sen/RHR złe — dziś tylko regeneracja", done: false, level: "recovery", extra: ["🚶 Spacer 20 min", "🫁 Oddech 4-7-8 (5 min)", "🧘 Rozciąganie 10 min"] };
+    return { id: "trening", label: "🌿 Recovery day", hint: "Sen/RHR złe — regeneracja", done: false, level: "recovery", extra: ["🚶 Spacer 20 min", "🫁 Oddech 4-7-8 (5 min)", "🧘 Rozciąganie 10 min"] };
   }
-  if (todayDow === 1) return { id: "trening", label: "🏊 Basen 1,5h", hint: level === "light" ? "Dziś lżej — 45 min zamiast 1,5h" : "Poniedziałek — klatka, plecy, regeneracja w wodzie", done: false, level: level };
-  if (todayDow === 0) return { id: "trening", label: "🌅 Dzień wolny", hint: "Regeneracja — spacer opcjonalnie", done: false, level: "off" };
-  if (level === "full") return { id: "trening", label: "💪 Kalistenika + hantle 1kg (FULL)", hint: "🔥 Pełny plan — sen i RHR idealne", done: false, level: "full", exercises: boostExercises(BASE_CALISTHENICS) };
-  if (level === "light") return { id: "trening", label: "💪 Kalistenika + hantle 1kg (LIGHT)", hint: "🟡 Lżejszy plan — mniej serii", done: false, level: "light", exercises: boostExercises(LIGHT_CALISTHENICS) };
+  if (todayDow === 1) return { id: "trening", label: "🏊 Basen 1,5h", hint: level === "light" ? "Dziś lżej — 45 min" : "Poniedziałek — woda, klatka, plecy", done: false, level: level };
+  if (level === "full") return { id: "trening", label: "💪 Kalistenika + hantle 1kg (FULL)", hint: "🔥 Sen i RHR idealne", done: false, level: "full", exercises: boostExercises(BASE_CALISTHENICS) };
+  if (level === "light") return { id: "trening", label: "💪 Kalistenika + hantle 1kg (LIGHT)", hint: "🟡 Lżejszy plan", done: false, level: "light", exercises: boostExercises(LIGHT_CALISTHENICS) };
   return { id: "trening", label: "💪 Kalistenika + hantle 1kg", hint: "Standardowy plan", done: false, level: "normal", exercises: boostExercises(BASE_CALISTHENICS) };
 }
 
@@ -1047,34 +1144,20 @@ function buildTrainingTask() {
 // TASK CATEGORIES
 // ============================================================================
 const TASK_CATEGORIES = [
-  { id: "suplementy", icon: "💊", name: "Suplementacja", color: "gold", tasks: [
-    { id: "d3", label: "D3 ×2 tabletki (4000 IU)", hint: "Rano, do tłuszczu", done: false }
-  ]},
+  { id: "suplementy", icon: "💊", name: "Suplementacja", color: "gold", tasks: [] },
   { id: "trening", icon: "💪", name: "Trening", color: "mint", tasks: [] },
-  { id: "burnout", icon: "🔥", name: "Burnout Set", color: "rose", tasks: [
-    { id: "burnout", label: "Burnout Set — 1 seria do upadku", hint: "Max pompek LUB krzesełko przy ścianie", done: false }
-  ]},
-  { id: "skincare", icon: "🧴", name: "Skincare / Glow Up", color: "lilac", tasks: [
-    { id: "cold-water-am", label: "Przemycie twarzy zimną wodą (rano)", hint: "Redukcja czerwonego nosa, obrzęk", done: false },
-    { id: "skincare-tolpa", label: "Tołpa / Ziaja — mycie twarzy", hint: "Delikatny żel", done: false },
-    { id: "skincare-acnederm", label: "Acnederm punktowo", hint: "Na wypryski", done: false },
-    { id: "skincare-cetaphil", label: "Cetaphil — krem nawilżający", hint: "Cała twarz", done: false },
-    { id: "cold-water-pm", label: "Przemycie twarzy zimną wodą (wieczór)", hint: "Zamknięcie porów", done: false }
-  ]},
-  { id: "jawline", icon: "🗿", name: "Jawline & Postawa", color: "mint", tasks: [
-    { id: "mewing", label: "Mewing — prawidłowa pozycja języka", hint: "Cały dzień, kluczowa dla linii szczęki", done: false },
-    { id: "postawa", label: "Kontrola postawy", hint: "Barki do tyłu, brzuch wciągnięty", done: false }
-  ]},
+  { id: "burnout", icon: "🔥", name: "Burnout Set", color: "rose", tasks: [] },
+  { id: "skincare", icon: "🧴", name: "Skincare / Glow Up", color: "lilac", tasks: [] },
+  { id: "jawline", icon: "🗿", name: "Jawline & Postawa", color: "mint", tasks: [] },
   { id: "higiena", icon: "🚿", name: "Higiena", color: "peach", tasks: [
     { id: "morning-water", label: "Szklanka wody po przebudzeniu", hint: "Podkrążone oczy + nawodnienie", done: false }
   ]},
-  { id: "regeneracja", icon: "😴", name: "Regeneracja", color: "lilac", tasks: [
-    { id: "telefon-off", label: "Telefon off 1h przed snem", hint: "Jakość snu", done: false }
-  ]},
+  { id: "regeneracja", icon: "😴", name: "Regeneracja", color: "lilac", tasks: [] },
   { id: "pomiary", icon: "📏", name: "Pomiary", color: "mint", tasks: [] },
 ];
+
 function applyConditionalTasks() {
-  // Suplementy — tylko jeśli toggle ON
+  // SUPPLEMENTS
   const suppCat = TASK_CATEGORIES.find(c => c.id === "suplementy");
   if (getToggle("supplements")) {
     suppCat.tasks = [{ id: "d3", label: "D3 ×2 tabletki (4000 IU)", hint: "Rano, do tłuszczu", done: false }];
@@ -1082,21 +1165,21 @@ function applyConditionalTasks() {
     suppCat.tasks = [];
   }
 
-  // Trening
+  // TRENING - Sunday: no task
   const treningCat = TASK_CATEGORIES.find(c => c.id === "trening");
-  treningCat.tasks = [buildTrainingTask()];
+  const trainingTask = buildTrainingTask();
+  treningCat.tasks = trainingTask ? [trainingTask] : [];
 
-  // Burnout — tylko w dni treningowe (nie Nd, nie recovery)
+  // BURNOUT - only training days (not Sunday, not Monday pool, not recovery)
   const burnoutCat = TASK_CATEGORIES.find(c => c.id === "burnout");
-  const treningTask = treningCat.tasks[0];
-  const isTrainingDay = todayDow !== 0 && todayDow !== 1 && treningTask.level !== "recovery" && treningTask.level !== "off";
+  const isTrainingDay = trainingTask && trainingTask.level !== "recovery" && todayDow !== 1 && todayDow !== 0;
   burnoutCat.tasks = isTrainingDay ? [{ id: "burnout", label: "Burnout Set — 1 seria do upadku", hint: "Max pompek LUB krzesełko przy ścianie (max czas)", done: false }] : [];
 
-  // Skincare — warunkowe
+  // SKINCARE
   const skincareCat = TASK_CATEGORIES.find(c => c.id === "skincare");
   if (getToggle("skincare")) {
     skincareCat.tasks = [
-      { id: "cold-water-am", label: "Przemycie twarzy zimną wodą (rano)", hint: "Redukcja czerwonego nosa i obrzęku", done: false },
+      { id: "cold-water-am", label: "Przemycie twarzy zimną wodą (rano)", hint: "Redukcja czerwonego nosa, obrzęk", done: false },
       { id: "skincare-tolpa", label: "Tołpa / Ziaja — mycie twarzy", hint: "Delikatny żel", done: false },
       { id: "skincare-acnederm", label: "Acnederm punktowo", hint: "Na wypryski", done: false },
       { id: "skincare-cetaphil", label: "Cetaphil — krem nawilżający", hint: "Cała twarz", done: false },
@@ -1106,7 +1189,7 @@ function applyConditionalTasks() {
     skincareCat.tasks = [];
   }
 
-  // Jawline — warunkowe
+  // JAWLINE
   const jawlineCat = TASK_CATEGORIES.find(c => c.id === "jawline");
   if (getToggle("jawline")) {
     jawlineCat.tasks = [
@@ -1117,17 +1200,13 @@ function applyConditionalTasks() {
     jawlineCat.tasks = [];
   }
 
-  // Higiena + regeneracja bazowe
-  const higienaCat = TASK_CATEGORIES.find(c => c.id === "higiena");
-  higienaCat.tasks = [
-    { id: "morning-water", label: "Szklanka wody po przebudzeniu", hint: "Podkrążone oczy + nawodnienie", done: false }
-  ];
+  // REGENERACJA
   const regenCat = TASK_CATEGORIES.find(c => c.id === "regeneracja");
-  const regenTasks = [{ id: "telefon-off", label: "Telefon off 1h przed snem", hint: "Jakość snu", done: false }];
+  const regenTasks = [{ id: "telefon-off", label: "Telefon off 1h przed snem", hint: "Jakość snu — hormon wzrostu", done: false }];
   if (getToggle("beast")) regenTasks.push({ id: "cold-shower", label: "Zimny prysznic 2 min", hint: "HARDCORE — hartowanie", done: false });
   regenCat.tasks = regenTasks;
 
-  // Pomiary warunkowe
+  // POMIARY
   const pomiaryCat = TASK_CATEGORIES.find(c => c.id === "pomiary");
   const pomiaryList = [];
   if (todayDow === 1 || todayDow === 4 || todayDow === 6) pomiaryList.push({ id: "wlosy", label: "Mycie włosów", hint: "Szampon + odżywka", done: false });
@@ -1148,8 +1227,7 @@ function syncStateFromCategories() { state.tasks = TASK_CATEGORIES.flatMap(c => 
 function calcCompletionPct() {
   const required = state.tasks.filter(t => !t.optional);
   if (!required.length) return 0;
-  const done = required.filter(t => t.done).length;
-  return Math.round((done / required.length) * 100);
+  return Math.round((required.filter(t => t.done).length / required.length) * 100);
 }
 function calcCompletionStats() {
   const required = state.tasks.filter(t => !t.optional);
@@ -1169,17 +1247,16 @@ function getSupplementTotals() {
   const s = getSettings();
   const isDone = (id) => { const t = state.tasks.find(x => x.id === id); return t && t.done; };
   const d3Done = isDone("d3") ? 1 : 0;
-  const totalD3 = s.d3Iu * s.d3Tablets * d3Done;
-  return { totalD3 };
+  return { totalD3: s.d3Iu * s.d3Tablets * d3Done };
 }
 function renderSupplementsCard() {
   const { totalD3 } = getSupplementTotals();
   const s = getSettings();
   const MAX_D3 = s.d3Iu * s.d3Tablets;
-  const d3Pct = Math.min(100, Math.round((totalD3 / MAX_D3) * 100));
-  if ($("supp-d3-bar")) $("supp-d3-bar").style.width = d3Pct + "%";
+  const pct = Math.min(100, Math.round((totalD3 / MAX_D3) * 100));
+  if ($("supp-d3-bar")) $("supp-d3-bar").style.width = pct + "%";
   if ($("supp-d3-text")) $("supp-d3-text").textContent = totalD3 + " / " + MAX_D3 + " IU";
-  if ($("supp-d3-hint")) $("supp-d3-hint").textContent = "Cel: " + MAX_D3 + " IU dziennie (" + s.d3Tablets + " tabletki × " + s.d3Iu + " IU)";
+  if ($("supp-d3-hint")) $("supp-d3-hint").textContent = "Cel: " + MAX_D3 + " IU (" + s.d3Tablets + " tabletki × " + s.d3Iu + " IU)";
   const badge = $("supp-status-badge");
   if (badge) {
     if (totalD3 > 0) { badge.textContent = "W normie"; badge.className = "text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-mint/15 text-mint"; }
@@ -1188,7 +1265,7 @@ function renderSupplementsCard() {
 }
 
 // ============================================================================
-// RENDER ZADAŃ
+// TASKS RENDER
 // ============================================================================
 function renderTasksByCategory() {
   const container = $("tasks-container"); if (!container) return;
@@ -1210,7 +1287,7 @@ function renderTasksByCategory() {
       '<div class="space-y-1.5">' +
         cat.tasks.map(t => {
           const extra = t.extra ? '<div class="mt-2 flex flex-wrap gap-1">' + t.extra.map(e => '<span class="text-[9px] glass rounded-full px-2 py-0.5">' + e + '</span>').join("") + '</div>' : "";
-          const exList = t.exercises ? '<div class="mt-2 grid grid-cols-1 gap-1">' + t.exercises.map(e => '<span class="text-[10px] glass rounded-lg px-2 py-1 flex items-center justify-between">' + e.label + '<span class="font-bold text-mint ml-2">' + e.series + '</span></span>').join("") + '</div>' : "";
+          const exList = t.exercises ? '<div class="mt-2 grid grid-cols-1 gap-1">' + t.exercises.map(e => '<span class="text-[10px] glass rounded-lg px-2 py-1 flex items-center justify-between"><span>' + e.label + (e.boosted ? ' <span class="booster-badge">+15%</span>' : '') + '</span><span class="font-bold text-mint ml-2">' + e.series + '</span></span>').join("") + '</div>' : "";
           const levelBadge = t.level === "full" ? '<span class="text-[9px] font-bold text-mint bg-mint/15 rounded-full px-2 py-0.5 ml-1">FULL 🔥</span>' : t.level === "light" ? '<span class="text-[9px] font-bold text-gold bg-gold/15 rounded-full px-2 py-0.5 ml-1">LIGHT 🟡</span>' : t.level === "recovery" ? '<span class="text-[9px] font-bold text-rose bg-rose/15 rounded-full px-2 py-0.5 ml-1">RECOVERY</span>' : "";
           const optBadge = t.optional ? '<span class="opt-badge text-[9px] font-bold rounded-full px-2 py-0.5 ml-1">OPCJONALNE</span>' : "";
           return '<div class="task-item ' + (t.optional ? "optional" : "") + ' flex items-start gap-3 p-3 rounded-2xl ' + (t.done ? "bg-gradient-to-r from-mint/10 to-lilac/10 border border-mint/30" : "bg-white/5 border border-white/8") + ' cursor-pointer" data-task-id="' + t.id + '">' +
@@ -1248,7 +1325,7 @@ function renderProgress() {
   if ($("hero-pct")) $("hero-pct").textContent = pct + "%";
   if ($("progress-sub")) {
     let sub = stats.requiredDone + " z " + stats.requiredTotal + " zadań";
-    if (stats.optionalTotal > 0) sub += " (+" + stats.optionalDone + "/" + stats.optionalTotal + " opcjonalne)";
+    if (stats.optionalTotal > 0) sub += " (+" + stats.optionalDone + "/" + stats.optionalTotal + ")";
     $("progress-sub").textContent = sub;
   }
   if ($("hero-ring")) $("hero-ring").style.strokeDashoffset = 169.6 - (pct / 100) * 169.6;
@@ -1259,13 +1336,9 @@ function renderProgress() {
     else $("progress-headline").textContent = "Zimowy Lock In 🥶";
   }
   const beast = $("beast-mode-badge");
-  if (beast) {
-    if (pct === 100) beast.classList.remove("hidden"); else beast.classList.add("hidden");
-  }
+  if (beast) { if (pct === 100) beast.classList.remove("hidden"); else beast.classList.add("hidden"); }
   const boosterBanner = $("booster-banner");
-  if (boosterBanner) {
-    if (isBoosterActive()) boosterBanner.classList.remove("hidden"); else boosterBanner.classList.add("hidden");
-  }
+  if (boosterBanner) { if (isBoosterActive()) boosterBanner.classList.remove("hidden"); else boosterBanner.classList.add("hidden"); }
 }
 async function persistToday() {
   syncStateFromCategories();
@@ -1308,7 +1381,7 @@ async function checkMilestone() {
   state.lastMilestoneShown = hit;
   const banner = $("milestone-banner"); if (!banner) return;
   $("milestone-title").textContent = "🎉 " + hit + " dni streak!";
-  const messages = { 7: "Tydzień! Pierwszy kamień milowy.", 14: "Dwa tygodnie. Wchodzi w nawyk.", 30: "Miesiąc! To nie eksperyment, to życie.", 60: "Dwa miesiące. Jesteś inną osobą.", 73: "Koniec Lock In! 73 dni dyscypliny — LEGENDA." };
+  const messages = { 7: "Tydzień! Pierwszy kamień.", 14: "Dwa tygodnie — wchodzi w nawyk.", 30: "Miesiąc! To życie.", 60: "Dwa miesiące. Inna osoba.", 73: "KONIEC LOCK IN! 73 dni dyscypliny — LEGENDA." };
   $("milestone-text").textContent = messages[hit] || hit + " dni!";
   banner.classList.remove("hidden"); setTimeout(() => banner.classList.add("hidden"), 12000);
   fireConfetti();
@@ -1318,16 +1391,16 @@ function renderReadiness() {
   const ring = $("readiness-ring"); const pctEl = $("readiness-pct"); const labelEl = $("readiness-label"); const tipEl = $("readiness-tip");
   if (!ring || !pctEl) return;
   const circ = 213.6;
-  if (pct == null) { pctEl.textContent = "—"; ring.style.strokeDashoffset = circ; ring.setAttribute("stroke", "#8b8397"); labelEl.textContent = "Uzupełnij raport"; labelEl.className = "font-extrabold text-base mb-1 text-neutral-400"; tipEl.textContent = "Im więcej danych, tym lepsza ocena."; return; }
+  if (pct == null) { pctEl.textContent = "—"; ring.style.strokeDashoffset = circ; ring.setAttribute("stroke", "#8b8397"); labelEl.textContent = "Uzupełnij raport"; labelEl.className = "font-extrabold text-sm mb-1 text-neutral-400"; tipEl.textContent = "Im więcej danych, tym lepsza ocena."; return; }
   ring.style.strokeDashoffset = circ - (pct / 100) * circ;
   pctEl.textContent = pct + "%";
   let color, label, tip, cls;
-  if (pct >= 80) { color = "#5eead4"; label = "Pełna gotowość"; tip = "Trenuj mocno, dziś FULL plan."; cls = "text-mint"; }
-  else if (pct >= 60) { color = "#fbbf24"; label = "Umiarkowana"; tip = "Trening normalny."; cls = "text-gold"; }
+  if (pct >= 80) { color = "#5eead4"; label = "Pełna gotowość"; tip = "Trenuj mocno — FULL plan."; cls = "text-mint"; }
+  else if (pct >= 60) { color = "#fbbf24"; label = "Umiarkowana"; tip = "Standardowy trening."; cls = "text-gold"; }
   else if (pct >= 40) { color = "#fbbf9d"; label = "Obniżona"; tip = "Lżejszy trening."; cls = "text-peach"; }
   else { color = "#fb7185"; label = "Niska"; tip = "Dziś recovery."; cls = "text-rose"; }
   ring.setAttribute("stroke", color);
-  labelEl.textContent = label; labelEl.className = "font-extrabold text-base mb-1 " + cls;
+  labelEl.textContent = label; labelEl.className = "font-extrabold text-sm mb-1 " + cls;
   tipEl.textContent = tip;
 }
 async function checkDeload() {
@@ -1336,7 +1409,7 @@ async function checkDeload() {
   const last3 = withData.slice(-3);
   const rpeDays = last3.filter(d => ((d.evening && d.evening.rpe) || 0) >= 8).length;
   const banner = $("deload-banner"); if (!banner) return;
-  if (rpeDays >= 3) { $("deload-text").textContent = "3 ostatnie treningi RPE ≥ 8. Zalecany deload: połowa serii, 60%."; banner.classList.remove("hidden"); } else banner.classList.add("hidden");
+  if (rpeDays >= 3) { $("deload-text").textContent = "3 treningi RPE ≥ 8. Deload: połowa serii, 60%."; banner.classList.remove("hidden"); } else banner.classList.add("hidden");
 }
 async function renderHealthWarnings() {
   const days = await loadLastNDays(8);
@@ -1350,15 +1423,15 @@ async function renderHealthWarnings() {
   if (todayRhr != null && rhrPrev7.length >= 3) {
     const avg7 = rhrPrev7.reduce((a, b) => a + b, 0) / rhrPrev7.length;
     const pctAbove = ((todayRhr - avg7) / avg7) * 100;
-    if (pctAbove >= 15) warnings.push({ icon: "💓", title: "RHR +" + pctAbove.toFixed(0) + "% vs 7d", text: todayRhr + " bpm vs średnia " + avg7.toFixed(0) + " bpm. Możliwe: choroba/przemęczenie." });
-    else if (todayRhr > range.max) warnings.push({ icon: "💓", title: "RHR powyżej normy (" + range.min + "–" + range.max + ")", text: todayRhr + " bpm — powyżej górnej granicy dla wieku." });
+    if (pctAbove >= 15) warnings.push({ icon: "💓", title: "RHR +" + pctAbove.toFixed(0) + "% vs 7d", text: todayRhr + " bpm vs " + avg7.toFixed(0) + " średnia." });
+    else if (todayRhr > range.max) warnings.push({ icon: "💓", title: "RHR powyżej normy", text: todayRhr + " bpm — powyżej normy wieku." });
   }
   const sleep3 = withData.slice(-3).map(d => d.morning && d.morning.sleepTotal).filter(s => s != null);
-  if (sleep3.length === 3 && sleep3.every(s => s < 6)) warnings.push({ icon: "😴", title: "3 dni <6h snu", text: "Kumulujesz dług senny. Dziś 8h+ obowiązkowo." });
+  if (sleep3.length === 3 && sleep3.every(s => s < 6)) warnings.push({ icon: "😴", title: "3 dni <6h snu", text: "8h+ obowiązkowo." });
   const weights = withData.slice(-4).map(d => d.morning && d.morning.dailyWeight).filter(w => w != null);
-  if (weights.length >= 4) { const declining = weights.slice(-3).every((w, i) => i === 0 || w < weights[weights.length - 4 + i]); if (declining) warnings.push({ icon: "⚖️", title: "Waga spada 3 dni", text: "Jesz za mało. Dorzuć szejk masowy." }); }
+  if (weights.length >= 4) { const declining = weights.slice(-3).every((w, i) => i === 0 || w < weights[weights.length - 4 + i]); if (declining) warnings.push({ icon: "⚖️", title: "Waga spada 3 dni", text: "Szejk masowy 700 kcal." }); }
   const stress3 = withData.slice(-3).map(d => d.evening && d.evening.stress).filter(s => s != null);
-  if (stress3.length === 3 && stress3.every(s => s > 70)) warnings.push({ icon: "🧘", title: "3 dni stresu >70", text: "Reset szczęki + oddech 4-7-8 obowiązkowy." });
+  if (stress3.length === 3 && stress3.every(s => s > 70)) warnings.push({ icon: "🧘", title: "3 dni stresu >70", text: "Reset + oddech 4-7-8." });
   const box = $("health-warnings"); if (!box) return;
   if (warnings.length === 0) { box.classList.add("hidden"); return; }
   box.classList.remove("hidden");
@@ -1366,7 +1439,7 @@ async function renderHealthWarnings() {
 }
 
 // ============================================================================
-// CYTAT
+// QUOTE
 // ============================================================================
 function getPersonalQuote() {
   const m = state.morning || {};
@@ -1375,13 +1448,13 @@ function getPersonalQuote() {
   const age = getSettings().age;
   const range = getRhrRange(age);
   const sleep = m.sleepTotal; const rhr = m.rhr; const mood = m.moodMorning;
-  if (level === "recovery") return "🛌 Dziś regeneracja. Sen, woda, oddech. Organizm mówi stop — słuchaj go.";
-  if (sleep != null && sleep < 6) return "😴 Kurwa, krótko spałeś. Dziś nie bij rekordów — chodzi o przetrwanie dnia.";
-  if (rhr != null && rhr > range.max + 5) return "💓 RHR " + rhr + " bpm — powyżej normy dla wieku (" + range.min + "–" + range.max + "). Obserwuj.";
-  if (mood != null && mood <= 3) return "😔 Słabszy dzień psychicznie. Nie musisz być bohaterem — dokończ zadania i idź spać wcześniej.";
-  if (level === "full") return "🔥 Sen, RHR i nastrój idealne. Dziś możesz pobić rekord. Wykorzystaj to!";
-  if (readiness != null && readiness >= 70) return "✅ Solidna gotowość. Trzymaj rytm — regularność buduje mistrza.";
-  return "🎯 Skup się na jednej rzeczy naraz. Małe kroki codziennie > wielkie plany raz na miesiąc.";
+  if (level === "recovery") return "🛌 Dziś regeneracja. Ciało rośnie w spoczynku. Zero wymówek.";
+  if (sleep != null && sleep < 6) return "😴 Kurwa, krótko spałeś. Dziś przetrwać, nie bić rekordów.";
+  if (rhr != null && rhr > range.max + 5) return "💓 RHR " + rhr + " bpm — powyżej normy. Obserwuj.";
+  if (mood != null && mood <= 3) return "😔 Dołek. Zrób podstawy i idź spać. Jutro nowy dzień.";
+  if (level === "full") return "🔥 Sen, RHR, nastrój idealne. Dziś pobij rekord. Wykorzystaj to!";
+  if (readiness != null && readiness >= 70) return "✅ Solidna gotowość. Regularność = mistrzostwo.";
+  return "🎯 Jedna rzecz naraz. Małe kroki codziennie > wielkie plany raz.";
 }
 
 // ============================================================================
@@ -1393,14 +1466,17 @@ async function renderImprovementTips() {
   const kws = detectKeywords(state.note);
   const age = getSettings().age;
   const range = getRhrRange(age);
-  if (kws.indexOf("sick") >= 0) tips.push({ icon: "🤒", text: "Choroba — dziś zero treningu, sen i woda." });
-  if (kws.indexOf("injury") >= 0) tips.push({ icon: "🩹", text: "Kontuzja/ból — odpuść trening, regeneracja." });
-  if (kws.indexOf("stress") >= 0) tips.push({ icon: "😰", text: "Stres w notatce — 5 min oddechu 4-7-8 pomoże." });
-  if (kws.indexOf("tired") >= 0) tips.push({ icon: "😴", text: "Zmęczenie — priorytet sen 8h+ dziś w nocy." });
-  if (kws.indexOf("lonely") >= 0 || kws.indexOf("sad") >= 0) tips.push({ icon: "💙", text: "Trudne emocje — pogadaj z kimś bliskim, wyjdź z domu." });
-  if (kws.indexOf("happy") >= 0 || kws.indexOf("success") >= 0) tips.push({ icon: "🌟", text: "Dobry dzień — zapamiętaj go, wracaj do niego w gorsze dni." });
-  if (kws.indexOf("motivated") >= 0) tips.push({ icon: "🔥", text: "Nakręcenie — wykorzystaj to, weź się za trudne zadanie." });
-  if (kws.indexOf("lazy") >= 0) tips.push({ icon: "💀", text: "Lenistwo wykryte — jedna rzecz teraz, ruszyć dupe." });
+  if (kws.indexOf("sick") >= 0) tips.push({ icon: "🤒", text: "Choroba — zero treningu, sen, woda." });
+  if (kws.indexOf("injury") >= 0) tips.push({ icon: "🩹", text: "Kontuzja — odpuść trening." });
+  if (kws.indexOf("stress") >= 0) tips.push({ icon: "😰", text: "Stres — 5 min oddechu 4-7-8." });
+  if (kws.indexOf("tired") >= 0) tips.push({ icon: "😴", text: "Zmęczenie — priorytet sen 8h+." });
+  if (kws.indexOf("sad") >= 0 || kws.indexOf("lonely") >= 0) tips.push({ icon: "💙", text: "Trudne emocje — pogadaj z kimś, wyjdź z domu." });
+  if (kws.indexOf("happy") >= 0 || kws.indexOf("success") >= 0) tips.push({ icon: "🌟", text: "Dobry dzień — zapamiętaj go." });
+  if (kws.indexOf("vape") >= 0) tips.push({ icon: "🚭", text: "Vape = koniec. Nie jesteś owcą." });
+  if (kws.indexOf("alcohol") >= 0) tips.push({ icon: "🍺", text: "Alkohol = -12% testosteronu. Nie ma opcji." });
+  if (kws.indexOf("girl") >= 0) tips.push({ icon: "💔", text: "Ból to paliwo. +5 kg mięśni to najlepszy rewanż." });
+  if (kws.indexOf("game") >= 0) tips.push({ icon: "🎮", text: "Najpierw trening, potem gry." });
+  if (kws.indexOf("junkfood") >= 0) tips.push({ icon: "🍟", text: "Syf zjedzony — woda, karna seria, reset." });
   if (m.sleepTotal != null && m.sleepTotal < 7) tips.push({ icon: "😴", text: "Sen " + m.sleepTotal + "h — poniżej progu. Idź spać przed 22:30." });
   if (m.rhr != null) {
     const days = await loadLastNDays(8);
@@ -1408,16 +1484,13 @@ async function renderImprovementTips() {
     const avg7 = rhrPrev7.length >= 3 ? rhrPrev7.reduce((a, b) => a + b, 0) / rhrPrev7.length : null;
     const analysis = analyzeRhr(m.rhr, age, avg7);
     if (analysis.status === "high" || analysis.status === "spike") tips.push({ icon: "💓", text: analysis.message });
-    else if (analysis.status === "low-alarm") tips.push({ icon: "💙", text: analysis.message });
   }
   if (m.breathing != null && m.breathing < 85) tips.push({ icon: "🫁", text: "Punkty oddychania " + m.breathing + " — przewietrz sypialnię." });
-  if (e.stress != null && e.stress > 60) tips.push({ icon: "🧘", text: "Stres " + e.stress + "/100 — oddech 4-7-8 przed snem." });
-  if (isBoosterActive()) tips.push({ icon: "⚡", text: "Booster +15% aktywny (Skincare lub Suplementy off). Trening podbity." });
-  const { totalD3 } = getSupplementTotals();
-  if (totalD3 > 0) tips.push({ icon: "💊", text: "D3 przyjęte: " + totalD3 + " IU. Bezpieczna dawka dla nastolatka ≤ 4000 IU." });
+  if (e.stress != null && e.stress > 60) tips.push({ icon: "🧘", text: "Stres " + e.stress + "/100 — oddech 4-7-8." });
+  if (isBoosterActive()) tips.push({ icon: "⚡", text: "Booster +15% aktywny. Trening podbity." });
   const stats = calcCompletionStats();
   if (stats.requiredTotal > 0 && stats.requiredDone < stats.requiredTotal) tips.push({ icon: "⚡", text: "Zostało " + (stats.requiredTotal - stats.requiredDone) + " zadań." });
-  else if (stats.requiredTotal > 0) tips.push({ icon: "🏆", text: "Wszystko zaliczone — LOCK IN!" });
+  else if (stats.requiredTotal > 0) tips.push({ icon: "🏆", text: "Wszystko zaliczone — BEAST MODE!" });
   const box = $("improvement-tips");
   if (!box) return;
   box.innerHTML = tips.length ? tips.map(t => '<div class="flex items-start gap-2.5"><span class="text-lg flex-shrink-0">' + t.icon + '</span><p class="flex-1 text-sm text-neutral-200 font-medium leading-snug">' + t.text + '</p></div>').join("") : '<p class="text-neutral-400">Uzupełnij raporty żeby zobaczyć wskazówki.</p>';
@@ -1442,9 +1515,10 @@ async function renderBrief() {
   }
   if (m.rhr != null) { const inNorm = m.rhr >= range.min && m.rhr <= range.max; lines.push("RHR " + m.rhr + " bpm" + (inNorm ? " (ok)" : "") + "."); }
   if (readiness != null) lines.push("Gotowość " + readiness + "%.");
-  if (level === "recovery") lines.push("→ Dziś recovery.");
-  else if (level === "full") lines.push("→ FULL plan gotowy.");
-  else if (level === "light") lines.push("→ Lżejszy trening.");
+  if (isSunday) lines.push("→ Niedziela: regeneracja.");
+  else if (level === "recovery") lines.push("→ Recovery.");
+  else if (level === "full") lines.push("→ FULL.");
+  else if (level === "light") lines.push("→ LIGHT.");
   const stats = calcCompletionStats();
   lines.push("Zadania: " + stats.requiredDone + "/" + stats.requiredTotal + ".");
   if (isBoosterActive()) lines.push("⚡ Booster +15%.");
@@ -1452,132 +1526,338 @@ async function renderBrief() {
 }
 
 // ============================================================================
-// KEYWORDS
+// KEYWORDS — HARDCORE v2.0
 // ============================================================================
 const KEYWORDS = {
   sick: ["chory","choroba","gorączka","przeziębienie","katar","kaszel","grypa","ból głowy","migrena","osłabiony","rozbity","niedobrze","mdli","wymioty","boli","źle się czuję","przeziębiony","gorączkuję","infekcja","zapalenie","angina","temperatura","dreszcze"],
-  alcohol: ["piwo","wódka","alkohol","impreza","kac","wino","drink","pub","klub","popiłem","napiłem","browar","pijany","bal"],
+  alcohol: ["piwo","wódka","alkohol","impreza","kac","wino","drink","pub","klub","popiłem","napiłem","browar","pijany","bal","wódzia"],
+  vape: ["efajka","e-fajka","vape","fajki","papieros","palić","paliłem","koledzy palą","juul","puff","jednorazówka","liquid","nikotyna"],
   stress: ["stres","stresu","stresujący","deadline","egzamin","sprawdzian","kolokwium","szef","kłótnia","kłopot","problem","zawalony","presja","nerwy","zdenerwowany","panika","niepokój","spięty","napięty","przygnębiony","dołek","dół"],
-  happy: ["dobry","świetny","super","radosny","wesoły","szczęśliwy","udany","wygrałem","zadowolony","euforia","mega","ekstra","świetnie","fantastycznie","genialnie","energia"],
+  happy: ["dobry","świetny","super","radosny","wesoły","szczęśliwy","udany","wygrałem","zadowolony","euforia","mega","ekstra","świetnie","fantastycznie","genialnie"],
   tired: ["zmęczony","wyczerpany","padnięty","senny","bez siły","ledwo żyję","słaby","senność","nie mam siły","wypompowany","zombie","spać","niedospany"],
   motivated: ["zmotywowany","energia","moc","chce mi się","cisnę","daję radę","nakręcony","gotowy","ogarniam"],
   lazy: ["leniwy","nie chciało","nie chce","brak siły","leń","olewam","odpuszczam","nie chce mi się","brak motywacji"],
   injury: ["kontuzja","skręcenie","uraz","naderwanie","stłuczenie","zwichnięcie","ból pleców","ból barku","ból kolana"],
   lonely: ["samotny","smutny","przygnębiony","depresja","płakałem","smutek","beznadzieja"],
   success: ["rekord","pobity","poprawa","progres","sukces","udało się","pobiłem"],
+  // NOWE HARDCORE v2.0:
+  school: ["jedynka","dwójka","szkoła","sprawdzian","ocena","poprawa","nauka","klasówka","wagar","nauczyciel","lekcja","kartkówka"],
+  girl: ["dziewczyna","rzuciła","zerwała","odrzuciła","nie chce mnie","friendzone","podoba mi się","zakochany","złamała serce","serce"],
+  mom: ["mama","matka","tata","ojciec","kłótnia","awantura","krzyczy","rodzice","dom","rodzina"],
+  game: ["gry","konsola","tiktok","youtube","instagram","scroll","gaming","lol","csgo","fortnite","minecraft","rolly"],
+  soreness: ["zakwasy","boli","obolały","przemęczony","zmęczone mięśnie","nie mogę się ruszyć","spięty"],
+  junkfood: ["zjadłem syf","chipsy","fast food","mc","kfc","burger","frytki","pizza","słodkie","cukier","napój","cola"],
 };
+
 function detectKeywords(text) {
   if (!text) return [];
   const lower = text.toLowerCase();
   const found = new Set();
   Object.keys(KEYWORDS).forEach(cat => {
-    const words = KEYWORDS[cat];
-    if (words.some(w => lower.indexOf(w) >= 0)) found.add(cat);
+    if (KEYWORDS[cat].some(w => lower.indexOf(w) >= 0)) found.add(cat);
   });
   return Array.from(found);
 }
 
 // ============================================================================
-// JEDZENIE
+// BLACK LIST
 // ============================================================================
-const FOOD_DB = {
-  breakfast: [
-    { name: "Jajecznica z 4 jajek na maśle + 2 kromki chleba razowego", kcal: 620, prot: 32 },
-    { name: "Owsianka na mleku (100g płatków) + banan + łyżka masła orzechowego", kcal: 680, prot: 24 },
-    { name: "Naleśniki z twarogiem i miodem (3 szt)", kcal: 640, prot: 28 },
-    { name: "Kanapki z twarogiem, rzodkiewką i szczypiorkiem (4 kromki)", kcal: 520, prot: 26 },
-    { name: "Omlet z 5 jajek z serem żółtym i szynką", kcal: 700, prot: 42 },
-    { name: "Kasza manna na mleku z kakao i orzechami", kcal: 580, prot: 18 },
-    { name: "Twaróg półtłusty 200g + miód + orzechy włoskie", kcal: 500, prot: 34 },
-    { name: "Jogurt grecki 200g + granola + borówki", kcal: 540, prot: 22 },
-    { name: "Kanapka z łososiem wędzonym + jajko sadzone", kcal: 610, prot: 30 },
-    { name: "Placki bananowe (2 jajka + banan + mąka) z syropem klonowym", kcal: 560, prot: 20 },
+const BLACK_LIST = [
+  { num: "01", title: "VAPE / E-PETY — NIE.", body: "Nie jesteś małą owcą. Palić może każdy frajer. Ty budujesz ciało, twarz i mózg. Odrzucasz to." },
+  { num: "02", title: "ALKOHOL", body: "Piwo = -12% testosteronu. Wódka = 0% masy. Nie ma opcji. Kropka." },
+  { num: "03", title: "SŁODKIE NAPOJE", body: "Cola = 40g cukru = trądzik + tłuszcz + brak wzrostu. Woda, mleko, kawa. Koniec tematu." },
+  { num: "04", title: "NIEBIESKIE ŚWIATŁO PRZED SNEM", body: "Telefon 1h przed snem = kasacja melatoniny = brak hormonu wzrostu. OFF i do łóżka." },
+  { num: "05", title: "BRAK POSTAWY", body: "Garb = -2 cm wizualnie. Postawa = darmowy wzrost. Codziennie, cały dzień." },
+];
+function renderBlackList() {
+  const el = $("black-list"); if (!el) return;
+  el.innerHTML = BLACK_LIST.map(b => '<div class="black-list-item"><div class="flex items-start gap-3"><div class="text-rose font-black text-lg leading-none w-6 flex-shrink-0">' + b.num + '</div><div class="flex-1"><div class="font-extrabold text-sm text-rose mb-0.5">' + b.title + '</div><div class="text-xs text-neutral-200 font-medium leading-relaxed">' + b.body + '</div></div></div></div>').join("");
+}
+
+// ============================================================================
+// RAGE QUOTES
+// ============================================================================
+const RAGE_QUOTES = [
+  "WSTAWAJ! Owce śpią, wilki trenują!",
+  "Ból jest tymczasowy. Słabość wieczna. Wybieraj.",
+  "Nie jesteś zmęczony, jesteś słaby. RUSZ DUPE!",
+  "73 dni. Potem albo nowy człowiek, albo stary tchórz.",
+  "Kolejny dzień dyscypliny to cios w twarz twojej przeszłości.",
+  "Twoja przyszła wersja nie chce wymówek. Chce efektów.",
+  "Chcesz być przeciętny? Przeciętni mają przeciętne ciała.",
+  "Zamknij ryj, zrób pompki, wypij szejka. Potem myśl.",
+  "Każdy trening to depozyt w banku dominacji. Zbieraj.",
+  "Nikt za ciebie nie zbuduje tego ciała. NIKT.",
+  "Chcesz mieć linię szczęki? Zamknij japę, oddychaj nosem, mewing.",
+  "Twoi koledzy z osiedla robią to samo od lat. Ty idziesz dalej.",
+  "Ból na treningu to podatek. Płać z uśmiechem.",
+  "Ostatni raz kiedy byłeś tak silny? Nigdy. Idziemy dalej.",
+  "Nie czekaj na motywację. Rusz dupe, motywacja przyjdzie w trakcie.",
+  "Zazdrość innych = twój dowód progresu. Pracuj dalej.",
+];
+function showRage() {
+  const q = RAGE_QUOTES[Math.floor(Math.random() * RAGE_QUOTES.length)];
+  const quoteEl = $("rage-quote"); if (quoteEl) quoteEl.textContent = q;
+  openModal("modal-rage");
+  vibrate([200, 100, 200]);
+  try { playSound("done"); } catch (e) {}
+}
+
+// ============================================================================
+// STORE MEALS (Żabka/Biedronka)
+// ============================================================================
+const STORE_MEALS = [
+  { name: "Zestaw 1 — Klasyk Masowy", items: ["Serek wiejski 200g", "Kabanosy 2 szt", "Bułka grahamka"], kcal: 520, prot: 32 },
+  { name: "Zestaw 2 — Słodki Boost", items: ["Pudding Ehrmann Protein", "Rogalik maślany", "Banan"], kcal: 505, prot: 22 },
+  { name: "Zestaw 3 — Protein Beast", items: ["Skyr 150g", "Garść orzechów włoskich", "Pieczywo chrupkie 2 szt"], kcal: 420, prot: 26 },
+];
+function showStoreMeals() {
+  const el = $("store-meals-content"); if (!el) return;
+  el.classList.remove("hidden");
+  el.innerHTML = STORE_MEALS.map(s => '<div class="glass rounded-2xl p-3 border border-mint/20"><div class="flex items-center justify-between mb-2"><span class="text-xs font-extrabold text-mint">' + s.name + '</span><span class="text-[10px] font-bold text-gold">' + s.kcal + ' kcal · ' + s.prot + 'g</span></div><div class="space-y-1 text-xs text-neutral-200 font-medium">' + s.items.map(i => '<div class="flex items-center gap-2"><span class="w-1 h-1 rounded-full bg-mint flex-shrink-0"></span>' + escapeHtml(i) + '</div>').join("") + '</div></div>').join("");
+  vibrate(20);
+}
+
+// ============================================================================
+// FOOD INGREDIENTS — CREATOR
+// ============================================================================
+const FOOD_INGREDIENTS = {
+  pieczywo: [
+    { name: "Chleb razowy (kromka 40g)", kcal: 95, prot: 3 },
+    { name: "Chleb pszenny (kromka 40g)", kcal: 110, prot: 3 },
+    { name: "Bułka kajzerka", kcal: 145, prot: 5 },
+    { name: "Bułka grahamka", kcal: 160, prot: 6 },
+    { name: "Rogalik maślany", kcal: 220, prot: 4 },
+    { name: "Pieczywo chrupkie (2 szt)", kcal: 70, prot: 2 },
+    { name: "Tosty (2 kromki)", kcal: 140, prot: 4 },
+    { name: "Bagietka (½)", kcal: 260, prot: 7 },
+    { name: "Pita", kcal: 165, prot: 5 },
+    { name: "Chleb tostowy pełnoziarnisty (2 kromki)", kcal: 130, prot: 5 }
   ],
-  lunch: [
-    { name: "Kurczak (200g) + ryż (100g) + warzywa na patelni", kcal: 780, prot: 48 },
-    { name: "Spaghetti bolognese (wołowina 150g + makaron 120g)", kcal: 820, prot: 42 },
-    { name: "Pierogi ruskie (10 szt) + śmietana + cebulka", kcal: 720, prot: 22 },
-    { name: "Kotlet schabowy + ziemniaki + surówka", kcal: 850, prot: 38 },
-    { name: "Gulasz wołowy z kaszą gryczaną", kcal: 760, prot: 44 },
-    { name: "Łosoś pieczony (180g) + bataty + brokuły", kcal: 720, prot: 40 },
-    { name: "Ryż z kurczakiem i warzywami (stir fry)", kcal: 700, prot: 42 },
-    { name: "Pizza domowa z szynką i serem (3 kawałki)", kcal: 850, prot: 32 },
-    { name: "Karkówka pieczona + ziemniaki + mizeria", kcal: 880, prot: 40 },
-    { name: "Kluski śląskie + rolada wołowa + modra kapusta", kcal: 820, prot: 38 },
+  wedliny: [
+    { name: "Szynka wiejska (2 plastry)", kcal: 50, prot: 6 },
+    { name: "Kiełbasa śląska (2 plastry)", kcal: 90, prot: 5 },
+    { name: "Kabanosy (2 szt)", kcal: 160, prot: 10 },
+    { name: "Salami (3 plastry)", kcal: 100, prot: 5 },
+    { name: "Polędwica sopocka (3 plastry)", kcal: 45, prot: 6 },
+    { name: "Parówki cielęce (2 szt)", kcal: 220, prot: 12 },
+    { name: "Pasztet drobiowy (50g)", kcal: 140, prot: 6 },
+    { name: "Mielonka (50g)", kcal: 130, prot: 7 },
+    { name: "Kiełbasa krakowska (3 plastry)", kcal: 120, prot: 6 },
+    { name: "Boczek wędzony (2 plastry)", kcal: 130, prot: 4 }
   ],
-  snack: [
-    { name: "Twaróg 150g + miód + orzechy", kcal: 400, prot: 28 },
-    { name: "Kanapka z masłem orzechowym i bananem", kcal: 420, prot: 14 },
-    { name: "Batony proteinowe 2×", kcal: 380, prot: 40 },
-    { name: "Jogurt grecki 200g + miód + orzechy", kcal: 360, prot: 20 },
-    { name: "Orzechy mieszane garść (50g)", kcal: 320, prot: 12 },
-    { name: "Jajka na twardo (3) + sól", kcal: 240, prot: 20 },
-    { name: "Koktajl mleko + banan + masło orzechowe", kcal: 460, prot: 18 },
-    { name: "Skyr 200g + kakao + banan", kcal: 340, prot: 26 },
+  sery: [
+    { name: "Ser żółty gouda (2 plastry)", kcal: 110, prot: 7 },
+    { name: "Twaróg półtłusty (100g)", kcal: 130, prot: 18 },
+    { name: "Serek wiejski 200g", kcal: 160, prot: 20 },
+    { name: "Mozzarella (50g)", kcal: 120, prot: 8 },
+    { name: "Serek topiony (1 porcja)", kcal: 70, prot: 3 },
+    { name: "Feta (50g)", kcal: 130, prot: 7 },
+    { name: "Skyr 150g", kcal: 90, prot: 17 },
+    { name: "Jogurt grecki 150g", kcal: 130, prot: 8 },
+    { name: "Serek homogenizowany 150g", kcal: 180, prot: 8 },
+    { name: "Mascarpone (30g)", kcal: 120, prot: 2 }
   ],
-  dinner: [
-    { name: "Twaróg 200g + warzywa + oliwa", kcal: 420, prot: 32 },
-    { name: "Omlet z 4 jajek z warzywami", kcal: 480, prot: 28 },
-    { name: "Sałatka z tuńczykiem, jajkiem, oliwkami", kcal: 500, prot: 36 },
-    { name: "Kanapki z pastą z awokado i jajkiem", kcal: 520, prot: 22 },
-    { name: "Kurczak gotowany 150g + kasza + warzywa", kcal: 620, prot: 44 },
-    { name: "Skyr 300g + owoce + orzechy", kcal: 460, prot: 32 },
-    { name: "Jajka sadzone (3) + chleb razowy + pomidor", kcal: 480, prot: 26 },
-    { name: "Łosoś wędzony + twarożek + pieczywo chrupkie", kcal: 420, prot: 30 },
+  jajka: [
+    { name: "Jajko gotowane (1)", kcal: 78, prot: 6 },
+    { name: "Jajecznica z 2 jaj", kcal: 180, prot: 13 },
+    { name: "Jajko sadzone (1)", kcal: 92, prot: 6 },
+    { name: "Omlet z 3 jaj", kcal: 260, prot: 19 },
+    { name: "Jajko na miękko (1)", kcal: 78, prot: 6 }
   ],
-  shake: [
-    { name: "Szejk masowy: mleko 400ml + banan + 50g płatków + masło orzechowe + miód", kcal: 700, prot: 22 },
-    { name: "Szejk proteinowy: mleko 400ml + 2 miarki białka + banan", kcal: 480, prot: 50 },
-    { name: "Szejk twarogowy: twaróg 200g + mleko + miód + kakao", kcal: 520, prot: 38 },
-    { name: "Szejk owsiany: mleko 400ml + 80g płatków + daktyle + masło orzechowe", kcal: 720, prot: 20 },
-    { name: "Szejk owocowy: mleko + mango + banan + jogurt grecki", kcal: 540, prot: 22 },
-    { name: "Szejk kawowy: mleko + kawa + białko + masło orzechowe", kcal: 460, prot: 34 },
+  dodatki: [
+    { name: "Masło (10g)", kcal: 75, prot: 0 },
+    { name: "Masło orzechowe (1 łyżka)", kcal: 95, prot: 3 },
+    { name: "Miód (1 łyżka)", kcal: 65, prot: 0 },
+    { name: "Płatki owsiane (40g)", kcal: 150, prot: 5 },
+    { name: "Awokado (½)", kcal: 130, prot: 2 },
+    { name: "Pomidor (1)", kcal: 20, prot: 1 },
+    { name: "Ogórek kiszony (1)", kcal: 10, prot: 0 },
+    { name: "Papryka (½)", kcal: 20, prot: 1 },
+    { name: "Sałata (garść)", kcal: 5, prot: 0 },
+    { name: "Oliwa z oliwek (łyżka)", kcal: 120, prot: 0 }
   ],
-  fast: [
-    { name: "Kanapka z tuńczykiem z puszki + majonez + ogórek", kcal: 480, prot: 28 },
-    { name: "Parówki + bułka + ketchup", kcal: 560, prot: 22 },
-    { name: "Jajka na twardo (4) + sól + chleb", kcal: 440, prot: 28 },
-    { name: "Twaróg + rzodkiewka + chleb razowy", kcal: 420, prot: 26 },
-    { name: "Zapiekanka z serem (bagietka)", kcal: 620, prot: 24 },
-    { name: "Kabanosy 100g + bułka + ogórek kiszony", kcal: 580, prot: 26 },
+  przekaski: [
+    { name: "Lays zielona cebulka (mała)", kcal: 160, prot: 2 },
+    { name: "Lays papryka (duża)", kcal: 320, prot: 4 },
+    { name: "Doritos nacho cheese (mała)", kcal: 180, prot: 2 },
+    { name: "Haribo Złote Misie (garść)", kcal: 130, prot: 1 },
+    { name: "Snickers (50g)", kcal: 245, prot: 4 },
+    { name: "Kinder Bueno (2 paski)", kcal: 210, prot: 4 },
+    { name: "Monte (1 szt)", kcal: 145, prot: 3 },
+    { name: "Prince Polo (1 szt)", kcal: 180, prot: 2 },
+    { name: "Orzeszki solone (garść 30g)", kcal: 180, prot: 6 },
+    { name: "Kabanosy mini (3 szt)", kcal: 240, prot: 15 },
+    { name: "Wafel ryżowy (1)", kcal: 35, prot: 1 },
+    { name: "Batat proteinowy (1)", kcal: 180, prot: 15 }
   ],
+  owoce: [
+    { name: "Banan (1)", kcal: 105, prot: 1 },
+    { name: "Jabłko (1)", kcal: 80, prot: 0 },
+    { name: "Mandarynka (2 szt)", kcal: 70, prot: 1 },
+    { name: "Winogrono (garść 100g)", kcal: 70, prot: 1 },
+    { name: "Borówki (garść 80g)", kcal: 45, prot: 1 },
+    { name: "Daktyle (3 szt)", kcal: 90, prot: 1 },
+    { name: "Gruszka (1)", kcal: 100, prot: 1 },
+    { name: "Kiwi (1)", kcal: 45, prot: 1 }
+  ],
+  napoje: [
+    { name: "Mleko 3.2% (250ml)", kcal: 155, prot: 8 },
+    { name: "Mleko 2% (250ml)", kcal: 120, prot: 8 },
+    { name: "Kakao na mleku (250ml)", kcal: 190, prot: 9 },
+    { name: "Sok pomarańczowy (250ml)", kcal: 110, prot: 1 },
+    { name: "Woda (250ml)", kcal: 0, prot: 0 },
+    { name: "Pudding Ehrmann Protein (1)", kcal: 180, prot: 20 },
+    { name: "Kefir 250ml", kcal: 130, prot: 8 },
+    { name: "Maślanka 250ml", kcal: 90, prot: 8 },
+    { name: "Sok jabłkowy (250ml)", kcal: 115, prot: 0 }
+  ],
+  obiady: [
+    { name: "Kotlet schabowy + ziemniaki + surówka", kcal: 720, prot: 35 },
+    { name: "Pierogi ruskie (10 szt) + śmietana", kcal: 680, prot: 20 },
+    { name: "Spaghetti bolognese (porcja)", kcal: 750, prot: 38 },
+    { name: "Kurczak pieczony + ryż + warzywa", kcal: 700, prot: 45 },
+    { name: "Zupa pomidorowa + makaron", kcal: 320, prot: 10 },
+    { name: "Gulasz wołowy + kasza gryczana", kcal: 720, prot: 40 },
+    { name: "Rolada wołowa + kluski", kcal: 780, prot: 38 },
+    { name: "Kurczak gotowany (150g)", kcal: 240, prot: 40 },
+    { name: "Ryż biały (100g suchy)", kcal: 350, prot: 7 },
+    { name: "Ziemniaki gotowane (200g)", kcal: 160, prot: 4 },
+    { name: "Mizeria (porcja)", kcal: 40, prot: 1 },
+    { name: "Surówka z kapusty (porcja)", kcal: 60, prot: 1 }
+  ]
 };
 
-const MASS_SHAKES = [
-  { name: "Klasyk Masowy", ingredients: ["300 ml mleka 3.2%", "40 g płatków owsianych", "1 banan", "2 łyżki masła orzechowego"], kcal: 700, prot: 24 },
-  { name: "Czekoladowy Moc", ingredients: ["300 ml mleka", "40 g płatków owsianych", "1 łyżka kakao", "1 banan", "1 łyżka miodu"], kcal: 690, prot: 22 },
-  { name: "Orzechowy Beast", ingredients: ["300 ml mleka", "30 g płatków owsianych", "2 łyżki masła orzechowego", "1 łyżka miodu", "garść orzechów włoskich"], kcal: 750, prot: 22 },
-  { name: "Bananowy Turbo", ingredients: ["350 ml mleka", "50 g płatków owsianych", "2 banany", "1 łyżka masła orzechowego"], kcal: 740, prot: 24 },
-  { name: "Twarogowy Pro", ingredients: ["250 ml mleka", "150 g twarogu", "1 banan", "1 łyżka miodu", "1 łyżka kakao"], kcal: 680, prot: 38 },
-  { name: "Daktyle & Masło", ingredients: ["300 ml mleka", "40 g płatków owsianych", "5 daktyli", "2 łyżki masła orzechowego"], kcal: 720, prot: 20 },
-  { name: "Owocowy Load", ingredients: ["300 ml mleka", "150 g jogurtu greckiego", "1 banan", "garść borówek", "2 łyżki płatków"], kcal: 640, prot: 26 },
-  { name: "Kawowy Rise", ingredients: ["300 ml mleka", "50 g płatków owsianych", "1 łyżka kawy rozpuszczalnej", "1 banan", "1 łyżka masła orzechowego"], kcal: 700, prot: 22 },
-];
-
-let currentFoodTab = "breakfast";
-function renderFoodList() {
-  const container = $("food-list"); if (!container) return;
-  const items = FOOD_DB[currentFoodTab] || [];
-  container.innerHTML = items.map(f => '<div class="food-card"><div class="text-sm font-bold text-neutral-100 leading-snug">' + escapeHtml(f.name) + '</div><div class="flex items-center gap-3 mt-2 text-[11px] font-bold"><span class="text-gold"><i class="fa-solid fa-fire mr-1"></i>' + f.kcal + ' kcal</span><span class="text-mint"><i class="fa-solid fa-drumstick-bite mr-1"></i>' + f.prot + ' g</span></div></div>').join("");
+// MEAL PLAN — load from localStorage
+function loadMealPlan() {
+  try {
+    const raw = localStorage.getItem(localKey("mealplan-" + todayKey));
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      state.mealPlan = Object.assign({ breakfast: [], breakfast2: [], lunch: [], dinner: [], snacks: [] }, parsed);
+    }
+  } catch (e) { state.mealPlan = { breakfast: [], breakfast2: [], lunch: [], dinner: [], snacks: [] }; }
 }
-function rollFoodPlan() {
-  const pick = (cat) => FOOD_DB[cat][Math.floor(Math.random() * FOOD_DB[cat].length)];
-  const breakfast = pick("breakfast"); const lunch = pick("lunch"); const snack = pick("snack"); const dinner = pick("dinner"); const shake = pick("shake");
-  const total = breakfast.kcal + lunch.kcal + snack.kcal + dinner.kcal + shake.kcal;
-  const prot = breakfast.prot + lunch.prot + snack.prot + dinner.prot + shake.prot;
-  const el = $("food-roll");
-  el.innerHTML = '<div class="text-xs font-extrabold text-mint mb-2 tracking-widest uppercase">🎲 Twój plan na dziś</div><div class="space-y-2 text-xs"><div><strong class="text-peach">Śniadanie:</strong> ' + escapeHtml(breakfast.name) + ' <span class="text-neutral-500">(' + breakfast.kcal + ' kcal / ' + breakfast.prot + 'g)</span></div><div><strong class="text-gold">Obiad:</strong> ' + escapeHtml(lunch.name) + ' <span class="text-neutral-500">(' + lunch.kcal + ' kcal / ' + lunch.prot + 'g)</span></div><div><strong class="text-mint">Przekąska:</strong> ' + escapeHtml(snack.name) + ' <span class="text-neutral-500">(' + snack.kcal + ' kcal / ' + snack.prot + 'g)</span></div><div><strong class="text-lilac">Kolacja:</strong> ' + escapeHtml(dinner.name) + ' <span class="text-neutral-500">(' + dinner.kcal + ' kcal / ' + dinner.prot + 'g)</span></div><div><strong class="text-rose">Szejk:</strong> ' + escapeHtml(shake.name) + ' <span class="text-neutral-500">(' + shake.kcal + ' kcal / ' + shake.prot + 'g)</span></div></div><div class="flex items-center justify-between mt-3 pt-3 border-t border-white/10"><div class="text-sm font-extrabold text-gold">≈ ' + total + ' kcal</div><div class="text-sm font-extrabold text-mint">≈ ' + prot + 'g białka</div></div>';
-  vibrate(30); playSound("done");
+function saveMealPlan() {
+  localStorage.setItem(localKey("mealplan-" + todayKey), JSON.stringify(state.mealPlan));
+  renderMealSummary();
 }
-function rollMassShake() {
-  const s = MASS_SHAKES[Math.floor(Math.random() * MASS_SHAKES.length)];
-  const el = $("mass-shake-roll");
-  el.innerHTML = '<div class="text-xs font-extrabold text-gold mb-2 tracking-widest uppercase">🥤 ' + escapeHtml(s.name) + '</div><div class="space-y-1.5 text-xs">' + s.ingredients.map(i => '<div class="flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-gold flex-shrink-0"></span><span class="text-neutral-200 font-medium">' + escapeHtml(i) + '</span></div>').join("") + '</div><div class="flex items-center justify-between mt-3 pt-3 border-t border-white/10"><div class="text-sm font-extrabold text-gold"><i class="fa-solid fa-fire mr-1"></i>≈ ' + s.kcal + ' kcal</div><div class="text-sm font-extrabold text-mint"><i class="fa-solid fa-drumstick-bite mr-1"></i>≈ ' + s.prot + 'g</div></div><p class="text-[10px] text-neutral-500 font-medium mt-2">Wrzuć wszystko do blendera. Pij po szkole lub rano.</p>';
-  vibrate(30); playSound("done");
+function getMealTotals(mealKey) {
+  const items = state.mealPlan[mealKey] || [];
+  return items.reduce((a, i) => ({ kcal: a.kcal + i.kcal, prot: a.prot + i.prot }), { kcal: 0, prot: 0 });
+}
+function getDayTotals() {
+  let kcal = 0, prot = 0;
+  Object.keys(state.mealPlan).forEach(k => {
+    const t = getMealTotals(k);
+    kcal += t.kcal; prot += t.prot;
+  });
+  return { kcal, prot };
+}
+function renderMealSummary() {
+  const el = $("meal-summary"); if (!el) return;
+  const t = getDayTotals();
+  const mealNames = { breakfast: "Śniadanie", breakfast2: "2. Śniadanie", lunch: "Obiad", dinner: "Kolacja", snacks: "Przekąski" };
+  el.innerHTML = '<div class="flex items-center justify-between mb-2"><span class="text-xs font-extrabold text-peach tracking-widest uppercase">DZIŚ</span><span class="text-xs font-bold text-gold">' + t.kcal + ' kcal · ' + t.prot + 'g białka</span></div>' +
+    Object.keys(mealNames).map(k => {
+      const m = getMealTotals(k);
+      const count = (state.mealPlan[k] || []).length;
+      return '<div class="flex items-center justify-between text-[11px] py-0.5"><span class="text-neutral-300 font-semibold">' + mealNames[k] + '</span><span class="text-neutral-500">' + (count > 0 ? count + ' poz. · ' + m.kcal + ' kcal · ' + m.prot + 'g' : '—') + '</span></div>';
+    }).join("") +
+    '<div class="h-1.5 bg-white/5 rounded-full overflow-hidden mt-2"><div class="progress-fill h-full rounded-full bg-gradient-to-r from-mint to-lilac" style="width:' + Math.min(100, Math.round((t.prot / 80) * 100)) + '%"></div></div>';
+}
+function renderCurrentMeal() {
+  const el = $("current-meal-items"); if (!el) return;
+  const items = state.mealPlan[state.activeMeal] || [];
+  if (!items.length) {
+    el.innerHTML = '<div class="text-xs text-neutral-500 font-medium text-center py-3">Puste — dodaj produkty poniżej</div>';
+    return;
+  }
+  el.innerHTML = items.map((it, i) => '<div class="flex items-center justify-between text-xs py-1 border-b border-white/5 last:border-0"><span class="flex-1 text-neutral-200 font-medium truncate">' + escapeHtml(it.name) + '</span><span class="text-neutral-400 text-[10px] mx-2 whitespace-nowrap">' + it.kcal + ' kcal · ' + it.prot + 'g</span><button class="remove-item w-5 h-5 flex items-center justify-center rounded-full bg-rose/20 text-rose text-[10px]" data-idx="' + i + '"><i class="fa-solid fa-xmark"></i></button></div>').join("");
+  el.querySelectorAll(".remove-item").forEach(b => {
+    b.addEventListener("click", (e) => {
+      e.stopPropagation();
+      const idx = parseInt(b.dataset.idx);
+      state.mealPlan[state.activeMeal].splice(idx, 1);
+      saveMealPlan(); renderCurrentMeal();
+    });
+  });
+}
+function renderIngredientsGrid() {
+  const el = $("ingredients-grid"); if (!el) return;
+  const items = FOOD_INGREDIENTS[state.activeCat] || [];
+  el.innerHTML = items.map((it, i) => '<button class="food-ing-btn glass rounded-xl p-2 text-left" data-cat="' + state.activeCat + '" data-idx="' + i + '"><div class="text-[11px] font-bold text-neutral-200 leading-tight mb-1">' + escapeHtml(it.name) + '</div><div class="flex items-center justify-between text-[9px] font-bold"><span class="text-gold">' + it.kcal + ' kcal</span><span class="text-mint">' + it.prot + 'g</span></div></button>').join("");
+  el.querySelectorAll(".food-ing-btn").forEach(b => {
+    b.addEventListener("click", () => {
+      const cat = b.dataset.cat; const idx = parseInt(b.dataset.idx);
+      const it = FOOD_INGREDIENTS[cat][idx];
+      state.mealPlan[state.activeMeal].push({ name: it.name, kcal: it.kcal, prot: it.prot });
+      saveMealPlan();
+      renderCurrentMeal();
+      renderIngredientsGrid();
+      vibrate(15); playSound("done");
+      b.classList.add("added");
+      setTimeout(() => b.classList.remove("added"), 300);
+    });
+  });
+}
+function renderCreatorTotals() {
+  const t = getDayTotals();
+  if ($("total-kcal")) $("total-kcal").textContent = t.kcal + " kcal";
+  if ($("total-prot")) $("total-prot").textContent = t.prot + " g / 80 g";
+  if ($("protein-bar")) $("protein-bar").style.width = Math.min(100, Math.round((t.prot / 80) * 100)) + "%";
 }
 
 // ============================================================================
-// ANALIZA TRENERA
+// GLOW UP MIRROR CHECK
+// ============================================================================
+const GLOWUP_QUESTIONS = [
+  { id: "jawline", q: "Szczęka wyraźna (mewing działa)" },
+  { id: "skin", q: "Cera czysta (bez wyprysków)" },
+  { id: "nose", q: "Nos czysty (nie zaczerwieniony)" },
+  { id: "posture", q: "Postawa prosta" },
+  { id: "eyes", q: "Oczy wypoczęte (bez sińców)" },
+  { id: "hair", q: "Włosy zadbane" },
+  { id: "lips", q: "Usta nie spierzchnięte" },
+  { id: "hands", q: "Skóra dłoni nawilżona" }
+];
+function renderGlowUpMirror() {
+  if (!isSunday) return;
+  const section = $("glowup-mirror-section"); if (!section) return;
+  section.classList.remove("hidden");
+  const weekKey = "glowup-" + todayKey;
+  const saved = JSON.parse(localStorage.getItem(localKey(weekKey)) || "{}");
+  const el = $("glowup-questions"); if (!el) return;
+  el.innerHTML = GLOWUP_QUESTIONS.map(q => '<div class="flex items-center justify-between py-1.5 border-b border-white/5 last:border-0"><span class="text-xs text-neutral-200 font-semibold flex-1 pr-2">' + q.q + '</span><div class="toggle-switch ' + (saved[q.id] ? 'on' : '') + '" data-glowup="' + q.id + '"></div></div>').join("");
+  el.querySelectorAll("[data-glowup]").forEach(t => {
+    t.addEventListener("click", () => {
+      const saved = JSON.parse(localStorage.getItem(localKey(weekKey)) || "{}");
+      saved[t.dataset.glowup] = !saved[t.dataset.glowup];
+      localStorage.setItem(localKey(weekKey), JSON.stringify(saved));
+      if (saved[t.dataset.glowup]) t.classList.add("on"); else t.classList.remove("on");
+      vibrate(15);
+      updateGlowUpScore();
+    });
+  });
+  updateGlowUpScore();
+}
+function updateGlowUpScore() {
+  const weekKey = "glowup-" + todayKey;
+  const saved = JSON.parse(localStorage.getItem(localKey(weekKey)) || "{}");
+  const total = GLOWUP_QUESTIONS.length;
+  const yes = GLOWUP_QUESTIONS.filter(q => saved[q.id]).length;
+  const pct = Math.round((yes / total) * 100);
+  const badge = $("glowup-score-badge");
+  if (badge) {
+    badge.textContent = pct + "%";
+    if (pct >= 80) badge.className = "text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-mint/15 text-mint";
+    else if (pct >= 50) badge.className = "text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-gold/15 text-gold";
+    else badge.className = "text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-rose/15 text-rose";
+  }
+}
+
+// ============================================================================
+// ANALYSIS — HARDCORE
 // ============================================================================
 function sec(title, icon, body, color) {
   return '<div class="analysis-section"><div class="analysis-title" style="color:' + (color || "#5eead4") + '">' + icon + ' ' + title + '</div><div class="analysis-body">' + body + '</div></div>';
@@ -1612,21 +1892,45 @@ async function generateFullAnalysis() {
   const level = getTrainingLevel();
   const sections = [];
 
+  // SCENARIUSZE HARDCORE
+  let scenarioHtml = "";
+  if (kws.indexOf("vape") >= 0) {
+    scenarioHtml += '<div class="analysis-section"><div class="analysis-title" style="color:#fb7185">🚭 VAPE ALERT</div><div class="analysis-body"><strong>Odrzucasz to.</strong> Nie jesteś jak reszta małych owiec na osiedlu. Robisz Lock In. Wapek = koniec twojej drogi. Kropka.</div></div>';
+  }
+  if (kws.indexOf("school") >= 0) {
+    scenarioHtml += '<div class="analysis-section"><div class="analysis-title" style="color:#fbbf24">📚 SZKOŁA</div><div class="analysis-body">Ocena do poprawy? <strong>Masz 15 minut.</strong> Wypij szejka, wróć do celu. Szkoła to etap, ciało zostaje na zawsze.</div></div>';
+  }
+  if (kws.indexOf("girl") >= 0) {
+    scenarioHtml += '<div class="analysis-section"><div class="analysis-title" style="color:#fb7185">💔 SERCE</div><div class="analysis-body"><strong>Ból to paliwo.</strong> Najlepszy rewanż to +5 kg mięśni, linia szczęki, skóra jak szkło. Ona zobaczy. Ale ty już nie będziesz patrzył wstecz.</div></div>';
+  }
+  if (kws.indexOf("mom") >= 0) {
+    scenarioHtml += '<div class="analysis-section"><div class="analysis-title" style="color:#c4b5fd">🏠 DOM</div><div class="analysis-body">Kłótnia z mamą/rodzicami? <strong>Zamknij emocje.</strong> Zrób szejka, idź spać o 22:00. Skup się na celach. Emocje to szum, dyscyplina to sygnał.</div></div>';
+  }
+  if (kws.indexOf("game") >= 0) {
+    scenarioHtml += '<div class="analysis-section"><div class="analysis-title" style="color:#fbbf24">🎮 GRY</div><div class="analysis-body">TikTok/konsola? <strong>Najpierw trening, potem gry.</strong> Prawdziwa postać ma wyglądać dobrze w realu, nie tylko na ekranie.</div></div>';
+  }
+  if (kws.indexOf("soreness") >= 0) {
+    scenarioHtml += '<div class="analysis-section"><div class="analysis-title" style="color:#5eead4">💪 ZAKWASY</div><div class="analysis-body"><strong>Zakwasy to dowód wzrostu.</strong> Białko, woda, sen. Jutro znowu do roboty.</div></div>';
+  }
+  if (kws.indexOf("junkfood") >= 0) {
+    scenarioHtml += '<div class="analysis-section"><div class="analysis-title" style="color:#fb7185">🍟 SYF</div><div class="analysis-body">Zjadłeś syf? <strong>Woda, odstaw cukier, karna seria do upadku.</strong> Jeden grzech nie zabija. Ale nie rób z tego codzienności.</div></div>';
+  }
+
   // 1. SEN
   {
     let b = "";
-    if (m.sleepTotal == null) b = "Brak danych o snie. Uzupełnij raport poranny.";
+    if (m.sleepTotal == null) b = "Brak danych o snie. Uzupełnij raport poranny — bez tego nie oceniam regeneracji.";
     else {
       const s = m.sleepTotal;
-      if (s >= 8.5) b += "<strong>" + s.toFixed(1) + "h</strong> — kozacki sen, organizm ma pełne pole do regeneracji.";
-      else if (s >= 8) b += "<strong>" + s.toFixed(1) + "h</strong> — solidnie, trzymaj rytm.";
+      if (s >= 8.5) b += "<strong>" + s.toFixed(1) + "h</strong> — kozacki sen. Tak buduje się mistrza.";
+      else if (s >= 8) b += "<strong>" + s.toFixed(1) + "h</strong> — solidnie, trzymaj.";
       else if (s >= 7) b += "<strong>" + s.toFixed(1) + "h</strong> — ok, ale celuj w 8+.";
-      else if (s >= 6) b += "<strong>" + s.toFixed(1) + "h</strong> — poniżej progu. Jutro priorytet: spać wcześniej.";
-      else b += "<em>Kurwa, tylko " + s.toFixed(1) + "h.</em> Organizm nie zbuduje masy na takim śnie.";
+      else if (s >= 6) b += "<strong>" + s.toFixed(1) + "h</strong> — poniżej progu. Jutro wcześniej spać.";
+      else b += "<em>Kurwa, tylko " + s.toFixed(1) + "h.</em> Na takim śnie masa nie rośnie, wzrost staje. Idź spać przed 22:30.";
       if (m.sleepDeep != null && s > 0) {
         const r = m.sleepDeep / s;
         b += " Głęboki: <strong>" + m.sleepDeep.toFixed(2) + "h</strong> (" + (r * 100).toFixed(0) + "%).";
-        if (r < 0.13) b += " Mało głębokiego — bez niego nie ma hormonu wzrostu.";
+        if (r < 0.13) b += " Mało głębokiego = mało hormonu wzrostu.";
       }
       if (avgSleep != null) b += " " + trendLabel(s, avgSleep) + ".";
     }
@@ -1636,16 +1940,11 @@ async function generateFullAnalysis() {
   // 2. RHR
   {
     let b = "";
-    if (m.rhr == null) b = "Brak RHR. Mierz rano przed wstaniem.";
+    if (m.rhr == null) b = "Brak RHR. Mierz rano przed wstaniem — kluczowy wskaźnik.";
     else {
       const analysis = analyzeRhr(m.rhr, age, avgRhr);
-      b += "Norma dla wieku " + age + " lat: <strong>" + rhrRange.min + "–" + rhrRange.max + " bpm</strong>. ";
+      b += "Norma wieku " + age + ": <strong>" + rhrRange.min + "–" + rhrRange.max + " bpm</strong>. ";
       b += analysis.message;
-      if (ym.rhr != null) {
-        const d = m.rhr - ym.rhr;
-        if (d >= 5) b += " <em>+" + d + " vs wczoraj</em>.";
-        else if (d <= -3) b += " <em>" + d + " vs wczoraj</em>.";
-      }
     }
     sections.push(sec("Regeneracja (RHR)", "💓", b, "#5eead4"));
   }
@@ -1656,12 +1955,13 @@ async function generateFullAnalysis() {
     if (readiness == null) b = "Za mało danych.";
     else {
       b += "Gotowość: <strong>" + readiness + "%</strong>. ";
-      if (readiness >= 80) b += "Możesz dziś napierdalać — pełny plan.";
+      if (readiness >= 80) b += "Dziś napierdalasz — pełna moc.";
       else if (readiness >= 60) b += "Standardowy trening.";
-      else if (readiness >= 40) b += "Lżejszy dzień.";
-      else b += "<em>Niska gotowość.</em> Recovery.";
+      else if (readiness >= 40) b += "Lżejszy dzień — technika > ciężar.";
+      else b += "<em>Niska gotowość.</em> Recovery: spacer, oddech, stretching.";
     }
-    if (level === "recovery") b += " Poziom: <em>RECOVERY</em>.";
+    if (isSunday) b += " <strong>Niedziela = regeneracja obowiązkowa.</strong> Mięśnie rosną w spoczynku.";
+    else if (level === "recovery") b += " Poziom: <em>RECOVERY</em>.";
     else if (level === "light") b += " Poziom: <em>LIGHT</em>.";
     else if (level === "full") b += " Poziom: <strong>FULL</strong> 🔥.";
     if (isBoosterActive()) b += " <em>⚡ Booster +15% aktywny.</em>";
@@ -1674,14 +1974,12 @@ async function generateFullAnalysis() {
     const mood = m.moodMorning != null ? m.moodMorning : e.moodEvening;
     if (mood == null) b = "Brak oceny nastroju.";
     else {
-      if (mood >= 8) b += "Nastrój <strong>" + mood + "/10</strong> — jest ogień.";
+      if (mood >= 8) b += "Nastrój <strong>" + mood + "/10</strong> — ogień. Wykorzystaj to.";
       else if (mood >= 6) b += "Nastrój <strong>" + mood + "/10</strong> — stabilnie.";
-      else if (mood >= 4) b += "Nastrój <strong>" + mood + "/10</strong> — taki sobie dzień.";
-      else b += "Nastrój <strong>" + mood + "/10</strong> — <em>dołek.</em> Zrób podstawy.";
+      else if (mood >= 4) b += "Nastrój <strong>" + mood + "/10</strong> — taki sobie. Trzymaj rytm.";
+      else b += "Nastrój <strong>" + mood + "/10</strong> — <em>dołek.</em> Zrób podstawy, idź spać. Jutro nowy dzień.";
       if (avgMood != null) b += " " + trendLabel(mood, avgMood) + ".";
     }
-    if (kws.indexOf("lonely") >= 0) b += " <em>Widzę w notatce smutek.</em> Pogadaj z kimś.";
-    if (kws.indexOf("happy") >= 0 || kws.indexOf("success") >= 0) b += " 🔥 Notatka pełna energii.";
     sections.push(sec("Nastrój", "😊", b, "#fbbf9d"));
   }
 
@@ -1694,8 +1992,8 @@ async function generateFullAnalysis() {
         const s = e.steps;
         if (s >= 12000) b += "Kroki: <strong>" + s + "</strong> — konkretny dystans.";
         else if (s >= 8000) b += "Kroki: <strong>" + s + "</strong> — solidnie.";
-        else if (s >= 5000) b += "Kroki: " + s + " — przeciętnie.";
-        else b += "Kroki: " + s + " — mało. Wyjdź na spacer.";
+        else if (s >= 5000) b += "Kroki: " + s + " — przeciętnie. Ruszyć dupe.";
+        else b += "Kroki: " + s + " — mało. WYJDŹ NA SPACER.";
         if (avgSteps != null) b += " " + trendLabel(s, avgSteps) + ".";
       }
       if (e.kcalBurned != null) b += " Spalone: <strong>" + e.kcalBurned + " kcal</strong>.";
@@ -1712,13 +2010,13 @@ async function generateFullAnalysis() {
         const s = e.stress;
         if (s < 25) b += "Stres: <strong>" + s + "/100</strong> — spokój.";
         else if (s < 40) b += "Stres: " + s + "/100 — normalnie.";
-        else if (s < 60) b += "Stres: " + s + "/100 — podniesiony.";
+        else if (s < 60) b += "Stres: " + s + "/100 — podniesiony. Oddech 4-7-8.";
         else if (s < 75) b += "Stres: <em>" + s + "/100</em> — wysoko.";
-        else b += "Stres: <em>" + s + "/100 — bardzo wysoko.</em>";
+        else b += "Stres: <em>" + s + "/100 — bardzo wysoko.</em> Trening odpuść.";
         if (avgStress != null) b += " " + trendLabel(s, avgStress) + ".";
       }
       if (m.breathing != null) {
-        b += " Punkty oddychania: <strong>" + m.breathing + "</strong>.";
+        b += " Oddychanie: <strong>" + m.breathing + "</strong>.";
         if (m.breathing < 85) b += " Przewietrz sypialnię.";
       }
     }
@@ -1729,14 +2027,12 @@ async function generateFullAnalysis() {
   {
     const stats = calcCompletionStats();
     const pct = calcCompletionPct();
-    let b = "Zadania: <strong>" + stats.requiredDone + "/" + stats.requiredTotal + "</strong> (" + pct + "%).";
-    if (stats.optionalTotal > 0) b += " Opcjonalne: " + stats.optionalDone + "/" + stats.optionalTotal + ".";
-    b += " ";
-    if (pct === 100) b += "Perfect day! BEAST MODE ACTIVE. 🔥";
+    let b = "Zadania: <strong>" + stats.requiredDone + "/" + stats.requiredTotal + "</strong> (" + pct + "%). ";
+    if (pct === 100) b += "PERFECT DAY! BEAST MODE ACTIVE. 🔥";
     else if (pct >= 75) b += "Bardzo dobrze — dokończ resztę.";
     else if (pct >= 50) b += "Połowa za tobą.";
     else if (pct > 0) b += "<em>Słabo.</em> Rób po kolei.";
-    else b += "<em>Zero zadań.</em> Od czegoś trzeba zacząć.";
+    else b += "<em>Zero zadań.</em> Od czegoś trzeba zacząć. Jedno teraz.";
     sections.push(sec("Zadania", "✅", b, "#5eead4"));
   }
 
@@ -1749,37 +2045,36 @@ async function generateFullAnalysis() {
     if (avgSleep != null) lines.push("Śr. sen 7d: " + avgSleep.toFixed(1) + "h");
     if (avgRhr != null) lines.push("Śr. RHR 7d: " + avgRhr.toFixed(0) + " bpm");
     if (avgSteps != null) lines.push("Śr. kroki 7d: " + avgSteps.toFixed(0));
-    let b = lines.length ? lines.join(" · ") : "Za mało danych.";
-    sections.push(sec("Trendy", "📈", b, "#fbbf24"));
+    sections.push(sec("Trendy", "📈", lines.length ? lines.join(" · ") : "Za mało danych.", "#fbbf24"));
   }
 
   // 9. PRIORYTETY
   {
     const priorities = [];
-    if (m.sleepTotal != null && m.sleepTotal < 7) priorities.push("Sen 8h+ dziś.");
-    if (m.rhr != null && m.rhr > rhrRange.max) priorities.push("RHR " + m.rhr + " bpm powyżej normy.");
+    if (m.sleepTotal != null && m.sleepTotal < 7) priorities.push("Sen 8h+ dziś — telefon off 1h przed snem.");
+    if (m.rhr != null && m.rhr > rhrRange.max) priorities.push("RHR " + m.rhr + " bpm powyżej normy — odpocznij, woda.");
     if (e.stress != null && e.stress > 60) priorities.push("Oddech 4-7-8 przed snem.");
     if (isBoosterActive()) priorities.push("Włącz Skincare/Suplementy żeby zdjąć booster +15%.");
     const stats = calcCompletionStats();
     if (stats.requiredDone < stats.requiredTotal) priorities.push("Dokończ " + (stats.requiredTotal - stats.requiredDone) + " zadań.");
-    if (m.dailyWeight != null && avgWeight != null && m.dailyWeight < avgWeight - 0.3) priorities.push("Zwiększ kalorie — szejk masowy 700 kcal.");
-    if (priorities.length === 0) priorities.push("Utrzymaj rytm — wszystko idzie zgodnie z planem.");
+    if (m.dailyWeight != null && avgWeight != null && m.dailyWeight < avgWeight - 0.3) priorities.push("Szejk masowy 700 kcal — masa spada.");
+    if (priorities.length === 0) priorities.push("Utrzymaj rytm — idzie zgodnie z planem.");
     const facts = [
-      "Hormon wzrostu wydziela się głównie w głębokim śnie (faza N3) — 70% dobowego wyrzutu.",
-      "Białko rozłożone na 4-5 posiłków po 25-40g = najlepsza synteza mięśniowa.",
-      "Wznosy bokiem hantlami 1kg w seriach 20-25 powtórzeń rozbudowują szerokość barków.",
-      "Mewing (język na podniebieniu) poprawia linię szczęki i symetrię twarzy.",
+      "Hormon wzrostu wydziela się głównie w fazie N3 (głęboki sen) — 70% dobowego wyrzutu.",
+      "Białko rozłożone na 4-5 posiłków po 25-40g = max synteza mięśniowa.",
+      "Wznosy bokiem hantlami 1kg w seriach 20-25 = szerokość barków.",
+      "Mewing (język na podniebieniu) poprawia linię szczęki i symetrię.",
       "Zimna woda na twarz rano redukuje obrzęk i czerwony nos.",
-      "16-17 lat to szczytowy moment skoku wzrostowego u chłopaków.",
-      "Dobra postawa dodaje 1-2 cm wizualnie — ćwicz core i plecy.",
-      "Burnout set na koniec treningu pobudza maksymalnie włókna typu II.",
+      "16-17 lat to szczyt skoku wzrostowego u chłopaków.",
+      "Dobra postawa dodaje 1-2 cm wizualnie — ćwicz core.",
+      "Burnout set = max pobudzenie włókien typu II = wyrzut GH.",
     ];
     const fact = facts[Math.floor(Math.random() * facts.length)];
     let b = "<strong>Priorytety na jutro:</strong><br>• " + priorities.join("<br>• ") + "<br><br>💡 <em>Ciekawostka:</em> " + fact;
     sections.push(sec("Priorytety + ciekawostka", "🎯", b, "#5eead4"));
   }
 
-  return sections.join("");
+  return scenarioHtml + sections.join("");
 }
 async function renderAutoAnalysis() {
   const box = $("auto-analysis-box"); const content = $("auto-analysis-content");
@@ -1789,10 +2084,9 @@ async function renderAutoAnalysis() {
     box.classList.add("hidden");
     return;
   }
-  const html = await generateFullAnalysis();
-  content.innerHTML = html;
+  content.innerHTML = await generateFullAnalysis();
   box.classList.remove("hidden");
-  await saveAnalysisToHistory(html);
+  await saveAnalysisToHistory(content.innerHTML);
 }
 async function saveAnalysisToHistory(html) {
   try {
@@ -1824,12 +2118,12 @@ async function renderGlowUp() {
   const thisWeek = await loadDaysRange(7, 0);
   const lastWeek = await loadDaysRange(7, 7);
   const metrics = [
-    { key: "sleep", label: "Sen", get: d => d.morning && d.morning.sleepTotal, unit: "h", better: "up" },
-    { key: "rhr", label: "RHR", get: d => d.morning && d.morning.rhr, unit: " bpm", better: "down" },
-    { key: "steps", label: "Kroki", get: d => d.evening && d.evening.steps, unit: "", better: "up" },
-    { key: "stress", label: "Stres", get: d => d.evening && d.evening.stress, unit: "/100", better: "down" },
-    { key: "mood", label: "Nastrój", get: d => d.morning && d.morning.moodMorning, unit: "/10", better: "up" },
-    { key: "weight", label: "Waga", get: d => d.morning && d.morning.dailyWeight, unit: " kg", better: "up" },
+    { label: "Sen", get: d => d.morning && d.morning.sleepTotal, unit: "h", better: "up" },
+    { label: "RHR", get: d => d.morning && d.morning.rhr, unit: " bpm", better: "down" },
+    { label: "Kroki", get: d => d.evening && d.evening.steps, unit: "", better: "up" },
+    { label: "Stres", get: d => d.evening && d.evening.stress, unit: "/100", better: "down" },
+    { label: "Nastrój", get: d => d.morning && d.morning.moodMorning, unit: "/10", better: "up" },
+    { label: "Waga", get: d => d.morning && d.morning.dailyWeight, unit: " kg", better: "up" },
   ];
   const rows = [];
   metrics.forEach(m => {
@@ -1840,9 +2134,8 @@ async function renderGlowUp() {
     const avB = b.reduce((x, y) => x + y, 0) / b.length;
     const diff = avA - avB;
     const good = m.better === "up" ? diff > 0 : diff < 0;
-    const sign = diff > 0 ? "+" : "";
     const color = Math.abs(diff) < 0.01 ? "text-neutral-400" : good ? "text-mint" : "text-rose";
-    rows.push('<div class="flex items-center justify-between text-sm"><span class="text-neutral-300 font-semibold">' + m.label + '</span><span class="font-extrabold ' + color + '">' + sign + diff.toFixed(2) + m.unit + '</span></div>');
+    rows.push('<div class="flex items-center justify-between text-sm"><span class="text-neutral-300 font-semibold">' + m.label + '</span><span class="font-extrabold ' + color + '">' + (diff > 0 ? "+" : "") + diff.toFixed(2) + m.unit + '</span></div>');
   });
   el.innerHTML = rows.length ? rows.join("") : '<p class="text-sm text-neutral-400 font-medium">Za mało danych. Zbieraj raporty 14 dni.</p>';
 }
@@ -1859,23 +2152,23 @@ async function renderCorrelation() {
   pairs.forEach(p => { const dx = p.sleep - meanX, dy = p.stress - meanY; num += dx * dy; denX += dx * dx; denY += dy * dy; });
   const r = denX && denY ? num / Math.sqrt(denX * denY) : 0;
   let desc;
-  if (r < -0.5) desc = "Wykryto <strong>silną ujemną korelację</strong> (r = " + r.toFixed(2) + "). Im więcej śpisz, tym niższy masz stres.";
-  else if (r < -0.25) desc = "Łagodna ujemna korelacja (r = " + r.toFixed(2) + "). Sen pomaga ci w stresie.";
-  else if (r > 0.4) desc = "Dodatnia korelacja (r = " + r.toFixed(2) + ") — obserwuj.";
-  else desc = "Brak wyraźnej zależności (r = " + r.toFixed(2) + ").";
+  if (r < -0.5) desc = "Silna ujemna korelacja (r = " + r.toFixed(2) + "). Sen = niższy stres. Priorytet!";
+  else if (r < -0.25) desc = "Łagodna ujemna korelacja (r = " + r.toFixed(2) + "). Sen pomaga.";
+  else if (r > 0.4) desc = "Dodatnia (r = " + r.toFixed(2) + ") — obserwuj.";
+  else desc = "Brak zależności (r = " + r.toFixed(2) + ").";
   txt.innerHTML = desc;
   box.classList.remove("hidden");
 }
 async function renderWeeklySummary() {
   const el = $("weekly-summary-text"); if (!el) return;
   const days = await loadDaysRange(7, 0);
-  if (!days.length) { el.textContent = "Brak danych z tego tygodnia."; return; }
+  if (!days.length) { el.textContent = "Brak danych."; return; }
   const sleep = days.map(d => d.morning && d.morning.sleepTotal).filter(v => v != null);
   const steps = days.map(d => d.evening && d.evening.steps).filter(v => v != null);
   const avgSleep = sleep.length ? (sleep.reduce((a, b) => a + b, 0) / sleep.length).toFixed(1) : "—";
   const avgSteps = steps.length ? Math.round(steps.reduce((a, b) => a + b, 0) / steps.length) : "—";
   const perfect = days.filter(d => d.completedPct === 100).length;
-  el.innerHTML = "Śr. sen: <strong>" + avgSleep + "h</strong> · Śr. kroki: <strong>" + avgSteps + "</strong> · Perfect days: <strong>" + perfect + "/7</strong>. " + (perfect >= 5 ? "🔥 Tydzień jak maszyna." : perfect >= 3 ? "💪 Dobry tydzień." : "🎯 Dorzuć perfect days.");
+  el.innerHTML = "Sen: <strong>" + avgSleep + "h</strong> · Kroki: <strong>" + avgSteps + "</strong> · Perfect: <strong>" + perfect + "/7</strong>. " + (perfect >= 5 ? "🔥 Tydzień jak maszyna." : perfect >= 3 ? "💪 Dobry tydzień." : "🎯 Dorzuć perfect days.");
 }
 
 // ============================================================================
@@ -1889,7 +2182,7 @@ async function renderLast30() {
   const totalTasks = days.reduce((a, d) => a + ((d.tasks && d.tasks.filter(t => t.done).length) || 0), 0);
   const sleepAvg = days.map(d => d.morning && d.morning.sleepTotal).filter(v => v != null);
   const avgSleep = sleepAvg.length ? (sleepAvg.reduce((a, b) => a + b, 0) / sleepAvg.length).toFixed(1) : "—";
-  el.innerHTML = '<div class="glass rounded-3xl p-4 text-center"><div class="text-2xl font-extrabold text-mint">' + perfect + '</div><div class="text-[11px] text-neutral-400 font-semibold mt-1">Perfect days</div></div><div class="glass rounded-3xl p-4 text-center"><div class="text-2xl font-extrabold text-gold">' + avgPct + '%</div><div class="text-[11px] text-neutral-400 font-semibold mt-1">Śr. ukończenie</div></div><div class="glass rounded-3xl p-4 text-center"><div class="text-2xl font-extrabold text-peach">' + totalTasks + '</div><div class="text-[11px] text-neutral-400 font-semibold mt-1">Zadań zrobionych</div></div><div class="glass rounded-3xl p-4 text-center"><div class="text-2xl font-extrabold text-lilac">' + avgSleep + 'h</div><div class="text-[11px] text-neutral-400 font-semibold mt-1">Śr. sen</div></div>';
+  el.innerHTML = '<div class="glass rounded-3xl p-4 text-center"><div class="text-2xl font-extrabold text-mint">' + perfect + '</div><div class="text-[11px] text-neutral-400 font-semibold mt-1">Perfect days</div></div><div class="glass rounded-3xl p-4 text-center"><div class="text-2xl font-extrabold text-gold">' + avgPct + '%</div><div class="text-[11px] text-neutral-400 font-semibold mt-1">Śr. ukończenie</div></div><div class="glass rounded-3xl p-4 text-center"><div class="text-2xl font-extrabold text-peach">' + totalTasks + '</div><div class="text-[11px] text-neutral-400 font-semibold mt-1">Zadań</div></div><div class="glass rounded-3xl p-4 text-center"><div class="text-2xl font-extrabold text-lilac">' + avgSleep + 'h</div><div class="text-[11px] text-neutral-400 font-semibold mt-1">Śr. sen</div></div>';
 }
 async function renderPersonalRecords() {
   const el = $("personal-records"); if (!el) return;
@@ -1901,9 +2194,8 @@ async function renderPersonalRecords() {
     if (mm.rhr != null) m.lowRhr = Math.min(m.lowRhr != null ? m.lowRhr : 999, mm.rhr);
     if (ee.steps != null) m.maxSteps = Math.max(m.maxSteps != null ? m.maxSteps : 0, ee.steps);
     if (mm.dailyWeight != null) m.maxWeight = Math.max(m.maxWeight != null ? m.maxWeight : 0, mm.dailyWeight);
-    if (ee.kcalBurned != null) m.maxKcal = Math.max(m.maxKcal != null ? m.maxKcal : 0, ee.kcalBurned);
   });
-  el.innerHTML = '<div class="record-card"><div class="text-[10px] text-gold font-bold tracking-widest">REKORD SNU</div><div class="text-xl font-extrabold">' + (m.bestSleep ? m.bestSleep.toFixed(1) + "h" : "—") + '</div></div><div class="record-card"><div class="text-[10px] text-mint font-bold tracking-widest">MIN RHR</div><div class="text-xl font-extrabold">' + (m.lowRhr ? m.lowRhr + " bpm" : "—") + '</div></div><div class="record-card"><div class="text-[10px] text-peach font-bold tracking-widest">MAX KROKI</div><div class="text-xl font-extrabold">' + (m.maxSteps || "—") + '</div></div><div class="record-card"><div class="text-[10px] text-gold font-bold tracking-widest">MAX WAGA</div><div class="text-xl font-extrabold">' + (m.maxWeight ? m.maxWeight.toFixed(1) + " kg" : "—") + '</div></div><div class="record-card"><div class="text-[10px] text-rose font-bold tracking-widest">MAX KCAL</div><div class="text-xl font-extrabold">' + (m.maxKcal || "—") + '</div></div>';
+  el.innerHTML = '<div class="record-card"><div class="text-[10px] text-gold font-bold tracking-widest">REKORD SNU</div><div class="text-xl font-extrabold">' + (m.bestSleep ? m.bestSleep.toFixed(1) + "h" : "—") + '</div></div><div class="record-card"><div class="text-[10px] text-mint font-bold tracking-widest">MIN RHR</div><div class="text-xl font-extrabold">' + (m.lowRhr ? m.lowRhr + " bpm" : "—") + '</div></div><div class="record-card"><div class="text-[10px] text-peach font-bold tracking-widest">MAX KROKI</div><div class="text-xl font-extrabold">' + (m.maxSteps || "—") + '</div></div><div class="record-card"><div class="text-[10px] text-gold font-bold tracking-widest">MAX WAGA</div><div class="text-xl font-extrabold">' + (m.maxWeight ? m.maxWeight.toFixed(1) + " kg" : "—") + '</div></div>';
 }
 async function renderPastSelf() {
   const el = $("past-self-comparison"); if (!el) return;
@@ -1916,21 +2208,22 @@ async function renderPastSelf() {
     const avA = a.reduce((x, y) => x + y, 0) / a.length;
     const avB = b.reduce((x, y) => x + y, 0) / b.length;
     const d = avA - avB;
-    const sign = d > 0 ? "+" : "";
     const cls = Math.abs(d) < 0.01 ? "text-neutral-400" : d > 0 ? "text-mint" : "text-rose";
-    return '<div class="flex items-center justify-between text-sm"><span class="text-neutral-300 font-semibold">' + label + '</span><span class="font-extrabold ' + cls + '">' + sign + d.toFixed(2) + unit + '</span></div>';
+    return '<div class="flex items-center justify-between text-sm"><span class="text-neutral-300 font-semibold">' + label + '</span><span class="font-extrabold ' + cls + '">' + (d > 0 ? "+" : "") + d.toFixed(2) + unit + '</span></div>';
   };
   const html = [cmp("Śr. sen", d => d.morning && d.morning.sleepTotal, "h"), cmp("Śr. RHR", d => d.morning && d.morning.rhr, " bpm"), cmp("Śr. kroki", d => d.evening && d.evening.steps, ""), cmp("Śr. waga", d => d.morning && d.morning.dailyWeight, " kg"), cmp("Śr. ukończenie", d => d.completedPct, "%")].filter(Boolean).join("");
   el.innerHTML = html || '<p class="text-xs text-neutral-400">Za mało danych.</p>';
 }
 
 // ============================================================================
-// WYKRESY
+// CHARTS — WITH FIX
 // ============================================================================
 const chartInstances = {};
 function makeChart(id, config) {
   const el = $(id); if (!el) return;
-  if (chartInstances[id]) chartInstances[id].destroy();
+  const existing = Chart.getChart(el);
+  if (existing) existing.destroy();
+  if (chartInstances[id]) { try { chartInstances[id].destroy(); } catch (e) {} }
   chartInstances[id] = new Chart(el.getContext("2d"), config);
 }
 const chartColors = { mint: "#5eead4", lilac: "#c4b5fd", gold: "#fbbf24", peach: "#fbbf9d", rose: "#fb7185" };
@@ -1962,7 +2255,7 @@ async function renderCharts() {
 }
 
 // ============================================================================
-// KALENDARZ
+// CALENDAR
 // ============================================================================
 let calMonth = new Date();
 async function renderCalendar() {
@@ -1976,8 +2269,7 @@ async function renderCalendar() {
   for (let i = 0; i < startDow; i++) cells.push('<div></div>');
   const promises = [];
   for (let d = 1; d <= daysInMonth; d++) {
-    const dk = dateKey(new Date(y, mo, d));
-    promises.push(loadDayDoc(dk));
+    promises.push(loadDayDoc(dateKey(new Date(y, mo, d))));
   }
   const docs = await Promise.all(promises);
   for (let d = 1; d <= daysInMonth; d++) {
@@ -2003,7 +2295,7 @@ async function openDayDetail(dk) {
 }
 
 // ============================================================================
-// ODZNAKI
+// BADGES
 // ============================================================================
 async function renderBadges() {
   const el = $("badges-grid"); if (!el) return;
@@ -2024,19 +2316,18 @@ async function renderBadges() {
 }
 
 // ============================================================================
-// GUIDE / KNOWLEDGE / FACTS
+// GUIDE / KB / FACTS
 // ============================================================================
 const GUIDE_SECTIONS = [
-  { icon: "🌙", title: "Sen — fundament wzrostu i masy", body: "Hormon wzrostu (GH) wydziela się w 70% w głębokim śnie. Idź spać przed 22:30, telefon off 1h wcześniej, ciemno i chłodno (18-19°C). Sen 8-9h = twój wzrost i masa." },
-  { icon: "🍽️", title: "Jedzenie — masa i wzrost", body: "Cel: 2800-3000 kcal dziennie, białko ~77g (1.7g/kg). Szejk masowy 700 kcal po szkole = game changer. Twaróg przed snem. Zero cukru po 18:00." },
-  { icon: "💪", title: "Trening — kalistenika + hantle 1kg", body: "3-4 treningi w tygodniu. Pompki (tempo 3s), przysiady z pauzą, wznosy bokiem z hantlami 1kg w seriach 20-25 powtórzeń = szerokość barków. Burnout set na koniec = max pobudzenie." },
-  { icon: "🔥", title: "Burnout Set — dlaczego działa", body: "1 seria do upadku (max pompek lub krzesełko przy ścianie) na koniec treningu = pobudzenie włókien typu II, wyrzut hormonu wzrostu, maksymalne zmęczenie mięśniowe." },
-  { icon: "🧴", title: "Visual Glow Up — skóra i twarz", body: "Zimna woda rano i wieczorem (redukcja obrzęku, czerwonego nosa), Tołpa/Ziaja, Acnederm punktowo, Cetaphil nawilżanie. Mewing (język na podniebieniu) = linia szczęki i symetria." },
-  { icon: "🧠", title: "Głowa — stres i nastrój", body: "Oddech 4-7-8 (wdech 4s, trzymaj 7s, wydech 8s) 5 min dziennie. Medytacja 10 min. Sen 8h. Stres obniża testosteron i hamuje wzrost." },
-  { icon: "💊", title: "Suplementacja D3 — bezpieczne dawki", body: "Nastolatki 12-17 lat: max 4000 IU/dzień. Twój stack: 2 tabletki × 2000 IU = 4000 IU, bezpiecznie. Wchłania się w tłuszczu — bierz do posiłku." },
-  { icon: "📏", title: "Pomiary — co i kiedy", body: "Wzrost: rano, boso, plecy do ściany, 1. dnia miesiąca. Obwody: klatka, talia, biceps. Waga: codziennie rano po toalecie. RHR: przed wstaniem." },
+  { icon: "🌙", title: "Sen — fundament wzrostu", body: "GH wydziela się w 70% w głębokim śnie. Spać przed 22:30, telefon off 1h wcześniej. 8-9h = wzrost + masa." },
+  { icon: "🍽️", title: "Jedzenie — masa", body: "2800-3000 kcal/dzień, białko ~80g. Szejk masowy 700 kcal po szkole. Twaróg przed snem. Zero cukru po 18:00." },
+  { icon: "💪", title: "Trening — kalistenika + hantle 1kg", body: "Pompki tempo 3s, przysiady z pauzą, wznosy bokiem hantle 1kg 20-25 powtórzeń = szerokość barków. Burnout set na koniec." },
+  { icon: "🔥", title: "Burnout Set — dlaczego działa", body: "1 seria do upadku (max pompek lub krzesełko przy ścianie). Pobudza włókna typu II, wyrzut GH. Nie 2, nie 3 — jedna, ale do końca." },
+  { icon: "🧴", title: "Visual Glow Up", body: "Zimna woda rano i wieczorem (obrzęk, czerwony nos), Tołpa/Ziaja, Acnederm punktowo, Cetaphil nawilżanie. Mewing = linia szczęki." },
+  { icon: "🧠", title: "Głowa — stres", body: "Oddech 4-7-8 (wdech 4s, trzymaj 7s, wydech 8s) 5 min dziennie. Stres obniża testosteron i hamuje wzrost." },
+  { icon: "💊", title: "Suplementacja D3", body: "Max 4000 IU/dzień dla nastolatka. Twój stack: 2 tabletki × 2000 IU = 4000 IU, bezpiecznie. Bierz z tłuszczem." },
+  { icon: "📏", title: "Pomiary", body: "Wzrost: rano, boso, do ściany, 1. dnia miesiąca. Obwody: klatka, talia, biceps. Waga: codziennie rano." },
 ];
-
 function renderGuideSections() {
   const el = $("guide-sections"); if (!el) return;
   el.innerHTML = GUIDE_SECTIONS.map((s, i) => '<div class="guide-section" data-guide-idx="' + i + '"><div class="guide-header"><div class="flex items-center gap-2"><span class="text-lg">' + s.icon + '</span><span class="font-bold text-sm">' + s.title + '</span></div><i class="fa-solid fa-chevron-down text-neutral-400 text-xs"></i></div><div class="guide-body"><p class="text-sm text-neutral-200 leading-relaxed font-medium">' + s.body + '</p></div></div>').join("");
@@ -2044,20 +2335,18 @@ function renderGuideSections() {
     node.querySelector(".guide-header").addEventListener("click", () => node.classList.toggle("open"));
   });
 }
-
 const KNOWLEDGE_BASE = [
-  { title: "Hormon wzrostu (GH)", body: "Wydzielany głównie w głębokim śnie. Stymulują go: sen 8h+, trening siłowy, post (16h). Hamują: cukier, alkohol, stres, brak snu." },
-  { title: "Testosteron", body: "Rośnie przez: sen 7-9h, trening siłowy, tłuszcze zwierzęce, witaminę D. Spada przez: stres, alkohol, niedobór snu, otyłość." },
-  { title: "Białko — ile i kiedy", body: "1.7g/kg = ~77g dla Karola. Rozłożone na 4-5 posiłków po 25-40g. Twaróg przed snem = kazeina = wolne uwalnianie w nocy." },
-  { title: "Hantle 1kg — jak używać", body: "Wznosy bokiem 20-25 powtórzeń z 1s pauzą na górze = szerokość barków. Wyciskanie nad głowę 15 powt. Uginanie ramion 15 powt. Nie za mało powtórzeń — high reps tutaj rządzi." },
-  { title: "Mewing — linia szczęki", body: "Język cały czas na podniebieniu (nie na zębach!). Usta zamknięte, oddychanie nosem. Efekty po 3-6 miesiącach. Wspomaga symetrię twarzy i definicję żuchwy." },
-  { title: "Zimna woda — glow up twarzy", body: "Rano: obniża obrzęk, zwęża naczynia, redukuje czerwony nos. Wieczorem: zamyka pory. 30 sekund pod zimną wodą, delikatnie osusz." },
-  { title: "Witamina D3 — bezpieczne dawki", body: "Nastolatki 12-17 lat: max 4000 IU/dzień. Wchłania się w tłuszczu — bierz z posiłkiem. Twój stack: 4000 IU (2 tabletki × 2000 IU). Bezpiecznie." },
-  { title: "Burnout set — jak zrobić", body: "Na koniec treningu: max pompek do upadku (nie zatrzymuj się przy 10 — idź do końca) LUB krzesełko przy ścianie na max czas. 1 seria. Nie 2, nie 3." },
-  { title: "Acne — jak walczyć", body: "Higiena (Tołpa, Acnederm, Cetaphil), dieta (mniej cukru i mleka), sen 8h+, stres minimum. Nie wyciskaj. Jeśli nie pomaga 3 miesiące — dermatolog." },
-  { title: "RHR — tętno spoczynkowe", body: "Norma dla nastolatków 12-17 lat: 60-90 bpm. Sportowcy mogą mieć niżej. Wysokie (>90) = stres, choroba, przemęczenie. Skok +15% vs średnia tygodniowa = alarm." },
+  { title: "Hormon wzrostu (GH)", body: "Głównie w głębokim śnie. Stymulują: sen 8h+, trening siłowy, post. Hamują: cukier, alkohol, stres." },
+  { title: "Testosteron", body: "Rośnie: sen 7-9h, trening siłowy, tłuszcze zwierzęce, witamina D. Spada: stres, alkohol, brak snu." },
+  { title: "Białko — ile i kiedy", body: "1.7g/kg = ~77-80g. 4-5 posiłków po 25-40g. Twaróg przed snem = kazeina = wolne uwalnianie." },
+  { title: "Hantle 1kg — jak używać", body: "Wznosy bokiem 20-25 powtórzeń z pauzą 1s na górze = szerokość barków. Wyciskanie 15 powt. High reps tutaj rządzi." },
+  { title: "Mewing — linia szczęki", body: "Język na podniebieniu (nie na zębach!). Usta zamknięte, oddech nosem. Efekty po 3-6 mies." },
+  { title: "Zimna woda — glow up twarzy", body: "Rano: obrzęk, czerwony nos. Wieczorem: zamyka pory. 30 sekund, delikatnie osusz." },
+  { title: "Witamina D3 — dawki", body: "Max 4000 IU dla nastolatka. Z tłuszczem. Twój stack: 4000 IU (2 tabl. × 2000)." },
+  { title: "Burnout set", body: "Max pompek do upadku LUB krzesełko na max czas. 1 seria. Nie więcej." },
+  { title: "Acne — walka", body: "Higiena (Tołpa, Acnederm, Cetaphil), dieta (mniej cukru i mleka), sen, stres. Nie wyciskaj." },
+  { title: "RHR — normy", body: "12-17 lat: 60-90 bpm. Skok +15% vs 7d = alarm. Wysokie = choroba/stres/przemęczenie." },
 ];
-
 function renderKnowledgeBase() {
   const el = $("knowledge-base"); if (!el) return;
   el.innerHTML = KNOWLEDGE_BASE.map((k, i) => '<div class="guide-section" data-kb-idx="' + i + '"><div class="guide-header"><span class="font-bold text-sm">' + k.title + '</span><i class="fa-solid fa-chevron-down text-neutral-400 text-xs"></i></div><div class="guide-body"><p class="text-sm text-neutral-200 leading-relaxed font-medium">' + k.body + '</p></div></div>').join("");
@@ -2065,18 +2354,17 @@ function renderKnowledgeBase() {
     node.querySelector(".guide-header").addEventListener("click", () => node.classList.toggle("open"));
   });
 }
-
 const FACTS = [
-  "Hormon wzrostu wydziela się w 70% w fazie snu N3 (głębokiej).",
-  "Witamina D3 z tłuszczem wchłania się 3× lepiej niż na czczo.",
-  "Wznosy bokiem hantlami 1kg w seriach 20-25 powtórzeń = szerokość barków.",
-  "Mewing przez 3-6 miesięcy zmienia linię szczęki i symetrię twarzy.",
-  "Burnout set na koniec = pobudzenie włókien typu II = wyrzut GH.",
-  "16-17 lat to szczyt skoku wzrostowego u większości chłopaków.",
-  "Białko rozłożone na 4-5 posiłków = lepsza synteza mięśniowa.",
-  "Dobra postawa dodaje 1-2 cm wizualnie — ćwicz core i plecy.",
-  "Zimna woda na twarz rano redukuje obrzęk i czerwony nos.",
-  "Testosteron rośnie najbardziej przez sen 7-9h + trening siłowy.",
+  "Hormon wzrostu wydziela się w 70% w fazie N3.",
+  "Witamina D3 z tłuszczem wchłania się 3× lepiej.",
+  "Wznosy bokiem hantlami 1kg 20-25 powtórzeń = szerokość barków.",
+  "Mewing przez 3-6 miesięcy zmienia linię szczęki.",
+  "Burnout set = pobudzenie włókien typu II = wyrzut GH.",
+  "16-17 lat to szczyt skoku wzrostowego u chłopaków.",
+  "Białko 4-5 posiłków = lepsza synteza mięśniowa.",
+  "Dobra postawa dodaje 1-2 cm wizualnie.",
+  "Zimna woda rano redukuje obrzęk twarzy.",
+  "Testosteron rośnie przez sen 7-9h + trening siłowy.",
 ];
 function renderFactOfDay() {
   const el = $("fact-of-day"); if (!el) return;
@@ -2096,16 +2384,17 @@ function updateCountdown() {
   const remaining = Math.max(0, Math.ceil((LOCKIN_END - now) / 86400000));
   if ($("days-remaining")) $("days-remaining").textContent = remaining;
   const dayNum = Math.max(1, Math.floor((now - LOCKIN_START) / 86400000) + 1);
-  if ($("lockin-day")) $("lockin-day").textContent = "Dzień " + Math.min(dayNum, LOCKIN_TOTAL_DAYS);
+  if ($("lockin-day")) $("lockin-day").textContent = "Dzień " + Math.min(dayNum, LOCKIN_TOTAL_DAYS) + "/" + LOCKIN_TOTAL_DAYS;
 }
 
 // ============================================================================
-// MODALE + EVENTY
+// MODALS
 // ============================================================================
 function openModal(id) { const m = $(id); if (m) { m.classList.remove("hidden"); document.body.style.overflow = "hidden"; } }
 function closeModal(m) { if (m) { m.classList.add("hidden"); document.body.style.overflow = ""; } }
 document.querySelectorAll("[data-close-modal]").forEach(el => el.addEventListener("click", () => closeModal(el.closest(".modal-wrap"))));
 
+// TABS
 document.querySelectorAll(".tab-btn").forEach(btn => {
   btn.addEventListener("click", () => {
     document.querySelectorAll(".tab-btn").forEach(b => {
@@ -2118,12 +2407,13 @@ document.querySelectorAll(".tab-btn").forEach(btn => {
     const target = document.getElementById("tab-" + btn.dataset.tab);
     if (target) { target.classList.remove("hidden"); target.classList.add("rise"); }
     if (btn.dataset.tab === "postepy") { renderCharts(); renderCalendar(); renderBadges(); renderLast30(); renderPersonalRecords(); renderPastSelf(); }
-    if (btn.dataset.tab === "mentor") { renderGuideSections(); renderKnowledgeBase(); renderFactOfDay(); renderAnalysisHistory(); }
-    if (btn.dataset.tab === "jedzenie") renderFoodList();
+    if (btn.dataset.tab === "mentor") { renderGuideSections(); renderKnowledgeBase(); renderFactOfDay(); renderAnalysisHistory(); renderBlackList(); }
+    if (btn.dataset.tab === "jedzenie") { renderFoodList(); renderMealSummary(); }
     if (btn.dataset.tab === "cialo") renderCialo();
   });
 });
 
+// REPORT TABS
 document.querySelectorAll(".report-btn").forEach(btn => {
   btn.addEventListener("click", () => {
     document.querySelectorAll(".report-btn").forEach(b => { b.classList.remove("bg-gradient-to-br", "from-peach", "to-gold", "text-ink"); b.classList.add("text-neutral-400"); });
@@ -2135,6 +2425,7 @@ document.querySelectorAll(".report-btn").forEach(btn => {
   });
 });
 
+// FOOD TABS
 document.querySelectorAll("[data-food-tab]").forEach(btn => {
   btn.addEventListener("click", () => {
     document.querySelectorAll("[data-food-tab]").forEach(b => { b.classList.remove("bg-gradient-to-br", "from-peach", "to-gold", "text-ink"); b.classList.add("text-neutral-400"); });
@@ -2144,16 +2435,22 @@ document.querySelectorAll("[data-food-tab]").forEach(btn => {
     renderFoodList();
   });
 });
+let currentFoodTab = "breakfast";
 if ($("btn-roll-food")) $("btn-roll-food").addEventListener("click", rollFoodPlan);
 if ($("btn-roll-shake")) $("btn-roll-shake").addEventListener("click", rollMassShake);
+if ($("btn-store-meals")) $("btn-store-meals").addEventListener("click", showStoreMeals);
 
+// RAGE
+if ($("btn-rage")) $("btn-rage").addEventListener("click", showRage);
+
+// MEASURE DISMISS
 if ($("btn-measure-dismiss")) $("btn-measure-dismiss").addEventListener("click", () => {
   const b = $("monthly-measure-banner"); if (b) b.classList.add("hidden");
   localStorage.setItem("regim:measure-dismiss-" + dateKey(new Date()), "1");
 });
 
-// TOGGLE SWITCHES
-document.querySelectorAll(".toggle-switch").forEach(el => {
+// TOGGLES
+document.querySelectorAll(".toggle-switch[data-toggle]").forEach(el => {
   const name = el.dataset.toggle;
   if (getToggle(name)) el.classList.add("on"); else el.classList.remove("on");
   el.addEventListener("click", () => {
@@ -2169,7 +2466,8 @@ document.querySelectorAll(".toggle-switch").forEach(el => {
   });
 });
 
-$("form-morning")?.addEventListener("submit", async (e) => {
+// MORNING FORM
+if ($("form-morning")) $("form-morning").addEventListener("submit", async (e) => {
   e.preventDefault();
   const g = (id) => { const v = $(id) && $(id).value; return v === "" || v == null ? null : parseFloat(v); };
   state.morning = {
@@ -2185,7 +2483,8 @@ $("form-morning")?.addEventListener("submit", async (e) => {
   if ($("quote-day")) $("quote-day").textContent = getPersonalQuote();
 });
 
-$("form-evening")?.addEventListener("submit", async (e) => {
+// EVENING FORM
+if ($("form-evening")) $("form-evening").addEventListener("submit", async (e) => {
   e.preventDefault();
   const g = (id) => { const v = $(id) && $(id).value; return v === "" || v == null ? null : parseFloat(v); };
   state.evening = {
@@ -2196,20 +2495,23 @@ $("form-evening")?.addEventListener("submit", async (e) => {
   };
   state.note = ($("input-note") && $("input-note").value) || "";
   await persistToday();
-  showToast("✅ Podsumowanie dnia zapisane");
+  showToast("✅ Podsumowanie zapisane");
   await renderAutoAnalysis();
   const box = $("auto-analysis-box");
   if (box && !box.classList.contains("hidden")) box.scrollIntoView({ behavior: "smooth", block: "start" });
 });
 
+// MOOD SLIDERS
 if ($("input-mood-morning")) $("input-mood-morning").addEventListener("input", (e) => { $("mood-morning-value").textContent = e.target.value; });
 if ($("input-mood-evening")) $("input-mood-evening").addEventListener("input", (e) => { $("mood-evening-value").textContent = e.target.value; });
 
+// TAGS
 document.querySelectorAll(".tag-chip").forEach(chip => {
   chip.addEventListener("click", () => chip.classList.toggle("active"));
 });
 
-$("btn-analyze-ai")?.addEventListener("click", async () => {
+// ANALYZE AI
+if ($("btn-analyze-ai")) $("btn-analyze-ai").addEventListener("click", async () => {
   const label = $("ai-btn-label"); const spinner = $("ai-btn-spinner"); const box = $("ai-result-box"); const text = $("ai-result-text");
   if (spinner) spinner.classList.remove("hidden"); if (label) label.textContent = "Analizuję...";
   await new Promise(r => setTimeout(r, 400));
@@ -2221,23 +2523,23 @@ $("btn-analyze-ai")?.addEventListener("click", async () => {
   vibrate(30); playSound("done");
   showToast("🔥 Analiza gotowa");
 });
+if ($("btn-toggle-analysis")) $("btn-toggle-analysis").addEventListener("click", () => { const c = $("auto-analysis-content"); if (c) c.classList.toggle("hidden"); });
 
-$("btn-toggle-analysis")?.addEventListener("click", () => { const c = $("auto-analysis-content"); if (c) c.classList.toggle("hidden"); });
-
-$("btn-settings")?.addEventListener("click", () => {
+// SETTINGS
+if ($("btn-settings")) $("btn-settings").addEventListener("click", () => {
   const s = getSettings();
   $("input-name").value = s.name; $("input-age").value = s.age; $("input-height").value = s.height;
   $("input-height-dad").value = s.heightDad || ""; $("input-height-mom").value = s.heightMom || "";
   $("input-goal-weight-settings").value = s.goalWeight;
   $("input-d3-iu").value = s.d3Iu;
   $("input-d3-tablets").value = s.d3Tablets;
-  document.querySelectorAll(".toggle-switch").forEach(el => {
+  document.querySelectorAll(".toggle-switch[data-toggle]").forEach(el => {
     if (getToggle(el.dataset.toggle)) el.classList.add("on"); else el.classList.remove("on");
   });
   const w = lastWeight(); if (w && s.height) { const bmi = calcBMI(w, s.height); $("settings-bmi").textContent = bmi.toFixed(1); $("settings-bmi-label").textContent = bmiLabel(bmi); }
   openModal("modal-settings");
 });
-$("btn-settings-save")?.addEventListener("click", () => {
+if ($("btn-settings-save")) $("btn-settings-save").addEventListener("click", () => {
   saveSettings({
     name: $("input-name").value || USER_NAME_DEFAULT,
     age: parseInt($("input-age").value) || 14,
@@ -2253,24 +2555,28 @@ $("btn-settings-save")?.addEventListener("click", () => {
   renderCialo(); renderSupplementsCard(); renderReadiness(); renderBrief();
 });
 
-$("btn-glowup-refresh")?.addEventListener("click", () => { renderGlowUp(); renderCorrelation(); });
-$("btn-history-refresh")?.addEventListener("click", renderAnalysisHistory);
-$("btn-weekly-summary")?.addEventListener("click", renderWeeklySummary);
-$("btn-refresh-brief")?.addEventListener("click", renderBrief);
+// GLOW UP REFRESH
+if ($("btn-glowup-refresh")) $("btn-glowup-refresh").addEventListener("click", () => { renderGlowUp(); renderCorrelation(); });
+if ($("btn-history-refresh")) $("btn-history-refresh").addEventListener("click", renderAnalysisHistory);
+if ($("btn-weekly-summary")) $("btn-weekly-summary").addEventListener("click", renderWeeklySummary);
+if ($("btn-refresh-brief")) $("btn-refresh-brief").addEventListener("click", renderBrief);
 
-$("btn-breath-start")?.addEventListener("click", startBreathing);
-$("btn-breath-stop")?.addEventListener("click", stopBreathing);
-$("btn-rest-start")?.addEventListener("click", startRest);
-$("btn-rest-stop")?.addEventListener("click", stopRest);
+// BREATHING / REST
+if ($("btn-breath-start")) $("btn-breath-start").addEventListener("click", startBreathing);
+if ($("btn-breath-stop")) $("btn-breath-stop").addEventListener("click", stopBreathing);
+if ($("btn-rest-start")) $("btn-rest-start").addEventListener("click", startRest);
+if ($("btn-rest-stop")) $("btn-rest-stop").addEventListener("click", stopRest);
 document.querySelectorAll(".rest-time-btn").forEach(b => b.addEventListener("click", () => { restSeconds = parseInt(b.dataset.rest); $("rest-timer-display").textContent = "00:" + String(restSeconds).padStart(2, "0"); }));
 
-$("btn-theme-toggle")?.addEventListener("click", () => {
+// THEME
+if ($("btn-theme-toggle")) $("btn-theme-toggle").addEventListener("click", () => {
   const isLight = document.documentElement.classList.toggle("light-theme");
   $("theme-icon").className = isLight ? "fa-solid fa-sun" : "fa-solid fa-moon";
   localStorage.setItem("regim:theme", isLight ? "light" : "dark");
 });
 
-$("btn-export")?.addEventListener("click", async () => {
+// EXPORT
+if ($("btn-export")) $("btn-export").addEventListener("click", async () => {
   const days = await collectAllDays();
   const blob = new Blob([JSON.stringify(days, null, 2)], { type: "application/json" });
   const url = URL.createObjectURL(blob);
@@ -2279,19 +2585,71 @@ $("btn-export")?.addEventListener("click", async () => {
   showToast("✅ Eksport gotowy");
 });
 
+// INSTALL
 let deferredPrompt = null;
 window.addEventListener("beforeinstallprompt", (e) => { e.preventDefault(); deferredPrompt = e; const b = $("install-banner"); if (b) b.classList.remove("hidden"); });
-$("btn-install")?.addEventListener("click", async () => { if (deferredPrompt) { deferredPrompt.prompt(); await deferredPrompt.userChoice; deferredPrompt = null; const b = $("install-banner"); if (b) b.classList.add("hidden"); } });
-$("btn-install-dismiss")?.addEventListener("click", () => { const b = $("install-banner"); if (b) b.classList.add("hidden"); });
+if ($("btn-install")) $("btn-install").addEventListener("click", async () => { if (deferredPrompt) { deferredPrompt.prompt(); await deferredPrompt.userChoice; deferredPrompt = null; const b = $("install-banner"); if (b) b.classList.add("hidden"); } });
+if ($("btn-install-dismiss")) $("btn-install-dismiss").addEventListener("click", () => { const b = $("install-banner"); if (b) b.classList.add("hidden"); });
 
-$("cal-prev")?.addEventListener("click", () => { calMonth.setMonth(calMonth.getMonth() - 1); renderCalendar(); });
-$("cal-next")?.addEventListener("click", () => { calMonth.setMonth(calMonth.getMonth() + 1); renderCalendar(); });
+// CALENDAR
+if ($("cal-prev")) $("cal-prev").addEventListener("click", () => { calMonth.setMonth(calMonth.getMonth() - 1); renderCalendar(); });
+if ($("cal-next")) $("cal-next").addEventListener("click", () => { calMonth.setMonth(calMonth.getMonth() + 1); renderCalendar(); });
 
-$("btn-goal-edit")?.addEventListener("click", () => { const w = $("goal-edit-wrapper"); if (w) w.classList.toggle("hidden"); });
-$("btn-goal-save")?.addEventListener("click", () => {
+// GOAL EDIT
+if ($("btn-goal-edit")) $("btn-goal-edit").addEventListener("click", () => { const w = $("goal-edit-wrapper"); if (w) w.classList.toggle("hidden"); });
+if ($("btn-goal-save")) $("btn-goal-save").addEventListener("click", () => {
   const v = parseFloat($("input-goal-weight").value);
   if (v > 0) { localStorage.setItem("regim:goal-weight", String(v)); showToast("✅ Cel zapisany"); const w = $("goal-edit-wrapper"); if (w) w.classList.add("hidden"); renderCialo(); }
 });
+
+// FOOD CREATOR
+if ($("btn-open-creator")) $("btn-open-creator").addEventListener("click", () => {
+  loadMealPlan();
+  state.activeMeal = "breakfast";
+  state.activeCat = "pieczywo";
+  document.querySelectorAll(".meal-tab").forEach(b => { b.classList.remove("bg-gradient-to-br", "from-mint", "to-lilac", "text-ink"); b.classList.add("text-neutral-400"); });
+  const firstMeal = document.querySelector('.meal-tab[data-meal="breakfast"]');
+  if (firstMeal) { firstMeal.classList.add("bg-gradient-to-br", "from-mint", "to-lilac", "text-ink"); firstMeal.classList.remove("text-neutral-400"); }
+  document.querySelectorAll(".ing-cat-tab").forEach(b => { b.classList.remove("bg-gradient-to-br", "from-gold", "to-peach", "text-ink"); b.classList.add("text-neutral-400"); });
+  const firstCat = document.querySelector('.ing-cat-tab[data-cat="pieczywo"]');
+  if (firstCat) { firstCat.classList.add("bg-gradient-to-br", "from-gold", "to-peach", "text-ink"); firstCat.classList.remove("text-neutral-400"); }
+  renderCurrentMeal();
+  renderIngredientsGrid();
+  renderCreatorTotals();
+  openModal("modal-food-creator");
+});
+document.querySelectorAll(".meal-tab").forEach(btn => {
+  btn.addEventListener("click", () => {
+    document.querySelectorAll(".meal-tab").forEach(b => { b.classList.remove("bg-gradient-to-br", "from-mint", "to-lilac", "text-ink"); b.classList.add("text-neutral-400"); });
+    btn.classList.add("bg-gradient-to-br", "from-mint", "to-lilac", "text-ink");
+    btn.classList.remove("text-neutral-400");
+    state.activeMeal = btn.dataset.meal;
+    renderCurrentMeal();
+  });
+});
+document.querySelectorAll(".ing-cat-tab").forEach(btn => {
+  btn.addEventListener("click", () => {
+    document.querySelectorAll(".ing-cat-tab").forEach(b => { b.classList.remove("bg-gradient-to-br", "from-gold", "to-peach", "text-ink"); b.classList.add("text-neutral-400"); });
+    btn.classList.add("bg-gradient-to-br", "from-gold", "to-peach", "text-ink");
+    btn.classList.remove("text-neutral-400");
+    state.activeCat = btn.dataset.cat;
+    renderIngredientsGrid();
+  });
+});
+if ($("btn-clear-mealplan")) $("btn-clear-mealplan").addEventListener("click", () => {
+  if (confirm("Wyczyścić cały plan dnia?")) {
+    state.mealPlan = { breakfast: [], breakfast2: [], lunch: [], dinner: [], snacks: [] };
+    saveMealPlan(); renderCurrentMeal(); renderCreatorTotals(); renderMealSummary();
+  }
+});
+
+// Update totals on any save
+const _originalSaveMealPlan = saveMealPlan;
+saveMealPlan = function() {
+  localStorage.setItem(localKey("mealplan-" + todayKey), JSON.stringify(state.mealPlan));
+  renderMealSummary();
+  renderCreatorTotals();
+};
 
 // ============================================================================
 // BREATHING TIMER
@@ -2300,8 +2658,8 @@ let breathTimer = null, breathSeconds = 180, breathCounter = null;
 function startBreathing() {
   const phases = [["inhale", 4], ["hold", 7], ["exhale", 8]];
   let pi = 0;
-  $("btn-breath-start")?.classList.add("hidden");
-  $("btn-breath-stop")?.classList.remove("hidden");
+  $("btn-breath-start").classList.add("hidden");
+  $("btn-breath-stop").classList.remove("hidden");
   const circle = $("breath-circle");
   const update = () => {
     const phase = phases[pi][0]; const dur = phases[pi][1];
@@ -2320,8 +2678,8 @@ function startBreathing() {
 }
 function stopBreathing() {
   clearTimeout(breathTimer); clearInterval(breathCounter);
-  $("btn-breath-start")?.classList.remove("hidden");
-  $("btn-breath-stop")?.classList.add("hidden");
+  $("btn-breath-start").classList.remove("hidden");
+  $("btn-breath-stop").classList.add("hidden");
   $("breath-phase-text").textContent = "Gotowy";
   $("breath-circle").className = "breath-circle";
   breathSeconds = 180;
@@ -2334,8 +2692,8 @@ function stopBreathing() {
 let restSeconds = 90, restRemaining = 90, restTimer = null;
 function startRest() {
   restRemaining = restSeconds;
-  $("btn-rest-start")?.classList.add("hidden");
-  $("btn-rest-stop")?.classList.remove("hidden");
+  $("btn-rest-start").classList.add("hidden");
+  $("btn-rest-stop").classList.remove("hidden");
   const tick = () => {
     const m = Math.floor(restRemaining / 60); const s = restRemaining % 60;
     $("rest-timer-display").textContent = String(m).padStart(2, "0") + ":" + String(s).padStart(2, "0");
@@ -2347,8 +2705,8 @@ function startRest() {
 }
 function stopRest() {
   clearTimeout(restTimer);
-  $("btn-rest-start")?.classList.remove("hidden");
-  $("btn-rest-stop")?.classList.add("hidden");
+  $("btn-rest-start").classList.remove("hidden");
+  $("btn-rest-stop").classList.add("hidden");
 }
 
 // ============================================================================
@@ -2372,7 +2730,6 @@ async function renderCialo() {
     if ($("predicted-height")) $("predicted-height").textContent = pred.toFixed(1) + " cm";
     if ($("predicted-height-range")) $("predicted-height-range").textContent = "Zakres: " + (pred - 4).toFixed(0) + "–" + (pred + 4).toFixed(0) + " cm";
   }
-  // Goal
   if ($("goal-target")) $("goal-target").textContent = s.goalWeight.toFixed(1) + " kg";
   if ($("goal-current")) $("goal-current").textContent = w ? w.toFixed(1) + " kg" : "—";
   if (w && $("goal-bar")) {
@@ -2381,14 +2738,109 @@ async function renderCialo() {
     const gained = w - start;
     const pct = Math.max(0, Math.min(100, Math.round((gained / range) * 100)));
     $("goal-bar").style.width = pct + "%";
-    if ($("goal-progress-text")) $("goal-progress-text").textContent = "Zostało " + (s.goalWeight - w).toFixed(1) + " kg do celu. Zwiększ kalorie.";
+    if ($("goal-progress-text")) $("goal-progress-text").textContent = "Zostało " + (s.goalWeight - w).toFixed(1) + " kg do celu. Szejk masowy 700 kcal.";
   }
+}
+
+// ============================================================================
+// FOOD LIST
+// ============================================================================
+const FOOD_DB = {
+  breakfast: [
+    { name: "Jajecznica z 4 jajek + chleb razowy", kcal: 620, prot: 32 },
+    { name: "Owsianka na mleku + banan + masło orzechowe", kcal: 680, prot: 24 },
+    { name: "Naleśniki z twarogiem i miodem (3 szt)", kcal: 640, prot: 28 },
+    { name: "Kanapki z twarogiem i warzywami (4 kromki)", kcal: 520, prot: 26 },
+    { name: "Omlet z 5 jajek z serem i szynką", kcal: 700, prot: 42 },
+    { name: "Kasza manna z kakao i orzechami", kcal: 580, prot: 18 },
+    { name: "Twaróg 200g + miód + orzechy włoskie", kcal: 500, prot: 34 },
+    { name: "Jogurt grecki + granola + borówki", kcal: 540, prot: 22 },
+    { name: "Kanapka z łososiem + jajko sadzone", kcal: 610, prot: 30 },
+    { name: "Placki bananowe z syrop:em klonowym", kcal: 560, prot: " 20 },
+  ],
+  lunch:Or [
+    { name:zech "yKurczak + ryż + warzywa", kcal: 780, prot: 48 },
+    { name: "Spaghetti bolognese", kcal: 820, prot: 42 },
+    { name: "Pierogi ruskie + śmietana", kcal: 720, prot: 22 },
+    { name: "Kotlet schabowy + ziemniaki + surówka", kcal: 850, prot: 38 },
+    { name: "Gulasz wołowy + kasza gryczana", kcal: 760, prot: 44 },
+    { name: "Łosoś pieczony + bataty + brokuły", kcal: 720, prot: 40 },
+    { name: "Ryż z kurczakiem i warzywami", kcal: 700, prot: 42 },
+    { name: "Pizza domowa (3 kawałki)", kcal: 850, prot: 32 },
+    { name: "Karkówka + ziemniaki + mizeria", kcal: 880, prot: 40 },
+    { name: "Kluski śląskie + rolada + modra kapusta", kcal: 820, prot: 38 },
+  ],
+  snack: [
+    { name: "Twaróg 150g + miód + orzechy", kcal: 400, prot: 28 },
+    { name: "Kanapka z masłem orzechowym i bananem", kcal: 420, prot: 14 },
+    { name: "Batony proteinowe 2×", kcal: 380, prot: 40 },
+    { name: "Jogurt grecki + miód + orzechy", kcal: 360, prot: 20 },
+    { name mieszane 50g", kcal: 320, prot: 12 },
+    { name: "Jajka na twardo (3) + sól", kcal: 240, prot: 20 },
+    { name: "Koktajl mleko + banan + masło orzechowe", kcal: 460, prot: 18 },
+    { name: "Skyr 200g + kakao + banan", kcal: 340, prot: 26 },
+  ],
+  dinner: [
+    { name: "Twaróg 200g + warzywa + oliwa", kcal: 420, prot: 32 },
+    { name: "Omlet z 4 jajek z warzywami", kcal: 480, prot: 28 },
+    { name: "Sałatka z tuńczykiem, jajkiem, oliwkami", kcal: 500, prot: 36 },
+    { name: "Kanapki z pastą awokado i jajkiem", kcal: 520, prot: 22 },
+    { name: "Kurczak 150g + kasza + warzywa", kcal: 620, prot: 44 },
+    { name: "Skyr 300g + owoce + orzechy", kcal: 460, prot: 32 },
+    { name: "Jajka sadzone (3) + chleb + pomidor", kcal: 480, prot: 26 },
+    { name: "Łosoś wędzony + twarożek + pieczywo chrupkie", kcal: 420, prot: 30 },
+  ],
+  shake: [
+    { name: "Szejk masowy: mleko + banan + płatki + masło orzechowe + miód", kcal: 700, prot: 22 },
+    { name: "Szejk proteinowy: mleko + białko + banan", kcal: 480, prot: 50 },
+    { name: "Szejk twarogowy: twaróg + mleko + miód + kakao", kcal: 520, prot: 38 },
+    { name: "Szejk owsiany: mleko + płatki + daktyle + masło orzechowe", kcal: 720, prot: 20 },
+    { name: "Szejk owocowy: mleko + mango + banan + jogurt", kcal: 540, prot: 22 },
+    { name: "Szejk kawowy: mleko + kawa + białko + masło orzechowe", kcal: 460, prot: 34 },
+  ],
+  fast: [
+    { name: "Kanapka z tuńczykiem + majonez + ogórek", kcal: 480, prot: 28 },
+    { name: "Parówki + bułka + ketchup", kcal: 560, prot: 22 },
+    { name: "Jajka na twardo (4) + sól + chleb", kcal: 440, prot: 28 },
+    { name: "Twaróg + rzodkiewka + chleb razowy", kcal: 420, prot: 26 },
+    { name: "Zapiekanka z serem", kcal: 620, prot: 24 },
+    { name: "Kabanosy 100g + bułka + ogórek", kcal: 580, prot: 26 },
+  ],
+};
+const MASS_SHAKES = [
+  { name: "Klasyk Masowy", ingredients: ["300 ml mleka 3.2%", "40 g płatków owsianych", "1 banan", "2 łyżki masła orzechowego"], kcal: 700, prot: 24 },
+  { name: "Czekoladowy Moc", ingredients: ["300 ml mleka", "40 g płatków owsianych", "1 łyżka kakao", "1 banan", "1 łyżka miodu"], kcal: 690, prot: 22 },
+  { name: "Orzechowy Beast", ingredients: ["300 ml mleka", "30 g płatków owsianych", "2 łyżki masła orzechowego", "1 łyżka miodu", "garść orzechów włoskich"], kcal: 750, prot: 22 },
+  { name: "Bananowy Turbo", ingredients: ["350 ml mleka", "50 g płatków owsianych", "2 banany", "1 łyżka masła orzechowego"], kcal: 740, prot: 24 },
+  { name: "Twarogowy Pro", ingredients: ["250 ml mleka", "150 g twarogu", "1 banan", "1 łyżka miodu", "1 łyżka kakao"], kcal: 680, prot: 38 },
+  { name: "Daktyle & Masło", ingredients: ["300 ml mleka", "40 g płatków owsianych", "5 daktyli", "2 łyżki masła orzechowego"], kcal: 720, prot: 20 },
+  { name: "Owocowy Load", ingredients: ["300 ml mleka", "150 g jogurtu greckiego", "1 banan", "garść borówek", "2 łyżki płatków"], kcal: 640, prot: 26 },
+  { name: "Kawowy Rise", ingredients: ["300 ml mleka", "50 g płatków owsianych", "1 łyżka kawy", "1 banan", "1 łyżka masła orzechowego"], kcal: 700, prot: 22 },
+];
+function renderFoodList() {
+  const container = $("food-list"); if (!container) return;
+  const items = FOOD_DB[currentFoodTab] || [];
+  container.innerHTML = items.map(f => '<div class="food-card"><div class="text-sm font-bold text-neutral-100 leading-snug">' + escapeHtml(f.name) + '</div><div class="flex items-center gap-3 mt-2 text-[11px] font-bold"><span class="text-gold"><i class="fa-solid fa-fire mr-1"></i>' + f.kcal + ' kcal</span><span class="text-mint"><i class="fa-solid fa-drumstick-bite mr-1"></i>' + f.prot + ' g</span></div></div>').join("");
+}
+function rollFoodPlan() {
+  const pick = (cat) => FOOD_DB[cat][Math.floor(Math.random() * FOOD_DB[cat].length)];
+  const breakfast = pick("breakfast"); const lunch = pick("lunch"); const snack = pick("snack"); const dinner = pick("dinner"); const shake = pick("shake");
+  const total = breakfast.kcal + lunch.kcal + snack.kcal + dinner.kcal + shake.kcal;
+  const prot = breakfast.prot + lunch.prot + snack.prot + dinner.prot + shake.prot;
+  const el = $("food-roll");
+  el.innerHTML = '<div class="text-xs font-extrabold text-mint mb-2 tracking-widest uppercase">🎲 Twój plan</div><div class="space-y-2 text-xs"><div><strong class="text-peach">Śniadanie:</strong> ' + escapeHtml(breakfast.name) + ' <span class="text-neutral-500">(' + breakfast.kcal + ' kcal / ' + breakfast.prot + 'g)</span></div><div><strong class="text-gold">Obiad:</strong> ' + escapeHtml(lunch.name) + ' <span class="text-neutral-500">(' + lunch.kcal + ' kcal / ' + lunch.prot + 'g)</span></div><div><strong class="text-mint">Przekąska:</strong> ' + escapeHtml(snack.name) + ' <span class="text-neutral-500">(' + snack.kcal + ' kcal / ' + snack.prot + 'g)</span></div><div><strong class="text-lilac">Kolacja:</strong> ' + escapeHtml(dinner.name) + ' <span class="text-neutral-500">(' + dinner.kcal + ' kcal / ' + dinner.prot + 'g)</span></div><div><strong class="text-rose">Szejk:</strong> ' + escapeHtml(shake.name) + ' <span class="text-neutral-500">(' + shake.kcal + ' kcal / ' + shake.prot + 'g)</span></div></div><div class="flex items-center justify-between mt-3 pt-3 border-t border-white/10"><div class="text-sm font-extrabold text-gold">≈ ' + total + ' kcal</div><div class="text-sm font-extrabold text-mint">≈ ' + prot + 'g białka</div></div>';
+  vibrate(30); playSound("done");
+}
+function rollMassShake() {
+  const s = MASS_SHAKES[Math.floor(Math.random() * MASS_SHAKES.length)];
+  const el = $("mass-shake-roll");
+  el.innerHTML = '<div class="text-xs font-extrabold text-gold mb-2 tracking-widest uppercase">🥤 ' + escapeHtml(s.name) + '</div><div class="space-y-1.5 text-xs">' + s.ingredients.map(i => '<div class="flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-gold flex-shrink-0"></span><span class="text-neutral-200 font-medium">' + escapeHtml(i) + '</span></div>').join("") + '</div><div class="flex items-center justify-between mt-3 pt-3 border-t border-white/10"><div class="text-sm font-extrabold text-gold"><i class="fa-solid fa-fire mr-1"></i>≈ ' + s.k &&cal + ' kcal</div><div class="text-sm font-extrabold text-mint"><i class="fa-solid fa-drumstick-bite mr-1"></i>≈ ' + s.prot + 'g</div></div>';
+  vibrate(30); playSound("done");
 }
 
 // ============================================================================
 // BOOT
 // ============================================================================
-async function reloadEverything() { await bootApp(); }
 async function bootApp() {
   booted = true;
   const s = getSettings();
@@ -2405,6 +2857,11 @@ async function bootApp() {
     if ($("theme-icon")) $("theme-icon").className = "fa-solid fa-sun";
   }
 
+  if (isSunday) {
+    const sr = $("sunday-recovery-banner"); if (sr) sr.classList.remove("hidden");
+    renderGlowUpMirror();
+  }
+
   if (todayObj.getDate() === 1) {
     const dismissed = localStorage.getItem("regim:measure-dismiss-" + dateKey(todayObj));
     if (!dismissed) { const b = $("monthly-measure-banner"); if (b) b.classList.remove("hidden"); }
@@ -2414,7 +2871,7 @@ async function bootApp() {
   const savedTasks = (today && today.tasks) || [];
   state.morning = (today && today.morning) || {};
   state.evening = (today && today.evening) || {};
-  state.note = (today && today.note) || "";
+  state.note = (today today.note) || "";
 
   applyConditionalTasks();
 
@@ -2425,6 +2882,7 @@ async function bootApp() {
     }));
   }
   syncStateFromCategories();
+  loadMealPlan();
 
   renderTasksByCategory();
   renderProgress();
@@ -2439,8 +2897,10 @@ async function bootApp() {
   renderKnowledgeBase();
   renderFactOfDay();
   renderAnalysisHistory();
+  renderBlackList();
   renderFoodList();
   renderCialo();
+  renderMealSummary();
   await renderAutoAnalysis();
 
   if ($("quote-day")) $("quote-day").textContent = getPersonalQuote();
