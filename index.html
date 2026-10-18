@@ -757,6 +757,7 @@ html.light-theme .history-item{border-left-color:rgba(30,26,53,.12)}
 // GLOBALS
 // ============================================================================
 let firebaseReady = false, currentUser = { uid: "local" }, authResolved = false, syncInProgress = false, booted = false, migrateDone = false;
+let firebaseInitPromise = null;
 const USER_NAME_DEFAULT = "Karol";
 const LOCKIN_TOTAL_DAYS = 73;
 if (!localStorage.getItem("regim:lockin-start")) {
@@ -925,7 +926,7 @@ async function loadDaysRange(n, offset) {
 }
 
 // ============================================================================
-// AUTH (Firebase lazy)
+// AUTH
 // ============================================================================
 function setSyncStatus(mode, label) {
   const el = $("sync-status"); if (!el) return;
@@ -983,7 +984,9 @@ function updateAuthUI(user) {
     if (acc) acc.textContent = "Niezalogowany";
   }
 }
+
 async function initFirebase() {
+  if (firebaseReady) return;
   try {
     const appMod = await import("https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js");
     const authMod = await import("https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js");
@@ -1002,22 +1005,61 @@ async function initFirebase() {
       if (!authResolved || !booted) { authResolved = true; await bootApp(); }
       else await bootApp();
     });
-    const signinBtn = $("btn-signin");
-    if (signinBtn) signinBtn.addEventListener("click", async () => {
-      const user = auth.currentUser;
+  } catch (e) { firebaseReady = false; authResolved = true; updateSyncUI(); }
+}
+
+async function ensureFirebase() {
+  if (firebaseReady && window.__fb) return true;
+  if (firebaseInitPromise) return firebaseInitPromise;
+  firebaseInitPromise = (async () => {
+    try { await initFirebase(); return !!(firebaseReady && window.__fb); }
+    catch (e) { return false; }
+    finally { firebaseInitPromise = null; }
+  })();
+  return firebaseInitPromise;
+}
+
+function attachSigninHandler() {
+  const signinBtn = $("btn-signin");
+  if (!signinBtn || signinBtn.dataset.bound === "1") return;
+  signinBtn.dataset.bound = "1";
+  signinBtn.addEventListener("click", async () => {
+    signinBtn.style.opacity = "0.5";
+    try {
+      if (!firebaseReady || !window.__fb) {
+        showToast("Łączę z chmurą...");
+        const ok = await ensureFirebase();
+        if (!ok || !window.__fb) { showToast("❌ Brak internetu / Firebase"); return; }
+      }
+      const fb = window.__fb;
+      const user = fb.auth.currentUser;
       if (user) {
-        if (confirm("Wylogować się z " + (user.displayName || user.email) + "?")) {
-          try { await authMod.signOut(auth); showToast("Wylogowano"); } catch (e) {}
+        const name = user.displayName || user.email || "konto";
+        if (confirm("Wylogować się z " + name + "?")) {
+          try { await fb.authMod.signOut(fb.auth); showToast("✅ Wylogowano"); updateAuthUI(null); updateSyncUI(); }
+          catch (e) { showToast("Błąd wylogowania"); }
         }
         return;
       }
       try {
-        const provider = new authMod.GoogleAuthProvider();
+        const provider = new fb.authMod.GoogleAuthProvider();
         provider.setCustomParameters({ prompt: "select_account" });
-        await authMod.signInWithPopup(auth, provider);
-      } catch (e) { try { await authMod.signInAnonymously(auth); } catch (e2) { showToast("Błąd logowania: " + (e && e.code ? e.code : "unknown")); } }
-    });
-  } catch (e) { firebaseReady = false; authResolved = true; updateSyncUI(); }
+        await fb.authMod.signInWithPopup(fb.auth, provider);
+        showToast("✅ Zalogowano");
+      } catch (err) {
+        if (err && err.code === "auth/popup-closed-by-user") { showToast("Anulowano logowanie"); return; }
+        try { await fb.authMod.signInAnonymously(fb.auth); showToast("✅ Tryb anonimowy"); }
+        catch (err2) {
+          let msg = "❌ Błąd logowania";
+          if (err && err.code === "auth/popup-blocked") msg = "🚫 Włącz popupy w przeglądarce";
+          else if (err && err.code === "auth/unauthorized-domain") msg = "🚫 Domena niezautoryzowana w Firebase";
+          else if (err && err.code === "auth/operation-not-allowed") msg = "🚫 Logowanie wyłączone w Firebase Console";
+          else if (err && err.code) msg = "❌ " + err.code;
+          showToast(msg);
+        }
+      }
+    } finally { signinBtn.style.opacity = ""; }
+  });
 }
 
 // ============================================================================
@@ -1071,14 +1113,14 @@ const BASE_CALISTHENICS = [
   { id: "biceps-1kg", label: "Uginanie ramion hantle 1kg", series: "3×15" },
   { id: "wznosy-bioder", label: "Wznosy bioder", series: "3×15" },
   { id: "deska", label: "Deska (plank)", series: "3×45s" },
-  { id: "unoszenie-nog", label: "Unoszenie nóg leżąc", series: "3×12" },
+  { id: "unoszenie-nog", label: "Unoszenie nóg leżąc", series: "3×12" }
 ];
 const LIGHT_CALISTHENICS = [
   { id: "pompki", label: "Pompki klasyczne", series: "2×6" },
   { id: "przysiady", label: "Przysiady", series: "2×10" },
   { id: "wznosy-barki", label: "Wznosy bokiem hantle 1kg", series: "2×15" },
   { id: "deska", label: "Deska (plank)", series: "2×20s" },
-  { id: "wznosy-bioder", label: "Wznosy bioder", series: "2×10" },
+  { id: "wznosy-bioder", label: "Wznosy bioder", series: "2×10" }
 ];
 function boostSeries(series) {
   const m = series.match(/^(\d+)×(.*)$/);
@@ -1153,29 +1195,23 @@ const TASK_CATEGORIES = [
     { id: "morning-water", label: "Szklanka wody po przebudzeniu", hint: "Podkrążone oczy + nawodnienie", done: false }
   ]},
   { id: "regeneracja", icon: "😴", name: "Regeneracja", color: "lilac", tasks: [] },
-  { id: "pomiary", icon: "📏", name: "Pomiary", color: "mint", tasks: [] },
+  { id: "pomiary", icon: "📏", name: "Pomiary", color: "mint", tasks: [] }
 ];
 
 function applyConditionalTasks() {
-  // SUPPLEMENTS
   const suppCat = TASK_CATEGORIES.find(c => c.id === "suplementy");
   if (getToggle("supplements")) {
     suppCat.tasks = [{ id: "d3", label: "D3 ×2 tabletki (4000 IU)", hint: "Rano, do tłuszczu", done: false }];
-  } else {
-    suppCat.tasks = [];
-  }
+  } else { suppCat.tasks = []; }
 
-  // TRENING - Sunday: no task
   const treningCat = TASK_CATEGORIES.find(c => c.id === "trening");
   const trainingTask = buildTrainingTask();
   treningCat.tasks = trainingTask ? [trainingTask] : [];
 
-  // BURNOUT - only training days (not Sunday, not Monday pool, not recovery)
   const burnoutCat = TASK_CATEGORIES.find(c => c.id === "burnout");
   const isTrainingDay = trainingTask && trainingTask.level !== "recovery" && todayDow !== 1 && todayDow !== 0;
   burnoutCat.tasks = isTrainingDay ? [{ id: "burnout", label: "Burnout Set — 1 seria do upadku", hint: "Max pompek LUB krzesełko przy ścianie (max czas)", done: false }] : [];
 
-  // SKINCARE
   const skincareCat = TASK_CATEGORIES.find(c => c.id === "skincare");
   if (getToggle("skincare")) {
     skincareCat.tasks = [
@@ -1185,28 +1221,21 @@ function applyConditionalTasks() {
       { id: "skincare-cetaphil", label: "Cetaphil — krem nawilżający", hint: "Cała twarz", done: false },
       { id: "cold-water-pm", label: "Przemycie twarzy zimną wodą (wieczór)", hint: "Zamknięcie porów", done: false }
     ];
-  } else {
-    skincareCat.tasks = [];
-  }
+  } else { skincareCat.tasks = []; }
 
-  // JAWLINE
   const jawlineCat = TASK_CATEGORIES.find(c => c.id === "jawline");
   if (getToggle("jawline")) {
     jawlineCat.tasks = [
       { id: "mewing", label: "Mewing — prawidłowa pozycja języka", hint: "Klucz do linii szczęki i symetrii twarzy", done: false },
       { id: "postawa", label: "Kontrola postawy", hint: "Barki do tyłu, brzuch wciągnięty", done: false }
     ];
-  } else {
-    jawlineCat.tasks = [];
-  }
+  } else { jawlineCat.tasks = []; }
 
-  // REGENERACJA
   const regenCat = TASK_CATEGORIES.find(c => c.id === "regeneracja");
   const regenTasks = [{ id: "telefon-off", label: "Telefon off 1h przed snem", hint: "Jakość snu — hormon wzrostu", done: false }];
   if (getToggle("beast")) regenTasks.push({ id: "cold-shower", label: "Zimny prysznic 2 min", hint: "HARDCORE — hartowanie", done: false });
   regenCat.tasks = regenTasks;
 
-  // POMIARY
   const pomiaryCat = TASK_CATEGORIES.find(c => c.id === "pomiary");
   const pomiaryList = [];
   if (todayDow === 1 || todayDow === 4 || todayDow === 6) pomiaryList.push({ id: "wlosy", label: "Mycie włosów", hint: "Szampon + odżywka", done: false });
@@ -1236,7 +1265,7 @@ function calcCompletionStats() {
     requiredDone: required.filter(t => t.done).length,
     requiredTotal: required.length,
     optionalDone: optional.filter(t => t.done).length,
-    optionalTotal: optional.length,
+    optionalTotal: optional.length
   };
 }
 
@@ -1526,7 +1555,7 @@ async function renderBrief() {
 }
 
 // ============================================================================
-// KEYWORDS — HARDCORE v2.0
+// KEYWORDS
 // ============================================================================
 const KEYWORDS = {
   sick: ["chory","choroba","gorączka","przeziębienie","katar","kaszel","grypa","ból głowy","migrena","osłabiony","rozbity","niedobrze","mdli","wymioty","boli","źle się czuję","przeziębiony","gorączkuję","infekcja","zapalenie","angina","temperatura","dreszcze"],
@@ -1540,13 +1569,12 @@ const KEYWORDS = {
   injury: ["kontuzja","skręcenie","uraz","naderwanie","stłuczenie","zwichnięcie","ból pleców","ból barku","ból kolana"],
   lonely: ["samotny","smutny","przygnębiony","depresja","płakałem","smutek","beznadzieja"],
   success: ["rekord","pobity","poprawa","progres","sukces","udało się","pobiłem"],
-  // NOWE HARDCORE v2.0:
   school: ["jedynka","dwójka","szkoła","sprawdzian","ocena","poprawa","nauka","klasówka","wagar","nauczyciel","lekcja","kartkówka"],
   girl: ["dziewczyna","rzuciła","zerwała","odrzuciła","nie chce mnie","friendzone","podoba mi się","zakochany","złamała serce","serce"],
   mom: ["mama","matka","tata","ojciec","kłótnia","awantura","krzyczy","rodzice","dom","rodzina"],
   game: ["gry","konsola","tiktok","youtube","instagram","scroll","gaming","lol","csgo","fortnite","minecraft","rolly"],
   soreness: ["zakwasy","boli","obolały","przemęczony","zmęczone mięśnie","nie mogę się ruszyć","spięty"],
-  junkfood: ["zjadłem syf","chipsy","fast food","mc","kfc","burger","frytki","pizza","słodkie","cukier","napój","cola"],
+  junkfood: ["zjadłem syf","chipsy","fast food","mc","kfc","burger","frytki","pizza","słodkie","cukier","napój","cola"]
 };
 
 function detectKeywords(text) {
@@ -1567,7 +1595,7 @@ const BLACK_LIST = [
   { num: "02", title: "ALKOHOL", body: "Piwo = -12% testosteronu. Wódka = 0% masy. Nie ma opcji. Kropka." },
   { num: "03", title: "SŁODKIE NAPOJE", body: "Cola = 40g cukru = trądzik + tłuszcz + brak wzrostu. Woda, mleko, kawa. Koniec tematu." },
   { num: "04", title: "NIEBIESKIE ŚWIATŁO PRZED SNEM", body: "Telefon 1h przed snem = kasacja melatoniny = brak hormonu wzrostu. OFF i do łóżka." },
-  { num: "05", title: "BRAK POSTAWY", body: "Garb = -2 cm wizualnie. Postawa = darmowy wzrost. Codziennie, cały dzień." },
+  { num: "05", title: "BRAK POSTAWY", body: "Garb = -2 cm wizualnie. Postawa = darmowy wzrost. Codziennie, cały dzień." }
 ];
 function renderBlackList() {
   const el = $("black-list"); if (!el) return;
@@ -1593,7 +1621,7 @@ const RAGE_QUOTES = [
   "Ból na treningu to podatek. Płać z uśmiechem.",
   "Ostatni raz kiedy byłeś tak silny? Nigdy. Idziemy dalej.",
   "Nie czekaj na motywację. Rusz dupe, motywacja przyjdzie w trakcie.",
-  "Zazdrość innych = twój dowód progresu. Pracuj dalej.",
+  "Zazdrość innych = twój dowód progresu. Pracuj dalej."
 ];
 function showRage() {
   const q = RAGE_QUOTES[Math.floor(Math.random() * RAGE_QUOTES.length)];
@@ -1604,12 +1632,12 @@ function showRage() {
 }
 
 // ============================================================================
-// STORE MEALS (Żabka/Biedronka)
+// STORE MEALS
 // ============================================================================
 const STORE_MEALS = [
   { name: "Zestaw 1 — Klasyk Masowy", items: ["Serek wiejski 200g", "Kabanosy 2 szt", "Bułka grahamka"], kcal: 520, prot: 32 },
   { name: "Zestaw 2 — Słodki Boost", items: ["Pudding Ehrmann Protein", "Rogalik maślany", "Banan"], kcal: 505, prot: 22 },
-  { name: "Zestaw 3 — Protein Beast", items: ["Skyr 150g", "Garść orzechów włoskich", "Pieczywo chrupkie 2 szt"], kcal: 420, prot: 26 },
+  { name: "Zestaw 3 — Protein Beast", items: ["Skyr 150g", "Garść orzechów włoskich", "Pieczywo chrupkie 2 szt"], kcal: 420, prot: 26 }
 ];
 function showStoreMeals() {
   const el = $("store-meals-content"); if (!el) return;
@@ -1619,7 +1647,7 @@ function showStoreMeals() {
 }
 
 // ============================================================================
-// FOOD INGREDIENTS — CREATOR
+// FOOD INGREDIENTS
 // ============================================================================
 const FOOD_INGREDIENTS = {
   pieczywo: [
@@ -1728,7 +1756,6 @@ const FOOD_INGREDIENTS = {
   ]
 };
 
-// MEAL PLAN — load from localStorage
 function loadMealPlan() {
   try {
     const raw = localStorage.getItem(localKey("mealplan-" + todayKey));
@@ -1741,6 +1768,7 @@ function loadMealPlan() {
 function saveMealPlan() {
   localStorage.setItem(localKey("mealplan-" + todayKey), JSON.stringify(state.mealPlan));
   renderMealSummary();
+  renderCreatorTotals();
 }
 function getMealTotals(mealKey) {
   const items = state.mealPlan[mealKey] || [];
@@ -1794,7 +1822,6 @@ function renderIngredientsGrid() {
       state.mealPlan[state.activeMeal].push({ name: it.name, kcal: it.kcal, prot: it.prot });
       saveMealPlan();
       renderCurrentMeal();
-      renderIngredientsGrid();
       vibrate(15); playSound("done");
       b.classList.add("added");
       setTimeout(() => b.classList.remove("added"), 300);
@@ -1809,7 +1836,7 @@ function renderCreatorTotals() {
 }
 
 // ============================================================================
-// GLOW UP MIRROR CHECK
+// GLOW UP MIRROR
 // ============================================================================
 const GLOWUP_QUESTIONS = [
   { id: "jawline", q: "Szczęka wyraźna (mewing działa)" },
@@ -1831,10 +1858,10 @@ function renderGlowUpMirror() {
   el.innerHTML = GLOWUP_QUESTIONS.map(q => '<div class="flex items-center justify-between py-1.5 border-b border-white/5 last:border-0"><span class="text-xs text-neutral-200 font-semibold flex-1 pr-2">' + q.q + '</span><div class="toggle-switch ' + (saved[q.id] ? 'on' : '') + '" data-glowup="' + q.id + '"></div></div>').join("");
   el.querySelectorAll("[data-glowup]").forEach(t => {
     t.addEventListener("click", () => {
-      const saved = JSON.parse(localStorage.getItem(localKey(weekKey)) || "{}");
-      saved[t.dataset.glowup] = !saved[t.dataset.glowup];
-      localStorage.setItem(localKey(weekKey), JSON.stringify(saved));
-      if (saved[t.dataset.glowup]) t.classList.add("on"); else t.classList.remove("on");
+      const savedObj = JSON.parse(localStorage.getItem(localKey(weekKey)) || "{}");
+      savedObj[t.dataset.glowup] = !savedObj[t.dataset.glowup];
+      localStorage.setItem(localKey(weekKey), JSON.stringify(savedObj));
+      if (savedObj[t.dataset.glowup]) t.classList.add("on"); else t.classList.remove("on");
       vibrate(15);
       updateGlowUpScore();
     });
@@ -1857,7 +1884,7 @@ function updateGlowUpScore() {
 }
 
 // ============================================================================
-// ANALYSIS — HARDCORE
+// ANALYSIS
 // ============================================================================
 function sec(title, icon, body, color) {
   return '<div class="analysis-section"><div class="analysis-title" style="color:' + (color || "#5eead4") + '">' + icon + ' ' + title + '</div><div class="analysis-body">' + body + '</div></div>';
@@ -1892,41 +1919,25 @@ async function generateFullAnalysis() {
   const level = getTrainingLevel();
   const sections = [];
 
-  // SCENARIUSZE HARDCORE
   let scenarioHtml = "";
-  if (kws.indexOf("vape") >= 0) {
-    scenarioHtml += '<div class="analysis-section"><div class="analysis-title" style="color:#fb7185">🚭 VAPE ALERT</div><div class="analysis-body"><strong>Odrzucasz to.</strong> Nie jesteś jak reszta małych owiec na osiedlu. Robisz Lock In. Wapek = koniec twojej drogi. Kropka.</div></div>';
-  }
-  if (kws.indexOf("school") >= 0) {
-    scenarioHtml += '<div class="analysis-section"><div class="analysis-title" style="color:#fbbf24">📚 SZKOŁA</div><div class="analysis-body">Ocena do poprawy? <strong>Masz 15 minut.</strong> Wypij szejka, wróć do celu. Szkoła to etap, ciało zostaje na zawsze.</div></div>';
-  }
-  if (kws.indexOf("girl") >= 0) {
-    scenarioHtml += '<div class="analysis-section"><div class="analysis-title" style="color:#fb7185">💔 SERCE</div><div class="analysis-body"><strong>Ból to paliwo.</strong> Najlepszy rewanż to +5 kg mięśni, linia szczęki, skóra jak szkło. Ona zobaczy. Ale ty już nie będziesz patrzył wstecz.</div></div>';
-  }
-  if (kws.indexOf("mom") >= 0) {
-    scenarioHtml += '<div class="analysis-section"><div class="analysis-title" style="color:#c4b5fd">🏠 DOM</div><div class="analysis-body">Kłótnia z mamą/rodzicami? <strong>Zamknij emocje.</strong> Zrób szejka, idź spać o 22:00. Skup się na celach. Emocje to szum, dyscyplina to sygnał.</div></div>';
-  }
-  if (kws.indexOf("game") >= 0) {
-    scenarioHtml += '<div class="analysis-section"><div class="analysis-title" style="color:#fbbf24">🎮 GRY</div><div class="analysis-body">TikTok/konsola? <strong>Najpierw trening, potem gry.</strong> Prawdziwa postać ma wyglądać dobrze w realu, nie tylko na ekranie.</div></div>';
-  }
-  if (kws.indexOf("soreness") >= 0) {
-    scenarioHtml += '<div class="analysis-section"><div class="analysis-title" style="color:#5eead4">💪 ZAKWASY</div><div class="analysis-body"><strong>Zakwasy to dowód wzrostu.</strong> Białko, woda, sen. Jutro znowu do roboty.</div></div>';
-  }
-  if (kws.indexOf("junkfood") >= 0) {
-    scenarioHtml += '<div class="analysis-section"><div class="analysis-title" style="color:#fb7185">🍟 SYF</div><div class="analysis-body">Zjadłeś syf? <strong>Woda, odstaw cukier, karna seria do upadku.</strong> Jeden grzech nie zabija. Ale nie rób z tego codzienności.</div></div>';
-  }
+  if (kws.indexOf("vape") >= 0) scenarioHtml += '<div class="analysis-section"><div class="analysis-title" style="color:#fb7185">🚭 VAPE ALERT</div><div class="analysis-body"><strong>Odrzucasz to.</strong> Nie jesteś jak reszta małych owiec na osiedlu. Robisz Lock In. Wapek = koniec twojej drogi. Kropka.</div></div>';
+  if (kws.indexOf("school") >= 0) scenarioHtml += '<div class="analysis-section"><div class="analysis-title" style="color:#fbbf24">📚 SZKOŁA</div><div class="analysis-body">Ocena do poprawy? <strong>Masz 15 minut.</strong> Wypij szejka, wróć do celu. Szkoła to etap, ciało zostaje na zawsze.</div></div>';
+  if (kws.indexOf("girl") >= 0) scenarioHtml += '<div class="analysis-section"><div class="analysis-title" style="color:#fb7185">💔 SERCE</div><div class="analysis-body"><strong>Ból to paliwo.</strong> Najlepszy rewanż to +5 kg mięśni, linia szczęki, skóra jak szkło. Ona zobaczy. Ale ty już nie będziesz patrzył wstecz.</div></div>';
+  if (kws.indexOf("mom") >= 0) scenarioHtml += '<div class="analysis-section"><div class="analysis-title" style="color:#c4b5fd">🏠 DOM</div><div class="analysis-body">Kłótnia z mamą/rodzicami? <strong>Zamknij emocje.</strong> Zrób szejka, idź spać o 22:00. Skup się na celach. Emocje to szum, dyscyplina to sygnał.</div></div>';
+  if (kws.indexOf("game") >= 0) scenarioHtml += '<div class="analysis-section"><div class="analysis-title" style="color:#fbbf24">🎮 GRY</div><div class="analysis-body">TikTok/konsola? <strong>Najpierw trening, potem gry.</strong> Prawdziwa postać ma wyglądać dobrze w realu, nie tylko na ekranie.</div></div>';
+  if (kws.indexOf("soreness") >= 0) scenarioHtml += '<div class="analysis-section"><div class="analysis-title" style="color:#5eead4">💪 ZAKWASY</div><div class="analysis-body"><strong>Zakwasy to dowód wzrostu.</strong> Białko, woda, sen. Jutro znowu do roboty.</div></div>';
+  if (kws.indexOf("junkfood") >= 0) scenarioHtml += '<div class="analysis-section"><div class="analysis-title" style="color:#fb7185">🍟 SYF</div><div class="analysis-body">Zjadłeś syf? <strong>Woda, odstaw cukier, karna seria do upadku.</strong> Jeden grzech nie zabija. Ale nie rób z tego codzienności.</div></div>';
 
-  // 1. SEN
   {
     let b = "";
-    if (m.sleepTotal == null) b = "Brak danych o snie. Uzupełnij raport poranny — bez tego nie oceniam regeneracji.";
+    if (m.sleepTotal == null) b = "Brak danych o snie. Uzupełnij raport poranny.";
     else {
       const s = m.sleepTotal;
       if (s >= 8.5) b += "<strong>" + s.toFixed(1) + "h</strong> — kozacki sen. Tak buduje się mistrza.";
       else if (s >= 8) b += "<strong>" + s.toFixed(1) + "h</strong> — solidnie, trzymaj.";
       else if (s >= 7) b += "<strong>" + s.toFixed(1) + "h</strong> — ok, ale celuj w 8+.";
       else if (s >= 6) b += "<strong>" + s.toFixed(1) + "h</strong> — poniżej progu. Jutro wcześniej spać.";
-      else b += "<em>Kurwa, tylko " + s.toFixed(1) + "h.</em> Na takim śnie masa nie rośnie, wzrost staje. Idź spać przed 22:30.";
+      else b += "<em>Kurwa, tylko " + s.toFixed(1) + "h.</em> Na takim śnie masa nie rośnie. Idź spać przed 22:30.";
       if (m.sleepDeep != null && s > 0) {
         const r = m.sleepDeep / s;
         b += " Głęboki: <strong>" + m.sleepDeep.toFixed(2) + "h</strong> (" + (r * 100).toFixed(0) + "%).";
@@ -1937,10 +1948,9 @@ async function generateFullAnalysis() {
     sections.push(sec("Sen", "🌙", b, "#c4b5fd"));
   }
 
-  // 2. RHR
   {
     let b = "";
-    if (m.rhr == null) b = "Brak RHR. Mierz rano przed wstaniem — kluczowy wskaźnik.";
+    if (m.rhr == null) b = "Brak RHR. Mierz rano przed wstaniem.";
     else {
       const analysis = analyzeRhr(m.rhr, age, avgRhr);
       b += "Norma wieku " + age + ": <strong>" + rhrRange.min + "–" + rhrRange.max + " bpm</strong>. ";
@@ -1949,7 +1959,6 @@ async function generateFullAnalysis() {
     sections.push(sec("Regeneracja (RHR)", "💓", b, "#5eead4"));
   }
 
-  // 3. TRENING
   {
     let b = "";
     if (readiness == null) b = "Za mało danych.";
@@ -1958,9 +1967,9 @@ async function generateFullAnalysis() {
       if (readiness >= 80) b += "Dziś napierdalasz — pełna moc.";
       else if (readiness >= 60) b += "Standardowy trening.";
       else if (readiness >= 40) b += "Lżejszy dzień — technika > ciężar.";
-      else b += "<em>Niska gotowość.</em> Recovery: spacer, oddech, stretching.";
+      else b += "<em>Niska gotowość.</em> Recovery.";
     }
-    if (isSunday) b += " <strong>Niedziela = regeneracja obowiązkowa.</strong> Mięśnie rosną w spoczynku.";
+    if (isSunday) b += " <strong>Niedziela = regeneracja obowiązkowa.</strong>";
     else if (level === "recovery") b += " Poziom: <em>RECOVERY</em>.";
     else if (level === "light") b += " Poziom: <em>LIGHT</em>.";
     else if (level === "full") b += " Poziom: <strong>FULL</strong> 🔥.";
@@ -1968,31 +1977,29 @@ async function generateFullAnalysis() {
     sections.push(sec("Gotowość + Trening", "🏋️", b, "#fbbf9d"));
   }
 
-  // 4. NASTRÓJ
   {
     let b = "";
     const mood = m.moodMorning != null ? m.moodMorning : e.moodEvening;
     if (mood == null) b = "Brak oceny nastroju.";
     else {
-      if (mood >= 8) b += "Nastrój <strong>" + mood + "/10</strong> — ogień. Wykorzystaj to.";
+      if (mood >= 8) b += "Nastrój <strong>" + mood + "/10</strong> — ogień.";
       else if (mood >= 6) b += "Nastrój <strong>" + mood + "/10</strong> — stabilnie.";
-      else if (mood >= 4) b += "Nastrój <strong>" + mood + "/10</strong> — taki sobie. Trzymaj rytm.";
-      else b += "Nastrój <strong>" + mood + "/10</strong> — <em>dołek.</em> Zrób podstawy, idź spać. Jutro nowy dzień.";
+      else if (mood >= 4) b += "Nastrój <strong>" + mood + "/10</strong> — taki sobie.";
+      else b += "Nastrój <strong>" + mood + "/10</strong> — <em>dołek.</em> Podstawy i spać.";
       if (avgMood != null) b += " " + trendLabel(mood, avgMood) + ".";
     }
     sections.push(sec("Nastrój", "😊", b, "#fbbf9d"));
   }
 
-  // 5. AKTYWNOŚĆ
   {
     let b = "";
     if (e.steps == null && e.kcalBurned == null) b = "Brak danych aktywności.";
     else {
       if (e.steps != null) {
         const s = e.steps;
-        if (s >= 12000) b += "Kroki: <strong>" + s + "</strong> — konkretny dystans.";
+        if (s >= 12000) b += "Kroki: <strong>" + s + "</strong> — konkret.";
         else if (s >= 8000) b += "Kroki: <strong>" + s + "</strong> — solidnie.";
-        else if (s >= 5000) b += "Kroki: " + s + " — przeciętnie. Ruszyć dupe.";
+        else if (s >= 5000) b += "Kroki: " + s + " — przeciętnie.";
         else b += "Kroki: " + s + " — mało. WYJDŹ NA SPACER.";
         if (avgSteps != null) b += " " + trendLabel(s, avgSteps) + ".";
       }
@@ -2001,7 +2008,6 @@ async function generateFullAnalysis() {
     sections.push(sec("Aktywność", "🏃", b, "#fbbf24"));
   }
 
-  // 6. STRES + ODDYCHANIE
   {
     let b = "";
     if (e.stress == null && m.breathing == null) b = "Brak danych.";
@@ -2010,9 +2016,9 @@ async function generateFullAnalysis() {
         const s = e.stress;
         if (s < 25) b += "Stres: <strong>" + s + "/100</strong> — spokój.";
         else if (s < 40) b += "Stres: " + s + "/100 — normalnie.";
-        else if (s < 60) b += "Stres: " + s + "/100 — podniesiony. Oddech 4-7-8.";
+        else if (s < 60) b += "Stres: " + s + "/100 — podniesiony.";
         else if (s < 75) b += "Stres: <em>" + s + "/100</em> — wysoko.";
-        else b += "Stres: <em>" + s + "/100 — bardzo wysoko.</em> Trening odpuść.";
+        else b += "Stres: <em>" + s + "/100 — bardzo wysoko.</em>";
         if (avgStress != null) b += " " + trendLabel(s, avgStress) + ".";
       }
       if (m.breathing != null) {
@@ -2023,7 +2029,6 @@ async function generateFullAnalysis() {
     sections.push(sec("Stres i oddychanie", "🧘", b, "#c4b5fd"));
   }
 
-  // 7. ZADANIA
   {
     const stats = calcCompletionStats();
     const pct = calcCompletionPct();
@@ -2032,11 +2037,10 @@ async function generateFullAnalysis() {
     else if (pct >= 75) b += "Bardzo dobrze — dokończ resztę.";
     else if (pct >= 50) b += "Połowa za tobą.";
     else if (pct > 0) b += "<em>Słabo.</em> Rób po kolei.";
-    else b += "<em>Zero zadań.</em> Od czegoś trzeba zacząć. Jedno teraz.";
+    else b += "<em>Zero zadań.</em> Od czegoś trzeba zacząć.";
     sections.push(sec("Zadania", "✅", b, "#5eead4"));
   }
 
-  // 8. TRENDY
   {
     const lines = [];
     if (m.sleepTotal != null && ym.sleepTotal != null) { const d = m.sleepTotal - ym.sleepTotal; if (Math.abs(d) >= 0.5) lines.push("Sen: <em>" + (d > 0 ? "+" : "") + d.toFixed(1) + "h</em> vs wczoraj"); }
@@ -2048,16 +2052,15 @@ async function generateFullAnalysis() {
     sections.push(sec("Trendy", "📈", lines.length ? lines.join(" · ") : "Za mało danych.", "#fbbf24"));
   }
 
-  // 9. PRIORYTETY
   {
     const priorities = [];
     if (m.sleepTotal != null && m.sleepTotal < 7) priorities.push("Sen 8h+ dziś — telefon off 1h przed snem.");
-    if (m.rhr != null && m.rhr > rhrRange.max) priorities.push("RHR " + m.rhr + " bpm powyżej normy — odpocznij, woda.");
+    if (m.rhr != null && m.rhr > rhrRange.max) priorities.push("RHR " + m.rhr + " bpm powyżej normy — odpocznij.");
     if (e.stress != null && e.stress > 60) priorities.push("Oddech 4-7-8 przed snem.");
     if (isBoosterActive()) priorities.push("Włącz Skincare/Suplementy żeby zdjąć booster +15%.");
     const stats = calcCompletionStats();
     if (stats.requiredDone < stats.requiredTotal) priorities.push("Dokończ " + (stats.requiredTotal - stats.requiredDone) + " zadań.");
-    if (m.dailyWeight != null && avgWeight != null && m.dailyWeight < avgWeight - 0.3) priorities.push("Szejk masowy 700 kcal — masa spada.");
+    if (m.dailyWeight != null && avgWeight != null && m.dailyWeight < avgWeight - 0.3) priorities.push("Szejk masowy 700 kcal.");
     if (priorities.length === 0) priorities.push("Utrzymaj rytm — idzie zgodnie z planem.");
     const facts = [
       "Hormon wzrostu wydziela się głównie w fazie N3 (głęboki sen) — 70% dobowego wyrzutu.",
@@ -2066,8 +2069,8 @@ async function generateFullAnalysis() {
       "Mewing (język na podniebieniu) poprawia linię szczęki i symetrię.",
       "Zimna woda na twarz rano redukuje obrzęk i czerwony nos.",
       "16-17 lat to szczyt skoku wzrostowego u chłopaków.",
-      "Dobra postawa dodaje 1-2 cm wizualnie — ćwicz core.",
-      "Burnout set = max pobudzenie włókien typu II = wyrzut GH.",
+      "Dobra postawa dodaje 1-2 cm wizualnie.",
+      "Burnout set = max pobudzenie włókien typu II = wyrzut GH."
     ];
     const fact = facts[Math.floor(Math.random() * facts.length)];
     let b = "<strong>Priorytety na jutro:</strong><br>• " + priorities.join("<br>• ") + "<br><br>💡 <em>Ciekawostka:</em> " + fact;
@@ -2123,7 +2126,7 @@ async function renderGlowUp() {
     { label: "Kroki", get: d => d.evening && d.evening.steps, unit: "", better: "up" },
     { label: "Stres", get: d => d.evening && d.evening.stress, unit: "/100", better: "down" },
     { label: "Nastrój", get: d => d.morning && d.morning.moodMorning, unit: "/10", better: "up" },
-    { label: "Waga", get: d => d.morning && d.morning.dailyWeight, unit: " kg", better: "up" },
+    { label: "Waga", get: d => d.morning && d.morning.dailyWeight, unit: " kg", better: "up" }
   ];
   const rows = [];
   metrics.forEach(m => {
@@ -2137,7 +2140,7 @@ async function renderGlowUp() {
     const color = Math.abs(diff) < 0.01 ? "text-neutral-400" : good ? "text-mint" : "text-rose";
     rows.push('<div class="flex items-center justify-between text-sm"><span class="text-neutral-300 font-semibold">' + m.label + '</span><span class="font-extrabold ' + color + '">' + (diff > 0 ? "+" : "") + diff.toFixed(2) + m.unit + '</span></div>');
   });
-  el.innerHTML = rows.length ? rows.join("") : '<p class="text-sm text-neutral-400 font-medium">Za mało danych. Zbieraj raporty 14 dni.</p>';
+  el.innerHTML = rows.length ? rows.join("") : '<p class="text-sm text-neutral-400 font-medium">Za mało danych.</p>';
 }
 async function renderCorrelation() {
   const box = $("correlation-box"); const txt = $("correlation-text");
@@ -2152,9 +2155,9 @@ async function renderCorrelation() {
   pairs.forEach(p => { const dx = p.sleep - meanX, dy = p.stress - meanY; num += dx * dy; denX += dx * dx; denY += dy * dy; });
   const r = denX && denY ? num / Math.sqrt(denX * denY) : 0;
   let desc;
-  if (r < -0.5) desc = "Silna ujemna korelacja (r = " + r.toFixed(2) + "). Sen = niższy stres. Priorytet!";
+  if (r < -0.5) desc = "Silna ujemna korelacja (r = " + r.toFixed(2) + "). Sen = niższy stres.";
   else if (r < -0.25) desc = "Łagodna ujemna korelacja (r = " + r.toFixed(2) + "). Sen pomaga.";
-  else if (r > 0.4) desc = "Dodatnia (r = " + r.toFixed(2) + ") — obserwuj.";
+  else if (r > 0.4) desc = "Dodatnia (r = " + r.toFixed(2) + ").";
   else desc = "Brak zależności (r = " + r.toFixed(2) + ").";
   txt.innerHTML = desc;
   box.classList.remove("hidden");
@@ -2168,7 +2171,7 @@ async function renderWeeklySummary() {
   const avgSleep = sleep.length ? (sleep.reduce((a, b) => a + b, 0) / sleep.length).toFixed(1) : "—";
   const avgSteps = steps.length ? Math.round(steps.reduce((a, b) => a + b, 0) / steps.length) : "—";
   const perfect = days.filter(d => d.completedPct === 100).length;
-  el.innerHTML = "Sen: <strong>" + avgSleep + "h</strong> · Kroki: <strong>" + avgSteps + "</strong> · Perfect: <strong>" + perfect + "/7</strong>. " + (perfect >= 5 ? "🔥 Tydzień jak maszyna." : perfect >= 3 ? "💪 Dobry tydzień." : "🎯 Dorzuć perfect days.");
+  el.innerHTML = "Sen: <strong>" + avgSleep + "h</strong> · Kroki: <strong>" + avgSteps + "</strong> · Perfect: <strong>" + perfect + "/7</strong>. " + (perfect >= 5 ? "🔥 Maszyna." : perfect >= 3 ? "💪 Dobry tydzień." : "🎯 Dorzuć perfect days.");
 }
 
 // ============================================================================
@@ -2216,7 +2219,7 @@ async function renderPastSelf() {
 }
 
 // ============================================================================
-// CHARTS — WITH FIX
+// CHARTS
 // ============================================================================
 const chartInstances = {};
 function makeChart(id, config) {
@@ -2233,7 +2236,7 @@ function baseChartOpts() {
     plugins: { legend: { labels: { color: "#9b95a8", font: { size: 10, weight: 700 } } } },
     scales: {
       x: { ticks: { color: "#6b6480", font: { size: 9 } }, grid: { color: "rgba(255,255,255,.04)" } },
-      y: { ticks: { color: "#6b6480", font: { size: 9 } }, grid: { color: "rgba(255,255,255,.04)" } },
+      y: { ticks: { color: "#6b6480", font: { size: 9 } }, grid: { color: "rgba(255,255,255,.04)" } }
     }
   };
 }
@@ -2310,7 +2313,7 @@ async function renderBadges() {
     { icon: "🏆", label: "Perfect ×10", un: perfect >= 10 },
     { icon: "👟", label: "15k kroków", un: maxSteps >= 15000 },
     { icon: "😴", label: "8h ×30", un: earlySleep >= 30 },
-    { icon: "⭐", label: "Perfect ×50", un: perfect >= 50 },
+    { icon: "⭐", label: "Perfect ×50", un: perfect >= 50 }
   ];
   el.innerHTML = badges.map(b => '<div class="badge-card glass rounded-3xl p-3 text-center ' + (b.un ? "unlocked" : "locked") + '"><div class="text-3xl">' + b.icon + '</div><div class="text-[10px] font-bold mt-1 text-neutral-300">' + b.label + '</div></div>').join("");
 }
@@ -2321,12 +2324,12 @@ async function renderBadges() {
 const GUIDE_SECTIONS = [
   { icon: "🌙", title: "Sen — fundament wzrostu", body: "GH wydziela się w 70% w głębokim śnie. Spać przed 22:30, telefon off 1h wcześniej. 8-9h = wzrost + masa." },
   { icon: "🍽️", title: "Jedzenie — masa", body: "2800-3000 kcal/dzień, białko ~80g. Szejk masowy 700 kcal po szkole. Twaróg przed snem. Zero cukru po 18:00." },
-  { icon: "💪", title: "Trening — kalistenika + hantle 1kg", body: "Pompki tempo 3s, przysiady z pauzą, wznosy bokiem hantle 1kg 20-25 powtórzeń = szerokość barków. Burnout set na koniec." },
-  { icon: "🔥", title: "Burnout Set — dlaczego działa", body: "1 seria do upadku (max pompek lub krzesełko przy ścianie). Pobudza włókna typu II, wyrzut GH. Nie 2, nie 3 — jedna, ale do końca." },
-  { icon: "🧴", title: "Visual Glow Up", body: "Zimna woda rano i wieczorem (obrzęk, czerwony nos), Tołpa/Ziaja, Acnederm punktowo, Cetaphil nawilżanie. Mewing = linia szczęki." },
+  { icon: "💪", title: "Trening — kalistenika + hantle 1kg", body: "Pompki tempo 3s, przysiady z pauzą, wznosy bokiem hantle 1kg 20-25 powtórzeń. Burnout set na koniec." },
+  { icon: "🔥", title: "Burnout Set", body: "1 seria do upadku (max pompek lub krzesełko przy ścianie). Pobudza włókna typu II, wyrzut GH." },
+  { icon: "🧴", title: "Visual Glow Up", body: "Zimna woda rano i wieczorem, Tołpa/Ziaja, Acnederm punktowo, Cetaphil nawilżanie. Mewing = linia szczęki." },
   { icon: "🧠", title: "Głowa — stres", body: "Oddech 4-7-8 (wdech 4s, trzymaj 7s, wydech 8s) 5 min dziennie. Stres obniża testosteron i hamuje wzrost." },
-  { icon: "💊", title: "Suplementacja D3", body: "Max 4000 IU/dzień dla nastolatka. Twój stack: 2 tabletki × 2000 IU = 4000 IU, bezpiecznie. Bierz z tłuszczem." },
-  { icon: "📏", title: "Pomiary", body: "Wzrost: rano, boso, do ściany, 1. dnia miesiąca. Obwody: klatka, talia, biceps. Waga: codziennie rano." },
+  { icon: "💊", title: "Suplementacja D3", body: "Max 4000 IU/dzień dla nastolatka. Twój stack: 2 tabletki × 2000 IU = 4000 IU, bezpiecznie. Z tłuszczem." },
+  { icon: "📏", title: "Pomiary", body: "Wzrost rano boso, do ściany, 1. dnia miesiąca. Obwody: klatka, talia, biceps. Waga codziennie rano." }
 ];
 function renderGuideSections() {
   const el = $("guide-sections"); if (!el) return;
@@ -2339,13 +2342,13 @@ const KNOWLEDGE_BASE = [
   { title: "Hormon wzrostu (GH)", body: "Głównie w głębokim śnie. Stymulują: sen 8h+, trening siłowy, post. Hamują: cukier, alkohol, stres." },
   { title: "Testosteron", body: "Rośnie: sen 7-9h, trening siłowy, tłuszcze zwierzęce, witamina D. Spada: stres, alkohol, brak snu." },
   { title: "Białko — ile i kiedy", body: "1.7g/kg = ~77-80g. 4-5 posiłków po 25-40g. Twaróg przed snem = kazeina = wolne uwalnianie." },
-  { title: "Hantle 1kg — jak używać", body: "Wznosy bokiem 20-25 powtórzeń z pauzą 1s na górze = szerokość barków. Wyciskanie 15 powt. High reps tutaj rządzi." },
+  { title: "Hantle 1kg", body: "Wznosy bokiem 20-25 powtórzeń z pauzą 1s na górze = szerokość barków. Wyciskanie 15 powt. High reps." },
   { title: "Mewing — linia szczęki", body: "Język na podniebieniu (nie na zębach!). Usta zamknięte, oddech nosem. Efekty po 3-6 mies." },
-  { title: "Zimna woda — glow up twarzy", body: "Rano: obrzęk, czerwony nos. Wieczorem: zamyka pory. 30 sekund, delikatnie osusz." },
-  { title: "Witamina D3 — dawki", body: "Max 4000 IU dla nastolatka. Z tłuszczem. Twój stack: 4000 IU (2 tabl. × 2000)." },
-  { title: "Burnout set", body: "Max pompek do upadku LUB krzesełko na max czas. 1 seria. Nie więcej." },
-  { title: "Acne — walka", body: "Higiena (Tołpa, Acnederm, Cetaphil), dieta (mniej cukru i mleka), sen, stres. Nie wyciskaj." },
-  { title: "RHR — normy", body: "12-17 lat: 60-90 bpm. Skok +15% vs 7d = alarm. Wysokie = choroba/stres/przemęczenie." },
+  { title: "Zimna woda — glow up", body: "Rano: obrzęk, czerwony nos. Wieczorem: zamyka pory. 30 sekund, delikatnie osusz." },
+  { title: "Witamina D3", body: "Max 4000 IU dla nastolatka. Z tłuszczem. Twój stack: 4000 IU (2 tabl. × 2000)." },
+  { title: "Burnout set", body: "Max pompek do upadku LUB krzesełko na max czas. 1 seria." },
+  { title: "Acne", body: "Higiena (Tołpa, Acnederm, Cetaphil), dieta (mniej cukru i mleka), sen, stres. Nie wyciskaj." },
+  { title: "RHR — normy", body: "12-17 lat: 60-90 bpm. Skok +15% vs 7d = alarm. Wysokie = choroba/stres/przemęczenie." }
 ];
 function renderKnowledgeBase() {
   const el = $("knowledge-base"); if (!el) return;
@@ -2364,7 +2367,7 @@ const FACTS = [
   "Białko 4-5 posiłków = lepsza synteza mięśniowa.",
   "Dobra postawa dodaje 1-2 cm wizualnie.",
   "Zimna woda rano redukuje obrzęk twarzy.",
-  "Testosteron rośnie przez sen 7-9h + trening siłowy.",
+  "Testosteron rośnie przez sen 7-9h + trening siłowy."
 ];
 function renderFactOfDay() {
   const el = $("fact-of-day"); if (!el) return;
@@ -2388,13 +2391,12 @@ function updateCountdown() {
 }
 
 // ============================================================================
-// MODALS
+// MODALS + EVENTS
 // ============================================================================
 function openModal(id) { const m = $(id); if (m) { m.classList.remove("hidden"); document.body.style.overflow = "hidden"; } }
 function closeModal(m) { if (m) { m.classList.add("hidden"); document.body.style.overflow = ""; } }
 document.querySelectorAll("[data-close-modal]").forEach(el => el.addEventListener("click", () => closeModal(el.closest(".modal-wrap"))));
 
-// TABS
 document.querySelectorAll(".tab-btn").forEach(btn => {
   btn.addEventListener("click", () => {
     document.querySelectorAll(".tab-btn").forEach(b => {
@@ -2413,7 +2415,6 @@ document.querySelectorAll(".tab-btn").forEach(btn => {
   });
 });
 
-// REPORT TABS
 document.querySelectorAll(".report-btn").forEach(btn => {
   btn.addEventListener("click", () => {
     document.querySelectorAll(".report-btn").forEach(b => { b.classList.remove("bg-gradient-to-br", "from-peach", "to-gold", "text-ink"); b.classList.add("text-neutral-400"); });
@@ -2425,7 +2426,6 @@ document.querySelectorAll(".report-btn").forEach(btn => {
   });
 });
 
-// FOOD TABS
 document.querySelectorAll("[data-food-tab]").forEach(btn => {
   btn.addEventListener("click", () => {
     document.querySelectorAll("[data-food-tab]").forEach(b => { b.classList.remove("bg-gradient-to-br", "from-peach", "to-gold", "text-ink"); b.classList.add("text-neutral-400"); });
@@ -2439,17 +2439,13 @@ let currentFoodTab = "breakfast";
 if ($("btn-roll-food")) $("btn-roll-food").addEventListener("click", rollFoodPlan);
 if ($("btn-roll-shake")) $("btn-roll-shake").addEventListener("click", rollMassShake);
 if ($("btn-store-meals")) $("btn-store-meals").addEventListener("click", showStoreMeals);
-
-// RAGE
 if ($("btn-rage")) $("btn-rage").addEventListener("click", showRage);
 
-// MEASURE DISMISS
 if ($("btn-measure-dismiss")) $("btn-measure-dismiss").addEventListener("click", () => {
   const b = $("monthly-measure-banner"); if (b) b.classList.add("hidden");
   localStorage.setItem("regim:measure-dismiss-" + dateKey(new Date()), "1");
 });
 
-// TOGGLES
 document.querySelectorAll(".toggle-switch[data-toggle]").forEach(el => {
   const name = el.dataset.toggle;
   if (getToggle(name)) el.classList.add("on"); else el.classList.remove("on");
@@ -2466,7 +2462,6 @@ document.querySelectorAll(".toggle-switch[data-toggle]").forEach(el => {
   });
 });
 
-// MORNING FORM
 if ($("form-morning")) $("form-morning").addEventListener("submit", async (e) => {
   e.preventDefault();
   const g = (id) => { const v = $(id) && $(id).value; return v === "" || v == null ? null : parseFloat(v); };
@@ -2475,7 +2470,7 @@ if ($("form-morning")) $("form-morning").addEventListener("submit", async (e) =>
     sleepWakes: g("input-sleep-wakes"), sleepHr: g("input-sleep-hr"), rhr: g("input-rhr"),
     breathing: g("input-breathing"), dailyWeight: g("input-weight-daily"),
     moodMorning: parseInt($("input-mood-morning") && $("input-mood-morning").value) || 5,
-    completedAt: Date.now(),
+    completedAt: Date.now()
   };
   await persistToday();
   showToast("✅ Raport poranny zapisany");
@@ -2483,7 +2478,6 @@ if ($("form-morning")) $("form-morning").addEventListener("submit", async (e) =>
   if ($("quote-day")) $("quote-day").textContent = getPersonalQuote();
 });
 
-// EVENING FORM
 if ($("form-evening")) $("form-evening").addEventListener("submit", async (e) => {
   e.preventDefault();
   const g = (id) => { const v = $(id) && $(id).value; return v === "" || v == null ? null : parseFloat(v); };
@@ -2491,7 +2485,7 @@ if ($("form-evening")) $("form-evening").addEventListener("submit", async (e) =>
     steps: g("input-steps"), kcalBurned: g("input-kcal-burned"), hrDay: g("input-hr-day"),
     spo2Day: g("input-spo2-day"), rpe: g("input-rpe"), stress: g("input-stress"),
     moodEvening: parseInt($("input-mood-evening") && $("input-mood-evening").value) || 5,
-    completedAt: Date.now(),
+    completedAt: Date.now()
   };
   state.note = ($("input-note") && $("input-note").value) || "";
   await persistToday();
@@ -2501,16 +2495,13 @@ if ($("form-evening")) $("form-evening").addEventListener("submit", async (e) =>
   if (box && !box.classList.contains("hidden")) box.scrollIntoView({ behavior: "smooth", block: "start" });
 });
 
-// MOOD SLIDERS
 if ($("input-mood-morning")) $("input-mood-morning").addEventListener("input", (e) => { $("mood-morning-value").textContent = e.target.value; });
 if ($("input-mood-evening")) $("input-mood-evening").addEventListener("input", (e) => { $("mood-evening-value").textContent = e.target.value; });
 
-// TAGS
 document.querySelectorAll(".tag-chip").forEach(chip => {
   chip.addEventListener("click", () => chip.classList.toggle("active"));
 });
 
-// ANALYZE AI
 if ($("btn-analyze-ai")) $("btn-analyze-ai").addEventListener("click", async () => {
   const label = $("ai-btn-label"); const spinner = $("ai-btn-spinner"); const box = $("ai-result-box"); const text = $("ai-result-text");
   if (spinner) spinner.classList.remove("hidden"); if (label) label.textContent = "Analizuję...";
@@ -2525,7 +2516,6 @@ if ($("btn-analyze-ai")) $("btn-analyze-ai").addEventListener("click", async () 
 });
 if ($("btn-toggle-analysis")) $("btn-toggle-analysis").addEventListener("click", () => { const c = $("auto-analysis-content"); if (c) c.classList.toggle("hidden"); });
 
-// SETTINGS
 if ($("btn-settings")) $("btn-settings").addEventListener("click", () => {
   const s = getSettings();
   $("input-name").value = s.name; $("input-age").value = s.age; $("input-height").value = s.height;
@@ -2548,34 +2538,30 @@ if ($("btn-settings-save")) $("btn-settings-save").addEventListener("click", () 
     heightMom: parseFloat($("input-height-mom").value) || null,
     goalWeight: parseFloat($("input-goal-weight-settings").value) || 50,
     d3Iu: parseInt($("input-d3-iu").value) || 2000,
-    d3Tablets: parseInt($("input-d3-tablets").value) || 2,
+    d3Tablets: parseInt($("input-d3-tablets").value) || 2
   });
   showToast("✅ Zapisano");
   closeModal($("modal-settings"));
   renderCialo(); renderSupplementsCard(); renderReadiness(); renderBrief();
 });
 
-// GLOW UP REFRESH
 if ($("btn-glowup-refresh")) $("btn-glowup-refresh").addEventListener("click", () => { renderGlowUp(); renderCorrelation(); });
 if ($("btn-history-refresh")) $("btn-history-refresh").addEventListener("click", renderAnalysisHistory);
 if ($("btn-weekly-summary")) $("btn-weekly-summary").addEventListener("click", renderWeeklySummary);
 if ($("btn-refresh-brief")) $("btn-refresh-brief").addEventListener("click", renderBrief);
 
-// BREATHING / REST
 if ($("btn-breath-start")) $("btn-breath-start").addEventListener("click", startBreathing);
 if ($("btn-breath-stop")) $("btn-breath-stop").addEventListener("click", stopBreathing);
 if ($("btn-rest-start")) $("btn-rest-start").addEventListener("click", startRest);
 if ($("btn-rest-stop")) $("btn-rest-stop").addEventListener("click", stopRest);
 document.querySelectorAll(".rest-time-btn").forEach(b => b.addEventListener("click", () => { restSeconds = parseInt(b.dataset.rest); $("rest-timer-display").textContent = "00:" + String(restSeconds).padStart(2, "0"); }));
 
-// THEME
 if ($("btn-theme-toggle")) $("btn-theme-toggle").addEventListener("click", () => {
   const isLight = document.documentElement.classList.toggle("light-theme");
   $("theme-icon").className = isLight ? "fa-solid fa-sun" : "fa-solid fa-moon";
   localStorage.setItem("regim:theme", isLight ? "light" : "dark");
 });
 
-// EXPORT
 if ($("btn-export")) $("btn-export").addEventListener("click", async () => {
   const days = await collectAllDays();
   const blob = new Blob([JSON.stringify(days, null, 2)], { type: "application/json" });
@@ -2585,24 +2571,20 @@ if ($("btn-export")) $("btn-export").addEventListener("click", async () => {
   showToast("✅ Eksport gotowy");
 });
 
-// INSTALL
 let deferredPrompt = null;
 window.addEventListener("beforeinstallprompt", (e) => { e.preventDefault(); deferredPrompt = e; const b = $("install-banner"); if (b) b.classList.remove("hidden"); });
 if ($("btn-install")) $("btn-install").addEventListener("click", async () => { if (deferredPrompt) { deferredPrompt.prompt(); await deferredPrompt.userChoice; deferredPrompt = null; const b = $("install-banner"); if (b) b.classList.add("hidden"); } });
 if ($("btn-install-dismiss")) $("btn-install-dismiss").addEventListener("click", () => { const b = $("install-banner"); if (b) b.classList.add("hidden"); });
 
-// CALENDAR
 if ($("cal-prev")) $("cal-prev").addEventListener("click", () => { calMonth.setMonth(calMonth.getMonth() - 1); renderCalendar(); });
 if ($("cal-next")) $("cal-next").addEventListener("click", () => { calMonth.setMonth(calMonth.getMonth() + 1); renderCalendar(); });
 
-// GOAL EDIT
 if ($("btn-goal-edit")) $("btn-goal-edit").addEventListener("click", () => { const w = $("goal-edit-wrapper"); if (w) w.classList.toggle("hidden"); });
 if ($("btn-goal-save")) $("btn-goal-save").addEventListener("click", () => {
   const v = parseFloat($("input-goal-weight").value);
   if (v > 0) { localStorage.setItem("regim:goal-weight", String(v)); showToast("✅ Cel zapisany"); const w = $("goal-edit-wrapper"); if (w) w.classList.add("hidden"); renderCialo(); }
 });
 
-// FOOD CREATOR
 if ($("btn-open-creator")) $("btn-open-creator").addEventListener("click", () => {
   loadMealPlan();
   state.activeMeal = "breakfast";
@@ -2642,14 +2624,6 @@ if ($("btn-clear-mealplan")) $("btn-clear-mealplan").addEventListener("click", (
     saveMealPlan(); renderCurrentMeal(); renderCreatorTotals(); renderMealSummary();
   }
 });
-
-// Update totals on any save
-const _originalSaveMealPlan = saveMealPlan;
-saveMealPlan = function() {
-  localStorage.setItem(localKey("mealplan-" + todayKey), JSON.stringify(state.mealPlan));
-  renderMealSummary();
-  renderCreatorTotals();
-};
 
 // ============================================================================
 // BREATHING TIMER
@@ -2756,10 +2730,10 @@ const FOOD_DB = {
     { name: "Twaróg 200g + miód + orzechy włoskie", kcal: 500, prot: 34 },
     { name: "Jogurt grecki + granola + borówki", kcal: 540, prot: 22 },
     { name: "Kanapka z łososiem + jajko sadzone", kcal: 610, prot: 30 },
-    { name: "Placki bananowe z syrop:em klonowym", kcal: 560, prot: " 20 },
+    { name: "Placki bananowe z syropem klonowym", kcal: 560, prot: 20 }
   ],
-  lunch:Or [
-    { name:zech "yKurczak + ryż + warzywa", kcal: 780, prot: 48 },
+  lunch: [
+    { name: "Kurczak + ryż + warzywa", kcal: 780, prot: 48 },
     { name: "Spaghetti bolognese", kcal: 820, prot: 42 },
     { name: "Pierogi ruskie + śmietana", kcal: 720, prot: 22 },
     { name: "Kotlet schabowy + ziemniaki + surówka", kcal: 850, prot: 38 },
@@ -2768,17 +2742,17 @@ const FOOD_DB = {
     { name: "Ryż z kurczakiem i warzywami", kcal: 700, prot: 42 },
     { name: "Pizza domowa (3 kawałki)", kcal: 850, prot: 32 },
     { name: "Karkówka + ziemniaki + mizeria", kcal: 880, prot: 40 },
-    { name: "Kluski śląskie + rolada + modra kapusta", kcal: 820, prot: 38 },
+    { name: "Kluski śląskie + rolada + modra kapusta", kcal: 820, prot: 38 }
   ],
   snack: [
     { name: "Twaróg 150g + miód + orzechy", kcal: 400, prot: 28 },
     { name: "Kanapka z masłem orzechowym i bananem", kcal: 420, prot: 14 },
     { name: "Batony proteinowe 2×", kcal: 380, prot: 40 },
     { name: "Jogurt grecki + miód + orzechy", kcal: 360, prot: 20 },
-    { name mieszane 50g", kcal: 320, prot: 12 },
+    { name: "Orzechy mieszane 50g", kcal: 320, prot: 12 },
     { name: "Jajka na twardo (3) + sól", kcal: 240, prot: 20 },
     { name: "Koktajl mleko + banan + masło orzechowe", kcal: 460, prot: 18 },
-    { name: "Skyr 200g + kakao + banan", kcal: 340, prot: 26 },
+    { name: "Skyr 200g + kakao + banan", kcal: 340, prot: 26 }
   ],
   dinner: [
     { name: "Twaróg 200g + warzywa + oliwa", kcal: 420, prot: 32 },
@@ -2788,7 +2762,7 @@ const FOOD_DB = {
     { name: "Kurczak 150g + kasza + warzywa", kcal: 620, prot: 44 },
     { name: "Skyr 300g + owoce + orzechy", kcal: 460, prot: 32 },
     { name: "Jajka sadzone (3) + chleb + pomidor", kcal: 480, prot: 26 },
-    { name: "Łosoś wędzony + twarożek + pieczywo chrupkie", kcal: 420, prot: 30 },
+    { name: "Łosoś wędzony + twarożek + pieczywo chrupkie", kcal: 420, prot: 30 }
   ],
   shake: [
     { name: "Szejk masowy: mleko + banan + płatki + masło orzechowe + miód", kcal: 700, prot: 22 },
@@ -2796,7 +2770,7 @@ const FOOD_DB = {
     { name: "Szejk twarogowy: twaróg + mleko + miód + kakao", kcal: 520, prot: 38 },
     { name: "Szejk owsiany: mleko + płatki + daktyle + masło orzechowe", kcal: 720, prot: 20 },
     { name: "Szejk owocowy: mleko + mango + banan + jogurt", kcal: 540, prot: 22 },
-    { name: "Szejk kawowy: mleko + kawa + białko + masło orzechowe", kcal: 460, prot: 34 },
+    { name: "Szejk kawowy: mleko + kawa + białko + masło orzechowe", kcal: 460, prot: 34 }
   ],
   fast: [
     { name: "Kanapka z tuńczykiem + majonez + ogórek", kcal: 480, prot: 28 },
@@ -2804,8 +2778,8 @@ const FOOD_DB = {
     { name: "Jajka na twardo (4) + sól + chleb", kcal: 440, prot: 28 },
     { name: "Twaróg + rzodkiewka + chleb razowy", kcal: 420, prot: 26 },
     { name: "Zapiekanka z serem", kcal: 620, prot: 24 },
-    { name: "Kabanosy 100g + bułka + ogórek", kcal: 580, prot: 26 },
-  ],
+    { name: "Kabanosy 100g + bułka + ogórek", kcal: 580, prot: 26 }
+  ]
 };
 const MASS_SHAKES = [
   { name: "Klasyk Masowy", ingredients: ["300 ml mleka 3.2%", "40 g płatków owsianych", "1 banan", "2 łyżki masła orzechowego"], kcal: 700, prot: 24 },
@@ -2815,7 +2789,7 @@ const MASS_SHAKES = [
   { name: "Twarogowy Pro", ingredients: ["250 ml mleka", "150 g twarogu", "1 banan", "1 łyżka miodu", "1 łyżka kakao"], kcal: 680, prot: 38 },
   { name: "Daktyle & Masło", ingredients: ["300 ml mleka", "40 g płatków owsianych", "5 daktyli", "2 łyżki masła orzechowego"], kcal: 720, prot: 20 },
   { name: "Owocowy Load", ingredients: ["300 ml mleka", "150 g jogurtu greckiego", "1 banan", "garść borówek", "2 łyżki płatków"], kcal: 640, prot: 26 },
-  { name: "Kawowy Rise", ingredients: ["300 ml mleka", "50 g płatków owsianych", "1 łyżka kawy", "1 banan", "1 łyżka masła orzechowego"], kcal: 700, prot: 22 },
+  { name: "Kawowy Rise", ingredients: ["300 ml mleka", "50 g płatków owsianych", "1 łyżka kawy", "1 banan", "1 łyżka masła orzechowego"], kcal: 700, prot: 22 }
 ];
 function renderFoodList() {
   const container = $("food-list"); if (!container) return;
@@ -2828,13 +2802,15 @@ function rollFoodPlan() {
   const total = breakfast.kcal + lunch.kcal + snack.kcal + dinner.kcal + shake.kcal;
   const prot = breakfast.prot + lunch.prot + snack.prot + dinner.prot + shake.prot;
   const el = $("food-roll");
+  if (!el) return;
   el.innerHTML = '<div class="text-xs font-extrabold text-mint mb-2 tracking-widest uppercase">🎲 Twój plan</div><div class="space-y-2 text-xs"><div><strong class="text-peach">Śniadanie:</strong> ' + escapeHtml(breakfast.name) + ' <span class="text-neutral-500">(' + breakfast.kcal + ' kcal / ' + breakfast.prot + 'g)</span></div><div><strong class="text-gold">Obiad:</strong> ' + escapeHtml(lunch.name) + ' <span class="text-neutral-500">(' + lunch.kcal + ' kcal / ' + lunch.prot + 'g)</span></div><div><strong class="text-mint">Przekąska:</strong> ' + escapeHtml(snack.name) + ' <span class="text-neutral-500">(' + snack.kcal + ' kcal / ' + snack.prot + 'g)</span></div><div><strong class="text-lilac">Kolacja:</strong> ' + escapeHtml(dinner.name) + ' <span class="text-neutral-500">(' + dinner.kcal + ' kcal / ' + dinner.prot + 'g)</span></div><div><strong class="text-rose">Szejk:</strong> ' + escapeHtml(shake.name) + ' <span class="text-neutral-500">(' + shake.kcal + ' kcal / ' + shake.prot + 'g)</span></div></div><div class="flex items-center justify-between mt-3 pt-3 border-t border-white/10"><div class="text-sm font-extrabold text-gold">≈ ' + total + ' kcal</div><div class="text-sm font-extrabold text-mint">≈ ' + prot + 'g białka</div></div>';
   vibrate(30); playSound("done");
 }
 function rollMassShake() {
   const s = MASS_SHAKES[Math.floor(Math.random() * MASS_SHAKES.length)];
   const el = $("mass-shake-roll");
-  el.innerHTML = '<div class="text-xs font-extrabold text-gold mb-2 tracking-widest uppercase">🥤 ' + escapeHtml(s.name) + '</div><div class="space-y-1.5 text-xs">' + s.ingredients.map(i => '<div class="flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-gold flex-shrink-0"></span><span class="text-neutral-200 font-medium">' + escapeHtml(i) + '</span></div>').join("") + '</div><div class="flex items-center justify-between mt-3 pt-3 border-t border-white/10"><div class="text-sm font-extrabold text-gold"><i class="fa-solid fa-fire mr-1"></i>≈ ' + s.k &&cal + ' kcal</div><div class="text-sm font-extrabold text-mint"><i class="fa-solid fa-drumstick-bite mr-1"></i>≈ ' + s.prot + 'g</div></div>';
+  if (!el) return;
+  el.innerHTML = '<div class="text-xs font-extrabold text-gold mb-2 tracking-widest uppercase">🥤 ' + escapeHtml(s.name) + '</div><div class="space-y-1.5 text-xs">' + s.ingredients.map(i => '<div class="flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-gold flex-shrink-0"></span><span class="text-neutral-200 font-medium">' + escapeHtml(i) + '</span></div>').join("") + '</div><div class="flex items-center justify-between mt-3 pt-3 border-t border-white/10"><div class="text-sm font-extrabold text-gold"><i class="fa-solid fa-fire mr-1"></i>≈ ' + s.kcal + ' kcal</div><div class="text-sm font-extrabold text-mint"><i class="fa-solid fa-drumstick-bite mr-1"></i>≈ ' + s.prot + 'g</div></div>';
   vibrate(30); playSound("done");
 }
 
@@ -2871,7 +2847,7 @@ async function bootApp() {
   const savedTasks = (today && today.tasks) || [];
   state.morning = (today && today.morning) || {};
   state.evening = (today && today.evening) || {};
-  state.note = (today today.note) || "";
+  state.note = (today && today.note) || "";
 
   applyConditionalTasks();
 
@@ -2943,6 +2919,7 @@ async function bootApp() {
 })();
 
 // INIT
+attachSigninHandler();
 updateSyncUI();
 initFirebase().catch(() => { authResolved = true; bootApp(); });
 setTimeout(() => { if (!booted) { authResolved = true; bootApp(); } }, 3000);
