@@ -1,6 +1,6 @@
 // ============================================================================
 // LOCK IN 2027 — js/modules/overview.js
-// Dashboard. Automatycznie nalicza XP przy wejściu.
+// Dashboard + debug XP (Podetap 2, wersja z logami).
 // ============================================================================
 
 import { $, escapeHtml, todayKey, formatDatePL } from "../core/utils.js";
@@ -170,14 +170,21 @@ function renderNextTraining() {
   `;
 }
 
+// ============================================================================
+// GŁÓWNA FUNKCJA RENDER
+// ============================================================================
+
 export async function render(container) {
+  console.log("%c[OVERVIEW] render start", "color:#60a5fa;font-weight:bold;");
+
   // 1. Ładujemy dzisiejsze zadania
   applyConditionalTasks();
   await loadToday();
-  
-  // 2. Sprawdzamy czy nie trzeba dopisać XP za dzisiejszy dzień
+
+  // 2. XP
   await syncXp();
 
+  // 3. Render
   const { remaining, dayNum } = updateCountdown();
   const settings = getSettings();
 
@@ -252,34 +259,86 @@ async function loadToday() {
   }
 }
 
-// Oblicza XP za dzisiejszy dzień i zapisuje tylko, jeśli jest większe niż poprzednio (zapobiega farmieniu)
+// ============================================================================
+// XP SYNC — wersja z debugowaniem
+// ============================================================================
+
 async function syncXp() {
-  await refreshStreak();
-  const gamData = await loadGamification() || { xp: 0, dailyXp: {} };
-  const today = todayKey();
-  
-  const completed = state.tasks.filter(t => t.done).length;
-  const total = state.tasks.length;
-  const todayXp = calculateDailyXp(completed, total, state._streak || 0);
-  
-  // Sprawdzamy czy dzisiejsze XP jest większe niż to, co już zapisaliśmy dzisiaj
-  const savedTodayXp = gamData.dailyXp?.[today] || 0;
-  
-  if (todayXp > savedTodayXp) {
-    const diff = todayXp - savedTodayXp;
-    const newTotalXp = (gamData.xp || 0) + diff;
-    const newLevel = Math.floor(Math.sqrt(newTotalXp / 100)) + 1;
-    
-    // Aktualizujemy pamięć
-    if (!gamData.dailyXp) gamData.dailyXp = {};
-    gamData.dailyXp[today] = todayXp;
-    gamData.xp = newTotalXp;
-    gamData.level = newLevel;
-    
-    await saveGamification({
-      xp: newTotalXp,
-      level: newLevel,
-      dailyXp: gamData.dailyXp
+  try {
+    await refreshStreak();
+
+    const gamData = await loadGamification() || { xp: 0, level: 1, dailyXp: {} };
+    const today = todayKey();
+
+    // Czytamy BEZPOŚREDNIO z dayDoc (niezależnie od state.tasks)
+    const dayDoc = await loadDayDoc(today);
+    const tasksInDoc = (dayDoc && dayDoc.tasks) || [];
+
+    let completed, total;
+    if (tasksInDoc.length > 0) {
+      completed = tasksInDoc.filter(t => t.done).length;
+      total = tasksInDoc.length;
+    } else {
+      completed = state.tasks.filter(t => t.done).length;
+      total = state.tasks.length;
+    }
+
+    const streak = state._streak || 0;
+    const todayXp = calculateDailyXp(completed, total, streak);
+    const savedTodayXp = (gamData.dailyXp && gamData.dailyXp[today]) || 0;
+
+    console.log("[XP] Stan:", {
+      tasksInDoc: tasksInDoc.length,
+      stateTasks: state.tasks.length,
+      completed,
+      total,
+      streak,
+      todayXp,
+      savedTodayXp,
+      currentTotalXp: gamData.xp || 0
     });
+
+    if (todayXp > savedTodayXp) {
+      const diff = todayXp - savedTodayXp;
+      const newTotalXp = (gamData.xp || 0) + diff;
+      const newLevel = Math.floor(Math.sqrt(newTotalXp / 100)) + 1;
+      const newDailyXp = { ...(gamData.dailyXp || {}), [today]: todayXp };
+
+      try {
+        await saveGamification({
+          xp: newTotalXp,
+          level: newLevel,
+          dailyXp: newDailyXp
+        });
+        console.log("[XP] ✅ Zapisano:", newTotalXp, "XP · Poziom", newLevel);
+      } catch (err) {
+        console.error("[XP] ❌ Zapis nieudany:", err);
+      }
+    } else {
+      console.log("[XP] Brak zmian (todayXp <= savedTodayXp)");
+    }
+  } catch (e) {
+    console.error("[XP] Błąd syncXp:", e);
   }
 }
+
+// ============================================================================
+// DEBUG — dostępne z konsoli przeglądarki
+// ============================================================================
+
+window.__debugXp = async () => {
+  console.log("%c=== XP DEBUG ===", "color:#fbbf24;font-weight:bold;font-size:14px;");
+  const gam = await loadGamification();
+  const day = await loadDayDoc(todayKey());
+  console.log("Gamification doc:", gam);
+  console.log("Day doc tasks:", day?.tasks);
+  console.log("state.tasks done:", state.tasks.filter(t => t.done).length, "/", state.tasks.length);
+  console.log("state._streak:", state._streak);
+};
+
+window.__forceXpSync = async () => {
+  console.log("%c=== FORCE XP SYNC ===", "color:#fbbf24;font-weight:bold;");
+  await syncXp();
+  console.log("%cReload za 1s...", "color:#4ade80;");
+  setTimeout(() => window.location.reload(), 1000);
+};
