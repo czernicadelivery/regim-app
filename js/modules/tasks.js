@@ -1,6 +1,7 @@
 // ============================================================================
 // LOCK IN 2027 — js/modules/tasks.js
 // Zadania: mode-based generation + custom CRUD + priority + frequency + archive.
+// FIX: poprawiony syncStateFromCategories (c is not defined).
 // ============================================================================
 
 import { $, escapeHtml, dateKey, todayKey, vibrate, playSound, fireConfetti } from "../core/utils.js";
@@ -17,7 +18,7 @@ const todayDow = new Date().getDay();
 const isSunday = todayDow === 0;
 
 // ============================================================================
-// LEGACY (dla userów bez modes)
+// LEGACY
 // ============================================================================
 
 export function buildTrainingTask() {
@@ -95,7 +96,7 @@ function applyModeTasks(modes) {
 }
 
 // ============================================================================
-// GŁÓWNA LOGIKA
+// GŁÓWNA LOGIKA (FIX: c is not defined)
 // ============================================================================
 
 export function applyConditionalTasks() {
@@ -105,7 +106,6 @@ export function applyConditionalTasks() {
   if (modes.length > 0) applyModeTasks(modes);
   else applyLegacyTasks();
 
-  // Custom tasks: filtrujemy archived
   const customCat = TASK_CATEGORIES.find(c => c.id === "custom");
   if (customCat) {
     customCat.tasks = state.customTasks
@@ -120,14 +120,28 @@ export function applyConditionalTasks() {
 }
 
 export function syncStateFromCategories() {
-  state.tasks = TASK_CATEGORIES.flatMap(c => c.tasks).map(t => ({
-    id: t.id, label: t.label, done: t.done, custom: !!t.custom,
-    priority: t.priority || "normal", category: c.id
-  }));
+  // FIX: category ustawiamy w osobnym kroku (nie w .map po flatMap)
+  state.tasks = [];
+  TASK_CATEGORIES.forEach(cat => {
+    cat.tasks.forEach(t => {
+      state.tasks.push({
+        id: t.id,
+        label: t.label,
+        done: t.done || false,
+        custom: !!t.custom,
+        priority: t.priority || "normal",
+        category: cat.id
+      });
+    });
+  });
+
   const customCat = TASK_CATEGORIES.find(c => c.id === "custom");
-  state.customTasks = customCat ? customCat.tasks.map(t => ({
-    id: t.id, label: t.label, hint: t.hint, done: t.done, priority: t.priority, frequency: t.frequency
-  })) : [];
+  state.customTasks = customCat
+    ? customCat.tasks.map(t => ({
+        id: t.id, label: t.label, hint: t.hint, done: t.done,
+        priority: t.priority, frequency: t.frequency
+      }))
+    : [];
 }
 
 export function calcCompletionPct() {
@@ -277,7 +291,6 @@ function renderCategories() {
   wrap.innerHTML = visible.map(cat => {
     const doneCount = cat.tasks.filter(t => t.done).length;
     const fullDone = doneCount === cat.tasks.length;
-    // Sortowanie: high priority first
     const sortedTasks = [...cat.tasks].sort((a, b) => {
       const pr = { high: 0, normal: 1, low: 2 };
       return (pr[a.priority] ?? 1) - (pr[b.priority] ?? 1);
@@ -375,7 +388,7 @@ function updateHeaderProgress() {
 }
 
 // ============================================================================
-// EDYTOR ZADANIA (Modal)
+// EDYTOR ZADANIA
 // ============================================================================
 
 function openTaskEditor(existingTask, container) {
