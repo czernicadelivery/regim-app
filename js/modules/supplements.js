@@ -340,4 +340,227 @@ function openAddSupplementModal(catalogItem = null) {
       </div>
       <div class="form-group">
         <label class="form-label">Notatki (opcjonalnie)</label>
-        <textarea class
+        <textarea class="textarea" id="as-notes" placeholder="np. przyjmować z posiłkiem"></textarea>
+      </div>
+      <div class="card card-flat" style="background:var(--warning-subtle);">
+        <div class="text-xs text-secondary">
+          ⚠️ Dawkę ustal z lekarzem/farmaceutą lub zgodnie z etykietą. Aplikacja nie sugeruje dawek.
+        </div>
+      </div>
+    </div>
+  `;
+
+  let status = "active";
+  body.querySelectorAll("[data-status]").forEach(el => {
+    el.addEventListener("click", () => {
+      status = el.dataset.status;
+      body.querySelectorAll("[data-status]").forEach(x => x.classList.remove("active"));
+      el.classList.add("active");
+    });
+  });
+
+  openModal({
+    title: isFromCatalog ? "Dodaj do moich" : "Nowy suplement",
+    body,
+    actions: [
+      { label: "Anuluj", variant: "ghost" },
+      {
+        label: "Zapisz",
+        variant: "primary",
+        onClick: async () => {
+          const name = body.querySelector("#as-name").value.trim();
+          if (!name) { showToast("Podaj nazwę", "error"); return; }
+
+          const data = {
+            catalogId: catalogItem?.id || null,
+            name,
+            category: body.querySelector("#as-category").value,
+            dose: body.querySelector("#as-dose").value.trim(),
+            unit: body.querySelector("#as-unit").value.trim(),
+            frequency: body.querySelector("#as-freq").value.trim(),
+            notes: body.querySelector("#as-notes").value.trim(),
+            status,
+            isActive: status === "active",
+            createdAt: new Date().toISOString()
+          };
+
+          await saveSupplement(null, data);
+          showToast("✅ Dodano", "success");
+          const container = document.getElementById("supplements-content");
+          if (container) render(container);
+        }
+      }
+    ]
+  });
+}
+
+// ============================================================================
+// EDYCJA
+// ============================================================================
+
+function openEditModal(s) {
+  const body = document.createElement("div");
+  body.innerHTML = `
+    <div class="stack">
+      <div class="form-group">
+        <label class="form-label">Nazwa</label>
+        <input class="input" id="ed-name" value="${escapeHtml(s.name)}">
+      </div>
+      <div class="grid-2">
+        <div class="form-group">
+          <label class="form-label">Dawka</label>
+          <input class="input" id="ed-dose" value="${escapeHtml(s.dose || "")}">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Jednostka</label>
+          <input class="input" id="ed-unit" value="${escapeHtml(s.unit || "")}">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Częstotliwość</label>
+        <input class="input" id="ed-freq" value="${escapeHtml(s.frequency || "")}">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Status</label>
+        <div class="row" style="gap:6px;flex-wrap:wrap;">
+          ${["active","paused","wishlist","observe","finished"].map(st => `
+            <button class="chip ${(s.status || "active") === st ? "active" : ""}" data-ed-status="${st}">
+              ${st === "active" ? "Stosuję" : st === "paused" ? "Przerwa" : st === "wishlist" ? "Do kupienia" : st === "observe" ? "Obserwuję" : "Zakończone"}
+            </button>
+          `).join("")}
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Notatki</label>
+        <textarea class="textarea" id="ed-notes">${escapeHtml(s.notes || "")}</textarea>
+      </div>
+    </div>
+  `;
+
+  let editStatus = s.status || "active";
+  body.querySelectorAll("[data-ed-status]").forEach(el => {
+    el.addEventListener("click", () => {
+      editStatus = el.dataset.edStatus;
+      body.querySelectorAll("[data-ed-status]").forEach(x => x.classList.remove("active"));
+      el.classList.add("active");
+    });
+  });
+
+  openModal({
+    title: "Edytuj suplement",
+    body,
+    actions: [
+      {
+        label: "Usuń", variant: "danger",
+        onClick: async () => {
+          if (!confirm("Usunąć ten suplement?")) return;
+          await deleteSupplement(s.id);
+          showToast("Usunięto", "");
+          const c = document.getElementById("supplements-content");
+          if (c) render(c);
+        },
+        close: false
+      },
+      { label: "Anuluj", variant: "ghost" },
+      {
+        label: "Zapisz", variant: "primary",
+        onClick: async () => {
+          const data = {
+            name: body.querySelector("#ed-name").value.trim(),
+            dose: body.querySelector("#ed-dose").value.trim(),
+            unit: body.querySelector("#ed-unit").value.trim(),
+            frequency: body.querySelector("#ed-freq").value.trim(),
+            notes: body.querySelector("#ed-notes").value.trim(),
+            status: editStatus,
+            isActive: editStatus === "active"
+          };
+          if (!data.name) { showToast("Podaj nazwę", "error"); return; }
+          await saveSupplement(s.id, data);
+          showToast("✅ Zapisano", "success");
+          const c = document.getElementById("supplements-content");
+          if (c) render(c);
+        }
+      }
+    ]
+  });
+}
+
+// ============================================================================
+// EVENTY
+// ============================================================================
+
+function bindEvents(container) {
+  // Tabs
+  container.querySelectorAll("#supp-tabs [data-tab]").forEach(tab => {
+    tab.addEventListener("click", () => {
+      _activeTab = tab.dataset.tab;
+      container.querySelectorAll("#supp-tabs [data-tab]").forEach(t => t.classList.remove("active"));
+      tab.classList.add("active");
+      renderContent(container);
+    });
+  });
+
+  // Add
+  container.querySelector("#btn-add-supp")?.addEventListener("click", () => openAddSupplementModal());
+}
+
+function bindTabEvents(container) {
+  // Mine — toggle taken
+  container.querySelectorAll("[data-toggle-supp]").forEach(btn => {
+    btn.addEventListener("click", async () => {
+      const id = btn.dataset.toggleSupp;
+      const taken = _logs[id] === true;
+      await logSupplement(id, !taken);
+      _logs[id] = !taken;
+      // Zapisz też do historii
+      const key = `regim:${window.__currentUser?.uid || "local"}:supp-history-${dateKey(new Date())}`;
+      try {
+        const hist = JSON.parse(localStorage.getItem(key) || "{}");
+        hist[id] = !taken;
+        localStorage.setItem(key, JSON.stringify(hist));
+      } catch (e) {}
+      renderContent(container);
+      if (!taken) showToast("✅ Przyjęte", "success");
+    });
+  });
+
+  // Mine — edit
+  container.querySelectorAll("[data-edit-supp]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const s = _mySupps.find(x => x.id === btn.dataset.editSupp);
+      if (s) openEditModal(s);
+    });
+  });
+
+  // Catalog — filter chips
+  container.querySelectorAll("[data-cat-filter]").forEach(chip => {
+    chip.addEventListener("click", () => {
+      _catalogFilter = chip.dataset.catFilter;
+      renderContent(container);
+    });
+  });
+
+  // Catalog — search
+  const searchEl = container.querySelector("#supp-search");
+  if (searchEl) {
+    searchEl.addEventListener("input", (e) => {
+      _searchQuery = e.target.value;
+      renderContent(container);
+      const newSearch = container.querySelector("#supp-search");
+      if (newSearch) { newSearch.focus(); newSearch.setSelectionRange(_searchQuery.length, _searchQuery.length); }
+    });
+  }
+
+  // Catalog — info
+  container.querySelectorAll("[data-info-supp]").forEach(btn => {
+    btn.addEventListener("click", () => openInfoModal(btn.dataset.infoSupp));
+  });
+
+  // Catalog — add
+  container.querySelectorAll("[data-add-from-cat]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const catItem = getSupplementById(btn.dataset.addFromCat);
+      if (catItem) openAddSupplementModal(catItem);
+    });
+  });
+}
