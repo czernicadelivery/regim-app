@@ -1,6 +1,6 @@
 // ============================================================================
 // LOCK IN 2027 — js/components/nav.js
-// Sidebar + bottom nav. Dodano Medications.
+// Sidebar + bottom nav. Dodano Inventory.
 // ============================================================================
 
 export const SECTIONS = [
@@ -19,6 +19,7 @@ export const EXTRA_SECTIONS = [
   { id: "nutrition",    icon: "fa-utensils",           label: "Nutrition" },
   { id: "supplements",  icon: "fa-capsules",           label: "Suplementy" },
   { id: "medications",  icon: "fa-prescription",       label: "Leki" },
+  { id: "inventory",    icon: "fa-box",                label: "Inventory" },
   { id: "achievements", icon: "fa-trophy",             label: "Osiągnięcia" },
   { id: "social",       icon: "fa-users",              label: "Social" }
 ];
