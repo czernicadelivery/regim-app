@@ -239,4 +239,296 @@ export async function render(container) {
       <div class="card-header">
         <div>
           <div class="card-title">Dziś</div>
-          <
+          <div class="card-subtitle">${calcCompletionStats().requiredDone}/${calcCompletionStats().requiredTotal} zadań</div>
+        </div>
+        <div class="text-2xl font-black text-accent" id="tasks-pct">${calcCompletionPct()}%</div>
+      </div>
+      <div class="progress"><div class="progress-fill" id="tasks-progress" style="width:${calcCompletionPct()}%"></div></div>
+    </div>
+
+    <div id="tasks-categories" class="stack-lg"></div>
+
+    <div class="row mt-4" style="gap:8px;flex-wrap:wrap;">
+      <button class="btn btn-primary" id="btn-add-task" style="flex:1;">
+        <i class="fa-solid fa-plus"></i> Nowe zadanie
+      </button>
+      ${archivedCount > 0 ? `
+        <button class="btn btn-secondary" id="btn-show-archive" style="flex:1;">
+          <i class="fa-solid fa-box-archive"></i> Archiwum (${archivedCount})
+        </button>
+      ` : ""}
+    </div>
+  `;
+
+  renderCategories();
+
+  $("btn-add-task")?.addEventListener("click", () => openTaskEditor(null, container));
+  $("btn-show-archive")?.addEventListener("click", () => openArchiveModal(container));
+}
+
+function renderCategories() {
+  const wrap = $("tasks-categories");
+  if (!wrap) return;
+  const visible = TASK_CATEGORIES.filter(c => c.tasks.length > 0);
+  if (!visible.length) {
+    wrap.innerHTML = `<div class="empty"><div class="empty-icon">📋</div><div class="empty-title">Brak zadań</div><div class="empty-text">Dodaj własne lub skonfiguruj tryby.</div></div>`;
+    return;
+  }
+  wrap.innerHTML = visible.map(cat => {
+    const doneCount = cat.tasks.filter(t => t.done).length;
+    const fullDone = doneCount === cat.tasks.length;
+    // Sortowanie: high priority first
+    const sortedTasks = [...cat.tasks].sort((a, b) => {
+      const pr = { high: 0, normal: 1, low: 2 };
+      return (pr[a.priority] ?? 1) - (pr[b.priority] ?? 1);
+    });
+    return `
+      <div class="card card-padded-sm">
+        <div class="card-header">
+          <div class="row">
+            <div style="width:32px;height:32px;border-radius:10px;background:var(--bg-surface);display:flex;align-items:center;justify-content:center;font-size:16px;">${cat.icon}</div>
+            <div class="card-title">${cat.name}</div>
+          </div>
+          <div class="badge ${fullDone ? "badge-success" : "badge-neutral"}">${doneCount}/${cat.tasks.length}</div>
+        </div>
+        <div class="stack-sm">${sortedTasks.map(t => renderTaskItem(t)).join("")}</div>
+      </div>
+    `;
+  }).join("");
+
+  wrap.querySelectorAll(".task-item").forEach(el => {
+    el.addEventListener("click", async (ev) => {
+      if (ev.target.closest(".task-edit") || ev.target.closest(".task-delete")) return;
+      const id = el.dataset.taskId;
+      let task = null;
+      TASK_CATEGORIES.forEach(c => { const f = c.tasks.find(t => t.id === id); if (f) task = f; });
+      if (!task) return;
+      task.done = !task.done;
+      syncStateFromCategories();
+      vibrate(20);
+      if (task.done) playSound("done");
+      await persistToday();
+      renderCategories();
+      updateHeaderProgress();
+      if (task.done && calcCompletionPct() === 100) setTimeout(() => fireConfetti(), 200);
+    });
+  });
+
+  wrap.querySelectorAll(".task-edit").forEach(btn => {
+    btn.addEventListener("click", (ev) => {
+      ev.stopPropagation();
+      const id = btn.dataset.taskId;
+      const task = state.customTasks.find(t => t.id === id);
+      if (task) {
+        const container = document.getElementById("tasks-content");
+        openTaskEditor(task, container);
+      }
+    });
+  });
+
+  wrap.querySelectorAll(".task-delete").forEach(btn => {
+    btn.addEventListener("click", async (ev) => {
+      ev.stopPropagation();
+      if (!confirm("Usunąć trwale? (można też zarchiwizować)")) return;
+      await deleteCustomTask(btn.dataset.taskId);
+      state.customTasks = loadCustomTasks();
+      applyConditionalTasks();
+      await persistToday();
+      renderCategories();
+      updateHeaderProgress();
+    });
+  });
+}
+
+function renderTaskItem(t) {
+  const priorityDot = t.priority === "high" ? `<span style="width:6px;height:6px;border-radius:50%;background:var(--danger);flex-shrink:0;" title="Wysoki priorytet"></span>` : "";
+  const freqBadge = (t.frequency && t.frequency !== "daily") ? `<span class="badge badge-info" style="font-size:9px;padding:2px 6px;">${t.frequency === "weekly" ? "tyg." : t.frequency === "monthly" ? "mies." : t.frequency}</span>` : "";
+
+  const editBtn = t.custom ? `<button class="task-edit btn-icon btn-icon-sm" data-task-id="${t.id}" title="Edytuj"><i class="fa-solid fa-pen"></i></button>` : "";
+  const delBtn = t.custom ? `<button class="task-delete btn-icon btn-icon-sm" data-task-id="${t.id}" title="Usuń" style="color:var(--danger);"><i class="fa-solid fa-xmark"></i></button>` : "";
+
+  return `
+    <div class="list-item list-item-clickable task-item ${t.done ? "task-done" : ""}" data-task-id="${t.id}" style="${t.done ? "background:var(--accent-subtle);border-color:var(--accent-medium);" : ""}">
+      <div class="checkbox-box" style="${t.done ? "background:var(--accent);border-color:var(--accent);color:var(--text-inverse);" : ""}">
+        ${t.done ? '<i class="fa-solid fa-check" style="font-size:12px;"></i>' : ""}
+      </div>
+      <div class="list-item-body">
+        <div class="row" style="gap:6px;align-items:center;">
+          ${priorityDot}
+          <div class="list-item-title ${t.done ? "text-tertiary" : ""}" style="${t.done ? "text-decoration:line-through;" : ""}">${escapeHtml(t.label)}</div>
+          ${freqBadge}
+        </div>
+        ${t.hint ? `<div class="list-item-subtitle">${escapeHtml(t.hint)}</div>` : ""}
+      </div>
+      ${editBtn}
+      ${delBtn}
+    </div>
+  `;
+}
+
+function updateHeaderProgress() {
+  const pct = calcCompletionPct();
+  const pctEl = $("tasks-pct");
+  const barEl = $("tasks-progress");
+  if (pctEl) pctEl.textContent = pct + "%";
+  if (barEl) barEl.style.width = pct + "%";
+}
+
+// ============================================================================
+// EDYTOR ZADANIA (Modal)
+// ============================================================================
+
+function openTaskEditor(existingTask, container) {
+  const isEdit = !!existingTask;
+  const data = existingTask ? { ...existingTask } : {
+    label: "",
+    hint: "",
+    priority: "normal",
+    frequency: "daily",
+    category: "custom"
+  };
+
+  const CATEGORIES = Object.entries(CATEGORY_META).map(([id, meta]) => ({ id, ...meta }));
+
+  const body = document.createElement("div");
+  body.innerHTML = `
+    <div class="stack">
+      <div class="form-group">
+        <label class="form-label">Nazwa zadania</label>
+        <input class="input" id="et-label" value="${escapeHtml(data.label || "")}" placeholder="np. Medytacja 10 min">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Opis (opcjonalnie)</label>
+        <input class="input" id="et-hint" value="${escapeHtml(data.hint || "")}" placeholder="np. wieczorem przed snem">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Kategoria</label>
+        <select class="input" id="et-category">
+          ${CATEGORIES.map(c => `<option value="${c.id}" ${data.category === c.id ? "selected" : ""}>${c.icon} ${c.name}</option>`).join("")}
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Priorytet</label>
+        <div class="row" style="gap:6px;">
+          <button class="chip ${data.priority === "high" ? "active" : ""}" data-priority="high">🔴 Wysoki</button>
+          <button class="chip ${data.priority === "normal" ? "active" : ""}" data-priority="normal">🟡 Normalny</button>
+          <button class="chip ${data.priority === "low" ? "active" : ""}" data-priority="low">🔵 Niski</button>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Częstotliwość</label>
+        <div class="row" style="gap:6px;flex-wrap:wrap;">
+          <button class="chip ${data.frequency === "daily" ? "active" : ""}" data-freq="daily">Codziennie</button>
+          <button class="chip ${data.frequency === "weekly" ? "active" : ""}" data-freq="weekly">Tygodniowo</button>
+          <button class="chip ${data.frequency === "monthly" ? "active" : ""}" data-freq="monthly">Miesięcznie</button>
+        </div>
+      </div>
+    </div>
+  `;
+
+  let priority = data.priority;
+  let frequency = data.frequency;
+
+  body.querySelectorAll("[data-priority]").forEach(el => {
+    el.addEventListener("click", () => {
+      priority = el.dataset.priority;
+      body.querySelectorAll("[data-priority]").forEach(x => x.classList.remove("active"));
+      el.classList.add("active");
+    });
+  });
+
+  body.querySelectorAll("[data-freq]").forEach(el => {
+    el.addEventListener("click", () => {
+      frequency = el.dataset.freq;
+      body.querySelectorAll("[data-freq]").forEach(x => x.classList.remove("active"));
+      el.classList.add("active");
+    });
+  });
+
+  openModal({
+    title: isEdit ? "Edytuj zadanie" : "Nowe zadanie",
+    body,
+    actions: [
+      { label: "Anuluj", variant: "ghost" },
+      {
+        label: isEdit ? "Zapisz" : "Dodaj",
+        variant: "primary",
+        onClick: async () => {
+          const label = body.querySelector("#et-label").value.trim();
+          if (!label) { showToast("Podaj nazwę", "error"); return; }
+
+          const taskData = {
+            label,
+            hint: body.querySelector("#et-hint").value.trim(),
+            category: body.querySelector("#et-category").value,
+            priority,
+            frequency,
+            done: isEdit ? (existingTask.done || false) : false
+          };
+
+          if (isEdit) {
+            await updateCustomTask(existingTask.id, taskData);
+            showToast("✅ Zaktualizowano", "success");
+          } else {
+            const id = "custom-" + Date.now();
+            const tasks = loadCustomTasks();
+            tasks.push({ id, ...taskData, archived: false, createdAt: Date.now() });
+            await saveCustomTasks(tasks);
+            showToast("✅ Dodano", "success");
+          }
+
+          state.customTasks = loadCustomTasks();
+          applyConditionalTasks();
+          await persistToday();
+          if (container) render(container);
+        }
+      }
+    ]
+  });
+}
+
+// ============================================================================
+// ARCHIWUM
+// ============================================================================
+
+function openArchiveModal(container) {
+  const archived = state.customTasks.filter(t => t.archived);
+
+  const body = document.createElement("div");
+  if (archived.length === 0) {
+    body.innerHTML = `<p class="text-sm text-tertiary">Brak zarchiwizowanych zadań.</p>`;
+  } else {
+    body.innerHTML = `
+      <div class="stack-sm">
+        ${archived.map(t => `
+          <div class="list-item">
+            <div class="list-item-body">
+              <div class="list-item-title">${escapeHtml(t.label)}</div>
+              ${t.hint ? `<div class="list-item-subtitle">${escapeHtml(t.hint)}</div>` : ""}
+            </div>
+            <button class="btn btn-sm btn-secondary" data-restore="${t.id}">
+              <i class="fa-solid fa-rotate-left"></i> Przywróć
+            </button>
+          </div>
+        `).join("")}
+      </div>
+    `;
+
+    body.querySelectorAll("[data-restore]").forEach(btn => {
+      btn.addEventListener("click", async () => {
+        await restoreCustomTask(btn.dataset.restore);
+        state.customTasks = loadCustomTasks();
+        applyConditionalTasks();
+        await persistToday();
+        showToast("✅ Przywrócono", "success");
+        if (container) render(container);
+      });
+    });
+  }
+
+  openModal({
+    title: "📦 Archiwum",
+    body,
+    actions: [{ label: "Zamknij", variant: "ghost" }]
+  });
+}
