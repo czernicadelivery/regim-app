@@ -1,6 +1,6 @@
 // ============================================================================
 // LOCK IN 2027 — js/router.js
-// Hash routing. Podetap 2: dodano achievements.
+// Hash routing. Dodano skincare.
 // ============================================================================
 
 import { state } from "./state.js";
@@ -9,7 +9,8 @@ import { setActiveNav } from "./components/nav.js";
 export const ROUTES = [
   "overview", "health", "training", "tasks", "progress", "coach",
   "nutrition", "supplements", "settings", "onboarding",
-  "measurements", "fitness", "custom-questions", "social", "achievements"
+  "measurements", "fitness", "custom-questions", "social", "achievements",
+  "routines", "skincare"
 ];
 
 const MODULE_MAP = {
@@ -27,7 +28,9 @@ const MODULE_MAP = {
   fitness: () => import("./modules/fitness.js"),
   "custom-questions": () => import("./modules/custom-questions.js"),
   social: () => import("./modules/social.js"),
-  achievements: () => import("./modules/achievements.js")
+  achievements: () => import("./modules/achievements.js"),
+  routines: () => import("./modules/routines.js"),
+  skincare: () => import("./modules/skincare.js")
 };
 
 let _initialized = false;
