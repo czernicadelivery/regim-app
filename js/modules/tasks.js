@@ -1,6 +1,6 @@
 // ============================================================================
 // LOCK IN 2027 — js/modules/tasks.js
-// Zadania + XP (aktualizacja przy każdym kliknięciu).
+// Zadania: jeśli profile.modes → generowane z modów. W przeciwnym razie legacy.
 // ============================================================================
 
 import { $, escapeHtml, dateKey, todayKey, vibrate, playSound, fireConfetti } from "../core/utils.js";
@@ -8,12 +8,16 @@ import { localKey, getToggle, isBoosterActive, getSettings } from "../core/stora
 import { TASK_CATEGORIES, BASE_CALISTHENICS, LIGHT_CALISTHENICS } from "../core/constants.js";
 import { loadDayDoc, saveDayDoc, loadCustomTasks, saveCustomTasks, loadGamification, saveGamification } from "../core/data.js";
 import { calculateDailyXp } from "../core/gamification-engine.js";
+import { getTasksFromModes, buildCategoriesFromTasks, CATEGORY_META } from "../core/modes.js";
 import { state } from "../state.js";
 import { showToast } from "../components/toast.js";
 
-const todayObj = new Date();
-const todayDow = todayObj.getDay();
+const todayDow = new Date().getDay();
 const isSunday = todayDow === 0;
+
+// ============================================================================
+// LEGACY: hardcoded tasks (dla userów bez modes)
+// ============================================================================
 
 export function buildTrainingTask() {
   if (isSunday) return null;
@@ -24,61 +28,109 @@ export function buildTrainingTask() {
   return { id: "trening", label: "💪 Kalistenika + hantle 1kg", hint: "Standardowy plan", done: false, exercises };
 }
 
-export function applyConditionalTasks() {
+function applyLegacyTasks() {
   const suppCat = TASK_CATEGORIES.find(c => c.id === "suplementy");
-  if (getToggle("supplements")) {
-    const arr = [{ id: "d3", label: "Witamina D3 ×2 tabletki", hint: "Rano, do tłuszczu", done: false }];
-    if (getToggle("creatine")) arr.push({ id: "creatine", label: "Kreatyna 3-5g", hint: "Do wody", done: false });
-    suppCat.tasks = arr;
-  } else suppCat.tasks = [];
+  if (suppCat) {
+    if (getToggle("supplements")) {
+      const arr = [{ id: "d3", label: "Witamina D3 ×2 tabletki", hint: "Rano", done: false }];
+      if (getToggle("creatine")) arr.push({ id: "creatine", label: "Kreatyna 3-5g", hint: "Do wody", done: false });
+      suppCat.tasks = arr;
+    } else suppCat.tasks = [];
+  }
 
   const treningCat = TASK_CATEGORIES.find(c => c.id === "trening");
-  const trainingTask = buildTrainingTask();
-  treningCat.tasks = trainingTask ? [trainingTask] : [];
+  if (treningCat) {
+    const t = buildTrainingTask();
+    treningCat.tasks = t ? [t] : [];
+  }
 
   const skincareCat = TASK_CATEGORIES.find(c => c.id === "skincare");
-  if (getToggle("skincare")) {
-    skincareCat.tasks = [
-      { id: "cold-am", label: "Przemycie twarzy zimną wodą (rano)", done: false },
-      { id: "benzacne", label: "Benzacne punktowo", done: false },
-      { id: "moisturizer", label: "Krem nawilżający", done: false },
-      { id: "cold-pm", label: "Przemycie twarzy zimną wodą (wieczór)", done: false }
-    ];
-  } else skincareCat.tasks = [];
+  if (skincareCat) {
+    if (getToggle("skincare")) {
+      skincareCat.tasks = [
+        { id: "cold-am", label: "Przemycie twarzy zimną wodą (rano)", done: false },
+        { id: "benzacne", label: "Benzacne punktowo", done: false },
+        { id: "moisturizer", label: "Krem nawilżający", done: false },
+        { id: "cold-pm", label: "Przemycie twarzy zimną wodą (wieczór)", done: false }
+      ];
+    } else skincareCat.tasks = [];
+  }
 
   const mentalCat = TASK_CATEGORIES.find(c => c.id === "mental");
-  const mentalTasks = [
-    { id: "nofap", label: "NoFap — zero pornografii", done: false },
-    { id: "milk-night", label: "Szklanka mleka przed snem", done: false },
-    { id: "vent-room", label: "Wietrzenie pokoju 2 min", done: false }
-  ];
-  if (getToggle("jawline")) {
-    mentalTasks.push({ id: "mewing", label: "Mewing", done: false });
-    mentalTasks.push({ id: "postawa", label: "Kontrola postawy", done: false });
+  if (mentalCat) {
+    const arr = [
+      { id: "nofap", label: "NoFap — zero pornografii", done: false },
+      { id: "milk-night", label: "Szklanka mleka przed snem", done: false },
+      { id: "vent-room", label: "Wietrzenie pokoju 2 min", done: false }
+    ];
+    if (getToggle("jawline")) { arr.push({ id: "mewing", label: "Mewing", done: false }); arr.push({ id: "postawa", label: "Kontrola postawy", done: false }); }
+    if (getToggle("beast")) arr.push({ id: "cold-shower", label: "Zimny prysznic 2 min", done: false });
+    mentalCat.tasks = arr;
   }
-  if (getToggle("beast")) mentalTasks.push({ id: "cold-shower", label: "Zimny prysznic 2 min", done: false });
-  mentalCat.tasks = mentalTasks;
 
   const masaCat = TASK_CATEGORIES.find(c => c.id === "masa");
-  masaCat.tasks = [{ id: "shake", label: "Szejk masowy / 80g białka", done: false }];
+  if (masaCat) masaCat.tasks = [{ id: "shake", label: "Szejk masowy / 80g białka", done: false }];
 
   const pomiaryCat = TASK_CATEGORIES.find(c => c.id === "pomiary");
-  pomiaryCat.tasks = isSunday ? [
-    { id: "pomiar-waga", label: "Pomiar wagi", done: false },
-    { id: "zarost", label: "Trymowanie zarostu", done: false },
-    { id: "paznokcie", label: "Paznokcie", done: false }
-  ] : [];
+  if (pomiaryCat) {
+    pomiaryCat.tasks = isSunday ? [
+      { id: "pomiar-waga", label: "Pomiar wagi", done: false },
+      { id: "zarost", label: "Trymowanie zarostu", done: false },
+      { id: "paznokcie", label: "Paznokcie", done: false }
+    ] : [];
+  }
+}
 
+// ============================================================================
+// MODE-BASED: generuje kategorie z modes
+// ============================================================================
+
+function applyModeTasks(modes) {
+  // 1. Zbierz zadania z modów
+  const modeTasks = getTasksFromModes(modes);
+
+  // 2. Zbuduj kategorie z tych zadań
+  const newCategories = buildCategoriesFromTasks(modeTasks);
+
+  // 3. Dodaj kategorię Custom (zawsze)
+  newCategories.push({ id: "custom", icon: CATEGORY_META.custom.icon, name: CATEGORY_META.custom.name, order: 999, tasks: [] });
+
+  // 4. Mutacja TASK_CATEGORIES in-place (zachowuje referencję dla innych modułów)
+  TASK_CATEGORIES.length = 0;
+  newCategories.forEach(c => TASK_CATEGORIES.push(c));
+}
+
+// ============================================================================
+// GŁÓWNA FUNKCJA — decyduje: mode-based czy legacy
+// ============================================================================
+
+export function applyConditionalTasks() {
+  const profile = state.profile || {};
+  const modes = Array.isArray(profile.modes) ? profile.modes : [];
+
+  if (modes.length > 0) {
+    applyModeTasks(modes);
+  } else {
+    applyLegacyTasks();
+  }
+
+  // Custom tasks (zawsze)
   const customCat = TASK_CATEGORIES.find(c => c.id === "custom");
-  customCat.tasks = state.customTasks.map(t => ({ id: t.id, label: t.label, hint: t.hint, done: t.done || false, custom: true }));
+  if (customCat) {
+    customCat.tasks = state.customTasks.map(t => ({
+      id: t.id, label: t.label, hint: t.hint, done: t.done || false, custom: true
+    }));
+  }
 
   syncStateFromCategories();
 }
 
 export function syncStateFromCategories() {
-  state.tasks = TASK_CATEGORIES.flatMap(c => c.tasks).map(t => ({ id: t.id, label: t.label, done: t.done, custom: !!t.custom }));
+  state.tasks = TASK_CATEGORIES.flatMap(c => c.tasks).map(t => ({
+    id: t.id, label: t.label, done: t.done, custom: !!t.custom
+  }));
   const customCat = TASK_CATEGORIES.find(c => c.id === "custom");
-  state.customTasks = customCat.tasks.map(t => ({ id: t.id, label: t.label, hint: t.hint, done: t.done }));
+  state.customTasks = customCat ? customCat.tasks.map(t => ({ id: t.id, label: t.label, hint: t.hint, done: t.done })) : [];
 }
 
 export function calcCompletionPct() {
@@ -91,7 +143,7 @@ export function calcCompletionStats() {
 }
 
 // ============================================================================
-// PERSIST + XP
+// PERSIST + XP (bez zmian)
 // ============================================================================
 
 export async function persistToday() {
@@ -110,13 +162,8 @@ export async function persistToday() {
   await saveDayDoc(dayData);
   await refreshStreak();
   await checkMilestone();
-
-  // XP: oblicz i zapisz (nowe w tym podetapie)
-  try {
-    await updateXpFromDay(dayData);
-  } catch (e) {
-    console.error("updateXpFromDay error:", e);
-  }
+  try { await updateXpFromDay(dayData); }
+  catch (e) { console.error("updateXpFromDay error:", e); }
 }
 
 async function updateXpFromDay(dayData) {
@@ -129,38 +176,23 @@ async function updateXpFromDay(dayData) {
   const todayXp = calculateDailyXp(completed, total, streak);
   const savedTodayXp = (gamData.dailyXp && gamData.dailyXp[today]) || 0;
 
-  console.log("[XP] Stan:", { completed, total, streak, todayXp, savedTodayXp, currentTotalXp: gamData.xp || 0 });
-
   if (todayXp > savedTodayXp) {
     const diff = todayXp - savedTodayXp;
     const newTotalXp = (gamData.xp || 0) + diff;
     const newLevel = Math.floor(Math.sqrt(newTotalXp / 100)) + 1;
     const newDailyXp = { ...(gamData.dailyXp || {}), [today]: todayXp };
-
-    await saveGamification({
-      xp: newTotalXp,
-      level: newLevel,
-      dailyXp: newDailyXp
-    });
-    console.log("[XP] ✅ Zapisano:", newTotalXp, "XP · Poziom", newLevel, "(+", diff, ")");
+    await saveGamification({ xp: newTotalXp, level: newLevel, dailyXp: newDailyXp });
     showToast(`+${diff} XP`, "success");
-  } else {
-    console.log("[XP] Brak zmian (todayXp <= savedTodayXp)");
   }
 }
-
-// ============================================================================
-// STREAK
-// ============================================================================
 
 export async function refreshStreak() {
   const today = await loadDayDoc(todayKey());
   const pctToday = today?.completedPct ?? 0;
   const base = await computeStreakUpTo(todayKey());
-  const streak = pctToday === 100 ? base + 1 : base;
-  state._streak = streak;
+  state._streak = pctToday === 100 ? base + 1 : base;
   const el = $("topbar-streak");
-  if (el) el.textContent = streak;
+  if (el) el.textContent = state._streak;
 }
 
 export async function computeStreakUpTo(dateStr) {
@@ -240,7 +272,12 @@ export async function render(container) {
 function renderCategories() {
   const wrap = $("tasks-categories");
   if (!wrap) return;
-  wrap.innerHTML = TASK_CATEGORIES.filter(c => c.tasks.length > 0).map(cat => {
+  const visible = TASK_CATEGORIES.filter(c => c.tasks.length > 0);
+  if (!visible.length) {
+    wrap.innerHTML = `<div class="empty"><div class="empty-icon">📋</div><div class="empty-title">Brak zadań</div><div class="empty-text">Skonfiguruj tryby w onboardingu.</div></div>`;
+    return;
+  }
+  wrap.innerHTML = visible.map(cat => {
     const doneCount = cat.tasks.filter(t => t.done).length;
     const fullDone = doneCount === cat.tasks.length;
     return `
@@ -252,9 +289,7 @@ function renderCategories() {
           </div>
           <div class="badge ${fullDone ? "badge-success" : "badge-neutral"}">${doneCount}/${cat.tasks.length}</div>
         </div>
-        <div class="stack-sm">
-          ${cat.tasks.map(t => renderTaskItem(t)).join("")}
-        </div>
+        <div class="stack-sm">${cat.tasks.map(t => renderTaskItem(t)).join("")}</div>
       </div>
     `;
   }).join("");
@@ -281,7 +316,7 @@ function renderCategories() {
     btn.addEventListener("click", async (ev) => {
       ev.stopPropagation();
       const id = btn.dataset.taskId;
-      if (!confirm("Usunąć to zadanie?")) return;
+      if (!confirm("Usunąć?")) return;
       state.customTasks = state.customTasks.filter(t => t.id !== id);
       await saveCustomTasks(state.customTasks);
       applyConditionalTasks();
@@ -299,7 +334,7 @@ function renderTaskItem(t) {
       <span class="text-accent font-bold" style="flex-shrink:0;">${e.series}</span>
     </div>
   `).join("")}</div>` : "";
-  const del = t.custom ? `<button class="task-delete btn-icon btn-icon-sm" data-task-id="${t.id}" title="Usuń"><i class="fa-solid fa-xmark"></i></button>` : "";
+  const del = t.custom ? `<button class="task-delete btn-icon btn-icon-sm" data-task-id="${t.id}"><i class="fa-solid fa-xmark"></i></button>` : "";
   return `
     <div class="list-item list-item-clickable task-item ${t.done ? "task-done" : ""}" data-task-id="${t.id}" style="${t.done ? "background:var(--accent-subtle);border-color:var(--accent-medium);" : ""}">
       <div class="checkbox-box" style="${t.done ? "background:var(--accent);border-color:var(--accent);color:var(--text-inverse);" : ""}">
