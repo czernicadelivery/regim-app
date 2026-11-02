@@ -1,4 +1,14 @@
 export const state = {
+  // --- Nowe pola Personal Profile 2.0 ---
+  profile: null,
+  measurements: [],
+  fitnessRecords: [],
+  customQuestions: [],
+  customAnswers: {},
+  supplements: [],
+  supplementLogs: [],
+  
+  // --- Stare pola ---
   tasks: [],
   customTasks: [],
   morning: {},
@@ -14,6 +24,14 @@ export const state = {
 };
 
 export function resetAppState() {
+  state.profile = null;
+  state.measurements = [];
+  state.fitnessRecords = [];
+  state.customQuestions = [];
+  state.customAnswers = {};
+  state.supplements = [];
+  state.supplementLogs = [];
+
   state.tasks = [];
   state.customTasks = [];
   state.morning = {};
