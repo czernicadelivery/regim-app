@@ -203,4 +203,69 @@ export const FOOD_INGREDIENTS = {
     { name: "Orzeszki solone (garść 30g)", kcal: 180, prot: 6 }
   ],
   owoce: [
-    { name: "Banan (1)", kcal: 
+    { name: "Banan (1)", kcal: 105, prot: 1 },
+    { name: "Jabłko (1)", kcal: 80, prot: 0 },
+    { name: "Mandarynka (2 szt)", kcal: 70, prot: 1 },
+    { name: "Winogrono (garść 100g)", kcal: 70, prot: 1 }
+  ],
+  napoje: [
+    { name: "Mleko 3.2% (250ml)", kcal: 155, prot: 8 },
+    { name: "Mleko 2% (250ml)", kcal: 120, prot: 8 },
+    { name: "Kakao na mleku (250ml)", kcal: 190, prot: 9 },
+    { name: "Pudding Ehrmann Protein", kcal: 180, prot: 20 }
+  ],
+  obiady: [
+    { name: "Kotlet schabowy + ziemniaki + surówka", kcal: 720, prot: 35 },
+    { name: "Pierogi ruskie (10 szt)", kcal: 680, prot: 20 },
+    { name: "Spaghetti bolognese", kcal: 750, prot: 38 },
+    { name: "Kurczak pieczony + ryż + warzywa", kcal: 700, prot: 45 }
+  ]
+};
+
+export const FOOD_DB = {
+  breakfast: [
+    { name: "Jajecznica z 4 jajek + chleb razowy", kcal: 620, prot: 32 },
+    { name: "Owsianka na mleku + banan + masło orzechowe", kcal: 680, prot: 24 },
+    { name: "Naleśniki z twarogiem i miodem", kcal: 640, prot: 28 },
+    { name: "Kanapki z twarogiem i warzywami", kcal: 520, prot: 26 },
+    { name: "Omlet z 5 jajek z serem i szynką", kcal: 700, prot: 42 }
+  ],
+  lunch: [
+    { name: "Kurczak + ryż + warzywa", kcal: 780, prot: 48 },
+    { name: "Spaghetti bolognese", kcal: 820, prot: 42 },
+    { name: "Kotlet schabowy + ziemniaki", kcal: 850, prot: 38 },
+    { name: "Gulasz wołowy + kasza gryczana", kcal: 760, prot: 44 }
+  ],
+  snack: [
+    { name: "Twaróg 150g + miód + orzechy", kcal: 400, prot: 28 },
+    { name: "Kanapka z masłem orzechowym", kcal: 420, prot: 14 },
+    { name: "Skyr 200g + kakao + banan", kcal: 340, prot: 26 }
+  ],
+  dinner: [
+    { name: "Twaróg 200g + warzywa", kcal: 420, prot: 32 },
+    { name: "Omlet z 4 jajek z warzywami", kcal: 480, prot: 28 },
+    { name: "Sałatka z tuńczykiem", kcal: 500, prot: 36 },
+    { name: "Skyr 300g + owoce", kcal: 460, prot: 32 }
+  ],
+  shake: [
+    { name: "Szejk masowy: mleko + banan + płatki", kcal: 700, prot: 22 },
+    { name: "Szejk proteinowy: mleko + białko + banan", kcal: 480, prot: 50 },
+    { name: "Szejk twarogowy: twaróg + mleko + miód", kcal: 520, prot: 38 }
+  ]
+};
+
+// --- KEYWORDS (analiza notatek) ------------------------------------------
+export const KEYWORDS = {
+  sick: ["chory", "choroba", "gorączka", "przeziębienie", "katar", "kaszel", "grypa", "osłabiony"],
+  alcohol: ["piwo", "wódka", "alkohol", "impreza", "kac"],
+  vape: ["efajka", "vape", "fajki", "papieros", "nikotyna"],
+  stress: ["stres", "egzamin", "sprawdzian", "kłótnia", "problem", "nerwy", "zdenerwowany"],
+  happy: ["dobry", "świetny", "super", "radosny", "szczęśliwy", "udany"],
+  tired: ["zmęczony", "wyczerpany", "padnięty", "senny", "bez siły"],
+  lazy: ["leniwy", "nie chciało", "brak motywacji", "odpuszczam"],
+  injury: ["kontuzja", "skręcenie", "uraz", "ból pleców", "ból kolana"],
+  girl: ["dziewczyna", "rzuciła", "zerwała", "friendzone"],
+  school: ["szkoła", "sprawdzian", "ocena", "nauka", "klasówka"],
+  game: ["gry", "konsola", "tiktok", "scroll", "gaming"],
+  junkfood: ["zjadłem syf", "chipsy", "fast food", "pizza", "słódkie", "cola"]
+};
