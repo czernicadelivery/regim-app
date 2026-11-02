@@ -1,14 +1,14 @@
 // ============================================================================
 // LOCK IN 2027 — js/modules/overview.js
-// Dashboard: Daily Score, streak, zadania dnia, cytat, brief.
-// Daily Score = 50% zadania + 30% sen + 20% aktywność (tylko z dostępnych).
+// Dashboard. Automatycznie nalicza XP przy wejściu.
 // ============================================================================
 
 import { $, escapeHtml, todayKey, formatDatePL } from "../core/utils.js";
 import { getSettings, getToggle, isBoosterActive } from "../core/storage.js";
-import { loadDayDoc } from "../core/data.js";
+import { loadDayDoc, loadGamification, saveGamification } from "../core/data.js";
 import { state } from "../state.js";
-import { calcCompletionPct, calcCompletionStats, applyConditionalTasks, syncStateFromCategories, buildTrainingTask } from "./tasks.js";
+import { calcCompletionPct, calcCompletionStats, applyConditionalTasks, syncStateFromCategories, buildTrainingTask, refreshStreak } from "./tasks.js";
+import { calculateDailyXp } from "../core/gamification-engine.js";
 
 const LOCKIN_TARGET = new Date("2027-01-01T00:00:00");
 const LOCKIN_TOTAL_DAYS = 73;
@@ -31,8 +31,6 @@ export function getPersonalQuote() {
 }
 
 export function calcDailyScore() {
-  // 3 składniki: zadania (50%), sen (30%), aktywność (20%).
-  // Składniki bez danych są pomijane, wagi renormalizowane.
   const parts = [];
   const pct = calcCompletionPct();
   if (calcCompletionStats().requiredTotal > 0) parts.push({ pct, weight: 0.5, label: "Zadania" });
@@ -105,28 +103,32 @@ function getScoreLabel(pct) {
   return "❌ Do poprawy";
 }
 
+async function renderXpWidget() {
+  const gam = await loadGamification() || { xp: 0, level: 1 };
+  return `
+    <a href="#achievements" class="card card-padded-sm row-between" style="text-decoration:none;color:inherit;">
+      <div class="row" style="gap:10px;">
+        <div style="font-size:24px;">🏆</div>
+        <div>
+          <div class="text-xs text-tertiary font-bold uppercase">Poziom ${gam.level || 1}</div>
+          <div class="text-sm font-bold text-accent">${gam.xp || 0} XP</div>
+        </div>
+      </div>
+      <i class="fa-solid fa-chevron-right text-tertiary"></i>
+    </a>
+  `;
+}
+
 async function renderQuickStats() {
   const m = state.morning || {};
   const e = state.evening || {};
   const streak = state._streak || 0;
   return `
     <div class="grid-2">
-      <div class="stat">
-        <div class="stat-label">Sen</div>
-        <div class="stat-value">${m.sleepTotal != null ? m.sleepTotal.toFixed(1) : "—"}<span class="stat-unit">h</span></div>
-      </div>
-      <div class="stat">
-        <div class="stat-label">Kroki</div>
-        <div class="stat-value">${e.steps != null ? e.steps.toLocaleString("pl-PL") : "—"}</div>
-      </div>
-      <div class="stat">
-        <div class="stat-label">RHR</div>
-        <div class="stat-value">${m.rhr != null ? m.rhr : "—"}<span class="stat-unit">bpm</span></div>
-      </div>
-      <div class="stat">
-        <div class="stat-label">Streak</div>
-        <div class="stat-value accent">${streak}<span class="stat-unit">dni</span></div>
-      </div>
+      <div class="stat"><div class="stat-label">Sen</div><div class="stat-value">${m.sleepTotal != null ? m.sleepTotal.toFixed(1) : "—"}<span class="stat-unit">h</span></div></div>
+      <div class="stat"><div class="stat-label">Kroki</div><div class="stat-value">${e.steps != null ? e.steps.toLocaleString("pl-PL") : "—"}</div></div>
+      <div class="stat"><div class="stat-label">RHR</div><div class="stat-value">${m.rhr != null ? m.rhr : "—"}<span class="stat-unit">bpm</span></div></div>
+      <div class="stat"><div class="stat-label">Streak</div><div class="stat-value accent">${streak}<span class="stat-unit">dni</span></div></div>
     </div>
   `;
 }
@@ -169,15 +171,19 @@ function renderNextTraining() {
 }
 
 export async function render(container) {
-  state.customTasks = state.customTasks.length ? state.customTasks : [];
+  // 1. Ładujemy dzisiejsze zadania
   applyConditionalTasks();
   await loadToday();
+  
+  // 2. Sprawdzamy czy nie trzeba dopisać XP za dzisiejszy dzień
+  await syncXp();
 
   const { remaining, dayNum } = updateCountdown();
   const settings = getSettings();
 
   container.innerHTML = `
     <div class="stack-lg">
+      ${await renderXpWidget()}
       ${await renderDailyScore()}
       ${await renderQuickStats()}
 
@@ -243,5 +249,37 @@ async function loadToday() {
       if (map.has(t.id)) t.done = map.get(t.id);
     }));
     syncStateFromCategories();
+  }
+}
+
+// Oblicza XP za dzisiejszy dzień i zapisuje tylko, jeśli jest większe niż poprzednio (zapobiega farmieniu)
+async function syncXp() {
+  await refreshStreak();
+  const gamData = await loadGamification() || { xp: 0, dailyXp: {} };
+  const today = todayKey();
+  
+  const completed = state.tasks.filter(t => t.done).length;
+  const total = state.tasks.length;
+  const todayXp = calculateDailyXp(completed, total, state._streak || 0);
+  
+  // Sprawdzamy czy dzisiejsze XP jest większe niż to, co już zapisaliśmy dzisiaj
+  const savedTodayXp = gamData.dailyXp?.[today] || 0;
+  
+  if (todayXp > savedTodayXp) {
+    const diff = todayXp - savedTodayXp;
+    const newTotalXp = (gamData.xp || 0) + diff;
+    const newLevel = Math.floor(Math.sqrt(newTotalXp / 100)) + 1;
+    
+    // Aktualizujemy pamięć
+    if (!gamData.dailyXp) gamData.dailyXp = {};
+    gamData.dailyXp[today] = todayXp;
+    gamData.xp = newTotalXp;
+    gamData.level = newLevel;
+    
+    await saveGamification({
+      xp: newTotalXp,
+      level: newLevel,
+      dailyXp: gamData.dailyXp
+    });
   }
 }
