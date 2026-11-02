@@ -1,22 +1,23 @@
 // ============================================================================
 // LOCK IN 2027 — js/modules/tasks.js
-// Zadania: jeśli profile.modes → generowane z modów. W przeciwnym razie legacy.
+// Zadania: mode-based generation + custom CRUD + priority + frequency + archive.
 // ============================================================================
 
 import { $, escapeHtml, dateKey, todayKey, vibrate, playSound, fireConfetti } from "../core/utils.js";
 import { localKey, getToggle, isBoosterActive, getSettings } from "../core/storage.js";
 import { TASK_CATEGORIES, BASE_CALISTHENICS, LIGHT_CALISTHENICS } from "../core/constants.js";
-import { loadDayDoc, saveDayDoc, loadCustomTasks, saveCustomTasks, loadGamification, saveGamification } from "../core/data.js";
+import { loadDayDoc, saveDayDoc, loadCustomTasks, saveCustomTasks, updateCustomTask, deleteCustomTask, archiveCustomTask, restoreCustomTask, loadGamification, saveGamification } from "../core/data.js";
 import { calculateDailyXp } from "../core/gamification-engine.js";
 import { getTasksFromModes, buildCategoriesFromTasks, CATEGORY_META } from "../core/modes.js";
 import { state } from "../state.js";
 import { showToast } from "../components/toast.js";
+import { openModal } from "../components/modal.js";
 
 const todayDow = new Date().getDay();
 const isSunday = todayDow === 0;
 
 // ============================================================================
-// LEGACY: hardcoded tasks (dla userów bez modes)
+// LEGACY (dla userów bez modes)
 // ============================================================================
 
 export function buildTrainingTask() {
@@ -82,44 +83,37 @@ function applyLegacyTasks() {
 }
 
 // ============================================================================
-// MODE-BASED: generuje kategorie z modes
+// MODE-BASED
 // ============================================================================
 
 function applyModeTasks(modes) {
-  // 1. Zbierz zadania z modów
   const modeTasks = getTasksFromModes(modes);
-
-  // 2. Zbuduj kategorie z tych zadań
   const newCategories = buildCategoriesFromTasks(modeTasks);
-
-  // 3. Dodaj kategorię Custom (zawsze)
   newCategories.push({ id: "custom", icon: CATEGORY_META.custom.icon, name: CATEGORY_META.custom.name, order: 999, tasks: [] });
-
-  // 4. Mutacja TASK_CATEGORIES in-place (zachowuje referencję dla innych modułów)
   TASK_CATEGORIES.length = 0;
   newCategories.forEach(c => TASK_CATEGORIES.push(c));
 }
 
 // ============================================================================
-// GŁÓWNA FUNKCJA — decyduje: mode-based czy legacy
+// GŁÓWNA LOGIKA
 // ============================================================================
 
 export function applyConditionalTasks() {
   const profile = state.profile || {};
   const modes = Array.isArray(profile.modes) ? profile.modes : [];
 
-  if (modes.length > 0) {
-    applyModeTasks(modes);
-  } else {
-    applyLegacyTasks();
-  }
+  if (modes.length > 0) applyModeTasks(modes);
+  else applyLegacyTasks();
 
-  // Custom tasks (zawsze)
+  // Custom tasks: filtrujemy archived
   const customCat = TASK_CATEGORIES.find(c => c.id === "custom");
   if (customCat) {
-    customCat.tasks = state.customTasks.map(t => ({
-      id: t.id, label: t.label, hint: t.hint, done: t.done || false, custom: true
-    }));
+    customCat.tasks = state.customTasks
+      .filter(t => !t.archived)
+      .map(t => ({
+        id: t.id, label: t.label, hint: t.hint, done: t.done || false,
+        custom: true, priority: t.priority || "normal", frequency: t.frequency || "daily"
+      }));
   }
 
   syncStateFromCategories();
@@ -127,10 +121,13 @@ export function applyConditionalTasks() {
 
 export function syncStateFromCategories() {
   state.tasks = TASK_CATEGORIES.flatMap(c => c.tasks).map(t => ({
-    id: t.id, label: t.label, done: t.done, custom: !!t.custom
+    id: t.id, label: t.label, done: t.done, custom: !!t.custom,
+    priority: t.priority || "normal", category: c.id
   }));
   const customCat = TASK_CATEGORIES.find(c => c.id === "custom");
-  state.customTasks = customCat ? customCat.tasks.map(t => ({ id: t.id, label: t.label, hint: t.hint, done: t.done })) : [];
+  state.customTasks = customCat ? customCat.tasks.map(t => ({
+    id: t.id, label: t.label, hint: t.hint, done: t.done, priority: t.priority, frequency: t.frequency
+  })) : [];
 }
 
 export function calcCompletionPct() {
@@ -143,7 +140,7 @@ export function calcCompletionStats() {
 }
 
 // ============================================================================
-// PERSIST + XP (bez zmian)
+// PERSIST + XP
 // ============================================================================
 
 export async function persistToday() {
@@ -235,125 +232,11 @@ export async function render(container) {
   }
   syncStateFromCategories();
 
+  const archivedCount = state.customTasks.filter(t => t.archived).length;
+
   container.innerHTML = `
     <div class="card mb-4">
       <div class="card-header">
         <div>
           <div class="card-title">Dziś</div>
-          <div class="card-subtitle">${calcCompletionStats().requiredDone}/${calcCompletionStats().requiredTotal} zadań</div>
-        </div>
-        <div class="text-2xl font-black text-accent" id="tasks-pct">${calcCompletionPct()}%</div>
-      </div>
-      <div class="progress"><div class="progress-fill" id="tasks-progress" style="width:${calcCompletionPct()}%"></div></div>
-    </div>
-    <div id="tasks-categories" class="stack-lg"></div>
-    <button class="btn btn-secondary btn-block mt-4" id="btn-add-task">
-      <i class="fa-solid fa-plus"></i> Dodaj własne zadanie
-    </button>
-  `;
-
-  renderCategories();
-
-  $("btn-add-task")?.addEventListener("click", async () => {
-    const label = prompt("Nazwa zadania:");
-    if (!label || !label.trim()) return;
-    const hint = prompt("Krótki opis (opcjonalnie):") || "";
-    const id = "custom-" + Date.now();
-    state.customTasks.push({ id, label: label.trim(), hint: hint.trim(), done: false });
-    await saveCustomTasks(state.customTasks);
-    applyConditionalTasks();
-    await persistToday();
-    renderCategories();
-    updateHeaderProgress();
-    showToast("✅ Dodano", "success");
-  });
-}
-
-function renderCategories() {
-  const wrap = $("tasks-categories");
-  if (!wrap) return;
-  const visible = TASK_CATEGORIES.filter(c => c.tasks.length > 0);
-  if (!visible.length) {
-    wrap.innerHTML = `<div class="empty"><div class="empty-icon">📋</div><div class="empty-title">Brak zadań</div><div class="empty-text">Skonfiguruj tryby w onboardingu.</div></div>`;
-    return;
-  }
-  wrap.innerHTML = visible.map(cat => {
-    const doneCount = cat.tasks.filter(t => t.done).length;
-    const fullDone = doneCount === cat.tasks.length;
-    return `
-      <div class="card card-padded-sm">
-        <div class="card-header">
-          <div class="row">
-            <div style="width:32px;height:32px;border-radius:10px;background:var(--bg-surface);display:flex;align-items:center;justify-content:center;font-size:16px;">${cat.icon}</div>
-            <div class="card-title">${cat.name}</div>
-          </div>
-          <div class="badge ${fullDone ? "badge-success" : "badge-neutral"}">${doneCount}/${cat.tasks.length}</div>
-        </div>
-        <div class="stack-sm">${cat.tasks.map(t => renderTaskItem(t)).join("")}</div>
-      </div>
-    `;
-  }).join("");
-
-  wrap.querySelectorAll(".task-item").forEach(el => {
-    el.addEventListener("click", async (ev) => {
-      if (ev.target.closest(".task-delete")) return;
-      const id = el.dataset.taskId;
-      let task = null;
-      TASK_CATEGORIES.forEach(c => { const f = c.tasks.find(t => t.id === id); if (f) task = f; });
-      if (!task) return;
-      task.done = !task.done;
-      syncStateFromCategories();
-      vibrate(20);
-      if (task.done) playSound("done");
-      await persistToday();
-      renderCategories();
-      updateHeaderProgress();
-      if (task.done && calcCompletionPct() === 100) setTimeout(() => fireConfetti(), 200);
-    });
-  });
-
-  wrap.querySelectorAll(".task-delete").forEach(btn => {
-    btn.addEventListener("click", async (ev) => {
-      ev.stopPropagation();
-      const id = btn.dataset.taskId;
-      if (!confirm("Usunąć?")) return;
-      state.customTasks = state.customTasks.filter(t => t.id !== id);
-      await saveCustomTasks(state.customTasks);
-      applyConditionalTasks();
-      await persistToday();
-      renderCategories();
-      updateHeaderProgress();
-    });
-  });
-}
-
-function renderTaskItem(t) {
-  const extra = t.exercises ? `<div class="mt-2 stack-sm">${t.exercises.map(e => `
-    <div class="row-between" style="padding:6px 10px;background:var(--bg-surface);border-radius:8px;font-size:11px;">
-      <span class="truncate">${escapeHtml(e.label)}</span>
-      <span class="text-accent font-bold" style="flex-shrink:0;">${e.series}</span>
-    </div>
-  `).join("")}</div>` : "";
-  const del = t.custom ? `<button class="task-delete btn-icon btn-icon-sm" data-task-id="${t.id}"><i class="fa-solid fa-xmark"></i></button>` : "";
-  return `
-    <div class="list-item list-item-clickable task-item ${t.done ? "task-done" : ""}" data-task-id="${t.id}" style="${t.done ? "background:var(--accent-subtle);border-color:var(--accent-medium);" : ""}">
-      <div class="checkbox-box" style="${t.done ? "background:var(--accent);border-color:var(--accent);color:var(--text-inverse);" : ""}">
-        ${t.done ? '<i class="fa-solid fa-check" style="font-size:12px;"></i>' : ""}
-      </div>
-      <div class="list-item-body">
-        <div class="list-item-title ${t.done ? "text-tertiary" : ""}" style="${t.done ? "text-decoration:line-through;" : ""}">${escapeHtml(t.label)}</div>
-        ${t.hint ? `<div class="list-item-subtitle">${escapeHtml(t.hint)}</div>` : ""}
-        ${extra}
-      </div>
-      ${del}
-    </div>
-  `;
-}
-
-function updateHeaderProgress() {
-  const pct = calcCompletionPct();
-  const pctEl = $("tasks-pct");
-  const barEl = $("tasks-progress");
-  if (pctEl) pctEl.textContent = pct + "%";
-  if (barEl) barEl.style.width = pct + "%";
-}
+          <
