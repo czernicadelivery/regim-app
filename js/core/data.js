@@ -1,611 +1,463 @@
 // ============================================================================
-// LOCK IN 2027 — js/core/data.js
-// Warstwa danych: Firestore + fallback localStorage.
-// Zawiera: dni, profil, pomiary, rekordy, pytania, suplementy, social, XP,
-//          widgety, taski (custom z priorytetami), rutyny (B2).
+// LOCK IN 2027 — js/modules/skincare.js
+// Skincare Studio: profil skóry, produkty, dziennik, biblioteka składników.
 // ============================================================================
 
-import { dateKey } from "./utils.js";
-import { localKey } from "./storage.js";
-import { getCurrentUser, isCloud, getFs, setSyncInProgress } from "../firebase.js";
+import { $, escapeHtml, dateKey } from "../core/utils.js";
+import {
+  loadSkinProfile, saveSkinProfile,
+  loadSkinProducts, saveSkinProducts,
+  loadSkinJournal, saveSkinJournal
+} from "../core/data.js";
+import {
+  SKIN_TYPES, PRODUCT_CATEGORIES, INGREDIENTS_CATALOG,
+  getSkinType, getProductCategory, getIngredient
+} from "../core/skincare-catalog.js";
+import { state } from "../state.js";
+import { showToast } from "../components/toast.js";
+import { openModal } from "../components/modal.js";
 
-// ============================================================================
-// 1. DNI / ZADANIA
-// ============================================================================
-export async function saveDayDoc(d) {
-  localStorage.setItem(localKey(d.date), JSON.stringify(d));
-  if (!isCloud()) return;
-  const { fsMod, db } = getFs();
-  const uid = getCurrentUser().uid;
-  setSyncInProgress(true);
-  try {
-    await fsMod.setDoc(fsMod.doc(db, "users", uid, "days", d.date), d, { merge: true });
-  } catch (e) { console.error("saveDayDoc error:", e); }
-  finally { setSyncInProgress(false); }
+let _activeTab = "profile";
+let _profile = {};
+let _products = [];
+let _journal = [];
+
+export async function render(container) {
+  _profile = loadSkinProfile();
+  _products = loadSkinProducts();
+  _journal = loadSkinJournal();
+
+  container.innerHTML = `
+    <div class="stack-lg">
+      <div class="card card-accent">
+        <div class="row-between">
+          <div>
+            <div class="card-subtitle">SKINCARE STUDIO</div>
+            <div class="card-title" style="margin-top:4px;">
+              ${_profile.skinType && _profile.skinType !== "unknown" ? (getSkinType(_profile.skinType)?.icon + " " + getSkinType(_profile.skinType)?.label) : "Skonfiguruj profil skóry"}
+            </div>
+          </div>
+          <div class="text-right">
+            <div class="text-2xl font-black text-accent">${_products.length}</div>
+            <div class="text-xs text-tertiary">produktów</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="tabs" id="skin-tabs">
+        <button class="tab ${_activeTab === "profile" ? "active" : ""}" data-tab="profile">👤 Profil</button>
+        <button class="tab ${_activeTab === "products" ? "active" : ""}" data-tab="products">🧴 Produkty</button>
+        <button class="tab ${_activeTab === "journal" ? "active" : ""}" data-tab="journal">📔 Dziennik</button>
+        <button class="tab ${_activeTab === "library" ? "active" : ""}" data-tab="library">📚 Składniki</button>
+      </div>
+
+      <div id="skin-content"></div>
+    </div>
+  `;
+
+  renderContent(container);
+  bindEvents(container);
 }
 
-export async function loadDayDoc(dateStr) {
-  const raw = localStorage.getItem(localKey(dateStr));
-  const localDoc = raw ? JSON.parse(raw) : null;
-  if (isCloud()) {
-    try {
-      const { fsMod, db } = getFs();
-      const uid = getCurrentUser().uid;
-      const snap = await fsMod.getDoc(fsMod.doc(db, "users", uid, "days", dateStr));
-      if (snap.exists()) {
-        const cloudDoc = snap.data();
-        const merged = Object.assign({}, localDoc || {}, cloudDoc);
-        localStorage.setItem(localKey(dateStr), JSON.stringify(merged));
-        return merged;
+function renderContent(container) {
+  const content = container.querySelector("#skin-content");
+  if (!content) return;
+
+  if (_activeTab === "profile") content.innerHTML = renderProfileTab();
+  else if (_activeTab === "products") content.innerHTML = renderProductsTab();
+  else if (_activeTab === "journal") content.innerHTML = renderJournalTab();
+  else if (_activeTab === "library") content.innerHTML = renderLibraryTab();
+
+  bindTabEvents(container);
+}
+
+// ============================================================================
+// PROFIL SKÓRY
+// ============================================================================
+
+function renderProfileTab() {
+  return `
+    <div class="card">
+      <div class="card-header"><div class="card-title">Typ skóry</div></div>
+      <div class="grid-2" style="gap:8px;">
+        ${SKIN_TYPES.map(st => `
+          <button class="card card-padded-sm ${_profile.skinType === st.id ? "card-accent" : ""}" data-skintype="${st.id}"
+            style="text-align:left;">
+            <div class="row-between">
+              <div>
+                <div class="text-sm font-bold">${st.icon} ${st.label}</div>
+              </div>
+              ${_profile.skinType === st.id ? '<i class="fa-solid fa-check-circle text-accent"></i>' : ''}
+            </div>
+          </button>
+        `).join("")}
+      </div>
+    </div>
+
+    <div class="card mt-4">
+      <div class="card-header"><div class="card-title">Notatki</div></div>
+      <textarea class="textarea" id="skin-notes" placeholder="np. suchość na policzkach, przetłuszczająca się strefa T">${escapeHtml(_profile.notes || "")}</textarea>
+      <button class="btn btn-primary btn-block mt-3" id="skin-save-profile">Zapisz profil</button>
+    </div>
+
+    <div class="card mt-4" style="background:var(--warning-subtle);border-color:var(--warning);">
+      <div class="text-sm text-secondary">
+        ⚠️ Pielęgnacja to kwestia indywidualna. Informacje tutaj są edukacyjne — nie zastępują porady dermatologa.
+        W przypadku problemów skórnych skonsultuj się ze specjalistą.
+      </div>
+    </div>
+  `;
+}
+
+// ============================================================================
+// PRODUKTY
+// ============================================================================
+
+function renderProductsTab() {
+  if (_products.length === 0) {
+    return `<div class="empty">
+      <div class="empty-icon">🧴</div>
+      <div class="empty-title">Brak produktów</div>
+      <div class="empty-text">Dodaj produkty, które posiadasz — to pomoże budować rutynę.</div>
+      <button class="btn btn-primary mt-3" id="btn-add-product">
+        <i class="fa-solid fa-plus"></i> Dodaj pierwszy
+      </button>
+    </div>`;
+  }
+
+  const byCategory = {};
+  _products.forEach(p => {
+    if (!byCategory[p.category]) byCategory[p.category] = [];
+    byCategory[p.category].push(p);
+  });
+
+  return `
+    <div class="stack">
+      ${Object.keys(byCategory).map(catId => {
+        const cat = getProductCategory(catId);
+        const items = byCategory[catId];
+        return `
+          <div>
+            <div class="section-header"><span class="section-header-title">${cat?.icon || "📦"} ${cat?.name || catId} (${items.length})</span></div>
+            <div class="stack-sm">
+              ${items.map(p => renderProductItem(p)).join("")}
+            </div>
+          </div>
+        `;
+      }).join("")}
+      <button class="btn btn-secondary btn-block mt-3" id="btn-add-product">
+        <i class="fa-solid fa-plus"></i> Dodaj produkt
+      </button>
+    </div>
+  `;
+}
+
+function renderProductItem(p) {
+  const statusBadge = p.status === "wishlist" ? '<span class="badge badge-warning" style="font-size:9px;">Wishlist</span>' :
+    p.status === "finished" ? '<span class="badge badge-neutral" style="font-size:9px;">Zakończone</span>' :
+    '<span class="badge badge-success" style="font-size:9px;">Posiadam</span>';
+  return `
+    <div class="card card-padded-sm">
+      <div class="row-between">
+        <div style="flex:1;min-width:0;">
+          <div class="row" style="gap:6px;flex-wrap:wrap;">
+            <span class="text-sm font-bold">${escapeHtml(p.name)}</span>
+            ${statusBadge}
+          </div>
+          ${p.brand ? `<div class="text-xs text-tertiary mt-1">${escapeHtml(p.brand)}</div>` : ""}
+          ${p.notes ? `<div class="text-xs text-secondary mt-1" style="line-height:1.4;">${escapeHtml(p.notes)}</div>` : ""}
+        </div>
+        <div class="row" style="gap:6px;">
+          <button class="btn-icon btn-icon-sm" data-edit-product="${p.id}"><i class="fa-solid fa-pen"></i></button>
+          <button class="btn-icon btn-icon-sm" data-del-product="${p.id}" style="color:var(--danger);"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+// ============================================================================
+// DZIENNIK
+// ============================================================================
+
+function renderJournalTab() {
+  const today = dateKey(new Date());
+  const todayEntry = _journal.find(e => e.date === today);
+
+  return `
+    <div class="card">
+      <div class="card-header"><div class="card-title">Wpis na dziś</div></div>
+      <div class="form-group">
+        <label class="form-label">Stan skóry dziś</label>
+        <div class="row" style="gap:6px;flex-wrap:wrap;" id="skin-feel-today">
+          ${[
+            { id: "great", icon: "🌟", label: "Świetnie" },
+            { id: "good", icon: "✅", label: "Dobrze" },
+            { id: "ok", icon: "🟡", label: "OK" },
+            { id: "bad", icon: "⚠️", label: "Słabo" },
+            { id: "breakout", icon: "🔴", label: "Wysyp" }
+          ].map(f => `
+            <button class="chip ${todayEntry?.feel === f.id ? "active" : ""}" data-feel="${f.id}">${f.icon} ${f.label}</button>
+          `).join("")}
+        </div>
+      </div>
+      <div class="form-group mt-3">
+        <label class="form-label">Notatka</label>
+        <textarea class="textarea" id="journal-note" placeholder="np. suchość na policzkach po nowym kremie">${escapeHtml(todayEntry?.note || "")}</textarea>
+      </div>
+      <button class="btn btn-primary btn-block mt-3" id="btn-save-journal">Zapisz wpis</button>
+    </div>
+
+    <div class="mt-4">
+      <div class="section-header"><span class="section-header-title">Historia (${_journal.length})</span></div>
+      ${_journal.length ? `
+        <div class="stack-sm">
+          ${_journal.slice(0, 14).map(e => `
+            <div class="card card-padded-sm">
+              <div class="row-between">
+                <div class="text-xs text-tertiary font-semibold">${e.date}</div>
+                <div class="text-sm">
+                  ${e.feel === "great" ? "🌟" : e.feel === "good" ? "✅" : e.feel === "ok" ? "🟡" : e.feel === "bad" ? "⚠️" : e.feel === "breakout" ? "🔴" : ""}
+                </div>
+              </div>
+              ${e.note ? `<div class="text-xs text-secondary mt-1" style="line-height:1.4;">${escapeHtml(e.note)}</div>` : ""}
+            </div>
+          `).join("")}
+        </div>
+      ` : `<div class="empty"><div class="empty-icon">📔</div><div class="empty-text">Brak wpisów. Dodaj pierwszy powyżej.</div></div>`}
+    </div>
+  `;
+}
+
+// ============================================================================
+// BIBLIOTEKA SKŁADNIKÓW
+// ============================================================================
+
+function renderLibraryTab() {
+  return `
+    <div class="card card-flat mb-3">
+      <div class="text-xs text-secondary" style="line-height:1.5;">
+        📚 Biblioteka składników — informacje edukacyjne. Nie zastępuje porady dermatologa.
+      </div>
+    </div>
+    <div class="stack">
+      ${INGREDIENTS_CATALOG.map(ing => renderIngredientCard(ing)).join("")}
+    </div>
+  `;
+}
+
+function renderIngredientCard(ing) {
+  return `
+    <div class="card card-padded-sm">
+      <div class="row-between">
+        <div style="flex:1;min-width:0;">
+          <div class="text-sm font-bold">${escapeHtml(ing.name)}</div>
+          <div class="text-xs text-tertiary mt-1">${escapeHtml(ing.category)}</div>
+        </div>
+        <button class="btn-icon btn-icon-sm" data-info-ing="${ing.id}"><i class="fa-solid fa-circle-info"></i></button>
+      </div>
+      <p class="text-xs text-secondary mt-2" style="line-height:1.5;">${escapeHtml(ing.what)}</p>
+    </div>
+  `;
+}
+
+function openIngredientModal(id) {
+  const ing = getIngredient(id);
+  if (!ing) return;
+
+  const body = document.createElement("div");
+  body.innerHTML = `
+    <div class="stack">
+      <div class="row" style="gap:6px;flex-wrap:wrap;">
+        <span class="badge badge-accent">${escapeHtml(ing.category)}</span>
+        <span class="badge badge-neutral">${escapeHtml(ing.concentration || "")}</span>
+      </div>
+      <p class="text-sm text-secondary" style="line-height:1.6;">${escapeHtml(ing.what)}</p>
+      ${ing.warnings ? `
+        <div class="card card-flat" style="background:var(--warning-subtle);border-color:var(--warning);">
+          <div class="card-subtitle mb-1" style="color:var(--warning);">⚠️ OSTRZEŻENIA</div>
+          <div class="text-sm text-secondary">${escapeHtml(ing.warnings)}</div>
+        </div>
+      ` : ""}
+      ${ing.pairs && ing.pairs.length ? `
+        <div class="card card-flat" style="background:var(--success-subtle);">
+          <div class="card-subtitle mb-1" style="color:var(--success);">✅ ŁĄCZ Z</div>
+          <div class="text-sm text-secondary">${ing.pairs.join(", ")}</div>
+        </div>
+      ` : ""}
+      ${ing.avoid && ing.avoid.length ? `
+        <div class="card card-flat" style="background:var(--danger-subtle);border-color:var(--danger);">
+          <div class="card-subtitle mb-1" style="color:var(--danger);">🚫 NIE ŁĄCZ Z</div>
+          <div class="text-sm text-secondary">${ing.avoid.join(", ")}</div>
+        </div>
+      ` : ""}
+      <div class="text-xs text-tertiary">
+        ℹ️ Informacje edukacyjne. Skonsultuj się z dermatologiem przed wprowadzeniem nowych aktywnych składników.
+      </div>
+    </div>
+  `;
+
+  openModal({
+    title: ing.name,
+    body,
+    actions: [{ label: "Zamknij", variant: "ghost" }]
+  });
+}
+
+// ============================================================================
+// DODAWANIE / EDYCJA PRODUKTU
+// ============================================================================
+
+function openProductModal(existing) {
+  const isEdit = !!existing;
+  const data = existing ? { ...existing } : {
+    name: "", brand: "", category: "cleanser", status: "owned", notes: ""
+  };
+
+  const body = document.createElement("div");
+  body.innerHTML = `
+    <div class="stack">
+      <div class="form-group">
+        <label class="form-label">Nazwa</label>
+        <input class="input" id="sp-name" value="${escapeHtml(data.name)}" placeholder="np. Kwas hialuronowy 2%">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Marka (opcjonalnie)</label>
+        <input class="input" id="sp-brand" value="${escapeHtml(data.brand)}" placeholder="np. The Ordinary">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Kategoria</label>
+        <select class="input" id="sp-cat">
+          ${PRODUCT_CATEGORIES.map(c => `<option value="${c.id}" ${data.category === c.id ? "selected" : ""}>${c.icon} ${c.name}</option>`).join("")}
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Status</label>
+        <div class="row" style="gap:6px;">
+          <button class="chip ${data.status === "owned" ? "active" : ""}" data-status="owned">Posiadam</button>
+          <button class="chip ${data.status === "wishlist" ? "active" : ""}" data-status="wishlist">Wishlist</button>
+          <button class="chip ${data.status === "finished" ? "active" : ""}" data-status="finished">Zakończone</button>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Notatki</label>
+        <textarea class="textarea" id="sp-notes" placeholder="np. stosować wieczorem, 2-3x w tyg.">${escapeHtml(data.notes)}</textarea>
+      </div>
+    </div>
+  `;
+
+  let status = data.status;
+  body.querySelectorAll("[data-status]").forEach(el => {
+    el.addEventListener("click", () => {
+      status = el.dataset.status;
+      body.querySelectorAll("[data-status]").forEach(x => x.classList.remove("active"));
+      el.classList.add("active");
+    });
+  });
+
+  openModal({
+    title: isEdit ? "Edytuj produkt" : "Nowy produkt",
+    body,
+    actions: [
+      { label: "Anuluj", variant: "ghost" },
+      {
+        label: isEdit ? "Zapisz" : "Dodaj",
+        variant: "primary",
+        onClick: async () => {
+          const name = body.querySelector("#sp-name").value.trim();
+          if (!name) { showToast("Podaj nazwę", "error"); return; }
+          const item = {
+            id: isEdit ? existing.id : "sp-" + Date.now(),
+            name,
+            brand: body.querySelector("#sp-brand").value.trim(),
+            category: body.querySelector("#sp-cat").value,
+            status,
+            notes: body.querySelector("#sp-notes").value.trim(),
+            createdAt: isEdit ? existing.createdAt : Date.now()
+          };
+          const idx = _products.findIndex(p => p.id === item.id);
+          if (idx >= 0) _products[idx] = item;
+          else _products.push(item);
+          await saveSkinProducts(_products);
+          showToast("✅ Zapisano", "success");
+          const container = document.getElementById("skincare-content");
+          if (container) render(container);
+        }
       }
-    } catch (e) {}
-  }
-  return localDoc;
-}
-
-export async function loadLastNDays(n) {
-  const today = new Date();
-  const dates = [];
-  for (let i = n - 1; i >= 0; i--) {
-    const d = new Date(today); d.setDate(d.getDate() - i);
-    dates.push(dateKey(d));
-  }
-  let cloudDocs = {};
-  if (isCloud()) {
-    try {
-      const { fsMod, db } = getFs();
-      const uid = getCurrentUser().uid;
-      const start = new Date(today); start.setDate(start.getDate() - (n - 1));
-      const q = fsMod.query(
-        fsMod.collection(db, "users", uid, "days"),
-        fsMod.where("date", ">=", dateKey(start)),
-        fsMod.orderBy("date", "asc")
-      );
-      const snaps = await fsMod.getDocs(q);
-      snaps.forEach(s => { cloudDocs[s.id] = s.data(); });
-    } catch (e) {}
-  }
-  const docs = [];
-  for (const dk of dates) {
-    const raw = localStorage.getItem(localKey(dk));
-    const localDoc = raw ? JSON.parse(raw) : null;
-    const cloudDoc = cloudDocs[dk];
-    const merged = cloudDoc ? Object.assign({}, localDoc || {}, cloudDoc) : localDoc;
-    if (merged) docs.push(merged);
-  }
-  return docs;
-}
-
-export async function collectAllDays() {
-  const results = {};
-  const today = new Date();
-  for (let i = 0; i < 365; i++) {
-    const d = new Date(today); d.setDate(d.getDate() - i);
-    const dk = dateKey(d);
-    const raw = localStorage.getItem(localKey(dk));
-    if (raw) { try { results[dk] = JSON.parse(raw); } catch (e) {} }
-  }
-  if (isCloud()) {
-    try {
-      const { fsMod, db } = getFs();
-      const uid = getCurrentUser().uid;
-      const snaps = await fsMod.getDocs(fsMod.collection(db, "users", uid, "days"));
-      snaps.forEach(s => { results[s.id] = Object.assign({}, results[s.id] || {}, s.data()); });
-    } catch (e) {}
-  }
-  return Object.values(results).sort((a, b) => (a.date || "").localeCompare(b.date || ""));
-}
-
-export async function loadDaysRange(n, offset = 0) {
-  const today = new Date();
-  const promises = [];
-  for (let i = n - 1; i >= 0; i--) {
-    const d = new Date(today); d.setDate(d.getDate() - i - offset);
-    promises.push(loadDayDoc(dateKey(d)));
-  }
-  const results = await Promise.all(promises);
-  return results.filter(Boolean);
-}
-
-let _migrateDone = false;
-export async function migrateLocalToCloud() {
-  if (_migrateDone || !isCloud()) return;
-  _migrateDone = true;
-  try {
-    const { fsMod, db } = getFs();
-    const uid = getCurrentUser().uid;
-    const metaRef = fsMod.doc(db, "users", uid, "meta", "migration");
-    const metaSnap = await fsMod.getDoc(metaRef);
-    if (metaSnap.exists() && metaSnap.data().done) return;
-    const localDays = [];
-    for (let i = 0; i < localStorage.length; i++) {
-      const k = localStorage.key(i);
-      if (!k.startsWith("regim:local:")) continue;
-      const ds = k.slice("regim:local:".length);
-      if (!/^\d{4}-\d{2}-\d{2}$/.test(ds)) continue;
-      try { const p = JSON.parse(localStorage.getItem(k)); if (p) localDays.push(p); } catch (e) {}
-    }
-    if (localDays.length === 0) {
-      await fsMod.setDoc(metaRef, { done: true, at: Date.now(), count: 0 });
-      return;
-    }
-    for (let i = 0; i < localDays.length; i += 400) {
-      const chunk = localDays.slice(i, i + 400);
-      const batch = fsMod.writeBatch(db);
-      chunk.forEach(day => batch.set(fsMod.doc(db, "users", uid, "days", day.date), day, { merge: true }));
-      await batch.commit();
-    }
-    await fsMod.setDoc(metaRef, { done: true, at: Date.now(), count: localDays.length });
-  } catch (e) { console.error("migrateLocalToCloud error:", e); }
+    ]
+  });
 }
 
 // ============================================================================
-// 2. CUSTOM TASKS (z priorytetami, częstotliwością, archiwizacją)
+// EVENTY
 // ============================================================================
 
-export function loadCustomTasks() {
-  try {
-    const raw = localStorage.getItem(localKey("custom-tasks"));
-    return raw ? JSON.parse(raw) || [] : [];
-  } catch (e) { return []; }
+function bindEvents(container) {
+  container.querySelectorAll("#skin-tabs [data-tab]").forEach(tab => {
+    tab.addEventListener("click", () => {
+      _activeTab = tab.dataset.tab;
+      container.querySelectorAll("#skin-tabs [data-tab]").forEach(t => t.classList.remove("active"));
+      tab.classList.add("active");
+      renderContent(container);
+    });
+  });
 }
 
-export async function saveCustomTasks(tasks) {
-  localStorage.setItem(localKey("custom-tasks"), JSON.stringify(tasks));
-  if (isCloud()) {
-    try {
-      const { fsMod, db } = getFs();
-      const uid = getCurrentUser().uid;
-      await fsMod.setDoc(fsMod.doc(db, "users", uid, "meta", "customTasks"), {
-        tasks, updatedAt: Date.now()
-      }, { merge: true });
-    } catch (e) {}
-  }
-}
+function bindTabEvents(container) {
+  // Profil skóry
+  container.querySelectorAll("[data-skintype]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      _profile.skinType = btn.dataset.skintype;
+      renderContent(container);
+    });
+  });
 
-export async function updateCustomTask(id, updates) {
-  const tasks = loadCustomTasks();
-  const idx = tasks.findIndex(t => t.id === id);
-  if (idx === -1) return false;
-  tasks[idx] = { ...tasks[idx], ...updates };
-  await saveCustomTasks(tasks);
-  return true;
-}
+  container.querySelector("#skin-save-profile")?.addEventListener("click", () => {
+    _profile.notes = container.querySelector("#skin-notes")?.value || "";
+    saveSkinProfile(_profile);
+    showToast("✅ Profil zapisany", "success");
+  });
 
-export async function deleteCustomTask(id) {
-  const tasks = loadCustomTasks().filter(t => t.id !== id);
-  await saveCustomTasks(tasks);
-}
+  // Produkty
+  container.querySelector("#btn-add-product")?.addEventListener("click", () => openProductModal(null));
+  container.querySelectorAll("[data-edit-product]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const p = _products.find(x => x.id === btn.dataset.editProduct);
+      if (p) openProductModal(p);
+    });
+  });
+  container.querySelectorAll("[data-del-product]").forEach(btn => {
+    btn.addEventListener("click", async () => {
+      if (!confirm("Usunąć produkt?")) return;
+      _products = _products.filter(x => x.id !== btn.dataset.delProduct);
+      await saveSkinProducts(_products);
+      const c = document.getElementById("skincare-content");
+      if (c) render(c);
+    });
+  });
 
-export async function archiveCustomTask(id) {
-  return updateCustomTask(id, { archived: true });
-}
+  // Dziennik
+  let feel = "ok";
+  container.querySelectorAll("[data-feel]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      feel = btn.dataset.feel;
+      container.querySelectorAll("[data-feel]").forEach(x => x.classList.remove("active"));
+      btn.classList.add("active");
+    });
+  });
 
-export async function restoreCustomTask(id) {
-  return updateCustomTask(id, { archived: false });
-}
-
-// ============================================================================
-// 3. ROUTINES (B2)
-// ============================================================================
-
-const DEFAULT_ROUTINE_STEPS = {
-  morning: [
-    { id: "m1", label: "Woda 250ml", icon: "💧" },
-    { id: "m2", label: "Skincare AM", icon: "✨" },
-    { id: "m3", label: "Śniadanie", icon: "🍳" },
-    { id: "m4", label: "Rozciąganie 5 min", icon: "🧘" }
-  ],
-  evening: [
-    { id: "e1", label: "Skincare PM", icon: "✨" },
-    { id: "e2", label: "Bez ekranów 1h", icon: "📵" },
-    { id: "e3", label: "Czytanie 15 min", icon: "📖" },
-    { id: "e4", label: "Sen 8h", icon: "😴" }
-  ],
-  workout: [
-    { id: "w1", label: "Rozgrzewka 5 min", icon: "🔥" },
-    { id: "w2", label: "Trening główny", icon: "🏋️" },
-    { id: "w3", label: "Stretching 10 min", icon: "🧘" }
-  ],
-  study: [
-    { id: "s1", label: "Pomodoro 25 min", icon: "🧠" },
-    { id: "s2", label: "Przerwa 5 min", icon: "☕" },
-    { id: "s3", label: "Pomodoro 25 min", icon: "🧠" },
-    { id: "s4", label: "Notatka z sesji", icon: "📝" }
-  ]
-};
-
-export function loadRoutines() {
-  try {
-    const raw = localStorage.getItem(localKey("routines"));
-    if (raw) {
-      const parsed = JSON.parse(raw);
-      if (Array.isArray(parsed)) return parsed;
-    }
-  } catch (e) {}
-  // Default: 4 domyślne rutyny
-  return [
-    { id: "rt-morning", name: "Rutyna poranna", icon: "🌅", steps: DEFAULT_ROUTINE_STEPS.morning, archived: false, createdAt: Date.now() },
-    { id: "rt-evening", name: "Rutyna wieczorna", icon: "🌙", steps: DEFAULT_ROUTINE_STEPS.evening, archived: false, createdAt: Date.now() },
-    { id: "rt-workout", name: "Trening", icon: "🏋️", steps: DEFAULT_ROUTINE_STEPS.workout, archived: false, createdAt: Date.now() },
-    { id: "rt-study", name: "Sesja nauki", icon: "📚", steps: DEFAULT_ROUTINE_STEPS.study, archived: false, createdAt: Date.now() }
-  ];
-}
-
-export async function saveRoutines(routines) {
-  localStorage.setItem(localKey("routines"), JSON.stringify(routines));
-  if (isCloud()) {
-    try {
-      const { fsMod, db } = getFs();
-      const uid = getCurrentUser().uid;
-      await fsMod.setDoc(fsMod.doc(db, "users", uid, "meta", "routines"), {
-        routines, updatedAt: Date.now()
-      }, { merge: true });
-    } catch (e) {}
-  }
-}
-
-export async function saveRoutine(routine) {
-  const all = loadRoutines();
-  const idx = all.findIndex(r => r.id === routine.id);
-  if (idx >= 0) all[idx] = routine;
-  else all.push(routine);
-  await saveRoutines(all);
-  return routine;
-}
-
-export async function deleteRoutine(id) {
-  const all = loadRoutines().filter(r => r.id !== id);
-  await saveRoutines(all);
-}
-
-export function loadRoutineHistory(dateStr) {
-  try {
-    const raw = localStorage.getItem(localKey("routine-history-" + dateStr));
-    return raw ? JSON.parse(raw) : {};
-  } catch (e) { return {}; }
-}
-
-export function saveRoutineHistory(dateStr, data) {
-  localStorage.setItem(localKey("routine-history-" + dateStr), JSON.stringify(data));
-}
-
-// ============================================================================
-// 4. MEAL PLAN
-// ============================================================================
-export function loadMealPlan(todayK) {
-  try {
-    const raw = localStorage.getItem(localKey("mealplan-" + todayK));
-    if (raw) return Object.assign({ breakfast: [], breakfast2: [], lunch: [], dinner: [], snacks: [] }, JSON.parse(raw));
-  } catch (e) {}
-  return { breakfast: [], breakfast2: [], lunch: [], dinner: [], snacks: [] };
-}
-
-export function saveMealPlan(todayK, plan) {
-  localStorage.setItem(localKey("mealplan-" + todayK), JSON.stringify(plan));
-}
-
-// ============================================================================
-// 5. ANALYSIS HISTORY
-// ============================================================================
-export function saveAnalysisToHistory(html) {
-  try {
+  container.querySelector("#btn-save-journal")?.addEventListener("click", () => {
     const today = dateKey(new Date());
-    const key = localKey("analysis-history");
-    const history = JSON.parse(localStorage.getItem(key) || "[]");
-    const filtered = history.filter(h => h.date !== today);
-    filtered.unshift({ date: today, html, at: Date.now() });
-    localStorage.setItem(key, JSON.stringify(filtered.slice(0, 30)));
-  } catch (e) {}
-}
-
-export function loadAnalysisHistory() {
-  try {
-    return JSON.parse(localStorage.getItem(localKey("analysis-history")) || "[]");
-  } catch (e) { return []; }
-}
-
-// ============================================================================
-// 6. PROFIL
-// ============================================================================
-export async function saveProfile(profileData) {
-  if (!isCloud()) return;
-  const { fsMod, db } = getFs();
-  const uid = getCurrentUser().uid;
-  const data = { ...profileData, updatedAt: fsMod.serverTimestamp() };
-  await fsMod.setDoc(fsMod.doc(db, "users", uid, "profile", "main"), data, { merge: true });
-  if (profileData.displayName) {
-    await fsMod.setDoc(fsMod.doc(db, "users", uid, "public", "main"), {
-      displayName: profileData.displayName,
-      shareProfile: false
-    }, { merge: true });
-  }
-}
-
-export async function loadProfile() {
-  if (!isCloud()) return null;
-  const { fsMod, db } = getFs();
-  const uid = getCurrentUser().uid;
-  const snap = await fsMod.getDoc(fsMod.doc(db, "users", uid, "profile", "main"));
-  return snap.exists() ? snap.data() : null;
-}
-
-export async function loadPublicProfile(userId) {
-  if (!isCloud()) return null;
-  const { fsMod, db } = getFs();
-  try {
-    const snap = await fsMod.getDoc(fsMod.doc(db, "users", userId, "public", "main"));
-    return snap.exists() ? snap.data() : null;
-  } catch (e) { return null; }
-}
-
-// ============================================================================
-// 7. POMIARY
-// ============================================================================
-export async function addMeasurement(data) {
-  if (!isCloud()) return;
-  const { fsMod, db } = getFs();
-  const uid = getCurrentUser().uid;
-  await fsMod.addDoc(fsMod.collection(db, "users", uid, "measurements"), { ...data, date: data.date || fsMod.serverTimestamp() });
-}
-
-export async function loadMeasurements() {
-  if (!isCloud()) return [];
-  const { fsMod, db } = getFs();
-  const uid = getCurrentUser().uid;
-  const q = fsMod.query(fsMod.collection(db, "users", uid, "measurements"), fsMod.orderBy("date", "desc"), fsMod.limit(100));
-  const snap = await fsMod.getDocs(q);
-  return snap.docs.map(d => ({ id: d.id, ...d.data() }));
-}
-
-export async function deleteMeasurement(id) {
-  if (!isCloud()) return;
-  const { fsMod, db } = getFs();
-  const uid = getCurrentUser().uid;
-  await fsMod.deleteDoc(fsMod.doc(db, "users", uid, "measurements", id));
-}
-
-// ============================================================================
-// 8. REKORDY
-// ============================================================================
-export async function addFitnessRecord(data) {
-  if (!isCloud()) return;
-  const { fsMod, db } = getFs();
-  const uid = getCurrentUser().uid;
-  await fsMod.addDoc(fsMod.collection(db, "users", uid, "fitnessRecords"), { ...data, date: data.date || fsMod.serverTimestamp() });
-}
-
-// ============================================================================
-// 9. PYTANIA
-// ============================================================================
-export async function saveCustomQuestion(questionId, data) {
-  if (!isCloud()) return;
-  const { fsMod, db } = getFs();
-  const uid = getCurrentUser().uid;
-  if (questionId) {
-    await fsMod.setDoc(fsMod.doc(db, "users", uid, "customQuestions", questionId), data, { merge: true });
-  } else {
-    await fsMod.addDoc(fsMod.collection(db, "users", uid, "customQuestions"), data);
-  }
-}
-
-export async function loadCustomQuestions() {
-  if (!isCloud()) return [];
-  const { fsMod, db } = getFs();
-  const uid = getCurrentUser().uid;
-  const q = fsMod.query(fsMod.collection(db, "users", uid, "customQuestions"), fsMod.orderBy("order", "asc"));
-  const snap = await fsMod.getDocs(q);
-  return snap.docs.map(d => ({ id: d.id, ...d.data() }));
-}
-
-// ============================================================================
-// 10. SUPLEMENTY
-// ============================================================================
-export async function saveSupplement(id, data) {
-  if (!isCloud()) return;
-  const { fsMod, db } = getFs();
-  const uid = getCurrentUser().uid;
-  if (id) {
-    await fsMod.setDoc(fsMod.doc(db, "users", uid, "supplements", id), data, { merge: true });
-  } else {
-    await fsMod.addDoc(fsMod.collection(db, "users", uid, "supplements"), data);
-  }
-}
-
-export async function loadSupplements() {
-  if (!isCloud()) return [];
-  const { fsMod, db } = getFs();
-  const uid = getCurrentUser().uid;
-  const snap = await fsMod.getDocs(fsMod.collection(db, "users", uid, "supplements"));
-  return snap.docs.map(d => ({ id: d.id, ...d.data() }));
-}
-
-export async function deleteSupplement(id) {
-  if (!isCloud()) return;
-  const { fsMod, db } = getFs();
-  const uid = getCurrentUser().uid;
-  await fsMod.deleteDoc(fsMod.doc(db, "users", uid, "supplements", id));
-}
-
-export async function loadSupplementLogs(supplementIds) {
-  if (!isCloud() || !supplementIds.length) return {};
-  const { fsMod, db } = getFs();
-  const uid = getCurrentUser().uid;
-  const today = dateKey(new Date());
-  const results = {};
-  await Promise.all(supplementIds.map(async (sid) => {
-    try {
-      const snap = await fsMod.getDoc(fsMod.doc(db, "users", uid, "supplementLogs", `${sid}_${today}`));
-      results[sid] = snap.exists() ? snap.data().taken : false;
-    } catch (e) { results[sid] = false; }
-  }));
-  return results;
-}
-
-export async function logSupplement(supplementId, taken) {
-  if (!isCloud()) return;
-  const { fsMod, db } = getFs();
-  const uid = getCurrentUser().uid;
-  const today = dateKey(new Date());
-  await fsMod.setDoc(fsMod.doc(db, "users", uid, "supplementLogs", `${supplementId}_${today}`), {
-    supplementId, date: today, taken, updatedAt: fsMod.serverTimestamp()
-  }, { merge: true });
-}
-
-// ============================================================================
-// 11. SOCIAL
-// ============================================================================
-export function generateInviteToken() {
-  const bytes = new Uint8Array(16);
-  crypto.getRandomValues(bytes);
-  return Array.from(bytes, b => b.toString(16).padStart(2, "0")).join("");
-}
-
-export function computeFriendshipId(uid1, uid2) {
-  return [uid1, uid2].sort().join("_");
-}
-
-export async function createInvite() {
-  if (!isCloud()) throw new Error("Wymaga logowania");
-  const { fsMod, db } = getFs();
-  const uid = getCurrentUser().uid;
-  const profile = await loadProfile();
-  const token = generateInviteToken();
-  const now = new Date();
-  const expires = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
-  await fsMod.setDoc(fsMod.doc(db, "invites", token), {
-    createdBy: uid,
-    createdByName: profile?.displayName || "Użytkownik",
-    createdAt: fsMod.serverTimestamp(),
-    expiresAt: fsMod.Timestamp.fromDate(expires)
+    const note = container.querySelector("#journal-note")?.value || "";
+    _journal = _journal.filter(e => e.date !== today);
+    _journal.unshift({ date: today, feel, note });
+    saveSkinJournal(_journal);
+    showToast("✅ Wpis zapisany", "success");
+    renderContent(container);
   });
-  return { token, expiresAt: expires };
-}
 
-export async function redeemInvite(token) {
-  if (!isCloud()) throw new Error("Wymaga logowania");
-  const { fsMod, db } = getFs();
-  const uid = getCurrentUser().uid;
-  const invSnap = await fsMod.getDoc(fsMod.doc(db, "invites", token));
-  if (!invSnap.exists()) throw new Error("Nieprawidłowy kod zaproszenia");
-  const inv = invSnap.data();
-  const expiresAt = inv.expiresAt?.toDate ? inv.expiresAt.toDate() : null;
-  if (!expiresAt || expiresAt < new Date()) throw new Error("Kod wygasł");
-  if (inv.createdBy === uid) throw new Error("Nie możesz dodać samego siebie");
-  const profile = await loadProfile();
-  await fsMod.addDoc(fsMod.collection(db, "friend_requests"), {
-    fromUid: uid, toUid: inv.createdBy,
-    fromName: profile?.displayName || "Użytkownik",
-    status: "pending",
-    createdAt: fsMod.serverTimestamp(),
-    inviteToken: token
+  // Biblioteka składników
+  container.querySelectorAll("[data-info-ing]").forEach(btn => {
+    btn.addEventListener("click", () => openIngredientModal(btn.dataset.infoIng));
   });
-  return { toUid: inv.createdBy, toName: inv.createdByName || "Znajomy" };
-}
-
-export async function loadIncomingRequests() {
-  if (!isCloud()) return [];
-  const { fsMod, db } = getFs();
-  const uid = getCurrentUser().uid;
-  const q = fsMod.query(fsMod.collection(db, "friend_requests"), fsMod.where("toUid", "==", uid), fsMod.where("status", "==", "pending"));
-  const snap = await fsMod.getDocs(q);
-  return snap.docs.map(d => ({ id: d.id, ...d.data() }));
-}
-
-export async function loadOutgoingRequests() {
-  if (!isCloud()) return [];
-  const { fsMod, db } = getFs();
-  const uid = getCurrentUser().uid;
-  const q = fsMod.query(fsMod.collection(db, "friend_requests"), fsMod.where("fromUid", "==", uid), fsMod.where("status", "==", "pending"));
-  const snap = await fsMod.getDocs(q);
-  return snap.docs.map(d => ({ id: d.id, ...d.data() }));
-}
-
-export async function acceptFriendRequest(requestId) {
-  if (!isCloud()) return;
-  const { fsMod, db } = getFs();
-  const uid = getCurrentUser().uid;
-  const reqRef = fsMod.doc(db, "friend_requests", requestId);
-  const reqSnap = await fsMod.getDoc(reqRef);
-  if (!reqSnap.exists()) throw new Error("Prośba nie istnieje");
-  const req = reqSnap.data();
-  if (req.toUid !== uid || req.status !== "pending") throw new Error("Nie możesz zaakceptować");
-  await fsMod.updateDoc(reqRef, { status: "accepted", respondedAt: fsMod.serverTimestamp() });
-  const profile = await loadProfile();
-  const fid = computeFriendshipId(req.fromUid, req.toUid);
-  const names = {};
-  names[req.fromUid] = req.fromName || "Znajomy";
-  names[req.toUid] = profile?.displayName || "Ja";
-  await fsMod.setDoc(fsMod.doc(db, "friendships", fid), {
-    users: [req.fromUid, req.toUid], names, requestId, createdAt: fsMod.serverTimestamp()
-  });
-}
-
-export async function rejectFriendRequest(requestId) {
-  if (!isCloud()) return;
-  const { fsMod, db } = getFs();
-  await fsMod.updateDoc(fsMod.doc(db, "friend_requests", requestId), {
-    status: "rejected", respondedAt: fsMod.serverTimestamp()
-  });
-}
-
-export async function loadFriends() {
-  if (!isCloud()) return [];
-  const { fsMod, db } = getFs();
-  const uid = getCurrentUser().uid;
-  const q = fsMod.query(fsMod.collection(db, "friendships"), fsMod.where("users", "array-contains", uid));
-  const snap = await fsMod.getDocs(q);
-  return snap.docs.map(d => ({ id: d.id, ...d.data() }));
-}
-
-export async function deleteFriend(friendshipId) {
-  if (!isCloud()) return;
-  const { fsMod, db } = getFs();
-  await fsMod.deleteDoc(fsMod.doc(db, "friendships", friendshipId));
-}
-
-// ============================================================================
-// 12. GAMIFIKACJA
-// ============================================================================
-export async function saveGamification(data) {
-  if (!isCloud()) return;
-  const { fsMod, db } = getFs();
-  const uid = getCurrentUser().uid;
-  await fsMod.setDoc(fsMod.doc(db, "users", uid, "gamification", "main"), {
-    ...data, updatedAt: fsMod.serverTimestamp()
-  }, { merge: true });
-}
-
-export async function loadGamification() {
-  if (!isCloud()) return null;
-  const { fsMod, db } = getFs();
-  const uid = getCurrentUser().uid;
-  try {
-    const snap = await fsMod.getDoc(fsMod.doc(db, "users", uid, "gamification", "main"));
-    return snap.exists() ? snap.data() : null;
-  } catch (e) { return null; }
-}
-
-// ============================================================================
-// 13. WIDGETY
-// ============================================================================
-const DEFAULT_WIDGETS = ["countdown", "xp", "dailyscore", "quickstats", "tasks", "training", "quote", "measurement", "social", "shortcuts"];
-
-export function loadWidgetsConfig() {
-  try {
-    const raw = localStorage.getItem(localKey("widgets"));
-    if (raw) {
-      const parsed = JSON.parse(raw);
-      if (Array.isArray(parsed) && parsed.every(x => typeof x === "string")) return parsed;
-    }
-  } catch (e) {}
-  return [...DEFAULT_WIDGETS];
-}
-
-export function saveWidgetsConfig(ids) {
-  try { localStorage.setItem(localKey("widgets"), JSON.stringify(ids)); } catch (e) {}
-}
-
-export function resetWidgetsConfig() {
-  try { localStorage.removeItem(localKey("widgets")); } catch (e) {}
 }
