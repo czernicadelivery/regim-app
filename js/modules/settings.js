@@ -1,6 +1,7 @@
 // ============================================================================
 // LOCK IN 2027 — js/modules/settings.js
-// Ustawienia: profil, edycja trybów, harmonogram, budżet, dashboard, restart.
+// Ustawienia: profil, tryby, harmonogram, budżet, Personal Profile hub,
+//             dashboard config, restart onboardingu.
 // ============================================================================
 
 import { $, escapeHtml } from "../core/utils.js";
@@ -17,15 +18,17 @@ import { MODES, CATEGORY_META, getCategoriesFromModes } from "../core/modes.js";
 // ============================================================================
 
 function getProfile() {
-  return state.profile || { displayName: getSettings().name || "Karol", units: "metric", modes: [], schedule: { days: [1,2,3,4,5], hours: "18:00" }, budget: "na" };
-}
-
-function lastWeight() {
-  return (state.morning && state.morning.dailyWeight) || null;
+  return state.profile || {
+    displayName: getSettings().name || "Karol",
+    units: "metric",
+    modes: [],
+    schedule: { days: [1, 2, 3, 4, 5], hours: "18:00" },
+    budget: "na"
+  };
 }
 
 // ============================================================================
-// SEKCJA: PROFIL PODSTAWOWY
+// SEKCJA: PROFIL
 // ============================================================================
 
 function renderProfileSection() {
@@ -65,7 +68,7 @@ function renderProfileSection() {
 }
 
 // ============================================================================
-// SEKCJA: TRYBY (MODES)
+// SEKCJA: TRYBY
 // ============================================================================
 
 function renderModesSection() {
@@ -125,7 +128,7 @@ const DAYS = [
 
 function renderScheduleSection() {
   const p = getProfile();
-  const sch = p.schedule || { days: [1,2,3,4,5], hours: "18:00" };
+  const sch = p.schedule || { days: [1, 2, 3, 4, 5], hours: "18:00" };
   return `
     <div class="card">
       <div class="card-header"><div class="card-title">📅 Harmonogram</div></div>
@@ -184,7 +187,7 @@ function renderBudgetSection() {
 }
 
 // ============================================================================
-// SEKCJA: PERSONAL PROFILE 2.0 (hub)
+// SEKCJA: PERSONAL PROFILE HUB (z suplementami)
 // ============================================================================
 
 function renderProfileHub() {
@@ -202,15 +205,15 @@ function renderProfileHub() {
           <div class="text-sm font-bold">Rekordy</div>
           <div class="text-xs text-tertiary mt-1">Pompki, plank</div>
         </a>
-        <a href="#custom-questions" class="card card-padded-sm" style="text-decoration:none;color:inherit;grid-column:span 2;">
-          <div class="row" style="gap:12px;align-items:center;">
-            <div class="text-2xl">❓</div>
-            <div style="flex:1;">
-              <div class="text-sm font-bold">Własne pytania</div>
-              <div class="text-xs text-tertiary mt-1">Personalizuj profil</div>
-            </div>
-            <i class="fa-solid fa-chevron-right text-tertiary"></i>
-          </div>
+        <a href="#custom-questions" class="card card-padded-sm" style="text-decoration:none;color:inherit;">
+          <div class="text-2xl mb-2">❓</div>
+          <div class="text-sm font-bold">Pytania</div>
+          <div class="text-xs text-tertiary mt-1">Personalizuj profil</div>
+        </a>
+        <a href="#supplements" class="card card-padded-sm" style="text-decoration:none;color:inherit;">
+          <div class="text-2xl mb-2">💊</div>
+          <div class="text-sm font-bold">Suplementy</div>
+          <div class="text-xs text-tertiary mt-1">Katalog + tracker</div>
         </a>
       </div>
     </div>
@@ -218,7 +221,7 @@ function renderProfileHub() {
 }
 
 // ============================================================================
-// SEKCJA: PERSONALIZACJA DASHBOARDU
+// SEKCJA: DASHBOARD CONFIG
 // ============================================================================
 
 function renderDashboardConfig() {
@@ -265,7 +268,7 @@ function renderDashboardConfig() {
 }
 
 // ============================================================================
-// SEKCJA: ZAAWANSOWANE (Restart onboarding)
+// SEKCJA: ZAAWANSOWANE
 // ============================================================================
 
 function renderAdvancedSection() {
@@ -351,39 +354,30 @@ function bindEvents(container) {
     }
   });
 
-  // Modes — toggle
+  // Modes toggle
   const selectedModes = new Set(getProfile().modes || []);
   container.querySelectorAll("[data-toggle-mode]").forEach(btn => {
     btn.addEventListener("click", () => {
       const id = btn.dataset.toggleMode;
       if (selectedModes.has(id)) selectedModes.delete(id);
       else selectedModes.add(id);
-      // Re-render tylko sekcji modes byłby skomplikowany, więc pełny re-render
       render(container);
     });
   });
 
-  // Modes — save
   $("btn-save-modes")?.addEventListener("click", async () => {
     const modesArr = Array.from(selectedModes);
-    if (modesArr.length === 0) {
-      showToast("Wybierz co najmniej jeden tryb", "error");
-      return;
-    }
+    if (modesArr.length === 0) { showToast("Wybierz co najmniej jeden tryb", "error"); return; }
     try {
       await saveProfile({ modes: modesArr });
       state.profile = { ...(state.profile || {}), modes: modesArr };
       showToast("✅ Tryby zapisane", "success");
-      // Re-render zakładki Tasks (na wypadek gdyby użytkownik tam wrócił)
       const { applyConditionalTasks } = await import("./tasks.js");
       applyConditionalTasks();
-    } catch (e) {
-      console.error(e);
-      showToast("Błąd zapisu", "error");
-    }
+    } catch (e) { console.error(e); showToast("Błąd zapisu", "error"); }
   });
 
-  // Schedule — toggle days
+  // Schedule
   const selectedDays = new Set(getProfile().schedule?.days || []);
   container.querySelectorAll("[data-toggle-day]").forEach(btn => {
     btn.addEventListener("click", () => {
@@ -394,7 +388,6 @@ function bindEvents(container) {
     });
   });
 
-  // Schedule — save
   $("btn-save-schedule")?.addEventListener("click", async () => {
     const hours = $("set-hours")?.value || "18:00";
     const daysArr = Array.from(selectedDays).sort((a, b) => a - b);
@@ -402,13 +395,10 @@ function bindEvents(container) {
       await saveProfile({ schedule: { days: daysArr, hours } });
       state.profile = { ...(state.profile || {}), schedule: { days: daysArr, hours } };
       showToast("✅ Harmonogram zapisany", "success");
-    } catch (e) {
-      console.error(e);
-      showToast("Błąd zapisu", "error");
-    }
+    } catch (e) { console.error(e); showToast("Błąd zapisu", "error"); }
   });
 
-  // Budget — toggle
+  // Budget
   container.querySelectorAll("[data-budget]").forEach(btn => {
     btn.addEventListener("click", async () => {
       const id = btn.dataset.budget;
@@ -417,14 +407,11 @@ function bindEvents(container) {
         state.profile = { ...(state.profile || {}), budget: id };
         showToast("✅ Budżet zapisany", "success");
         render(container);
-      } catch (e) {
-        console.error(e);
-        showToast("Błąd zapisu", "error");
-      }
+      } catch (e) { console.error(e); showToast("Błąd zapisu", "error"); }
     });
   });
 
-  // Dashboard — toggle widget
+  // Dashboard widgets
   container.querySelectorAll("[data-toggle-widget]").forEach(btn => {
     btn.addEventListener("click", () => {
       const id = btn.dataset.toggleWidget;
@@ -435,25 +422,22 @@ function bindEvents(container) {
     });
   });
 
-  // Dashboard — move up
   container.querySelectorAll("[data-move-up]").forEach(btn => {
     btn.addEventListener("click", () => {
       const cur = loadWidgetsConfig();
       const idx = cur.indexOf(btn.dataset.moveUp);
-      if (idx > 0) { [cur[idx-1], cur[idx]] = [cur[idx], cur[idx-1]]; saveWidgetsConfig(cur); render(container); }
+      if (idx > 0) { [cur[idx - 1], cur[idx]] = [cur[idx], cur[idx - 1]]; saveWidgetsConfig(cur); render(container); }
     });
   });
 
-  // Dashboard — move down
   container.querySelectorAll("[data-move-down]").forEach(btn => {
     btn.addEventListener("click", () => {
       const cur = loadWidgetsConfig();
       const idx = cur.indexOf(btn.dataset.moveDown);
-      if (idx >= 0 && idx < cur.length - 1) { [cur[idx+1], cur[idx]] = [cur[idx], cur[idx+1]]; saveWidgetsConfig(cur); render(container); }
+      if (idx >= 0 && idx < cur.length - 1) { [cur[idx + 1], cur[idx]] = [cur[idx], cur[idx + 1]]; saveWidgetsConfig(cur); render(container); }
     });
   });
 
-  // Dashboard — reset
   $("btn-reset-dash")?.addEventListener("click", () => {
     if (!confirm("Reset konfiguracji dashboardu?")) return;
     resetWidgetsConfig();
@@ -461,7 +445,7 @@ function bindEvents(container) {
     render(container);
   });
 
-  // Advanced — restart onboarding
+  // Restart onboarding
   $("btn-restart-onboarding")?.addEventListener("click", async () => {
     if (!confirm("Restart onboardingu? Ustawienia profilu zostaną zresetowane, ale Twoje dane (dni, pomiary, treningi, XP) zostaną zachowane.")) return;
     try {
@@ -470,9 +454,6 @@ function bindEvents(container) {
       showToast("Onboarding zresetowany", "success");
       location.hash = "#onboarding";
       setTimeout(() => window.location.reload(), 400);
-    } catch (e) {
-      console.error(e);
-      showToast("Błąd", "error");
-    }
+    } catch (e) { console.error(e); showToast("Błąd", "error"); }
   });
 }
