@@ -1,3 +1,8 @@
+// ============================================================================
+// LOCK IN 2027 — js/components/nav.js
+// Sidebar (desktop) + Bottom nav (mobile). Podetap 1D: dodano Social.
+// ============================================================================
+
 export const SECTIONS = [
   { id: "overview",    icon: "fa-house",              label: "Overview" },
   { id: "health",      icon: "fa-heart-pulse",        label: "Health" },
@@ -9,7 +14,8 @@ export const SECTIONS = [
 
 export const EXTRA_SECTIONS = [
   { id: "nutrition",   icon: "fa-utensils",           label: "Nutrition" },
-  { id: "supplements", icon: "fa-capsules",           label: "Suplementy" }
+  { id: "supplements", icon: "fa-capsules",           label: "Suplementy" },
+  { id: "social",      icon: "fa-users",              label: "Social" }
 ];
 
 let _currentRoute = "overview";
