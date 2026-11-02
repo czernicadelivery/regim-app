@@ -1,12 +1,13 @@
 // ============================================================================
 // LOCK IN 2027 — js/modules/tasks.js
-// Zadania codzienne, kategorie, streak, milestone, persistToday.
+// Zadania + XP (aktualizacja przy każdym kliknięciu).
 // ============================================================================
 
 import { $, escapeHtml, dateKey, todayKey, vibrate, playSound, fireConfetti } from "../core/utils.js";
 import { localKey, getToggle, isBoosterActive, getSettings } from "../core/storage.js";
 import { TASK_CATEGORIES, BASE_CALISTHENICS, LIGHT_CALISTHENICS } from "../core/constants.js";
-import { loadDayDoc, saveDayDoc, loadCustomTasks, saveCustomTasks } from "../core/data.js";
+import { loadDayDoc, saveDayDoc, loadCustomTasks, saveCustomTasks, loadGamification, saveGamification } from "../core/data.js";
+import { calculateDailyXp } from "../core/gamification-engine.js";
 import { state } from "../state.js";
 import { showToast } from "../components/toast.js";
 
@@ -14,7 +15,6 @@ const todayObj = new Date();
 const todayDow = todayObj.getDay();
 const isSunday = todayDow === 0;
 
-// --- Trening (uproszczony build) ----------------------------------------
 export function buildTrainingTask() {
   if (isSunday) return null;
   if (todayDow === 1) return { id: "trening", label: "🏊 Basen 1,5h", hint: "Poniedziałek", done: false };
@@ -24,7 +24,6 @@ export function buildTrainingTask() {
   return { id: "trening", label: "💪 Kalistenika + hantle 1kg", hint: "Standardowy plan", done: false, exercises };
 }
 
-// --- Budowa zadań z kategorii -------------------------------------------
 export function applyConditionalTasks() {
   const suppCat = TASK_CATEGORIES.find(c => c.id === "suplementy");
   if (getToggle("supplements")) {
@@ -82,7 +81,6 @@ export function syncStateFromCategories() {
   state.customTasks = customCat.tasks.map(t => ({ id: t.id, label: t.label, hint: t.hint, done: t.done }));
 }
 
-// --- Obliczenia ---------------------------------------------------------
 export function calcCompletionPct() {
   if (!state.tasks.length) return 0;
   return Math.round((state.tasks.filter(t => t.done).length / state.tasks.length) * 100);
@@ -92,11 +90,14 @@ export function calcCompletionStats() {
   return { requiredDone: state.tasks.filter(t => t.done).length, requiredTotal: state.tasks.length };
 }
 
-// --- Persist ------------------------------------------------------------
+// ============================================================================
+// PERSIST + XP
+// ============================================================================
+
 export async function persistToday() {
   syncStateFromCategories();
   const existing = (await loadDayDoc(todayKey())) || {};
-  await saveDayDoc({
+  const dayData = {
     ...existing,
     date: todayKey(),
     tasks: state.tasks,
@@ -105,10 +106,52 @@ export async function persistToday() {
     morning: { ...(existing.morning || {}), ...state.morning },
     evening: { ...(existing.evening || {}), ...state.evening },
     updatedAt: Date.now()
-  });
+  };
+  await saveDayDoc(dayData);
   await refreshStreak();
   await checkMilestone();
+
+  // XP: oblicz i zapisz (nowe w tym podetapie)
+  try {
+    await updateXpFromDay(dayData);
+  } catch (e) {
+    console.error("updateXpFromDay error:", e);
+  }
 }
+
+async function updateXpFromDay(dayData) {
+  const gamData = (await loadGamification()) || { xp: 0, level: 1, dailyXp: {} };
+  const today = dayData.date;
+  const tasks = dayData.tasks || [];
+  const completed = tasks.filter(t => t.done).length;
+  const total = tasks.length;
+  const streak = state._streak || 0;
+  const todayXp = calculateDailyXp(completed, total, streak);
+  const savedTodayXp = (gamData.dailyXp && gamData.dailyXp[today]) || 0;
+
+  console.log("[XP] Stan:", { completed, total, streak, todayXp, savedTodayXp, currentTotalXp: gamData.xp || 0 });
+
+  if (todayXp > savedTodayXp) {
+    const diff = todayXp - savedTodayXp;
+    const newTotalXp = (gamData.xp || 0) + diff;
+    const newLevel = Math.floor(Math.sqrt(newTotalXp / 100)) + 1;
+    const newDailyXp = { ...(gamData.dailyXp || {}), [today]: todayXp };
+
+    await saveGamification({
+      xp: newTotalXp,
+      level: newLevel,
+      dailyXp: newDailyXp
+    });
+    console.log("[XP] ✅ Zapisano:", newTotalXp, "XP · Poziom", newLevel, "(+", diff, ")");
+    showToast(`+${diff} XP`, "success");
+  } else {
+    console.log("[XP] Brak zmian (todayXp <= savedTodayXp)");
+  }
+}
+
+// ============================================================================
+// STREAK
+// ============================================================================
 
 export async function refreshStreak() {
   const today = await loadDayDoc(todayKey());
@@ -142,12 +185,14 @@ export async function checkMilestone() {
   showToast(`🎉 ${hit} dni streak!`, "success");
 }
 
-// --- Render -------------------------------------------------------------
+// ============================================================================
+// RENDER
+// ============================================================================
+
 export async function render(container) {
   state.customTasks = loadCustomTasks();
   applyConditionalTasks();
 
-  // Wczytaj savedTasks z Firestore/local
   const today = await loadDayDoc(todayKey());
   const savedTasks = (today && today.tasks) || [];
   if (savedTasks.length) {
