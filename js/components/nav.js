@@ -1,6 +1,6 @@
 // ============================================================================
 // LOCK IN 2027 — js/components/nav.js
-// Sidebar + bottom nav. Dodano Looksmaxxing.
+// Sidebar + bottom nav. Dodano Medications.
 // ============================================================================
 
 export const SECTIONS = [
@@ -18,6 +18,7 @@ export const EXTRA_SECTIONS = [
   { id: "looksmaxxing", icon: "fa-eye",                label: "Looksmaxxing" },
   { id: "nutrition",    icon: "fa-utensils",           label: "Nutrition" },
   { id: "supplements",  icon: "fa-capsules",           label: "Suplementy" },
+  { id: "medications",  icon: "fa-prescription",       label: "Leki" },
   { id: "achievements", icon: "fa-trophy",             label: "Osiągnięcia" },
   { id: "social",       icon: "fa-users",              label: "Social" }
 ];
