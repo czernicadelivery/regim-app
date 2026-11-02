@@ -1,6 +1,6 @@
 // ============================================================================
 // LOCK IN 2027 — js/router.js
-// Hash routing. Dodano medications.
+// Hash routing. Dodano inventory.
 // ============================================================================
 
 import { state } from "./state.js";
@@ -10,7 +10,7 @@ export const ROUTES = [
   "overview", "health", "training", "tasks", "progress", "coach",
   "nutrition", "supplements", "settings", "onboarding",
   "measurements", "fitness", "custom-questions", "social", "achievements",
-  "routines", "skincare", "looksmaxxing", "medications"
+  "routines", "skincare", "looksmaxxing", "medications", "inventory"
 ];
 
 const MODULE_MAP = {
@@ -32,7 +32,8 @@ const MODULE_MAP = {
   routines: () => import("./modules/routines.js"),
   skincare: () => import("./modules/skincare.js"),
   looksmaxxing: () => import("./modules/looksmaxxing.js"),
-  medications: () => import("./modules/medications.js")
+  medications: () => import("./modules/medications.js"),
+  inventory: () => import("./modules/inventory.js")
 };
 
 let _initialized = false;
