@@ -1,16 +1,13 @@
 // ============================================================================
 // LOCK IN 2027 — js/core/data.js
-// Warstwa danych: Firestore + fallback localStorage.
+// Warstwa danych: Firestore + fallback localStorage. Podetap 2: widgety.
 // ============================================================================
 
 import { dateKey } from "./utils.js";
 import { localKey } from "./storage.js";
 import { getCurrentUser, isCloud, getFs, setSyncInProgress } from "../firebase.js";
 
-// ============================================================================
-// 1. DNI / ZADANIA
-// ============================================================================
-
+// --- 1. DNI / ZADANIA -------------------------------------------------------
 export async function saveDayDoc(d) {
   localStorage.setItem(localKey(d.date), JSON.stringify(d));
   if (!isCloud()) return;
@@ -185,10 +182,7 @@ export function loadAnalysisHistory() {
   } catch (e) { return []; }
 }
 
-// ============================================================================
-// 2. PROFIL + PUBLICZNY
-// ============================================================================
-
+// --- 2. PROFIL -------------------------------------------------------------
 export async function saveProfile(profileData) {
   if (!isCloud()) return;
   const { fsMod, db } = getFs();
@@ -220,26 +214,19 @@ export async function loadPublicProfile(userId) {
   } catch (e) { return null; }
 }
 
-// ============================================================================
-// 3. POMIARY
-// ============================================================================
-
+// --- 3. POMIARY ------------------------------------------------------------
 export async function addMeasurement(data) {
   if (!isCloud()) return;
   const { fsMod, db } = getFs();
   const uid = getCurrentUser().uid;
-  const ref = fsMod.collection(db, "users", uid, "measurements");
-  await fsMod.addDoc(ref, { ...data, date: data.date || fsMod.serverTimestamp() });
+  await fsMod.addDoc(fsMod.collection(db, "users", uid, "measurements"), { ...data, date: data.date || fsMod.serverTimestamp() });
 }
 
 export async function loadMeasurements() {
   if (!isCloud()) return [];
   const { fsMod, db } = getFs();
   const uid = getCurrentUser().uid;
-  const q = fsMod.query(
-    fsMod.collection(db, "users", uid, "measurements"),
-    fsMod.orderBy("date", "desc"), fsMod.limit(100)
-  );
+  const q = fsMod.query(fsMod.collection(db, "users", uid, "measurements"), fsMod.orderBy("date", "desc"), fsMod.limit(100));
   const snap = await fsMod.getDocs(q);
   return snap.docs.map(d => ({ id: d.id, ...d.data() }));
 }
@@ -251,22 +238,15 @@ export async function deleteMeasurement(id) {
   await fsMod.deleteDoc(fsMod.doc(db, "users", uid, "measurements", id));
 }
 
-// ============================================================================
-// 4. REKORDY
-// ============================================================================
-
+// --- 4. REKORDY ------------------------------------------------------------
 export async function addFitnessRecord(data) {
   if (!isCloud()) return;
   const { fsMod, db } = getFs();
   const uid = getCurrentUser().uid;
-  const ref = fsMod.collection(db, "users", uid, "fitnessRecords");
-  await fsMod.addDoc(ref, { ...data, date: data.date || fsMod.serverTimestamp() });
+  await fsMod.addDoc(fsMod.collection(db, "users", uid, "fitnessRecords"), { ...data, date: data.date || fsMod.serverTimestamp() });
 }
 
-// ============================================================================
-// 5. WŁASNE PYTANIA
-// ============================================================================
-
+// --- 5. PYTANIA ------------------------------------------------------------
 export async function saveCustomQuestion(questionId, data) {
   if (!isCloud()) return;
   const { fsMod, db } = getFs();
@@ -287,10 +267,7 @@ export async function loadCustomQuestions() {
   return snap.docs.map(d => ({ id: d.id, ...d.data() }));
 }
 
-// ============================================================================
-// 6. SUPLEMENTY
-// ============================================================================
-
+// --- 6. SUPLEMENTY ---------------------------------------------------------
 export async function saveSupplement(id, data) {
   if (!isCloud()) return;
   const { fsMod, db } = getFs();
@@ -342,10 +319,7 @@ export async function logSupplement(supplementId, taken) {
   }, { merge: true });
 }
 
-// ============================================================================
-// 7. SOCIAL
-// ============================================================================
-
+// --- 7. SOCIAL -------------------------------------------------------------
 export function generateInviteToken() {
   const bytes = new Uint8Array(16);
   crypto.getRandomValues(bytes);
@@ -383,7 +357,6 @@ export async function redeemInvite(token) {
   const expiresAt = inv.expiresAt?.toDate ? inv.expiresAt.toDate() : null;
   if (!expiresAt || expiresAt < new Date()) throw new Error("Kod wygasł");
   if (inv.createdBy === uid) throw new Error("Nie możesz dodać samego siebie");
-
   const profile = await loadProfile();
   await fsMod.addDoc(fsMod.collection(db, "friend_requests"), {
     fromUid: uid,
@@ -393,7 +366,6 @@ export async function redeemInvite(token) {
     createdAt: fsMod.serverTimestamp(),
     inviteToken: token
   });
-
   return { toUid: inv.createdBy, toName: inv.createdByName || "Znajomy" };
 }
 
@@ -432,15 +404,12 @@ export async function acceptFriendRequest(requestId) {
   if (!reqSnap.exists()) throw new Error("Prośba nie istnieje");
   const req = reqSnap.data();
   if (req.toUid !== uid || req.status !== "pending") throw new Error("Nie możesz zaakceptować");
-
   await fsMod.updateDoc(reqRef, { status: "accepted", respondedAt: fsMod.serverTimestamp() });
-
   const profile = await loadProfile();
   const fid = computeFriendshipId(req.fromUid, req.toUid);
   const names = {};
   names[req.fromUid] = req.fromName || "Znajomy";
   names[req.toUid] = profile?.displayName || "Ja";
-
   await fsMod.setDoc(fsMod.doc(db, "friendships", fid), {
     users: [req.fromUid, req.toUid],
     names,
@@ -452,7 +421,6 @@ export async function acceptFriendRequest(requestId) {
 export async function rejectFriendRequest(requestId) {
   if (!isCloud()) return;
   const { fsMod, db } = getFs();
-  const uid = getCurrentUser().uid;
   await fsMod.updateDoc(fsMod.doc(db, "friend_requests", requestId), {
     status: "rejected",
     respondedAt: fsMod.serverTimestamp()
@@ -474,17 +442,13 @@ export async function deleteFriend(friendshipId) {
   await fsMod.deleteDoc(fsMod.doc(db, "friendships", friendshipId));
 }
 
-// ============================================================================
-// 8. GAMIFIKACJA (XP)
-// ============================================================================
-
+// --- 8. GAMIFIKACJA --------------------------------------------------------
 export async function saveGamification(data) {
   if (!isCloud()) return;
   const { fsMod, db } = getFs();
   const uid = getCurrentUser().uid;
   await fsMod.setDoc(fsMod.doc(db, "users", uid, "gamification", "main"), {
-    ...data,
-    updatedAt: fsMod.serverTimestamp()
+    ...data, updatedAt: fsMod.serverTimestamp()
   }, { merge: true });
 }
 
@@ -495,7 +459,34 @@ export async function loadGamification() {
   try {
     const snap = await fsMod.getDoc(fsMod.doc(db, "users", uid, "gamification", "main"));
     return snap.exists() ? snap.data() : null;
-  } catch (e) {
-    return null;
-  }
+  } catch (e) { return null; }
+}
+
+// --- 9. WIDGETY (Dashboard 2.0) -------------------------------------------
+// Konfiguracja widgetów w localStorage per-user (lekkie, natychmiastowe).
+
+const DEFAULT_WIDGETS = ["countdown", "xp", "dailyscore", "quickstats", "tasks", "training", "quote", "measurement", "social", "shortcuts"];
+
+export function loadWidgetsConfig() {
+  try {
+    const raw = localStorage.getItem(localKey("widgets"));
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      // Walidacja: tablica stringów
+      if (Array.isArray(parsed) && parsed.every(x => typeof x === "string")) return parsed;
+    }
+  } catch (e) {}
+  return [...DEFAULT_WIDGETS];
+}
+
+export function saveWidgetsConfig(ids) {
+  try {
+    localStorage.setItem(localKey("widgets"), JSON.stringify(ids));
+  } catch (e) {}
+}
+
+export function resetWidgetsConfig() {
+  try {
+    localStorage.removeItem(localKey("widgets"));
+  } catch (e) {}
 }
