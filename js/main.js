@@ -1,21 +1,19 @@
 // ============================================================================
 // LOCK IN 2027 — js/main.js
 // Entry point: init Firebase → auth listener → reset state → router → nav.
-// Wbudowane poprawki A+B+C+D z Etapu 1d:
-//   A) resetAppState na starcie handleUserChange
-//   B) formularze zawsze czyszczone (w modułach health/settings)
-//   C) try/catch + booted flag + safety net 3s
-//   D) jeden listener (onAuthStateChanged), jeden router, jeden nav
+// Podetap 1A: Ładowanie profilu z Firestore + opcjonalna migracja z localStorage.
 // ============================================================================
 
 import { initFirebase, getAuthMod, setCurrentUser, updateAuthUI, updateSyncUI, attachSigninHandler } from "./firebase.js";
-import { migrateLocalToCloud } from "./core/data.js";
+import { migrateLocalToCloud, loadProfile, saveProfile } from "./core/data.js";
 import { resetAppState, state } from "./state.js";
 import { initRouter, refreshCurrent } from "./router.js";
 import { renderNav } from "./components/nav.js";
 import { showToast } from "./components/toast.js";
+import { getSettings } from "./core/storage.js";
+import { openModal } from "./components/modal.js";
 
-// Wewnętrzne pola stanu (nie w state.js, żeby nie modyfikować już wgranych plików)
+// Wewnętrzne pola stanu
 state._currentUid = undefined;
 state._routerInitialized = false;
 state._booted = false;
@@ -37,16 +35,67 @@ async function handleUserChange(user) {
 
   if (user) {
     updateAuthUI(user);
+    
     try {
+      // 1. Migracja starych dni (zadania, sen, nawyki)
       await migrateLocalToCloud();
+      
+      // 2. Ładowanie profilu
+      state.profile = await loadProfile();
+      
+      // 3. Migracja ustawień profilu z localStorage (z potwierdzeniem)
+      if (!state.profile) {
+        const hasLocalSettings = localStorage.getItem("regim:name"); // Czy jest stary profil?
+        
+        if (hasLocalSettings) {
+          const localSettings = getSettings();
+          
+          // Pokazujemy użytkownikowi pytanie
+          openModal({
+            title: "Wykryto stare dane",
+            body: "Znaleźliśmy dane profilu z poprzedniej wersji aplikacji na tym urządzeniu. Czy chcesz je bezpiecznie przenieść na to konto w chmurze?",
+            actions: [
+              { 
+                label: "Nie, pomiń", 
+                variant: "secondary",
+                onClick: () => {
+                  // W przyszłości (Podetap 1B) tutaj przekierujemy do onboardingu
+                  // location.hash = "#onboarding";
+                }
+              },
+              { 
+                label: "Tak, przenieś", 
+                variant: "primary", 
+                onClick: async () => {
+                  await saveProfile({
+                    displayName: localSettings.name,
+                    goalWeight: localSettings.goalWeight,
+                    startWeight: localSettings.startWeight,
+                    age: localSettings.age,
+                    height: localSettings.height,
+                    onboardingCompleted: true // Stary użytkownik ma już ukończony profil
+                  });
+                  showToast("Dane przeniesione do chmury", "success");
+                  setTimeout(() => window.location.reload(), 1000);
+                }
+              }
+            ]
+          });
+        } else {
+          // Brak profilu i brak starych danych -> Tu w 1B dodamy przekierowanie do onboardingu
+          // location.hash = "#onboarding";
+        }
+      }
     } catch (e) {
-      console.error("Migration error:", e);
+      console.error("Błąd podczas ładowania profilu/migracji:", e);
     }
   } else {
     updateAuthUI(null);
   }
+  
   updateSyncUI();
 
+  // Renderowanie nawigacji i routera
   renderNav();
 
   if (!state._routerInitialized) {
@@ -105,7 +154,7 @@ function attachButtons() {
     attachSigninHandler(sidebarSignin);
   }
 
-  // Signin: topbar (na mobile sidebar jest ukryty — dodajemy przycisk w topbar przez JS)
+  // Signin: topbar (na mobile sidebar jest ukryty)
   const topbarRight = document.querySelector(".topbar-right");
   if (topbarRight && !topbarRight.querySelector('[data-action="signin"]')) {
     const btn = document.createElement("button");
