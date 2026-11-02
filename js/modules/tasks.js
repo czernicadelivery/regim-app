@@ -1,8 +1,10 @@
 // ============================================================================
 // LOCK IN 2027 — js/modules/tasks.js
-// Zadania: mode-based generation + custom CRUD + priority + frequency + archive.
-// FIX: poprawiony syncStateFromCategories (c is not defined).
+// FIX v2: syncStateFromCategories przepisane od zera (bez flatMap).
+// Marker: [TASKS] v2 — c is not defined fix
 // ============================================================================
+
+console.log("[TASKS] v2 — c is not defined fix");
 
 import { $, escapeHtml, dateKey, todayKey, vibrate, playSound, fireConfetti } from "../core/utils.js";
 import { localKey, getToggle, isBoosterActive, getSettings } from "../core/storage.js";
@@ -16,10 +18,6 @@ import { openModal } from "../components/modal.js";
 
 const todayDow = new Date().getDay();
 const isSunday = todayDow === 0;
-
-// ============================================================================
-// LEGACY
-// ============================================================================
 
 export function buildTrainingTask() {
   if (isSunday) return null;
@@ -83,10 +81,6 @@ function applyLegacyTasks() {
   }
 }
 
-// ============================================================================
-// MODE-BASED
-// ============================================================================
-
 function applyModeTasks(modes) {
   const modeTasks = getTasksFromModes(modes);
   const newCategories = buildCategoriesFromTasks(modeTasks);
@@ -94,10 +88,6 @@ function applyModeTasks(modes) {
   TASK_CATEGORIES.length = 0;
   newCategories.forEach(c => TASK_CATEGORIES.push(c));
 }
-
-// ============================================================================
-// GŁÓWNA LOGIKA (FIX: c is not defined)
-// ============================================================================
 
 export function applyConditionalTasks() {
   const profile = state.profile || {};
@@ -119,43 +109,63 @@ export function applyConditionalTasks() {
   syncStateFromCategories();
 }
 
+// ============================================================================
+// FIX: syncStateFromCategories — BEZ flatMap, BEZ arrow zagnieżdżonego
+// ============================================================================
+
 export function syncStateFromCategories() {
-  // FIX: category ustawiamy w osobnym kroku (nie w .map po flatMap)
-  state.tasks = [];
-  TASK_CATEGORIES.forEach(cat => {
-    cat.tasks.forEach(t => {
-      state.tasks.push({
+  const newTasks = [];
+
+  for (let i = 0; i < TASK_CATEGORIES.length; i++) {
+    const category = TASK_CATEGORIES[i];
+    for (let j = 0; j < category.tasks.length; j++) {
+      const task = category.tasks[j];
+      newTasks.push({
+        id: task.id,
+        label: task.label,
+        done: task.done || false,
+        custom: task.custom === true,
+        priority: task.priority || "normal",
+        category: category.id
+      });
+    }
+  }
+
+  state.tasks = newTasks;
+
+  const customCategory = TASK_CATEGORIES.find(function(c) { return c.id === "custom"; });
+  if (customCategory) {
+    state.customTasks = customCategory.tasks.map(function(t) {
+      return {
         id: t.id,
         label: t.label,
-        done: t.done || false,
-        custom: !!t.custom,
-        priority: t.priority || "normal",
-        category: cat.id
-      });
+        hint: t.hint,
+        done: t.done,
+        priority: t.priority,
+        frequency: t.frequency
+      };
     });
-  });
-
-  const customCat = TASK_CATEGORIES.find(c => c.id === "custom");
-  state.customTasks = customCat
-    ? customCat.tasks.map(t => ({
-        id: t.id, label: t.label, hint: t.hint, done: t.done,
-        priority: t.priority, frequency: t.frequency
-      }))
-    : [];
+  } else {
+    state.customTasks = [];
+  }
 }
 
 export function calcCompletionPct() {
   if (!state.tasks.length) return 0;
-  return Math.round((state.tasks.filter(t => t.done).length / state.tasks.length) * 100);
+  let done = 0;
+  for (let i = 0; i < state.tasks.length; i++) {
+    if (state.tasks[i].done) done++;
+  }
+  return Math.round((done / state.tasks.length) * 100);
 }
 
 export function calcCompletionStats() {
-  return { requiredDone: state.tasks.filter(t => t.done).length, requiredTotal: state.tasks.length };
+  let done = 0;
+  for (let i = 0; i < state.tasks.length; i++) {
+    if (state.tasks[i].done) done++;
+  }
+  return { requiredDone: done, requiredTotal: state.tasks.length };
 }
-
-// ============================================================================
-// PERSIST + XP
-// ============================================================================
 
 export async function persistToday() {
   syncStateFromCategories();
@@ -181,7 +191,8 @@ async function updateXpFromDay(dayData) {
   const gamData = (await loadGamification()) || { xp: 0, level: 1, dailyXp: {} };
   const today = dayData.date;
   const tasks = dayData.tasks || [];
-  const completed = tasks.filter(t => t.done).length;
+  let completed = 0;
+  for (let i = 0; i < tasks.length; i++) { if (tasks[i].done) completed++; }
   const total = tasks.length;
   const streak = state._streak || 0;
   const todayXp = calculateDailyXp(completed, total, streak);
@@ -193,13 +204,13 @@ async function updateXpFromDay(dayData) {
     const newLevel = Math.floor(Math.sqrt(newTotalXp / 100)) + 1;
     const newDailyXp = { ...(gamData.dailyXp || {}), [today]: todayXp };
     await saveGamification({ xp: newTotalXp, level: newLevel, dailyXp: newDailyXp });
-    showToast(`+${diff} XP`, "success");
+    showToast("+" + diff + " XP", "success");
   }
 }
 
 export async function refreshStreak() {
   const today = await loadDayDoc(todayKey());
-  const pctToday = today?.completedPct ?? 0;
+  const pctToday = today && today.completedPct != null ? today.completedPct : 0;
   const base = await computeStreakUpTo(todayKey());
   state._streak = pctToday === 100 ? base + 1 : base;
   const el = $("topbar-streak");
@@ -225,12 +236,8 @@ export async function checkMilestone() {
   if (!hit || state.lastMilestoneShown === hit) return;
   state.lastMilestoneShown = hit;
   fireConfetti();
-  showToast(`🎉 ${hit} dni streak!`, "success");
+  showToast("🎉 " + hit + " dni streak!", "success");
 }
-
-// ============================================================================
-// RENDER
-// ============================================================================
 
 export async function render(container) {
   state.customTasks = loadCustomTasks();
@@ -293,7 +300,7 @@ function renderCategories() {
     const fullDone = doneCount === cat.tasks.length;
     const sortedTasks = [...cat.tasks].sort((a, b) => {
       const pr = { high: 0, normal: 1, low: 2 };
-      return (pr[a.priority] ?? 1) - (pr[b.priority] ?? 1);
+      return (pr[a.priority] != null ? pr[a.priority] : 1) - (pr[b.priority] != null ? pr[b.priority] : 1);
     });
     return `
       <div class="card card-padded-sm">
@@ -354,11 +361,10 @@ function renderCategories() {
 }
 
 function renderTaskItem(t) {
-  const priorityDot = t.priority === "high" ? `<span style="width:6px;height:6px;border-radius:50%;background:var(--danger);flex-shrink:0;" title="Wysoki priorytet"></span>` : "";
+  const priorityDot = t.priority === "high" ? `<span style="width:6px;height:6px;border-radius:50%;background:var(--danger);flex-shrink:0;"></span>` : "";
   const freqBadge = (t.frequency && t.frequency !== "daily") ? `<span class="badge badge-info" style="font-size:9px;padding:2px 6px;">${t.frequency === "weekly" ? "tyg." : t.frequency === "monthly" ? "mies." : t.frequency}</span>` : "";
-
-  const editBtn = t.custom ? `<button class="task-edit btn-icon btn-icon-sm" data-task-id="${t.id}" title="Edytuj"><i class="fa-solid fa-pen"></i></button>` : "";
-  const delBtn = t.custom ? `<button class="task-delete btn-icon btn-icon-sm" data-task-id="${t.id}" title="Usuń" style="color:var(--danger);"><i class="fa-solid fa-xmark"></i></button>` : "";
+  const editBtn = t.custom ? `<button class="task-edit btn-icon btn-icon-sm" data-task-id="${t.id}"><i class="fa-solid fa-pen"></i></button>` : "";
+  const delBtn = t.custom ? `<button class="task-delete btn-icon btn-icon-sm" data-task-id="${t.id}" style="color:var(--danger);"><i class="fa-solid fa-xmark"></i></button>` : "";
 
   return `
     <div class="list-item list-item-clickable task-item ${t.done ? "task-done" : ""}" data-task-id="${t.id}" style="${t.done ? "background:var(--accent-subtle);border-color:var(--accent-medium);" : ""}">
@@ -387,20 +393,9 @@ function updateHeaderProgress() {
   if (barEl) barEl.style.width = pct + "%";
 }
 
-// ============================================================================
-// EDYTOR ZADANIA
-// ============================================================================
-
 function openTaskEditor(existingTask, container) {
   const isEdit = !!existingTask;
-  const data = existingTask ? { ...existingTask } : {
-    label: "",
-    hint: "",
-    priority: "normal",
-    frequency: "daily",
-    category: "custom"
-  };
-
+  const data = existingTask ? { ...existingTask } : { label: "", hint: "", priority: "normal", frequency: "daily", category: "custom" };
   const CATEGORIES = Object.entries(CATEGORY_META).map(([id, meta]) => ({ id, ...meta }));
 
   const body = document.createElement("div");
@@ -412,7 +407,7 @@ function openTaskEditor(existingTask, container) {
       </div>
       <div class="form-group">
         <label class="form-label">Opis (opcjonalnie)</label>
-        <input class="input" id="et-hint" value="${escapeHtml(data.hint || "")}" placeholder="np. wieczorem przed snem">
+        <input class="input" id="et-hint" value="${escapeHtml(data.hint || "")}">
       </div>
       <div class="form-group">
         <label class="form-label">Kategoria</label>
@@ -430,7 +425,7 @@ function openTaskEditor(existingTask, container) {
       </div>
       <div class="form-group">
         <label class="form-label">Częstotliwość</label>
-        <div class="row" style="gap:6px;flex-wrap:wrap;">
+        <div class="row" style="gap:6px;">
           <button class="chip ${data.frequency === "daily" ? "active" : ""}" data-freq="daily">Codziennie</button>
           <button class="chip ${data.frequency === "weekly" ? "active" : ""}" data-freq="weekly">Tygodniowo</button>
           <button class="chip ${data.frequency === "monthly" ? "active" : ""}" data-freq="monthly">Miesięcznie</button>
@@ -474,8 +469,7 @@ function openTaskEditor(existingTask, container) {
             label,
             hint: body.querySelector("#et-hint").value.trim(),
             category: body.querySelector("#et-category").value,
-            priority,
-            frequency,
+            priority, frequency,
             done: isEdit ? (existingTask.done || false) : false
           };
 
@@ -500,32 +494,22 @@ function openTaskEditor(existingTask, container) {
   });
 }
 
-// ============================================================================
-// ARCHIWUM
-// ============================================================================
-
 function openArchiveModal(container) {
   const archived = state.customTasks.filter(t => t.archived);
-
   const body = document.createElement("div");
   if (archived.length === 0) {
     body.innerHTML = `<p class="text-sm text-tertiary">Brak zarchiwizowanych zadań.</p>`;
   } else {
-    body.innerHTML = `
-      <div class="stack-sm">
-        ${archived.map(t => `
-          <div class="list-item">
-            <div class="list-item-body">
-              <div class="list-item-title">${escapeHtml(t.label)}</div>
-              ${t.hint ? `<div class="list-item-subtitle">${escapeHtml(t.hint)}</div>` : ""}
-            </div>
-            <button class="btn btn-sm btn-secondary" data-restore="${t.id}">
-              <i class="fa-solid fa-rotate-left"></i> Przywróć
-            </button>
-          </div>
-        `).join("")}
+    body.innerHTML = `<div class="stack-sm">${archived.map(t => `
+      <div class="list-item">
+        <div class="list-item-body">
+          <div class="list-item-title">${escapeHtml(t.label)}</div>
+        </div>
+        <button class="btn btn-sm btn-secondary" data-restore="${t.id}">
+          <i class="fa-solid fa-rotate-left"></i> Przywróć
+        </button>
       </div>
-    `;
+    `).join("")}</div>`;
 
     body.querySelectorAll("[data-restore]").forEach(btn => {
       btn.addEventListener("click", async () => {
