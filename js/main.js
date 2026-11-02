@@ -2,6 +2,7 @@
 // LOCK IN 2027 — js/main.js
 // Entry point: init Firebase → auth listener → reset state → router → nav.
 // Podetap 1A: Ładowanie profilu z Firestore + opcjonalna migracja z localStorage.
+// Podetap 1B: Przekierowanie do onboardingu dla nowych użytkowników.
 // ============================================================================
 
 import { initFirebase, getAuthMod, setCurrentUser, updateAuthUI, updateSyncUI, attachSigninHandler } from "./firebase.js";
@@ -24,48 +25,40 @@ async function handleUserChange(user) {
   const prevUid = state._currentUid;
   const nextUid = user ? user.uid : "local";
 
-  // Tylko jeśli user się zmienił (lub pierwszy boot)
   if (prevUid === nextUid && state._booted) return;
 
   state._currentUid = nextUid;
   state._booted = true;
 
   setCurrentUser(user || { uid: "local" });
-  resetAppState(); // (A) reset stanu — zero wycieku między userami
+  resetAppState();
+
+  let redirectToOnboarding = false;
 
   if (user) {
     updateAuthUI(user);
-    
+
     try {
-      // 1. Migracja starych dni (zadania, sen, nawyki)
       await migrateLocalToCloud();
-      
-      // 2. Ładowanie profilu
       state.profile = await loadProfile();
-      
-      // 3. Migracja ustawień profilu z localStorage (z potwierdzeniem)
+
       if (!state.profile) {
-        const hasLocalSettings = localStorage.getItem("regim:name"); // Czy jest stary profil?
-        
+        const hasLocalSettings = localStorage.getItem("regim:name");
+
         if (hasLocalSettings) {
           const localSettings = getSettings();
-          
-          // Pokazujemy użytkownikowi pytanie
           openModal({
             title: "Wykryto stare dane",
             body: "Znaleźliśmy dane profilu z poprzedniej wersji aplikacji na tym urządzeniu. Czy chcesz je bezpiecznie przenieść na to konto w chmurze?",
             actions: [
-              { 
-                label: "Nie, pomiń", 
+              {
+                label: "Nie, pomiń",
                 variant: "secondary",
-                onClick: () => {
-                  // W przyszłości (Podetap 1B) tutaj przekierujemy do onboardingu
-                  // location.hash = "#onboarding";
-                }
+                onClick: () => { redirectToOnboarding = true; }
               },
-              { 
-                label: "Tak, przenieś", 
-                variant: "primary", 
+              {
+                label: "Tak, przenieś",
+                variant: "primary",
                 onClick: async () => {
                   await saveProfile({
                     displayName: localSettings.name,
@@ -73,7 +66,7 @@ async function handleUserChange(user) {
                     startWeight: localSettings.startWeight,
                     age: localSettings.age,
                     height: localSettings.height,
-                    onboardingCompleted: true // Stary użytkownik ma już ukończony profil
+                    onboardingCompleted: true
                   });
                   showToast("Dane przeniesione do chmury", "success");
                   setTimeout(() => window.location.reload(), 1000);
@@ -82,20 +75,19 @@ async function handleUserChange(user) {
             ]
           });
         } else {
-          // Brak profilu i brak starych danych -> Tu w 1B dodamy przekierowanie do onboardingu
-          // location.hash = "#onboarding";
+          redirectToOnboarding = true;
         }
+      } else if (!state.profile.onboardingCompleted) {
+        redirectToOnboarding = true;
       }
     } catch (e) {
-      console.error("Błąd podczas ładowania profilu/migracji:", e);
+      console.error("Błąd podczas ładowania profilu:", e);
     }
   } else {
     updateAuthUI(null);
   }
-  
-  updateSyncUI();
 
-  // Renderowanie nawigacji i routera
+  updateSyncUI();
   renderNav();
 
   if (!state._routerInitialized) {
@@ -103,6 +95,10 @@ async function handleUserChange(user) {
     state._routerInitialized = true;
   } else {
     refreshCurrent();
+  }
+
+  if (redirectToOnboarding) {
+    setTimeout(() => { location.hash = "#onboarding"; }, 100);
   }
 }
 
@@ -134,7 +130,6 @@ async function bootstrap() {
     attachButtons();
     startSafetyNet();
   } catch (e) {
-    // (C) try/catch — bezpieczny fallback w trybie lokalnym
     console.error("[LOCK IN 2027] bootstrap fatal error:", e);
     showToast("Błąd ładowania — odśwież stronę", "error");
     state._booted = false;
@@ -148,13 +143,11 @@ async function bootstrap() {
 
 // --- Attach buttons -----------------------------------------------------
 function attachButtons() {
-  // Signin: sidebar
   const sidebarSignin = document.querySelector('[data-action="signin"]');
   if (sidebarSignin) {
     attachSigninHandler(sidebarSignin);
   }
 
-  // Signin: topbar (na mobile sidebar jest ukryty)
   const topbarRight = document.querySelector(".topbar-right");
   if (topbarRight && !topbarRight.querySelector('[data-action="signin"]')) {
     const btn = document.createElement("button");
@@ -166,7 +159,6 @@ function attachButtons() {
     attachSigninHandler(btn);
   }
 
-  // Settings buttons (sidebar + topbar) → nawigacja do #settings
   document.querySelectorAll('[data-action="settings"]').forEach(btn => {
     if (btn.dataset.bound === "1") return;
     btn.dataset.bound = "1";
