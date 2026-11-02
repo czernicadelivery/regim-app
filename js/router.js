@@ -1,6 +1,6 @@
 // ============================================================================
 // LOCK IN 2027 — js/router.js
-// Hash routing. Podetap 1D: dodano social.
+// Hash routing. Podetap 2: dodano achievements.
 // ============================================================================
 
 import { state } from "./state.js";
@@ -9,7 +9,7 @@ import { setActiveNav } from "./components/nav.js";
 export const ROUTES = [
   "overview", "health", "training", "tasks", "progress", "coach",
   "nutrition", "supplements", "settings", "onboarding",
-  "measurements", "fitness", "custom-questions", "social"
+  "measurements", "fitness", "custom-questions", "social", "achievements"
 ];
 
 const MODULE_MAP = {
@@ -26,7 +26,8 @@ const MODULE_MAP = {
   measurements: () => import("./modules/measurements.js"),
   fitness: () => import("./modules/fitness.js"),
   "custom-questions": () => import("./modules/custom-questions.js"),
-  social: () => import("./modules/social.js")
+  social: () => import("./modules/social.js"),
+  achievements: () => import("./modules/achievements.js")
 };
 
 let _initialized = false;
