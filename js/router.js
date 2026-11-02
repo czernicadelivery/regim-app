@@ -1,6 +1,6 @@
 // ============================================================================
 // LOCK IN 2027 — js/router.js
-// Hash routing. Lazy import modułów. Podetap 1C: dodano measurements/fitness/custom-questions.
+// Hash routing. Podetap 1D: dodano social.
 // ============================================================================
 
 import { state } from "./state.js";
@@ -9,7 +9,7 @@ import { setActiveNav } from "./components/nav.js";
 export const ROUTES = [
   "overview", "health", "training", "tasks", "progress", "coach",
   "nutrition", "supplements", "settings", "onboarding",
-  "measurements", "fitness", "custom-questions"
+  "measurements", "fitness", "custom-questions", "social"
 ];
 
 const MODULE_MAP = {
@@ -25,7 +25,8 @@ const MODULE_MAP = {
   onboarding: () => import("./modules/onboarding.js"),
   measurements: () => import("./modules/measurements.js"),
   fitness: () => import("./modules/fitness.js"),
-  "custom-questions": () => import("./modules/custom-questions.js")
+  "custom-questions": () => import("./modules/custom-questions.js"),
+  social: () => import("./modules/social.js")
 };
 
 let _initialized = false;
@@ -57,11 +58,8 @@ async function renderView(route) {
 
   try {
     const mod = await loader();
-    if (typeof mod.render === "function") {
-      await mod.render(container);
-    } else {
-      container.innerHTML = `<div class="empty"><div class="empty-icon">🚧</div><div class="empty-title">Moduł „${route}"</div></div>`;
-    }
+    if (typeof mod.render === "function") await mod.render(container);
+    else container.innerHTML = `<div class="empty"><div class="empty-icon">🚧</div><div class="empty-title">Moduł „${route}"</div></div>`;
   } catch (e) {
     console.error("Router render error:", route, e);
     container.innerHTML = `<div class="empty"><div class="empty-icon">⚠️</div><div class="empty-title">Błąd</div><div class="empty-text">${e.message || ""}</div></div>`;
