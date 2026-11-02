@@ -1,6 +1,6 @@
 // ============================================================================
 // LOCK IN 2027 — js/components/nav.js
-// Sidebar + bottom nav. Dodano Skincare.
+// Sidebar + bottom nav. Dodano Looksmaxxing.
 // ============================================================================
 
 export const SECTIONS = [
@@ -15,6 +15,7 @@ export const SECTIONS = [
 export const EXTRA_SECTIONS = [
   { id: "routines",     icon: "fa-list-check",         label: "Rutyny" },
   { id: "skincare",     icon: "fa-spa",                label: "Skincare" },
+  { id: "looksmaxxing", icon: "fa-eye",                label: "Looksmaxxing" },
   { id: "nutrition",    icon: "fa-utensils",           label: "Nutrition" },
   { id: "supplements",  icon: "fa-capsules",           label: "Suplementy" },
   { id: "achievements", icon: "fa-trophy",             label: "Osiągnięcia" },
