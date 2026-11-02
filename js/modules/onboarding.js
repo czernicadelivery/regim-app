@@ -1,44 +1,26 @@
 // ============================================================================
 // LOCK IN 2027 — js/modules/onboarding.js
-// Onboarding 4.0: 8 kroków. Zapisuje rozszerzony profil (modes, goals, schedule, budget).
+// 6 kroków: Basics → Cel (6 modes) → Fitness → Schedule → Lifestyle → Summary.
+// Podgląd kategorii zadań na żywo pod wyborem trybów.
 // ============================================================================
 
 import { $, escapeHtml } from "../core/utils.js";
 import { saveProfile } from "../core/data.js";
 import { state } from "../state.js";
 import { showToast } from "../components/toast.js";
-import { MODES } from "../core/modes.js";
+import { MODES, CATEGORY_META, getCategoriesFromModes, getTasksFromModes } from "../core/modes.js";
 
 // ============================================================================
 // DANE
 // ============================================================================
 
-const GOALS = [
-  { id: "lose-weight", label: "Schudnąć", icon: "⚖️" },
-  { id: "gain-weight", label: "Przybrać na wadze", icon: "📈" },
-  { id: "build-muscle", label: "Zbudować mięśnie", icon: "💪" },
-  { id: "improve-strength", label: "Poprawić siłę", icon: "🏋️" },
-  { id: "improve-fitness", label: "Poprawić kondycję", icon: "🏃" },
-  { id: "health", label: "Dbać o zdrowie", icon: "❤️" },
-  { id: "looks", label: "Poprawić wygląd", icon: "👁️" },
-  { id: "skincare", label: "Rozwinąć skincare", icon: "✨" },
-  { id: "hair", label: "Wygląd włosów", icon: "💇" },
-  { id: "style", label: "Styl ubierania", icon: "👔" },
-  { id: "hygiene", label: "Higiena i grooming", icon: "🧼" },
-  { id: "consistency", label: "Regularność", icon: "🔁" },
-  { id: "sleep", label: "Poprawić sen", icon: "😴" },
-  { id: "nutrition", label: "Odżywianie", icon: "🍽️" },
-  { id: "focus", label: "Koncentracja", icon: "🧠" },
-  { id: "organization", label: "Organizacja", icon: "📅" }
-];
-
 const BUDGETS = [
-  { id: "0", label: "0 zł — bez wydatków", desc: "Bez zakupów, bez presji" },
-  { id: "30", label: "Do 30 zł / mies.", desc: "Podstawowe produkty" },
-  { id: "60", label: "30–60 zł / mies.", desc: "Umiarkowany budżet" },
-  { id: "100", label: "60–100 zł / mies.", desc: "Rozszerzony zestaw" },
-  { id: "100plus", label: "100+ zł / mies.", desc: "Bez limitu" },
-  { id: "na", label: "Nie chcę określać" }
+  { id: "0",     label: "0 zł — bez wydatków",  desc: "Żadnych sugestii zakupowych" },
+  { id: "30",    label: "Do 30 zł / mies.",     desc: "Podstawowe produkty" },
+  { id: "60",    label: "30–60 zł / mies.",     desc: "Umiarkowany budżet" },
+  { id: "100",   label: "60–100 zł / mies.",    desc: "Rozszerzony zestaw" },
+  { id: "100plus", label: "100+ zł / mies.",    desc: "Bez limitu" },
+  { id: "na",    label: "Nie chcę określać" }
 ];
 
 const DAYS = [
@@ -46,35 +28,38 @@ const DAYS = [
   { id: 4, label: "Czw" }, { id: 5, label: "Pt" }, { id: 6, label: "Sob" }, { id: 0, label: "Nd" }
 ];
 
+const EQUIPMENT = [
+  { id: "dumbbells", label: "🏋️ Hantle" },
+  { id: "bands",     label: "🔗 Gumy" },
+  { id: "gym",       label: "🏢 Siłownia" },
+  { id: "pool",      label: "🏊 Basen" }
+];
+
 const STEPS = [
-  { id: "basics",      icon: "👋", title: "Poznajmy się",        desc: "Podstawowe informacje" },
-  { id: "goals",       icon: "🎯", title: "Twoje cele",          desc: "Co chcesz osiągnąć?" },
-  { id: "modes",       icon: "⚙️", title: "Tryby aplikacji",     desc: "Wybierz jeden lub więcej" },
-  { id: "fitness",     icon: "💪", title: "Twoja forma",         desc: "Możliwości i sprzęt" },
-  { id: "schedule",    icon: "📅", title: "Harmonogram",         desc: "Kiedy trenujesz?" },
-  { id: "skincare",    icon: "✨", title: "Skincare",            desc: "Czy interesuje Cię pielęgnacja?" },
-  { id: "supplements", icon: "💊", title: "Suplementy i budżet", desc: "Twoje podejście" },
-  { id: "summary",     icon: "✅", title: "Gotowe!",             desc: "Podsumowanie konfiguracji" }
+  { id: "basics",     icon: "👋", title: "Poznajmy się",       desc: "Podstawowe informacje" },
+  { id: "goal",       icon: "🎯", title: "Twój cel",           desc: "Wybierz co najmniej jeden tryb" },
+  { id: "fitness",    icon: "💪", title: "Twoja forma",        desc: "Możliwości i sprzęt (opcjonalnie)" },
+  { id: "schedule",   icon: "📅", title: "Harmonogram",        desc: "Kiedy trenujesz?" },
+  { id: "lifestyle",  icon: "✨", title: "Lifestyle",          desc: "Suplementy, budżet, skincare" },
+  { id: "summary",    icon: "✅", title: "Gotowe!",            desc: "Podsumowanie konfiguracji" }
 ];
 
 // ============================================================================
-// STAN LOKALNY KREATORA
+// STAN KREATORA
 // ============================================================================
 
 let _step = 0;
 let _data = {
   displayName: "",
   units: "metric",
-  language: "pl",
-  goals: [],
+  age: null,
   modes: [],
   fitness: { pushups: null, pullups: null, plank: null, squats: null },
   equipment: [],
   schedule: { days: [1, 2, 3, 4, 5], hours: "18:00" },
-  skincareInterest: false,
-  skinType: null,
   supplementsInterest: "none",
   budget: "na",
+  skincareInterest: false,
   onboardingCompleted: false
 };
 
@@ -124,19 +109,17 @@ function renderStep(container) {
 
 function renderStepFields(stepId) {
   switch (stepId) {
-    case "basics": return renderBasics();
-    case "goals": return renderGoals();
-    case "modes": return renderModes();
-    case "fitness": return renderFitness();
-    case "schedule": return renderSchedule();
-    case "skincare": return renderSkincare();
-    case "supplements": return renderSupplements();
-    case "summary": return renderSummary();
+    case "basics":    return renderBasics();
+    case "goal":      return renderGoal();
+    case "fitness":   return renderFitness();
+    case "schedule":  return renderSchedule();
+    case "lifestyle": return renderLifestyle();
+    case "summary":   return renderSummary();
     default: return "";
   }
 }
 
-// --- Krok 1: Basics --------------------------------------------------------
+// --- Krok 1: Basics ------------------------------------------------------
 function renderBasics() {
   return `
     <div class="form-group">
@@ -150,58 +133,77 @@ function renderBasics() {
         <button class="chip ${_data.units === "imperial" ? "active" : ""}" data-units="imperial">⚖️ lb, ft</button>
       </div>
     </div>
-  `;
-}
-
-// --- Krok 2: Goals ---------------------------------------------------------
-function renderGoals() {
-  return `
-    <p class="text-xs text-tertiary mb-2">Możesz wybrać wiele opcji (${_data.goals.length} wybrano)</p>
-    <div class="grid-2" style="gap:8px;">
-      ${GOALS.map(g => `
-        <button class="card card-padded-sm ${_data.goals.includes(g.id) ? "card-accent" : ""}"
-          data-goal="${g.id}" style="text-align:left;padding:10px;">
-          <div style="font-size:20px;">${g.icon}</div>
-          <div class="text-xs font-bold mt-1">${g.label}</div>
-        </button>
-      `).join("")}
+    <div class="form-group">
+      <label class="form-label">Wiek (opcjonalnie)</label>
+      <input type="number" class="input" id="onb-age" placeholder="np. 16" value="${_data.age ?? ""}">
     </div>
   `;
 }
 
-// --- Krok 3: Modes ---------------------------------------------------------
-function renderModes() {
+// --- Krok 2: Cel (6 modów) ----------------------------------------------
+function renderGoal() {
+  const selected = _data.modes;
   return `
-    <p class="text-xs text-tertiary mb-2">Tryby określają, jakie zadania dostajesz (${_data.modes.length} wybrano)</p>
-    <div class="stack-sm">
-      ${MODES.map(m => `
-        <button class="card card-padded-sm ${_data.modes.includes(m.id) ? "card-accent" : ""}"
-          data-mode="${m.id}" style="text-align:left;width:100%;">
-          <div class="row" style="gap:12px;align-items:center;">
-            <div style="font-size:28px;">${m.icon}</div>
-            <div style="flex:1;">
-              <div class="text-sm font-bold">${m.label}</div>
-              <div class="text-xs text-tertiary">${m.desc}</div>
+    <p class="text-xs text-tertiary mb-3">Możesz wybrać kilka trybów — zadania się połączą (bez duplikatów).</p>
+    <div class="grid-2" style="gap:10px;">
+      ${MODES.map(m => {
+        const isSel = selected.includes(m.id);
+        const cats = getCategoriesFromModes([m.id]);
+        return `
+          <button class="card ${isSel ? "card-accent" : ""}" data-mode="${m.id}"
+            style="text-align:left;padding:14px;position:relative;${isSel ? 'border-color:var(--accent);' : ''}">
+            ${isSel ? `<div style="position:absolute;top:8px;right:8px;width:22px;height:22px;border-radius:50%;background:var(--accent);color:var(--text-inverse);display:flex;align-items:center;justify-content:center;font-size:11px;"><i class="fa-solid fa-check"></i></div>` : ''}
+            <div style="font-size:32px;line-height:1;margin-bottom:8px;">${m.icon}</div>
+            <div class="text-sm font-bold">${m.name}</div>
+            <div class="text-xs text-tertiary" style="margin-top:2px;line-height:1.3;">${m.desc}</div>
+            <div class="row" style="gap:4px;flex-wrap:wrap;margin-top:8px;">
+              ${cats.map(c => {
+                const meta = CATEGORY_META[c];
+                if (!meta) return "";
+                return `<span style="font-size:14px;" title="${meta.name}">${meta.icon}</span>`;
+              }).join("")}
             </div>
-            ${_data.modes.includes(m.id) ? '<i class="fa-solid fa-check-circle text-accent"></i>' : ''}
-          </div>
-        </button>
-      `).join("")}
+          </button>
+        `;
+      }).join("")}
+    </div>
+
+    <div class="card mt-4" style="background:var(--bg-surface);">
+      <div class="card-subtitle mb-2">KATEGORIE KTÓRE SIĘ POJAWIĄ</div>
+      ${renderCategoryPreview()}
     </div>
   `;
 }
 
-// --- Krok 4: Fitness -------------------------------------------------------
+function renderCategoryPreview() {
+  if (!_data.modes.length) {
+    return `<div class="text-sm text-tertiary">Wybierz co najmniej jeden tryb, żeby zobaczyć kategorie.</div>`;
+  }
+  const cats = getCategoriesFromModes(_data.modes);
+  const tasks = getTasksFromModes(_data.modes);
+  return `
+    <div class="row" style="gap:6px;flex-wrap:wrap;">
+      ${cats.map(id => {
+        const meta = CATEGORY_META[id];
+        if (!meta) return "";
+        return `<span class="badge badge-accent">${meta.icon} ${meta.name}</span>`;
+      }).join("")}
+    </div>
+    <div class="text-xs text-tertiary mt-3">📊 ${tasks.length} unikalnych zadań</div>
+  `;
+}
+
+// --- Krok 3: Fitness -----------------------------------------------------
 function renderFitness() {
   return `
-    <p class="text-xs text-tertiary mb-2">Wpisz swoje maksymalne wyniki (opcjonalnie, do personalizacji treningu)</p>
+    <p class="text-xs text-tertiary mb-2">Personalizujemy poziom treningu (możesz pominąć).</p>
     <div class="grid-2">
       <div class="form-group">
         <label class="form-label">Pompki (max)</label>
         <input type="number" class="input" id="onb-pushups" placeholder="np. 25" value="${_data.fitness.pushups ?? ""}">
       </div>
       <div class="form-group">
-        <label class="form-label">Podciągnięcia (max)</label>
+        <label class="form-label">Podciągnięcia</label>
         <input type="number" class="input" id="onb-pullups" placeholder="np. 8" value="${_data.fitness.pullups ?? ""}">
       </div>
       <div class="form-group">
@@ -209,19 +211,14 @@ function renderFitness() {
         <input type="number" class="input" id="onb-plank" placeholder="np. 60" value="${_data.fitness.plank ?? ""}">
       </div>
       <div class="form-group">
-        <label class="form-label">Przysiady (max)</label>
+        <label class="form-label">Przysiady</label>
         <input type="number" class="input" id="onb-squats" placeholder="np. 40" value="${_data.fitness.squats ?? ""}">
       </div>
     </div>
     <div class="form-group mt-3">
       <label class="form-label">Sprzęt, który masz</label>
       <div class="row" style="gap:8px;flex-wrap:wrap;">
-        ${[
-          { id: "dumbbells", label: "🏋️ Hantle" },
-          { id: "bands", label: "🔗 Gumy" },
-          { id: "gym", label: "🏢 Siłownia" },
-          { id: "pool", label: "🏊 Basen" }
-        ].map(e => `
+        ${EQUIPMENT.map(e => `
           <button class="chip ${_data.equipment.includes(e.id) ? "active" : ""}" data-equip="${e.id}">${e.label}</button>
         `).join("")}
       </div>
@@ -229,7 +226,7 @@ function renderFitness() {
   `;
 }
 
-// --- Krok 5: Schedule ------------------------------------------------------
+// --- Krok 4: Schedule ----------------------------------------------------
 function renderSchedule() {
   return `
     <p class="text-xs text-tertiary mb-2">Kiedy trenujesz?</p>
@@ -248,45 +245,16 @@ function renderSchedule() {
   `;
 }
 
-// --- Krok 6: Skincare ------------------------------------------------------
-function renderSkincare() {
-  return `
-    <div class="form-group">
-      <label class="form-label">Czy interesuje Cię pielęgnacja twarzy?</label>
-      <div class="row" style="gap:8px;">
-        <button class="chip ${_data.skincareInterest ? "active" : ""}" data-skincare="yes">✨ Tak</button>
-        <button class="chip ${!_data.skincareInterest ? "active" : ""}" data-skincare="no">Nie</button>
-      </div>
-    </div>
-    ${_data.skincareInterest ? `
-      <div class="form-group mt-3">
-        <label class="form-label">Typ skóry (jeśli znasz)</label>
-        <div class="row" style="gap:6px;flex-wrap:wrap;">
-          ${[
-            { id: "normal", label: "Normalna" },
-            { id: "oily", label: "Tłusta" },
-            { id: "dry", label: "Sucha" },
-            { id: "combination", label: "Mieszana" },
-            { id: "unknown", label: "Nie wiem" }
-          ].map(t => `
-            <button class="chip ${_data.skinType === t.id ? "active" : ""}" data-skintype="${t.id}">${t.label}</button>
-          `).join("")}
-        </div>
-      </div>
-    ` : ""}
-  `;
-}
-
-// --- Krok 7: Supplements ---------------------------------------------------
-function renderSupplements() {
+// --- Krok 5: Lifestyle ---------------------------------------------------
+function renderLifestyle() {
   return `
     <div class="form-group">
       <label class="form-label">Suplementy</label>
       <div class="stack-sm">
         ${[
-          { id: "none", label: "🚫 Nie stosuję", desc: "Bez suplementów" },
-          { id: "catalog", label: "📚 Tylko biblioteka", desc: "Chcę wiedzieć, nie kupuję" },
-          { id: "tracking", label: "💊 Śledzę przyjmowanie", desc: "Stosuję i monitoruję" }
+          { id: "none",     label: "🚫 Nie stosuję",              desc: "Bez suplementów" },
+          { id: "catalog",  label: "📚 Tylko biblioteka",         desc: "Chcę wiedzieć, nie kupuję" },
+          { id: "tracking", label: "💊 Śledzę przyjmowanie",      desc: "Stosuję i monitoruję" }
         ].map(s => `
           <button class="card card-padded-sm ${_data.supplementsInterest === s.id ? "card-accent" : ""}"
             data-supp="${s.id}" style="text-align:left;">
@@ -301,8 +269,9 @@ function renderSupplements() {
         `).join("")}
       </div>
     </div>
-    <div class="form-group mt-3">
-      <label class="form-label">Budżet miesięczny na suplementy</label>
+
+    <div class="form-group mt-4">
+      <label class="form-label">Budżet miesięczny</label>
       <div class="stack-sm">
         ${BUDGETS.map(b => `
           <button class="card card-padded-sm ${_data.budget === b.id ? "card-accent" : ""}"
@@ -313,19 +282,30 @@ function renderSupplements() {
         `).join("")}
       </div>
     </div>
+
     ${_data.budget === "0" ? `
       <div class="card card-flat mt-3" style="background:var(--success-subtle);">
-        <div class="text-sm text-secondary">✅ OK — żadnych sugestii zakupowych. Skupiamy się na tym, co masz.</div>
+        <div class="text-sm text-secondary">✅ Bez sugestii zakupowych. Skupiamy się na tym co masz.</div>
       </div>
     ` : ""}
+
+    <div class="form-group mt-4">
+      <label class="form-label">Czy interesuje Cię pielęgnacja twarzy?</label>
+      <div class="row" style="gap:8px;">
+        <button class="chip ${_data.skincareInterest ? "active" : ""}" data-skincare="yes">✨ Tak</button>
+        <button class="chip ${!_data.skincareInterest ? "active" : ""}" data-skincare="no">Nie</button>
+      </div>
+    </div>
   `;
 }
 
-// --- Krok 8: Summary -------------------------------------------------------
+// --- Krok 6: Summary -----------------------------------------------------
 function renderSummary() {
-  const modes = _data.modes.map(id => MODES.find(m => m.id === id)).filter(Boolean);
-  const goals = _data.goals.map(id => GOALS.find(g => g.id === id)).filter(Boolean);
+  const modeObjs = _data.modes.map(id => MODES.find(m => m.id === id)).filter(Boolean);
+  const cats = getCategoriesFromModes(_data.modes);
+  const tasks = getTasksFromModes(_data.modes);
   const days = _data.schedule.days.map(id => DAYS.find(d => d.id === id)?.label).filter(Boolean);
+  const budgetLabel = BUDGETS.find(b => b.id === _data.budget)?.label || "—";
 
   return `
     <div class="stack">
@@ -333,25 +313,33 @@ function renderSummary() {
         <div class="card-subtitle mb-1">Imię</div>
         <div class="text-sm font-bold">${escapeHtml(_data.displayName || "—")}</div>
       </div>
+
       <div class="card card-flat">
-        <div class="card-subtitle mb-1">Tryby (${modes.length})</div>
+        <div class="card-subtitle mb-1">Tryby (${modeObjs.length})</div>
         <div class="row" style="gap:4px;flex-wrap:wrap;">
-          ${modes.length ? modes.map(m => `<span class="badge badge-accent">${m.icon} ${m.label}</span>`).join("") : '<span class="text-sm text-tertiary">Brak</span>'}
+          ${modeObjs.length ? modeObjs.map(m => `<span class="badge badge-accent">${m.icon} ${m.name}</span>`).join("") : '<span class="text-sm text-tertiary">Brak</span>'}
         </div>
       </div>
+
       <div class="card card-flat">
-        <div class="card-subtitle mb-1">Cele (${goals.length})</div>
+        <div class="card-subtitle mb-1">Kategorie zadań (${cats.length})</div>
         <div class="row" style="gap:4px;flex-wrap:wrap;">
-          ${goals.length ? goals.map(g => `<span class="badge badge-neutral">${g.icon} ${g.label}</span>`).join("") : '<span class="text-sm text-tertiary">Brak</span>'}
+          ${cats.map(id => {
+            const meta = CATEGORY_META[id];
+            return `<span class="badge badge-neutral">${meta.icon} ${meta.name}</span>`;
+          }).join("")}
         </div>
+        <div class="text-xs text-tertiary mt-2">📊 ${tasks.length} unikalnych zadań</div>
       </div>
+
       <div class="card card-flat">
         <div class="card-subtitle mb-1">Trening</div>
-        <div class="text-sm">${days.length ? days.join(", ") : "Brak dni"}</div>
+        <div class="text-sm">${days.length ? days.join(", ") + " · " + _data.schedule.hours : "Brak dni"}</div>
       </div>
+
       <div class="card card-flat">
-        <div class="card-subtitle mb-1">Budżet suplementów</div>
-        <div class="text-sm">${BUDGETS.find(b => b.id === _data.budget)?.label || "—"}</div>
+        <div class="card-subtitle mb-1">Budżet</div>
+        <div class="text-sm">${budgetLabel}</div>
       </div>
     </div>
   `;
@@ -362,23 +350,10 @@ function renderSummary() {
 // ============================================================================
 
 function bindEvents(container) {
-  // Basics: units
   container.querySelectorAll("[data-units]").forEach(el => {
     el.addEventListener("click", () => { _data.units = el.dataset.units; renderStep(container); });
   });
 
-  // Goals
-  container.querySelectorAll("[data-goal]").forEach(el => {
-    el.addEventListener("click", () => {
-      const id = el.dataset.goal;
-      const idx = _data.goals.indexOf(id);
-      if (idx >= 0) _data.goals.splice(idx, 1);
-      else _data.goals.push(id);
-      renderStep(container);
-    });
-  });
-
-  // Modes
   container.querySelectorAll("[data-mode]").forEach(el => {
     el.addEventListener("click", () => {
       const id = el.dataset.mode;
@@ -389,7 +364,6 @@ function bindEvents(container) {
     });
   });
 
-  // Equipment
   container.querySelectorAll("[data-equip]").forEach(el => {
     el.addEventListener("click", () => {
       const id = el.dataset.equip;
@@ -400,7 +374,6 @@ function bindEvents(container) {
     });
   });
 
-  // Schedule days
   container.querySelectorAll("[data-day]").forEach(el => {
     el.addEventListener("click", () => {
       const id = parseInt(el.dataset.day);
@@ -411,19 +384,6 @@ function bindEvents(container) {
     });
   });
 
-  // Skincare
-  container.querySelectorAll("[data-skincare]").forEach(el => {
-    el.addEventListener("click", () => {
-      _data.skincareInterest = el.dataset.skincare === "yes";
-      renderStep(container);
-    });
-  });
-
-  container.querySelectorAll("[data-skintype]").forEach(el => {
-    el.addEventListener("click", () => { _data.skinType = el.dataset.skintype; renderStep(container); });
-  });
-
-  // Supplements
   container.querySelectorAll("[data-supp]").forEach(el => {
     el.addEventListener("click", () => { _data.supplementsInterest = el.dataset.supp; renderStep(container); });
   });
@@ -432,7 +392,10 @@ function bindEvents(container) {
     el.addEventListener("click", () => { _data.budget = el.dataset.budget; renderStep(container); });
   });
 
-  // Navigation
+  container.querySelectorAll("[data-skincare]").forEach(el => {
+    el.addEventListener("click", () => { _data.skincareInterest = el.dataset.skincare === "yes"; renderStep(container); });
+  });
+
   $("btn-onb-back")?.addEventListener("click", () => {
     if (_step > 0) { saveStep(); _step--; renderStep(container); }
   });
@@ -449,9 +412,10 @@ function bindEvents(container) {
 }
 
 function saveStep() {
-  // Basics
   const nameEl = $("onb-name");
   if (nameEl) _data.displayName = nameEl.value.trim();
+  const ageEl = $("onb-age");
+  if (ageEl) _data.age = ageEl.value ? parseInt(ageEl.value) : null;
   const hoursEl = $("onb-hours");
   if (hoursEl) _data.schedule.hours = hoursEl.value;
   const push = $("onb-pushups"); const pull = $("onb-pullups"); const plank = $("onb-plank"); const squat = $("onb-squats");
@@ -462,13 +426,14 @@ function saveStep() {
 }
 
 function validateAndSaveStep() {
-  const currentStep = STEPS[_step];
+  const step = STEPS[_step];
 
-  if (currentStep.id === "basics") {
+  if (step.id === "basics") {
     const name = $("onb-name")?.value.trim();
     if (!name) { showToast("Podaj swoje imię", "error"); return false; }
   }
-  if (currentStep.id === "modes") {
+
+  if (step.id === "goal") {
     if (_data.modes.length === 0) { showToast("Wybierz co najmniej jeden tryb", "error"); return false; }
   }
 
