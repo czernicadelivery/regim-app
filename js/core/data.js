@@ -1,7 +1,6 @@
 // ============================================================================
 // LOCK IN 2027 — js/core/data.js
 // Warstwa danych: Firestore + fallback localStorage.
-// Zawiera: dni, migracja, profile, pomiary, rekordy, pytania, suplementy, social.
 // ============================================================================
 
 import { dateKey } from "./utils.js";
@@ -344,7 +343,7 @@ export async function logSupplement(supplementId, taken) {
 }
 
 // ============================================================================
-// 7. SOCIAL — Zaproszenia, Znajomi
+// 7. SOCIAL
 // ============================================================================
 
 export function generateInviteToken() {
@@ -473,4 +472,30 @@ export async function deleteFriend(friendshipId) {
   if (!isCloud()) return;
   const { fsMod, db } = getFs();
   await fsMod.deleteDoc(fsMod.doc(db, "friendships", friendshipId));
+}
+
+// ============================================================================
+// 8. GAMIFIKACJA (XP)
+// ============================================================================
+
+export async function saveGamification(data) {
+  if (!isCloud()) return;
+  const { fsMod, db } = getFs();
+  const uid = getCurrentUser().uid;
+  await fsMod.setDoc(fsMod.doc(db, "users", uid, "gamification", "main"), {
+    ...data,
+    updatedAt: fsMod.serverTimestamp()
+  }, { merge: true });
+}
+
+export async function loadGamification() {
+  if (!isCloud()) return null;
+  const { fsMod, db } = getFs();
+  const uid = getCurrentUser().uid;
+  try {
+    const snap = await fsMod.getDoc(fsMod.doc(db, "users", uid, "gamification", "main"));
+    return snap.exists() ? snap.data() : null;
+  } catch (e) {
+    return null;
+  }
 }
