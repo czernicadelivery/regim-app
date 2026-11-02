@@ -1,7 +1,8 @@
 // ============================================================================
 // LOCK IN 2027 — js/core/data.js
 // Warstwa danych: Firestore + fallback localStorage.
-// Zawiera: dni, profil, pomiary, rekordy, pytania, suplementy, social, XP, widgety, taski.
+// Zawiera: dni, profil, pomiary, rekordy, pytania, suplementy, social, XP,
+//          widgety, taski (custom z priorytetami), rutyny (B2).
 // ============================================================================
 
 import { dateKey } from "./utils.js";
@@ -139,7 +140,7 @@ export async function migrateLocalToCloud() {
 }
 
 // ============================================================================
-// CUSTOM TASKS (rozszerzone o priority, frequency, archived)
+// 2. CUSTOM TASKS (z priorytetami, częstotliwością, archiwizacją)
 // ============================================================================
 
 export function loadCustomTasks() {
@@ -185,7 +186,92 @@ export async function restoreCustomTask(id) {
 }
 
 // ============================================================================
-// MEAL PLAN
+// 3. ROUTINES (B2)
+// ============================================================================
+
+const DEFAULT_ROUTINE_STEPS = {
+  morning: [
+    { id: "m1", label: "Woda 250ml", icon: "💧" },
+    { id: "m2", label: "Skincare AM", icon: "✨" },
+    { id: "m3", label: "Śniadanie", icon: "🍳" },
+    { id: "m4", label: "Rozciąganie 5 min", icon: "🧘" }
+  ],
+  evening: [
+    { id: "e1", label: "Skincare PM", icon: "✨" },
+    { id: "e2", label: "Bez ekranów 1h", icon: "📵" },
+    { id: "e3", label: "Czytanie 15 min", icon: "📖" },
+    { id: "e4", label: "Sen 8h", icon: "😴" }
+  ],
+  workout: [
+    { id: "w1", label: "Rozgrzewka 5 min", icon: "🔥" },
+    { id: "w2", label: "Trening główny", icon: "🏋️" },
+    { id: "w3", label: "Stretching 10 min", icon: "🧘" }
+  ],
+  study: [
+    { id: "s1", label: "Pomodoro 25 min", icon: "🧠" },
+    { id: "s2", label: "Przerwa 5 min", icon: "☕" },
+    { id: "s3", label: "Pomodoro 25 min", icon: "🧠" },
+    { id: "s4", label: "Notatka z sesji", icon: "📝" }
+  ]
+};
+
+export function loadRoutines() {
+  try {
+    const raw = localStorage.getItem(localKey("routines"));
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed)) return parsed;
+    }
+  } catch (e) {}
+  // Default: 4 domyślne rutyny
+  return [
+    { id: "rt-morning", name: "Rutyna poranna", icon: "🌅", steps: DEFAULT_ROUTINE_STEPS.morning, archived: false, createdAt: Date.now() },
+    { id: "rt-evening", name: "Rutyna wieczorna", icon: "🌙", steps: DEFAULT_ROUTINE_STEPS.evening, archived: false, createdAt: Date.now() },
+    { id: "rt-workout", name: "Trening", icon: "🏋️", steps: DEFAULT_ROUTINE_STEPS.workout, archived: false, createdAt: Date.now() },
+    { id: "rt-study", name: "Sesja nauki", icon: "📚", steps: DEFAULT_ROUTINE_STEPS.study, archived: false, createdAt: Date.now() }
+  ];
+}
+
+export async function saveRoutines(routines) {
+  localStorage.setItem(localKey("routines"), JSON.stringify(routines));
+  if (isCloud()) {
+    try {
+      const { fsMod, db } = getFs();
+      const uid = getCurrentUser().uid;
+      await fsMod.setDoc(fsMod.doc(db, "users", uid, "meta", "routines"), {
+        routines, updatedAt: Date.now()
+      }, { merge: true });
+    } catch (e) {}
+  }
+}
+
+export async function saveRoutine(routine) {
+  const all = loadRoutines();
+  const idx = all.findIndex(r => r.id === routine.id);
+  if (idx >= 0) all[idx] = routine;
+  else all.push(routine);
+  await saveRoutines(all);
+  return routine;
+}
+
+export async function deleteRoutine(id) {
+  const all = loadRoutines().filter(r => r.id !== id);
+  await saveRoutines(all);
+}
+
+export function loadRoutineHistory(dateStr) {
+  try {
+    const raw = localStorage.getItem(localKey("routine-history-" + dateStr));
+    return raw ? JSON.parse(raw) : {};
+  } catch (e) { return {}; }
+}
+
+export function saveRoutineHistory(dateStr, data) {
+  localStorage.setItem(localKey("routine-history-" + dateStr), JSON.stringify(data));
+}
+
+// ============================================================================
+// 4. MEAL PLAN
 // ============================================================================
 export function loadMealPlan(todayK) {
   try {
@@ -200,7 +286,7 @@ export function saveMealPlan(todayK, plan) {
 }
 
 // ============================================================================
-// ANALYSIS HISTORY
+// 5. ANALYSIS HISTORY
 // ============================================================================
 export function saveAnalysisToHistory(html) {
   try {
@@ -220,7 +306,7 @@ export function loadAnalysisHistory() {
 }
 
 // ============================================================================
-// PROFIL
+// 6. PROFIL
 // ============================================================================
 export async function saveProfile(profileData) {
   if (!isCloud()) return;
@@ -254,7 +340,7 @@ export async function loadPublicProfile(userId) {
 }
 
 // ============================================================================
-// POMIARY
+// 7. POMIARY
 // ============================================================================
 export async function addMeasurement(data) {
   if (!isCloud()) return;
@@ -280,7 +366,7 @@ export async function deleteMeasurement(id) {
 }
 
 // ============================================================================
-// REKORDY
+// 8. REKORDY
 // ============================================================================
 export async function addFitnessRecord(data) {
   if (!isCloud()) return;
@@ -290,7 +376,7 @@ export async function addFitnessRecord(data) {
 }
 
 // ============================================================================
-// PYTANIA
+// 9. PYTANIA
 // ============================================================================
 export async function saveCustomQuestion(questionId, data) {
   if (!isCloud()) return;
@@ -313,7 +399,7 @@ export async function loadCustomQuestions() {
 }
 
 // ============================================================================
-// SUPLEMENTY
+// 10. SUPLEMENTY
 // ============================================================================
 export async function saveSupplement(id, data) {
   if (!isCloud()) return;
@@ -367,7 +453,7 @@ export async function logSupplement(supplementId, taken) {
 }
 
 // ============================================================================
-// SOCIAL
+// 11. SOCIAL
 // ============================================================================
 export function generateInviteToken() {
   const bytes = new Uint8Array(16);
@@ -479,7 +565,7 @@ export async function deleteFriend(friendshipId) {
 }
 
 // ============================================================================
-// GAMIFIKACJA
+// 12. GAMIFIKACJA
 // ============================================================================
 export async function saveGamification(data) {
   if (!isCloud()) return;
@@ -501,7 +587,7 @@ export async function loadGamification() {
 }
 
 // ============================================================================
-// WIDGETY
+// 13. WIDGETY
 // ============================================================================
 const DEFAULT_WIDGETS = ["countdown", "xp", "dailyscore", "quickstats", "tasks", "training", "quote", "measurement", "social", "shortcuts"];
 
