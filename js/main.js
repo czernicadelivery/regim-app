@@ -3,7 +3,7 @@
 // Entry point: init Firebase → auth listener → reset state → router → nav.
 // Wbudowane poprawki A+B+C+D z Etapu 1d:
 //   A) resetAppState na starcie handleUserChange
-//   B) formularze zawsze czyszczone (w modułach health/settings przez setVal)
+//   B) formularze zawsze czyszczone (w modułach health/settings)
 //   C) try/catch + booted flag + safety net 3s
 //   D) jeden listener (onAuthStateChanged), jeden router, jeden nav
 // ============================================================================
