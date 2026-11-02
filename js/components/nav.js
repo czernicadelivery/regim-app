@@ -1,6 +1,6 @@
 // ============================================================================
 // LOCK IN 2027 — js/components/nav.js
-// Sidebar (desktop) + Bottom nav (mobile). Podetap 1D: dodano Social.
+// Podetap 2: dodano Osiągnięcia.
 // ============================================================================
 
 export const SECTIONS = [
@@ -13,9 +13,10 @@ export const SECTIONS = [
 ];
 
 export const EXTRA_SECTIONS = [
-  { id: "nutrition",   icon: "fa-utensils",           label: "Nutrition" },
-  { id: "supplements", icon: "fa-capsules",           label: "Suplementy" },
-  { id: "social",      icon: "fa-users",              label: "Social" }
+  { id: "nutrition",    icon: "fa-utensils",           label: "Nutrition" },
+  { id: "supplements",  icon: "fa-capsules",           label: "Suplementy" },
+  { id: "achievements", icon: "fa-trophy",             label: "Osiągnięcia" },
+  { id: "social",       icon: "fa-users",              label: "Social" }
 ];
 
 let _currentRoute = "overview";
