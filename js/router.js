@@ -1,7 +1,12 @@
+// ============================================================================
+// LOCK IN 2027 — js/router.js
+// Hash routing. Lazy import modułów przy pierwszym wejściu na sekcję.
+// ============================================================================
+
 import { state } from "./state.js";
 import { setActiveNav } from "./components/nav.js";
 
-export const ROUTES = ["overview", "health", "training", "tasks", "progress", "coach", "nutrition", "supplements", "settings"];
+export const ROUTES = ["overview", "health", "training", "tasks", "progress", "coach", "nutrition", "supplements", "settings", "onboarding"];
 
 const MODULE_MAP = {
   overview: () => import("./modules/overview.js"),
@@ -12,7 +17,8 @@ const MODULE_MAP = {
   coach: () => import("./modules/coach.js"),
   nutrition: () => import("./modules/nutrition.js"),
   supplements: () => import("./modules/supplements.js"),
-  settings: () => import("./modules/settings.js")
+  settings: () => import("./modules/settings.js"),
+  onboarding: () => import("./modules/onboarding.js")
 };
 
 let _initialized = false;
