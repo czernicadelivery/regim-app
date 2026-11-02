@@ -59,83 +59,80 @@
   <main class="app-main" id="app-main">
 
     <section class="view active" id="view-overview" data-view="overview">
-      <div class="view-header">
-        <h1 class="view-title">Overview</h1>
-        <p class="view-subtitle">Twój dzień w skrócie</p>
-      </div>
+      <div class="view-header"><h1 class="view-title">Overview</h1><p class="view-subtitle">Twój dzień w skrócie</p></div>
       <div id="overview-content"></div>
     </section>
 
     <section class="view" id="view-health" data-view="health">
-      <div class="view-header">
-        <h1 class="view-title">Health</h1>
-        <p class="view-subtitle">Sen, tętno, aktywność, regeneracja</p>
-      </div>
+      <div class="view-header"><h1 class="view-title">Health</h1><p class="view-subtitle">Sen, tętno, aktywność</p></div>
       <div id="health-content"></div>
     </section>
 
     <section class="view" id="view-training" data-view="training">
-      <div class="view-header">
-        <h1 class="view-title">Training</h1>
-        <p class="view-subtitle">Biblioteka, trening, plan tygodnia</p>
-      </div>
+      <div class="view-header"><h1 class="view-title">Training</h1><p class="view-subtitle">Biblioteka, trening, plan</p></div>
       <div id="training-content"></div>
     </section>
 
     <section class="view" id="view-tasks" data-view="tasks">
-      <div class="view-header">
-        <h1 class="view-title">Tasks</h1>
-        <p class="view-subtitle">Codzienne zadania i dyscyplina</p>
-      </div>
+      <div class="view-header"><h1 class="view-title">Tasks</h1><p class="view-subtitle">Codzienne zadania</p></div>
       <div id="tasks-content"></div>
     </section>
 
     <section class="view" id="view-progress" data-view="progress">
-      <div class="view-header">
-        <h1 class="view-title">Progress</h1>
-        <p class="view-subtitle">Historia, rekordy, trendy</p>
-      </div>
+      <div class="view-header"><h1 class="view-title">Progress</h1><p class="view-subtitle">Historia, rekordy</p></div>
       <div id="progress-content"></div>
     </section>
 
     <section class="view" id="view-coach" data-view="coach">
-      <div class="view-header">
-        <h1 class="view-title">AI Coach</h1>
-        <p class="view-subtitle">Analiza, wskazówki, wiedza</p>
-      </div>
+      <div class="view-header"><h1 class="view-title">AI Coach</h1><p class="view-subtitle">Analiza, wiedza</p></div>
       <div id="coach-content"></div>
     </section>
 
     <section class="view" id="view-nutrition" data-view="nutrition">
-      <div class="view-header">
-        <h1 class="view-title">Nutrition</h1>
-        <p class="view-subtitle">Posiłki, kalorie, szejki</p>
-      </div>
+      <div class="view-header"><h1 class="view-title">Nutrition</h1><p class="view-subtitle">Posiłki, kalorie</p></div>
       <div id="nutrition-content"></div>
     </section>
 
     <section class="view" id="view-supplements" data-view="supplements">
-      <div class="view-header">
-        <h1 class="view-title">Suplementy</h1>
-        <p class="view-subtitle">D3, kreatyna, historia</p>
-      </div>
+      <div class="view-header"><h1 class="view-title">Suplementy</h1><p class="view-subtitle">D3, kreatyna</p></div>
       <div id="supplements-content"></div>
     </section>
 
     <section class="view" id="view-settings" data-view="settings">
-      <div class="view-header">
-        <h1 class="view-title">Ustawienia</h1>
-        <p class="view-subtitle">Profil, tryby, sylwetka</p>
-      </div>
+      <div class="view-header"><h1 class="view-title">Ustawienia</h1><p class="view-subtitle">Profil i personalizacja</p></div>
       <div id="settings-content"></div>
     </section>
 
     <section class="view" id="view-onboarding" data-view="onboarding">
-      <div class="view-header">
-        <h1 class="view-title">Konfiguracja</h1>
-        <p class="view-subtitle">Skonfigurujmy Twoje LOCK IN 2027</p>
-      </div>
+      <div class="view-header"><h1 class="view-title">Konfiguracja</h1><p class="view-subtitle">Skonfigurujmy Twoje LOCK IN 2027</p></div>
       <div id="onboarding-content"></div>
+    </section>
+
+    <section class="view" id="view-measurements" data-view="measurements">
+      <div class="view-header">
+        <button class="btn btn-ghost btn-sm mb-2" onclick="location.hash='#settings'"><i class="fa-solid fa-arrow-left"></i> Ustawienia</button>
+        <h1 class="view-title">Pomiary ciała</h1>
+        <p class="view-subtitle">Waga, obwody, historia</p>
+      </div>
+      <div id="measurements-content"></div>
+    </section>
+
+    <section class="view" id="view-fitness" data-view="fitness">
+      <div class="view-header">
+        <button class="btn btn-ghost btn-sm mb-2" onclick="location.hash='#settings'"><i class="fa-solid fa-arrow-left"></i> Ustawienia</button>
+        <h1 class="view-title">Rekordy sportowe</h1>
+        <p class="view-subtitle">Twoje maksymalne wyniki</p>
+      </div>
+      <div id="fitness-content"></div>
+    </section>
+
+    <section class="view" id="view-custom-questions" data-view="custom-questions">
+      <div class="view-header">
+        <button class="btn btn-ghost btn-sm mb-2" onclick="location.hash='#settings'"><i class="fa-solid fa-arrow-left"></i> Ustawienia</button>
+        <h1 class="view-title">Własne pytania</h1>
+        <p class="view-subtitle">Skonfiguruj swój profil</p>
+      </div>
+      <div id="custom-questions-content"></div>
     </section>
 
   </main>
