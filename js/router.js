@@ -1,6 +1,6 @@
 // ============================================================================
 // LOCK IN 2027 — js/router.js
-// Hash routing. Dodano looksmaxxing.
+// Hash routing. Dodano medications.
 // ============================================================================
 
 import { state } from "./state.js";
@@ -10,7 +10,7 @@ export const ROUTES = [
   "overview", "health", "training", "tasks", "progress", "coach",
   "nutrition", "supplements", "settings", "onboarding",
   "measurements", "fitness", "custom-questions", "social", "achievements",
-  "routines", "skincare", "looksmaxxing"
+  "routines", "skincare", "looksmaxxing", "medications"
 ];
 
 const MODULE_MAP = {
@@ -31,7 +31,8 @@ const MODULE_MAP = {
   achievements: () => import("./modules/achievements.js"),
   routines: () => import("./modules/routines.js"),
   skincare: () => import("./modules/skincare.js"),
-  looksmaxxing: () => import("./modules/looksmaxxing.js")
+  looksmaxxing: () => import("./modules/looksmaxxing.js"),
+  medications: () => import("./modules/medications.js")
 };
 
 let _initialized = false;
