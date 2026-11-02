@@ -1,13 +1,16 @@
 // ============================================================================
 // LOCK IN 2027 — js/core/data.js
-// Warstwa danych: Firestore + fallback localStorage. Podetap 2: widgety.
+// Warstwa danych: Firestore + fallback localStorage.
+// Zawiera: dni, profil, pomiary, rekordy, pytania, suplementy, social, XP, widgety, taski.
 // ============================================================================
 
 import { dateKey } from "./utils.js";
 import { localKey } from "./storage.js";
 import { getCurrentUser, isCloud, getFs, setSyncInProgress } from "../firebase.js";
 
-// --- 1. DNI / ZADANIA -------------------------------------------------------
+// ============================================================================
+// 1. DNI / ZADANIA
+// ============================================================================
 export async function saveDayDoc(d) {
   localStorage.setItem(localKey(d.date), JSON.stringify(d));
   if (!isCloud()) return;
@@ -135,6 +138,10 @@ export async function migrateLocalToCloud() {
   } catch (e) { console.error("migrateLocalToCloud error:", e); }
 }
 
+// ============================================================================
+// CUSTOM TASKS (rozszerzone o priority, frequency, archived)
+// ============================================================================
+
 export function loadCustomTasks() {
   try {
     const raw = localStorage.getItem(localKey("custom-tasks"));
@@ -148,11 +155,38 @@ export async function saveCustomTasks(tasks) {
     try {
       const { fsMod, db } = getFs();
       const uid = getCurrentUser().uid;
-      await fsMod.setDoc(fsMod.doc(db, "users", uid, "meta", "customTasks"), { tasks, updatedAt: Date.now() }, { merge: true });
+      await fsMod.setDoc(fsMod.doc(db, "users", uid, "meta", "customTasks"), {
+        tasks, updatedAt: Date.now()
+      }, { merge: true });
     } catch (e) {}
   }
 }
 
+export async function updateCustomTask(id, updates) {
+  const tasks = loadCustomTasks();
+  const idx = tasks.findIndex(t => t.id === id);
+  if (idx === -1) return false;
+  tasks[idx] = { ...tasks[idx], ...updates };
+  await saveCustomTasks(tasks);
+  return true;
+}
+
+export async function deleteCustomTask(id) {
+  const tasks = loadCustomTasks().filter(t => t.id !== id);
+  await saveCustomTasks(tasks);
+}
+
+export async function archiveCustomTask(id) {
+  return updateCustomTask(id, { archived: true });
+}
+
+export async function restoreCustomTask(id) {
+  return updateCustomTask(id, { archived: false });
+}
+
+// ============================================================================
+// MEAL PLAN
+// ============================================================================
 export function loadMealPlan(todayK) {
   try {
     const raw = localStorage.getItem(localKey("mealplan-" + todayK));
@@ -165,6 +199,9 @@ export function saveMealPlan(todayK, plan) {
   localStorage.setItem(localKey("mealplan-" + todayK), JSON.stringify(plan));
 }
 
+// ============================================================================
+// ANALYSIS HISTORY
+// ============================================================================
 export function saveAnalysisToHistory(html) {
   try {
     const today = dateKey(new Date());
@@ -182,7 +219,9 @@ export function loadAnalysisHistory() {
   } catch (e) { return []; }
 }
 
-// --- 2. PROFIL -------------------------------------------------------------
+// ============================================================================
+// PROFIL
+// ============================================================================
 export async function saveProfile(profileData) {
   if (!isCloud()) return;
   const { fsMod, db } = getFs();
@@ -214,7 +253,9 @@ export async function loadPublicProfile(userId) {
   } catch (e) { return null; }
 }
 
-// --- 3. POMIARY ------------------------------------------------------------
+// ============================================================================
+// POMIARY
+// ============================================================================
 export async function addMeasurement(data) {
   if (!isCloud()) return;
   const { fsMod, db } = getFs();
@@ -238,7 +279,9 @@ export async function deleteMeasurement(id) {
   await fsMod.deleteDoc(fsMod.doc(db, "users", uid, "measurements", id));
 }
 
-// --- 4. REKORDY ------------------------------------------------------------
+// ============================================================================
+// REKORDY
+// ============================================================================
 export async function addFitnessRecord(data) {
   if (!isCloud()) return;
   const { fsMod, db } = getFs();
@@ -246,7 +289,9 @@ export async function addFitnessRecord(data) {
   await fsMod.addDoc(fsMod.collection(db, "users", uid, "fitnessRecords"), { ...data, date: data.date || fsMod.serverTimestamp() });
 }
 
-// --- 5. PYTANIA ------------------------------------------------------------
+// ============================================================================
+// PYTANIA
+// ============================================================================
 export async function saveCustomQuestion(questionId, data) {
   if (!isCloud()) return;
   const { fsMod, db } = getFs();
@@ -267,7 +312,9 @@ export async function loadCustomQuestions() {
   return snap.docs.map(d => ({ id: d.id, ...d.data() }));
 }
 
-// --- 6. SUPLEMENTY ---------------------------------------------------------
+// ============================================================================
+// SUPLEMENTY
+// ============================================================================
 export async function saveSupplement(id, data) {
   if (!isCloud()) return;
   const { fsMod, db } = getFs();
@@ -319,7 +366,9 @@ export async function logSupplement(supplementId, taken) {
   }, { merge: true });
 }
 
-// --- 7. SOCIAL -------------------------------------------------------------
+// ============================================================================
+// SOCIAL
+// ============================================================================
 export function generateInviteToken() {
   const bytes = new Uint8Array(16);
   crypto.getRandomValues(bytes);
@@ -359,8 +408,7 @@ export async function redeemInvite(token) {
   if (inv.createdBy === uid) throw new Error("Nie możesz dodać samego siebie");
   const profile = await loadProfile();
   await fsMod.addDoc(fsMod.collection(db, "friend_requests"), {
-    fromUid: uid,
-    toUid: inv.createdBy,
+    fromUid: uid, toUid: inv.createdBy,
     fromName: profile?.displayName || "Użytkownik",
     status: "pending",
     createdAt: fsMod.serverTimestamp(),
@@ -373,11 +421,7 @@ export async function loadIncomingRequests() {
   if (!isCloud()) return [];
   const { fsMod, db } = getFs();
   const uid = getCurrentUser().uid;
-  const q = fsMod.query(
-    fsMod.collection(db, "friend_requests"),
-    fsMod.where("toUid", "==", uid),
-    fsMod.where("status", "==", "pending")
-  );
+  const q = fsMod.query(fsMod.collection(db, "friend_requests"), fsMod.where("toUid", "==", uid), fsMod.where("status", "==", "pending"));
   const snap = await fsMod.getDocs(q);
   return snap.docs.map(d => ({ id: d.id, ...d.data() }));
 }
@@ -386,11 +430,7 @@ export async function loadOutgoingRequests() {
   if (!isCloud()) return [];
   const { fsMod, db } = getFs();
   const uid = getCurrentUser().uid;
-  const q = fsMod.query(
-    fsMod.collection(db, "friend_requests"),
-    fsMod.where("fromUid", "==", uid),
-    fsMod.where("status", "==", "pending")
-  );
+  const q = fsMod.query(fsMod.collection(db, "friend_requests"), fsMod.where("fromUid", "==", uid), fsMod.where("status", "==", "pending"));
   const snap = await fsMod.getDocs(q);
   return snap.docs.map(d => ({ id: d.id, ...d.data() }));
 }
@@ -411,10 +451,7 @@ export async function acceptFriendRequest(requestId) {
   names[req.fromUid] = req.fromName || "Znajomy";
   names[req.toUid] = profile?.displayName || "Ja";
   await fsMod.setDoc(fsMod.doc(db, "friendships", fid), {
-    users: [req.fromUid, req.toUid],
-    names,
-    requestId,
-    createdAt: fsMod.serverTimestamp()
+    users: [req.fromUid, req.toUid], names, requestId, createdAt: fsMod.serverTimestamp()
   });
 }
 
@@ -422,8 +459,7 @@ export async function rejectFriendRequest(requestId) {
   if (!isCloud()) return;
   const { fsMod, db } = getFs();
   await fsMod.updateDoc(fsMod.doc(db, "friend_requests", requestId), {
-    status: "rejected",
-    respondedAt: fsMod.serverTimestamp()
+    status: "rejected", respondedAt: fsMod.serverTimestamp()
   });
 }
 
@@ -442,7 +478,9 @@ export async function deleteFriend(friendshipId) {
   await fsMod.deleteDoc(fsMod.doc(db, "friendships", friendshipId));
 }
 
-// --- 8. GAMIFIKACJA --------------------------------------------------------
+// ============================================================================
+// GAMIFIKACJA
+// ============================================================================
 export async function saveGamification(data) {
   if (!isCloud()) return;
   const { fsMod, db } = getFs();
@@ -462,9 +500,9 @@ export async function loadGamification() {
   } catch (e) { return null; }
 }
 
-// --- 9. WIDGETY (Dashboard 2.0) -------------------------------------------
-// Konfiguracja widgetów w localStorage per-user (lekkie, natychmiastowe).
-
+// ============================================================================
+// WIDGETY
+// ============================================================================
 const DEFAULT_WIDGETS = ["countdown", "xp", "dailyscore", "quickstats", "tasks", "training", "quote", "measurement", "social", "shortcuts"];
 
 export function loadWidgetsConfig() {
@@ -472,7 +510,6 @@ export function loadWidgetsConfig() {
     const raw = localStorage.getItem(localKey("widgets"));
     if (raw) {
       const parsed = JSON.parse(raw);
-      // Walidacja: tablica stringów
       if (Array.isArray(parsed) && parsed.every(x => typeof x === "string")) return parsed;
     }
   } catch (e) {}
@@ -480,13 +517,9 @@ export function loadWidgetsConfig() {
 }
 
 export function saveWidgetsConfig(ids) {
-  try {
-    localStorage.setItem(localKey("widgets"), JSON.stringify(ids));
-  } catch (e) {}
+  try { localStorage.setItem(localKey("widgets"), JSON.stringify(ids)); } catch (e) {}
 }
 
 export function resetWidgetsConfig() {
-  try {
-    localStorage.removeItem(localKey("widgets"));
-  } catch (e) {}
+  try { localStorage.removeItem(localKey("widgets")); } catch (e) {}
 }
